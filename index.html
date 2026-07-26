@@ -7369,14 +7369,17 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         <!-- [나이테 섹션] -->
         <div class="tree-ring-section">
             <div class="ring-header">
-                <div class="ring-title-group">
-                    <span class="ring-label">ACTIVITY HISTORY</span>
-                    <!-- ✏️ [수정] ⓘ 버튼 추가 -->
-                    <h3 class="ring-main-title">
-                        활동 나이테 
-                        <button class="info-help-btn" onclick="openMountainInfoModal('ring')" title="활동 나이테 안내">ⓘ</button>
-                    </h3>
-                </div>
+                <!-- [나이테 섹션] 타이틀 그룹 부분 -->
+<div class="ring-title-group">
+    <span class="ring-label">ACTIVITY HISTORY</span>
+    
+    <!-- 💡 아래 h3 태그와 버튼에 position과 z-index를 추가하여 나이테 애니메이션 위로 버튼을 완전히 빼냅니다. -->
+    <h3 class="ring-main-title" style="position: relative; z-index: 100;">
+        활동 나이테 
+        <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
+    </h3>
+</div>
+
                 <div class="ring-stats" style="text-align: right;">
                     <span id="activityMonths" class="ring-months-val">0</span>
                     <span class="ring-unit">Months</span>
