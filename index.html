@@ -4967,39 +4967,39 @@ function renderGrowthChart(data) {
     });
 }
 
-// 🌱 1. 분기 운동 잔디 안내 모달 (단독 완성형)
+                    // 🌱 1. 분기 운동 잔디 안내 모달 (최상단 노출 보장)
 window.openGrassInfoModal = function(event) {
     if (event) {
         if (typeof event.preventDefault === 'function') event.preventDefault();
         if (typeof event.stopPropagation === 'function') event.stopPropagation();
     }
 
-    let modal = document.getElementById('mwInfoHelpModal');
+    let modal = document.getElementById('mwInfoHelpModal_grass');
     if (!modal) {
         modal = document.createElement('div');
-        modal.id = 'mwInfoHelpModal';
-        modal.className = 'mw-info-modal';
+        modal.id = 'mwInfoHelpModal_grass';
+        modal.className = 'mw-info-modal active'; // 생성 즉시 active 부여
+        modal.style.cssText = 'display:flex !important; z-index:99999 !important; position:fixed; top:0; left:0; width:100vw; height:100vh;';
         
-        // 배경 클릭 시 스르륵 닫히기
+        // 배경 클릭 시 닫기
         modal.onclick = function() {
-            modal.classList.remove('active');
-            setTimeout(() => { modal.style.display = 'none'; }, 300);
+            modal.style.display = 'none';
         };
 
         modal.innerHTML = `
             <div class="mw-info-card" onclick="event.stopPropagation()">
                 <div class="mw-info-header">
-                    <span id="mwInfoModalTitle" class="mw-info-title"></span>
-                    <button type="button" class="mw-info-close-btn" onclick="this.closest('.mw-info-modal').classList.remove('active'); setTimeout(() => { this.closest('.mw-info-modal').style.display = 'none'; }, 300);">&times;</button>
+                    <span id="mwInfoModalTitle_grass" class="mw-info-title"></span>
+                    <button type="button" class="mw-info-close-btn" onclick="document.getElementById('mwInfoHelpModal_grass').style.display='none'">&times;</button>
                 </div>
-                <div id="mwInfoModalBody" class="mw-info-body"></div>
+                <div id="mwInfoModalBody_grass" class="mw-info-body"></div>
             </div>
         `;
         document.body.appendChild(modal);
     }
 
-    const titleEl = document.getElementById('mwInfoModalTitle');
-    const bodyEl = document.getElementById('mwInfoModalBody');
+    const titleEl = document.getElementById('mwInfoModalTitle_grass');
+    const bodyEl = document.getElementById('mwInfoModalBody_grass');
 
     if (titleEl) titleEl.innerHTML = `🌱 분기 운동 잔디 안내`;
     if (bodyEl) {
@@ -5025,25 +5025,24 @@ window.openGrassInfoModal = function(event) {
         `;
     }
 
-    modal.style.display = 'flex';
-    requestAnimationFrame(() => { modal.classList.add('active'); });
+    modal.style.setProperty('display', 'flex', 'important');
 };
 
-// 📊 2. 분기 성장 추이 안내 모달 (단독 완성형)
+// 📊 2. 분기 성장 추이 안내 모달 (최상단 노출 보장)
 window.openGrowthInfoModal = function(event) {
     if (event) {
         if (typeof event.preventDefault === 'function') event.preventDefault();
         if (typeof event.stopPropagation === 'function') event.stopPropagation();
     }
 
-    let modal = document.getElementById('mwInfoHelpModal');
+    let modal = document.getElementById('mwInfoHelpModal_grass');
     if (!modal) {
         window.openGrassInfoModal(event);
-        modal = document.getElementById('mwInfoHelpModal');
+        modal = document.getElementById('mwInfoHelpModal_grass');
     }
 
-    const titleEl = document.getElementById('mwInfoModalTitle');
-    const bodyEl = document.getElementById('mwInfoModalBody');
+    const titleEl = document.getElementById('mwInfoModalTitle_grass');
+    const bodyEl = document.getElementById('mwInfoModalBody_grass');
 
     if (titleEl) titleEl.innerHTML = `📊 분기 성장 추이 안내`;
     if (bodyEl) {
@@ -5065,8 +5064,7 @@ window.openGrowthInfoModal = function(event) {
         `;
     }
 
-    modal.style.display = 'flex';
-    requestAnimationFrame(() => { modal.classList.add('active'); });
+    modal.style.setProperty('display', 'flex', 'important');
 };
 
 
