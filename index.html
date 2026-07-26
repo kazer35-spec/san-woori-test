@@ -5058,21 +5058,6 @@ window.openGrowthInfoModal = function(event) {
     });
 };
 
-// 모달 닫기 전용 함수
-window.closeMwInfoModal = function(event) {
-    if (event) {
-        if (typeof event.stopPropagation === 'function') event.stopPropagation();
-        if (typeof event.preventDefault === 'function') event.preventDefault();
-    }
-    const modal = document.getElementById('mwInfoHelpModal');
-    if (modal) {
-        modal.classList.remove('active');
-        setTimeout(() => {
-            modal.style.setProperty('display', 'none', 'important');
-        }, 300); // CSS fade-out transition 시간 고려
-    }
-};
-
 
 
     window.toggleMapView = () => {
