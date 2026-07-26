@@ -4967,17 +4967,13 @@ function renderGrowthChart(data) {
     });
 }
 
-                    
-// 🌿 공통 통합 모달 생성/열기 (단 하나의 ID로 순서 꼬임 방지)
+      // 🌿 공통 통합 모달 (고유 ID 충돌 원천 차단 및 안정성 강화)
 function showUnifiedInfoModal(titleHtml, bodyHtml, event) {
     if (event) {
         if (typeof event.stopPropagation === 'function') event.stopPropagation();
         if (typeof event.preventDefault === 'function') event.preventDefault();
-    } else if (window.event) {
-        window.event.cancelBubble = true;
     }
 
-    // 1. 단 하나의 모달 ID 사용
     let modal = document.getElementById('mwInfoHelpModal');
     
     if (!modal) {
@@ -5006,7 +5002,7 @@ function showUnifiedInfoModal(titleHtml, bodyHtml, event) {
     if (titleEl) titleEl.innerHTML = titleHtml;
     if (bodyEl) bodyEl.innerHTML = bodyHtml;
 
-    // 2. 강제 최상단 노출 및 활성화
+    // 강제 최상단 노출
     modal.style.setProperty('display', 'flex', 'important');
     modal.style.setProperty('z-index', '999999', 'important');
     
@@ -5015,55 +5011,55 @@ function showUnifiedInfoModal(titleHtml, bodyHtml, event) {
     });
 }
 
-// 🌱 1. 분기 운동 잔디 안내 모달 (산맥 모달과 100% 동일한 ul/li 들여쓰기 구조)
+// 🌱 1. 분기 운동 잔디 안내 모달 (좌측 여백 확보 및 순수 div 구조)
 window.openGrassInfoModal = function(event) {
-    const title = `<span>🌱</span> <span>분기 운동 잔디 안내</span>`;
+    const title = `🌱 분기 운동 잔디 안내`;
     const body = `
-        <ul>
-            <li>
-                <strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <strong style="color:#f97316;">🔥 HOT</strong> 배지를 획득하며, 30% 확률로 잔디에 계절별 꽃이 생성됩니다.
-                <div style="font-size:11px; color:#94a3b8; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex; flex-direction:column; gap:12px; padding-left:4px;">
+            <div>
+                <strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <strong style="color:#f97316;">🔥 HOT</strong> 배지를 획득하며, <strong style="color:#e2e8f0;">30% 확률</strong>로 잔디에 계절별 꽃이 생성됩니다.
+                <div style="font-size:11px; color:#94a3b8; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
                     🌸 봄: 🌸, 🌷, 🌼, 🪷 | 🌻 여름: 🌻, 🏵, 🌹, 🌺<br>
                     🍁 가을: 🍁, 🍂, 🌾, 🪻 | ❄️ 겨울: ❄️, 🌲, 🪾, ☃️
                 </div>
-            </li>
-            <li>
-                <strong>운동 잔디:</strong> 분기 동안의 나의 활동 빈도를 시각화하며, 하루 활동 횟수에 따라 3단계로 색상이 변화합니다.
-            </li>
-            <li>
+            </div>
+            <div>
+                <strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong style="color:#e2e8f0;">3단계로 색상</strong>이 변화합니다.
+            </div>
+            <div>
                 <strong>활동별 색상:</strong> 일정산행(<span style="color:#4ade80;">초록</span>), 번외산행(<span style="color:#2dd4bf;">청녹</span>), 런닝(<span style="color:#f472b6;">분홍</span>), 트레킹(<span style="color:#c084fc;">보라</span>), 산책(<span style="color:#fb923c;">주황</span>)으로 구분됩니다.
-            </li>
-            <li>
-                <strong>특별한 잔디:</strong> 정기 산행 시 계절 마크가 포함된 무지개 엠보싱 프리미엄 잔디가 생성됩니다.
-            </li>
-        </ul>
+            </div>
+            <div>
+                <strong>특별한 잔디:</strong> 정기 산행 시 계절 마크가 포함된 <strong style="color:#e2e8f0;">무지개 엠보싱 프리미엄 잔디</strong>가 생성됩니다.
+            </div>
+        </div>
     `;
     showUnifiedInfoModal(title, body, event);
 };
 
-// 📊 2. 분기 성장 추이 안내 모달 (산맥 모달과 100% 동일한 ul/li 들여쓰기 구조)
+// 📊 2. 분기 성장 추이 안내 모달 (좌측 여백 확보 및 순수 div 구조)
 window.openGrowthInfoModal = function(event) {
-    const title = `<span>📊</span> <span>분기 성장 추이 안내</span>`;
+    const title = `📊 분기 성장 추이 안내`;
     const body = `
-        <ul>
-            <li>
+        <div style="display:flex; flex-direction:column; gap:12px; padding-left:4px;">
+            <div>
                 <strong>분기 성과:</strong> 분기별 누적 고도, 최고봉, 분기 등산 및 운동 횟수를 한눈에 확인합니다.
-            </li>
-            <li>
-                <strong>산 성분 분석:</strong> 정복한 산의 바위(🪨), 숲(🌲), 계곡(🌊) 성분 비율을 분석하여 표시합니다.
-            </li>
-            <li>
+            </div>
+            <div>
+                <strong>산 성분 분석:</strong> 정복한 산의 <strong style="color:#e2e8f0;">바위(🪨)</strong>, <strong style="color:#e2e8f0;">숲(🌲)</strong>, <strong style="color:#e2e8f0;">계곡(🌊)</strong> 성분 비율을 분석하여 표시합니다.
+            </div>
+            <div>
                 <strong>계절별 테마:</strong> 계절 변화에 따라 그래프 막대 색상이 자동으로 변경됩니다.
-                <div style="font-size:11px; color:#cbd5e1; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
+                <div style="font-size:11px; color:#cbd5e1; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
                     • <span style="color:#f472b6; font-weight:bold;">봄: 분홍</span> | <span style="color:#34d399; font-weight:bold;">여름: 초록</span> | <span style="color:#fb923c; font-weight:bold;">가을: 주황</span> | <span style="color:#00FFFF; font-weight:bold;">겨울: 하늘</span>
                 </div>
-            </li>
-        </ul>
+            </div>
+        </div>
     `;
     showUnifiedInfoModal(title, body, event);
 };
 
-// 닫기 공통 함수
+// 닫기 공통 함수 (버튼 및 배경 클릭 시 확실하게 닫힘 보장)
 window.closeMountainInfoModal = function(event) {
     if (event) {
         if (typeof event.stopPropagation === 'function') event.stopPropagation();
@@ -5077,6 +5073,8 @@ window.closeMountainInfoModal = function(event) {
         }, 200);
     }
 };
+              
+
 
 
     window.toggleMapView = () => {
