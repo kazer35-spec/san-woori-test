@@ -6471,9 +6471,9 @@ mwMountainName.innerHTML = `
     }
 };
 
- // ℹ️ 도움말 모달 제어 함수 (보강 버전)
+ // ℹ️ 도움말 모달 제어 함수 (수정본)
 window.openMountainInfoModal = (type, event) => {
-    // 이벤트 propagation 차단 (부모 창 닫힘 방지)
+    // 버튼 클릭 시 뒤에 있는 모달창/카드가 닫히거나 이벤트를 먹는 현상 방지
     if (event) {
         if (event.stopPropagation) event.stopPropagation();
         if (event.preventDefault) event.preventDefault();
@@ -6483,39 +6483,31 @@ window.openMountainInfoModal = (type, event) => {
     const titleEl = document.getElementById('mwInfoModalTitle');
     const bodyEl = document.getElementById('mwInfoModalBody');
 
-    if (!modal || !titleEl || !bodyEl) {
-        console.error("모달 요소를 찾을 수 없습니다. (mwInfoHelpModal)");
-        return;
-    }
+    if (!modal || !titleEl || !bodyEl) return;
 
     if (type === 'ring') {
         titleEl.innerText = "🌀 활동 나이테 안내";
         bodyEl.innerHTML = `
-            <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 13px; color: #e2e8f0;">
-                <li style="margin-bottom: 8px;"><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
-                <li style="margin-bottom: 8px;"><strong>중심 코어:</strong> 회원의 레벨에 따라 <strong>원형, 삼각형, 다이아몬드, 별 모양</strong>으로 다채롭게 변화합니다.</li>
+            <ul>
+                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
+                <li><strong>중심 코어:</strong> 회원의 레벨에 따라 <strong>원형, 삼각형, 다이아몬드, 별 모양</strong>으로 다채롭게 변화합니다.</li>
                 <li><strong>위성 별(Star):</strong> 정기 산행 참석 기록이 있는 달에는 해당 나이테 궤도 위에 고유한 <strong>정기산행 위성 별</strong>이 생성됩니다.</li>
             </ul>
         `;
     } else if (type === 'mountain') {
         titleEl.innerText = "🏔️ 산맥 비주얼 안내";
         bodyEl.innerHTML = `
-            <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 13px; color: #e2e8f0;">
-                <li style="margin-bottom: 8px;"><strong>개인 산맥 높이:</strong> 정복한 산들의 해발 고도(m) 비율에 맞춰 산 봉우리가 형상화됩니다.</li>
-                <li style="margin-bottom: 8px;"><strong>황금빛 봉우리:</strong> 개인 기록 중 <strong>가장 높은 최정상 산</strong>은 황금빛 광원 효과로 강조됩니다.</li>
+            <ul>
+                <li><strong>개인 산맥 높이:</strong> 정복한 산들의 해발 고도(m) 비율에 맞춰 산 봉우리가 형상화됩니다.</li>
+                <li><strong>황금빛 봉우리:</strong> 개인 기록 중 <strong>가장 높은 최정상 산</strong>은 황금빛 광원 효과로 강조됩니다.</li>
                 <li><strong>누적 100회 달성:</strong> 완등 횟수가 100회를 초과하면 슈퍼노바 라이트 빔 버스트 연출이 활성화됩니다.</li>
             </ul>
         `;
     }
 
-    // 모달을 가장 상단 레이어로 표시
+    // 모달 활성화
     modal.style.display = 'flex';
-    modal.style.zIndex = '99999';
-    
-    // 약간의 지연 후 active 클래스 부여 (애니메이션 효과)
-    setTimeout(() => {
-        modal.classList.add('active');
-    }, 10);
+    modal.classList.add('active');
 };
 
 window.closeMountainInfoModal = (event) => {
@@ -6523,9 +6515,7 @@ window.closeMountainInfoModal = (event) => {
     const modal = document.getElementById('mwInfoHelpModal');
     if (modal) {
         modal.classList.remove('active');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 200); // fade-out 애니메이션 시간 고려
+        modal.style.display = 'none';
     }
 };
 
@@ -7388,17 +7378,13 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 <div id="mountainViewModal" class="mountain-modal" onclick="this.style.display='none'">
     <div id="integratedCard" class="integrated-member-card" onclick="event.stopPropagation()">
 
-        <!-- [나이테 섹션 - 헤더 부분만 교체] -->
-<div class="ring-header" style="position: relative; z-index: 10;">
+        <!-- [나이테 섹션 - 원래 구조 유지] -->
+<div class="ring-header">
     <div class="ring-title-group">
         <span class="ring-label">ACTIVITY HISTORY</span>
-        <h3 class="ring-main-title" style="display: flex; align-items: center; gap: 6px;">
+        <h3 class="ring-main-title">
             활동 나이테
-            <button type="button" 
-                    class="info-help-btn" 
-                    onclick="event.stopPropagation(); window.openMountainInfoModal('ring', event);" 
-                    title="활동 나이테 안내" 
-                    style="position: relative; z-index: 20; cursor: pointer;">ⓘ</button>
+            <button type="button" class="info-help-btn" onclick="openMountainInfoModal('ring', event)" title="활동 나이테 안내">ⓘ</button>
         </h3>
     </div>
     <div class="ring-stats" style="text-align: right;">
