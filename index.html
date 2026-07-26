@@ -3041,7 +3041,7 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
   getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, deleteDoc, 
-  increment, query, orderBy, Timestamp, where, getDocs, getDoc, setDoc, limit, writeBatch, startAfter
+  increment, query, orderBy, Timestamp, where, getDocs, getDoc, setDoc, limit, writeBatch, startAfter, getCountFromServer
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -4348,26 +4348,45 @@ window.showMemberTimeline = async (mId, mName) => {
         const totalDaysInQ = Math.floor((end - start) / (1000 * 60 * 60 * 24));
 
         // 2. 데이터 로드 (Firebase)
-        const snapAll = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "desc")));
-        const logsAll = snapAll.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
-        
-        // ⭐ 필터링용 전역 변수에 저장
-        currentMemberLogs = logsAll; 
-        
-        const logsQuarter = logsAll.filter(l => l.date >= start && l.date < end);
+        // ✅ 지운 자리에 새로 들어갈 절약 코드
 
-        // 🎯 [핵심 수정] 등산/운동/전체 카운트 계산 로직
-        // - 산행: 이번 분기 중 러닝, 트레킹, 산책, 번외산행이 모두 아닌 '순수 등산'
-        const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
-        // - 운동: 이번 분기의 모든 활동 로그 총합 (등산 + 러닝 + 트레킹 + 산책 + 번외)
-        const exerciseCount = logsQuarter.length;
-        // - 전체: 역대 모든 분기 누적 로그 총합
-        const totalCount = logsAll.length;
+// 1. 이번 분기 데이터만 DB에서 핀포인트로 가져오기 (가장 큰 비용 절약)
+const qQuarter = query(
+    collection(db, `sanwoori/${mId}/logs`),
+    where("date", ">=", start),
+    where("date", "<", end),
+    orderBy("date", "desc")
+);
+const snapQuarter = await getDocs(qQuarter);
+const logsQuarter = snapQuarter.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
 
-        const badge = document.getElementById('timelineCountBadge');
-        if(badge) {
-            badge.innerText = `산행 ${hikeCount}회 / 운동 ${exerciseCount}회 / 전체 ${totalCount}회`;
-        }
+// 2. 최근 30일 데이터만 핀포인트로 가져오기 (HOT 멤버 판정용)
+const thirtyDaysAgo = new Date();
+thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+const qRecent = query(
+    collection(db, `sanwoori/${mId}/logs`),
+    where("date", ">=", thirtyDaysAgo),
+    orderBy("date", "desc")
+);
+const snapRecent = await getDocs(qRecent);
+const logsRecent = snapRecent.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
+
+// 3. 역대 전체 개수만 DB 카운트 서비스로 받아오기 (문서 다운로드 없이 읽기 1회만 청구)
+const snapCount = await getCountFromServer(collection(db, `sanwoori/${mId}/logs`));
+const totalCount = snapCount.data().count;
+
+// ⭐ 필터링용 전역 변수에 저장 (이번 분기 로그 세팅)
+currentMemberLogs = logsQuarter; 
+
+// 4. 상단 카운트 배지 렌더링
+const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
+const exerciseCount = logsQuarter.length;
+
+const badge = document.getElementById('timelineCountBadge');
+if(badge) {
+    badge.innerText = `산행 ${hikeCount}회 / 운동 ${exerciseCount}회 / 전체 ${totalCount}회`;
+}
+
 
         // 3. 차트 렌더링
         const chartData = await calculateGrowthData(mId);
@@ -4379,8 +4398,14 @@ window.showMemberTimeline = async (mId, mName) => {
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
         // 최근 30일 이내 '산행' 기록(isRunning, isTracking 제외)이 4회 이상인지 확인
-        const recentCount = logsAll.filter(l => l.date >= thirtyDaysAgo && !l.isRunning && !l.isTracking).length;
-        
+        const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
+const exerciseCount = logsQuarter.length;
+
+const badge = document.getElementById('timelineCountBadge');
+if(badge) {
+    badge.innerText = `산행 ${hikeCount}회 / 운동 ${exerciseCount}회 / 전체 ${totalCount}회`;
+}
+
         if(recentCount >= 4) {
             vibeArea.innerHTML = `<span class="hot-vibe flex items-center h-[18px] text-[9px] font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">🔥 HOT</span>`;
             isHotMember = true;
