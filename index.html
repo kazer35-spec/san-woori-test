@@ -13,27 +13,49 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* 💡 네온 ⓘ 물음표 버튼 스타일 */
+/* 안내 버튼이 터치/클릭을 확실히 받도록 설정 */
 .info-help-btn {
-    background: transparent;
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    color: #00FFFF;
-    font-size: 11px;
-    font-weight: bold;
-    width: 16px;
-    height: 16px;
+    position: relative !important;
+    z-index: 100 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
     border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    margin-left: 5px;
-    vertical-align: middle;
-    transition: all 0.25s ease;
-    box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
-    line-height: 1;
+    margin-left: 4px;
     padding: 0;
 }
+
+/* 도움말 모달 최상단 배치 */
+.mw-info-modal {
+    display: none;
+    position: fixed !important; /* absolute 대신 fixed로 변경하여 부모 스코프 탈출 */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(5px);
+    z-index: 999999 !important;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: auto !important;
+    transition: opacity 0.2s ease;
+}
+
+.mw-info-modal.active {
+    display: flex !important;
+    opacity: 1 !important;
+}
+
 
 .info-help-btn:hover {
     border-color: #1ABC9C;
@@ -41,27 +63,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: rgba(26, 188, 156, 0.15);
     box-shadow: 0 0 10px rgba(26, 188, 156, 0.6), 0 0 15px rgba(0, 255, 255, 0.4);
     transform: scale(1.1);
-}
-
-/* 🌌 네온 가이드 안내 팝업 모달 */
-/* 🌌 네온 가이드 안내 팝업 모달 (우선순위 강제 적용) */
-/* 중첩 스코프 영향 안 받는 독립 레이어 */
-.mw-info-modal {
-    display: none;
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.75) !important;
-    backdrop-filter: blur(5px);
-    z-index: 999999 !important; /* 3중 감싸기 밖이므로 100% 최상단 출력 */
-    align-items: center;
-    justify-content: center;
-}
-
-.mw-info-modal.active {
-    display: flex !important;
 }
 
 
@@ -6471,63 +6472,67 @@ mwMountainName.innerHTML = `
     }
 };
 
- // ➕ 안내 모달 열기 함수 (최상단 노출 보장)
+// ℹ️ 도움말 모달 제어 함수 (완전 수정본)
 window.openMountainInfoModal = (type, event) => {
-    // 1. 이벤트 버블링(부모 요소 클릭 및 닫힘) 완전 차단
+    // 1. 부모 요소로 이벤트 전파 차단 (창이 접히거나 닫히는 현상 방지)
     if (event) {
-        if (event.stopPropagation) event.stopPropagation();
-        if (event.preventDefault) event.preventDefault();
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
     }
-
+    
     const modal = document.getElementById('mwInfoHelpModal');
     const titleEl = document.getElementById('mwInfoModalTitle');
     const bodyEl = document.getElementById('mwInfoModalBody');
 
-    if (!modal || !titleEl || !bodyEl) return;
+    if (!modal || !titleEl || !bodyEl) {
+        console.error("모달 요소를 찾을 수 없습니다. (mwInfoHelpModal)");
+        return;
+    }
 
+    // 2. 내용 세팅
     if (type === 'ring') {
         titleEl.innerText = "🌀 활동 나이테 안내";
         bodyEl.innerHTML = `
-            <ul>
-                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
-                <li><strong>중심 코어:</strong> 회원의 레벨에 따라 <strong>원형, 삼각형, 다이아몬드, 별 모양</strong>으로 다채롭게 변화합니다.</li>
+            <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 13px; color: #e2e8f0;">
+                <li style="margin-bottom: 8px;"><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
+                <li style="margin-bottom: 8px;"><strong>중심 코어:</strong> 회원의 레벨에 따라 <strong>원형, 삼각형, 다이아몬드, 별 모양</strong>으로 다채롭게 변화합니다.</li>
                 <li><strong>위성 별(Star):</strong> 정기 산행 참석 기록이 있는 달에는 해당 나이테 궤도 위에 고유한 <strong>정기산행 위성 별</strong>이 생성됩니다.</li>
             </ul>
         `;
     } else if (type === 'mountain') {
         titleEl.innerText = "🏔️ 산맥 비주얼 안내";
         bodyEl.innerHTML = `
-            <ul>
-                <li><strong>개인 산맥 높이:</strong> 정복한 산들의 해발 고도(m) 비율에 맞춰 산 봉우리가 형상화됩니다.</li>
-                <li><strong>황금빛 봉우리:</strong> 개인 기록 중 <strong>가장 높은 최정상 산</strong>은 황금빛 광원 효과로 강조됩니다.</li>
+            <ul style="margin: 0; padding-left: 18px; line-height: 1.6; font-size: 13px; color: #e2e8f0;">
+                <li style="margin-bottom: 8px;"><strong>개인 산맥 높이:</strong> 정복한 산들의 해발 고도(m) 비율에 맞춰 산 봉우리가 형상화됩니다.</li>
+                <li style="margin-bottom: 8px;"><strong>황금빛 봉우리:</strong> 개인 기록 중 <strong>가장 높은 최정상 산</strong>은 황금빛 광원 효과로 강조됩니다.</li>
                 <li><strong>누적 100회 달성:</strong> 완등 횟수가 100회를 초과하면 슈퍼노바 라이트 빔 버스트 연출이 활성화됩니다.</li>
             </ul>
         `;
     }
 
-    // 2. 강제로 최상단 레이어 전환 및 출력
-    modal.style.display = 'flex';
-    modal.style.zIndex = '99999';
+    // 3. 최상단 레이어 출력 강제 적용 (!important 구문 돌파)
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
     
-    // 약간의 딜레이로 active 클래스 바인딩 (CSS transition 보장)
-    setTimeout(() => {
+    // 약간의 딜레이로 active 클래스 바인딩 (애니메이션 출력)
+    requestAnimationFrame(() => {
         modal.classList.add('active');
-    }, 10);
+    });
 };
 
-// ➕ 안내 모달 닫기 함수
 window.closeMountainInfoModal = (event) => {
-    if (event && event.stopPropagation) event.stopPropagation();
+    if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
     const modal = document.getElementById('mwInfoHelpModal');
     if (modal) {
         modal.classList.remove('active');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 200);
+        modal.style.setProperty('display', 'none', 'important');
     }
 };
 
-        
                         
 window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const container = document.getElementById('treeRingContainer');
@@ -7387,22 +7392,25 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     <div id="integratedCard" class="integrated-member-card" onclick="event.stopPropagation()">
         <!-- [나이테 섹션] -->
         <div class="tree-ring-section">
-            <div class="ring-header">
-                <div class="ring-title-group">
-                    <span class="ring-label">ACTIVITY HISTORY</span>
-                    <h3 class="ring-main-title">
-                        활동 나이테 
-                        <button type="button" class="info-help-btn" onclick="openMountainInfoModal('ring', event)" title="활동 나이테 안내">ⓘ</button>
-                    </h3>
-                </div>
-                <div class="ring-stats" style="text-align: right;">
-                    <span id="activityMonths" class="ring-months-val">0</span>
-                    <span class="ring-unit">Months</span>
-                    <div id="ringLaunchedDate" style="font-size: 9px; color: #1ABC9C; font-family: monospace; font-weight: bold; margin-top: 4px; letter-spacing: 0.5px; opacity: 0.8;">LAUNCHED: ----.--.--</div>
-                </div>
-            </div>
-            <div id="treeRingContainer" class="ring-canvas"></div>
-        </div>
+            <!-- [나이테 섹션 - 헤더 부분] -->
+<div class="ring-header" style="position: relative; z-index: 10;">
+    <div class="ring-title-group">
+        <span class="ring-label">ACTIVITY HISTORY</span>
+        <h3 class="ring-main-title" style="display: flex; align-items: center; gap: 6px;">
+            활동 나이테
+            <button type="button" 
+                    class="info-help-btn" 
+                    onclick="event.stopPropagation(); event.preventDefault(); window.openMountainInfoModal('ring', event);" 
+                    title="활동 나이테 안내">ⓘ</button>
+        </h3>
+    </div>
+    <div class="ring-stats" style="text-align: right;">
+        <span id="activityMonths" class="ring-months-val">0</span>
+        <span class="ring-unit">Months</span>
+        <div id="ringLaunchedDate" style="font-size: 9px; color: #1ABC9C; font-family: monospace; font-weight: bold; margin-top: 4px; letter-spacing: 0.5px; opacity: 0.8;">LAUNCHED: ----.--.--</div>
+    </div>
+</div>
+
 
         <!-- [산맥 비주얼 섹션] -->
         <div class="mountain-section">
