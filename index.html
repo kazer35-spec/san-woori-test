@@ -6827,9 +6827,17 @@ window.showMilkyWay = async (mId, mName) => {
         "람쥐": 1, "몽꽁": 1, "란이": 2, "얌얌": 0, "수리": 1, "희야": 0, "성민": 0, 
     };
 
-    // --- [3. UI 초기화] ---
+        // --- [3. UI 초기화 및 제목 옆 ⓘ 버튼 배치] ---
     modal.style.display = 'flex';
-    if (nameLabel) nameLabel.innerText = `${mName}님의 은하수`;
+    if (nameLabel) {
+        // 💡 은하수 제목 옆에 ⓘ 버튼 배치 및 클릭 간섭 방지 처리
+        nameLabel.innerHTML = `
+            <span style="display: inline-flex; align-items: center; gap: 6px;">
+                ${mName}님의 은하수
+                <button class="info-help-btn" onclick="event.stopPropagation(); openMilkyWayInfoModal(event);" title="은하수 안내" style="position: relative; z-index: 10015; pointer-events: auto; cursor: pointer;">ⓘ</button>
+            </span>
+        `;
+    }
     board.innerHTML = '<div class="nebula-cloud"></div>'; // 안개 레이어 유지
 
     try {
@@ -6941,13 +6949,23 @@ window.showMilkyWay = async (mId, mName) => {
     }
 };
 
-// 🌌 은하수 전용 안내 모달 열기 함수
-window.openMilkyWayInfoModal = () => {
+// 🌌 은하수 전용 안내 모달 열기 함수 (최상위 노출 보장)
+window.openMilkyWayInfoModal = (event) => {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     const modal = document.getElementById('mwInfoHelpModal');
     const titleEl = document.getElementById('mwInfoModalTitle');
     const bodyEl = document.getElementById('mwInfoModalBody');
 
     if (!modal || !titleEl || !bodyEl) return;
+
+    // 부모 모달의 z-index 제한을 탈출하기 위해 body 직속으로 이동
+    if (modal.parentNode !== document.body) {
+        document.body.appendChild(modal);
+    }
 
     titleEl.innerText = "🌌 은하수 비주얼 안내";
     bodyEl.innerHTML = `
@@ -6955,12 +6973,13 @@ window.openMilkyWayInfoModal = () => {
             <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
             <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
             <li><strong>특별한 별빛:</strong> 정기산행, 명산(100대 명산), 스페셜 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
-            <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 의미를 확인하실 수 있습니다.</li>
+            <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 상세 정보를 확인하실 수 있습니다.</li>
         </ul>
     `;
 
     modal.classList.add('active');
 };
+
 
     
     
