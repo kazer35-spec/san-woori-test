@@ -6479,11 +6479,18 @@ window.openMountainInfoModal = (type) => {
     if (!modal || !titleEl || !bodyEl) return;
 
     if (type === 'ring') {
+    if (type === 'ring') {
         titleEl.innerText = "🌀 활동 나이테 안내";
         bodyEl.innerHTML = `
             <ul>
                 <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
-                <li><strong>중심 코어:</strong> 회원의 레벨에 따라 <strong>원형, 삼각형, 다이아몬드, 별 모양</strong>으로 다채롭게 변화합니다.</li>
+                <li><strong>중심 코어 모양:</strong> 회원 레벨에 따라 다채롭게 변경됩니다.
+                    <br>• 1~19 레벨: <strong>○ (원)</strong>
+                    <br>• 20~49 레벨: <strong>△ (삼각형)</strong>
+                    <br>• 50~79 레벨: <strong>◇ (다이아몬드)</strong>
+                    <br>• 80 레벨 이상: <strong>☆ (별)</strong>
+                </li>
+                <li><strong>테마 색상:</strong> 레벨 색상에 맞추어 <strong>빛줄기, 나이테, 전체 창 색상</strong>이 자동으로 변경됩니다.</li>
                 <li><strong>위성 별(Star):</strong> 정기 산행 참석 기록이 있는 달에는 해당 나이테 궤도 위에 고유한 <strong>정기산행 위성 별</strong>이 생성됩니다.</li>
             </ul>
         `;
@@ -6493,6 +6500,7 @@ window.openMountainInfoModal = (type) => {
             <ul>
                 <li><strong>개인 산맥 높이:</strong> 정복한 산들의 해발 고도(m) 비율에 맞춰 산 봉우리가 형상화됩니다.</li>
                 <li><strong>황금빛 봉우리:</strong> 개인 기록 중 <strong>가장 높은 최정상 산</strong>은 황금빛 광원 효과로 강조됩니다.</li>
+                <li><strong>산맥 색상 변화:</strong> 누적 산행 <strong>100회 이후</strong>부터는 산맥 색상이 <strong>검붉은 색</strong>으로 변경됩니다.</li>
                 <li><strong>누적 100회 달성:</strong> 완등 횟수가 100회를 초과하면 슈퍼노바 라이트 빔 버스트 연출이 활성화됩니다.</li>
             </ul>
         `;
