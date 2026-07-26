@@ -6786,6 +6786,7 @@ svg.appendChild(coreShape);
     }, 100);
 };
 
+     
 window.showMilkyWay = async (mId, mName) => {
     const modal = document.getElementById('milkyWayModal');
     const board = document.getElementById('constellationBoard');
@@ -6793,10 +6794,12 @@ window.showMilkyWay = async (mId, mName) => {
 
     if (!modal || !board) return;
 
-  // --- [1. 가이드 UI 주입] ---
+    // --- [1. 가이드 UI 주입 (ⓘ 버튼 및 은하수 가이드 모달 추가)] ---
     if (!document.getElementById('starGuideBtn')) {
         const guideHTML = `
-            <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010;">
+            <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010; display: flex; align-items: center; gap: 8px;">
+                <!-- 💡 네온 ⓘ 안내 버튼 추가 -->
+                <button class="info-help-btn" onclick="event.stopPropagation(); openMilkyWayInfoModal();" title="은하수 안내" style="position: relative; z-index: 10011; pointer-events: auto; cursor: pointer;">ⓘ</button>
                 <button id="starGuideBtn" onclick="toggleStarGuide(true)" class="star-guide-btn" style="border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.4);">
                     <span class="sparkle-icon">✨</span> 별 가이드
                 </button>
@@ -6808,14 +6811,14 @@ window.showMilkyWay = async (mId, mName) => {
                         <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 5px;">산우리의 밤하늘을 수놓는 특별한 별빛들</p>
                     </div>
                     <div class="guide-grid" id="guideGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex-grow: 1; align-content: center;">
-                        </div>
+                    </div>
                     <button onclick="toggleStarGuide(false)" class="guide-close-btn" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.6;">&times;</button>
                 </div>
             </div>`;
         modal.insertAdjacentHTML('afterbegin', guideHTML);
     }
 
-    // --- [1. 기초 데이터 정의] ---
+    // --- [2. 기초 데이터 정의] ---
     const initialHikes = {
         "오즈": 33, "지니": 24, "나스": 19, "해수": 15, "하트": 13, "아랑": 19, "쿠키": 8, "용삼": 14, 
         "식이": 6, "몰랑": 10, "길치": 7, "등초": 7, "구름": 5, "튜브": 4, "햄찌": 5, "로드": 3, 
@@ -6824,53 +6827,49 @@ window.showMilkyWay = async (mId, mName) => {
         "람쥐": 1, "몽꽁": 1, "란이": 2, "얌얌": 0, "수리": 1, "희야": 0, "성민": 0, 
     };
 
-    // --- [2. UI 초기화] ---
+    // --- [3. UI 초기화] ---
     modal.style.display = 'flex';
     if (nameLabel) nameLabel.innerText = `${mName}님의 은하수`;
     board.innerHTML = '<div class="nebula-cloud"></div>'; // 안개 레이어 유지
 
-   try {
-        // [2. 동행지수 계산]
+    try {
+        // [4. 동행지수 계산]
         const memberInfo = (typeof currentData !== 'undefined') ? currentData.find(m => m.id === mId) : null;
         const baseHikes = initialHikes[mName] || 0;
         const myMultiHikes = (memberInfo && memberInfo.buddyCount !== undefined) ? memberInfo.buddyCount : 0;
         const finalSynergy = baseHikes > 0 ? Math.min(100, Math.round((myMultiHikes / baseHikes) * 100)) : 0;
 
-        // [3. 동행지수 80% 이상일 때만 배경 효과 실행]
-if (finalSynergy >= 60) {
-    // 은은하고 다채로운 별 색상들 (민트, 핑크, 골드, 라벤더, 화이트)
-    const starColors = ["#E0F7FA", "#FFF0F5", "#FFECB3", "#F3E5F5", "#FFFFFF", "#80CBC4", "#FFAB91"];
-    
-    for (let i = 0; i < 70; i++) {
-        const bgStar = document.createElement('div');
-        bgStar.className = 'bg-star';
-        
-        const size = Math.random() * 1.5 + 0.5; // 0.5px ~ 2px
-        bgStar.style.width = `${size}px`;
-        bgStar.style.height = `${size}px`;
-        bgStar.style.left = `${Math.random() * 100}%`;
-        bgStar.style.top = `${Math.random() * 100}%`;
-        
-        // --- 핵심: 여기서 색상을 랜덤하게 직접 꽂아줍니다 ---
-        const pickedColor = starColors[Math.floor(Math.random() * starColors.length)];
-        bgStar.style.backgroundColor = pickedColor;
-        bgStar.style.boxShadow = `0 0 3px ${pickedColor}`; // 색상별로 은은한 광채 추가
-        
-        // 애니메이션 속도 (천천히 5s ~ 10s)
-        bgStar.style.animationDuration = `${Math.random() * 5 + 5}s`;
-        bgStar.style.animationDelay = `${Math.random() * 10}s`;
-        
-        board.appendChild(bgStar);
-    }
-    
-            // B. 오로라 소환
+        // [5. 동행지수 60% 이상일 때만 배경 효과 실행]
+        if (finalSynergy >= 60) {
+            const starColors = ["#E0F7FA", "#FFF0F5", "#FFECB3", "#F3E5F5", "#FFFFFF", "#80CBC4", "#FFAB91"];
+            
+            for (let i = 0; i < 70; i++) {
+                const bgStar = document.createElement('div');
+                bgStar.className = 'bg-star';
+                
+                const size = Math.random() * 1.5 + 0.5;
+                bgStar.style.width = `${size}px`;
+                bgStar.style.height = `${size}px`;
+                bgStar.style.left = `${Math.random() * 100}%`;
+                bgStar.style.top = `${Math.random() * 100}%`;
+                
+                const pickedColor = starColors[Math.floor(Math.random() * starColors.length)];
+                bgStar.style.backgroundColor = pickedColor;
+                bgStar.style.boxShadow = `0 0 3px ${pickedColor}`;
+                
+                bgStar.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                bgStar.style.animationDelay = `${Math.random() * 10}s`;
+                
+                board.appendChild(bgStar);
+            }
+            
             const aurora = document.createElement('div');
             aurora.className = 'aurora-layer';
             board.prepend(aurora); 
             requestAnimationFrame(() => aurora.classList.add('aurora-active'));
         }
      
-        // --- [4. 별자리 데이터 로드 및 그리기] ---
+        // --- [6. 별자리 데이터 로드 및 그리기] ---
         const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
         const logs = snap.docs
             .map(d => d.data())
@@ -6885,7 +6884,6 @@ if (finalSynergy >= 60) {
         logs.forEach((log, index) => {
             let starColor = "white", shadowColor = "#FFFFFF", starSize = "w-1.5 h-1.5", customStyle = "", shouldTwinkle = false;
 
-            // 별 타입별 스타일 설정
             if (log.starType) {
                 shouldTwinkle = true;
                 if (log.starType === "super") {
@@ -6905,7 +6903,6 @@ if (finalSynergy >= 60) {
                 customStyle = `background-color: ${starColor}; box-shadow: 0 0 6px ${shadowColor};`;
             }
 
-            // 별 생성
             const star = document.createElement('div');
             star.className = `absolute ${starSize} rounded-full z-10`;
             star.style.cssText += customStyle || `background-color: ${starColor}; box-shadow: 0 0 6px ${shadowColor}, 0 0 12px ${shadowColor}`;
@@ -6915,7 +6912,6 @@ if (finalSynergy >= 60) {
             star.style.transition = "opacity 1s ease";
             board.appendChild(star);
 
-            // 선 생성
             let line = null;
             if (index > 0) {
                 const prev = logs[index - 1];
@@ -6932,7 +6928,6 @@ if (finalSynergy >= 60) {
                 board.appendChild(line);
             }
 
-            // 순차 애니메이션 실행
             setTimeout(() => {
                 star.style.opacity = "1";
                 if (line) line.style.opacity = "1";
@@ -6946,6 +6941,28 @@ if (finalSynergy >= 60) {
     }
 };
 
+// 🌌 은하수 전용 안내 모달 열기 함수
+window.openMilkyWayInfoModal = () => {
+    const modal = document.getElementById('mwInfoHelpModal');
+    const titleEl = document.getElementById('mwInfoModalTitle');
+    const bodyEl = document.getElementById('mwInfoModalBody');
+
+    if (!modal || !titleEl || !bodyEl) return;
+
+    titleEl.innerText = "🌌 은하수 비주얼 안내";
+    bodyEl.innerHTML = `
+        <ul>
+            <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
+            <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
+            <li><strong>특별한 별빛:</strong> 정기산행, 명산(100대 명산), 스페셜 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
+            <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 의미를 확인하실 수 있습니다.</li>
+        </ul>
+    `;
+
+    modal.classList.add('active');
+};
+
+    
     
 // --- [가이드 렌더링 함수] ---
 window.toggleStarGuide = (show) => {
