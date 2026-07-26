@@ -73,16 +73,17 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 /* 🌌 네온 가이드 안내 팝업 모달 */
+/* 🌌 네온 가이드 안내 팝업 모달 */
 .mw-info-modal {
     display: none;
-    position: absolute;
+    position: fixed; /* absolute -> fixed 로 변경 (화면 최상단 고정) */
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(5, 10, 20, 0.75);
     backdrop-filter: blur(8px);
-    z-index: 300;
+    z-index: 999999; /* z-index를 최상 레벨로 변경하여 타임라인 모달 위로 배치 */
     align-items: center;
     justify-content: center;
     opacity: 0;
@@ -90,9 +91,10 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 .mw-info-modal.active {
-    display: flex;
-    opacity: 1;
+    display: flex !important;
+    opacity: 1 !important;
 }
+
 
 .mw-info-card {
     width: 85%;
@@ -4969,7 +4971,7 @@ function renderGrowthChart(data) {
 
       
 
-// 🔒 공통 모달 닫기 함수 (클릭 막힘 원천 차단)
+// 🔒 공통 모달 닫기
 window.closeMountainInfoModal = function(e) {
     if (e) {
         if (typeof e.stopPropagation === 'function') e.stopPropagation();
@@ -4978,14 +4980,13 @@ window.closeMountainInfoModal = function(e) {
     const modal = document.getElementById('mwInfoHelpModal');
     if (modal) {
         modal.classList.remove('active');
-        // CSS transition(0.3s) 후 완전히 숨김
         setTimeout(() => {
             modal.style.display = 'none';
         }, 300);
     }
 };
 
-// 🌿 공통 통합 모달 표출 함수
+// 🌿 공통 통합 모달 표출
 window.showUnifiedInfoModal = function(titleText, bodyHtml, e) {
     if (e) {
         if (typeof e.stopPropagation === 'function') e.stopPropagation();
@@ -4996,13 +4997,11 @@ window.showUnifiedInfoModal = function(titleText, bodyHtml, e) {
 
     let modal = document.getElementById('mwInfoHelpModal');
     
-    // 모달 DOM이 없으면 새로 생성
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'mwInfoHelpModal';
         modal.className = 'mw-info-modal';
         
-        // 배경 클릭 시 닫기
         modal.onclick = function(event) {
             window.closeMountainInfoModal(event);
         };
@@ -5025,10 +5024,8 @@ window.showUnifiedInfoModal = function(titleText, bodyHtml, e) {
     if (titleEl) titleEl.innerHTML = titleText;
     if (bodyEl) bodyEl.innerHTML = bodyHtml;
 
-    // 모달 표시 (pointer-events 오버라이딩 제거)
     modal.style.display = 'flex';
     
-    // CSS 애니메이션 실행
     requestAnimationFrame(() => {
         modal.classList.add('active');
     });
