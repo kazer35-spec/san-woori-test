@@ -2860,8 +2860,10 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 
 
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
+<div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
         
+        <!-- 상단 헤더 -->
         <div class="flex justify-between items-center mb-3">
             <div>
                 <h2 class="text-lg font-black text-slate-800">
@@ -2871,8 +2873,12 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
             <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
         </div>
 
+        <!-- 🌱 분기 운동 잔디 타이틀 영역 -->
         <div class="flex justify-between items-center mb-2.5">
-            <p class="text-[10px] font-extrabold text-slate-500">🌱 분기 운동 잔디</p>
+            <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1">
+                🌱 분기 운동 잔디
+                <button class="info-help-btn" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내" style="pointer-events: auto; cursor: pointer;">ⓘ</button>
+            </p>
             
             <div class="flex items-center gap-1.5">
                 <div id="passionVibeArea"></div>
@@ -2884,37 +2890,48 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
             </div>
         </div>
 
+        <!-- 잔디 보드 -->
         <div id="grassBoard" class="grass-container mb-2"></div>
 
+        <!-- 범례 -->
         <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
         </div>
 
+        <!-- 📊 분기 성장 추이 영역 -->
         <div id="chartBox" class="chart-container-box mb-4">
-            <div class="chart-header">
-                <div class="chart-title-sub">📊 분기 성장 추이</div>
-                <div class="chart-legend">
-                    <div class="legend-item"><span class="dot-bar"></span>횟수</div>
-                    <div class="legend-item"><span class="dot-line"></span>고도</div>
+            <div class="chart-header flex items-center justify-between mb-1">
+                <div class="chart-title-sub flex items-center gap-1 text-xs font-bold text-slate-700">
+                    📊 분기 성장 추이
+                    <button class="info-help-btn" onclick="event.stopPropagation(); openGrowthInfoModal(event);" title="성장 추이 안내" style="pointer-events: auto; cursor: pointer;">ⓘ</button>
+                </div>
+                <div class="chart-legend flex items-center gap-2 text-[10px]">
+                    <div class="legend-item flex items-center gap-1"><span class="dot-bar"></span>횟수</div>
+                    <div class="legend-item flex items-center gap-1"><span class="dot-line"></span>고도</div>
                 </div>
             </div>
-            <div class="chart-guide-txt">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
+            <div class="chart-guide-txt text-[10px] text-slate-400 mb-2">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
             <div style="height: 120px; position: relative;">
                 <canvas id="growthChart"></canvas>
             </div>
         </div>
-            
-        <!-- 메인 인연의 숲 버튼 (기존 튀던 딥 그라데이션 제거 버전) -->
-<button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" class="w-full py-3 bg-emerald-50 text-emerald-600 rounded-xl font-extrabold text-sm border border-emerald-100 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform">
-    <span>🌳 인연의 숲 자세히 보기</span>
-    <span class="text-emerald-400">▶</span>
-</button>
 
+        <!-- 📜 타임라인 컨테이너 (JS에서 setupTimelineTabs()로 탭과 목록이 들어가는 영역) -->
+        <div id="timelineContent"></div>
+
+        <!-- 메인 인연의 숲 버튼 -->
+        <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" class="w-full py-3 bg-emerald-50 text-emerald-600 rounded-xl font-extrabold text-sm border border-emerald-100 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform mt-3">
+            <span>🌳 인연의 숲 자세히 보기</span>
+            <span class="text-emerald-400">▶</span>
+        </button>
+
+        <!-- 닫기 버튼 -->
         <button onclick="toggleTimelineModal(false)" class="w-full mt-2 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm active:scale-[0.98] transition-transform">
             닫기
         </button>
 
     </div> 
-</div> 
+</div>
+
 
 <!-- JS 크래시 방지용 더미 데이터 존 (숨겨짐) -->
 <div id="logPopup" style="display: none !important;">
