@@ -6826,16 +6826,17 @@ window.showMilkyWay = async (mId, mName) => {
         "람쥐": 1, "몽꽁": 1, "란이": 2, "얌얌": 0, "수리": 1, "희야": 0, "성민": 0, 
     };
 
-    // --- [UI 초기화: 제목 중앙 고정 & 우측 ⓘ 버튼 배치] ---
+     // --- [UI 초기화: 글씨 완벽 중앙 고정 & 버튼 오른쪽 우회 배치] ---
     modal.style.display = 'flex';
     if (nameLabel) {
         nameLabel.style.textAlign = 'center';
         nameLabel.style.width = '100%';
+        nameLabel.style.position = 'relative';
         
         nameLabel.innerHTML = `
-            <span style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; position: relative;">
+            <span style="position: relative; display: inline-block;">
                 ${mName}님의 은하수
-                <button class="info-help-btn" onclick="event.stopPropagation(); openMilkyWayInfoModal(event);" title="은하수 안내" style="position: relative; z-index: 10015; pointer-events: auto; cursor: pointer; margin-left: 2px;">ⓘ</button>
+                <button class="info-help-btn" onclick="event.stopPropagation(); openMilkyWayInfoModal(event);" title="은하수 안내" style="position: absolute; left: 100%; top: 50%; transform: translateY(-50%); margin-left: 6px; z-index: 10015; pointer-events: auto; cursor: pointer;">ⓘ</button>
             </span>
         `;
     }
@@ -6973,7 +6974,7 @@ window.openMilkyWayInfoModal = (event) => {
         <ul>
             <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
             <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
-            <li><strong>특별한 별빛:</strong> 정기산행, 명산(100대 명산), 스페셜 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
+            <li><strong>특별한 별빛:</strong> 정기산행, 명산(100대 명산) 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
             <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 상세 정보를 확인하실 수 있습니다.</li>
         </ul>
     `;
