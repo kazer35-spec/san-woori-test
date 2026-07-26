@@ -5068,35 +5068,35 @@ window.renderAndShowMwModal = function(titleHtml, bodyHtml, event) {
     });
 };
 
-// 🌱 1. 분기 운동 잔디 안내 (나이테 모달과 동일한 ul/li 깔끔한 구조)
+// 🌱 1. 분기 운동 잔디 안내
 window.openGrassInfoModal = function(event) {
-    const title = "🌱 분기 운동 잔디 안내";
+    const title = `🌱 분기 운동 잔디 안내`;
     const body = `
-        <ul>
-            <li>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+            <div>
                 <strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <strong style="color:#f97316;">🔥 HOT</strong> 배지를 획득하며, <strong style="color:#e2e8f0;">30% 확률</strong>로 잔디에 계절별 꽃이 생성됩니다.
                 <div style="font-size:11px; color:#94a3b8; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
                     🌸 봄: 🌸, 🌷, 🌼, 🪷 | 🌻 여름: 🌻, 🏵, 🌹, 🌺<br>
                     🍁 가을: 🍁, 🍂, 🌾, 🪻 | ❄️ 겨울: ❄️, 🌲, 🪾, ☃️
                 </div>
-            </li>
-            <li>
-                <strong>잔디 나비:</strong> 분기 <strong style="color:#e2e8f0;">4주 연속 일정 산행 시</strong> 1~2마리의 나비가 랜덤으로 생성됩니다.
-            </li>
-            <li>
+                </div>
+                <div>
+                <strong>잔디 나비:</strong> 분기 <strong style="color:#e2e8f0;">4주 연속 일정 산행시</strong> 1~2마리의 나비가 랜덤으로 생성됩니다.
+            </div>
+            </div>
+            <div>
                 <strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong style="color:#e2e8f0;">3단계로 색상</strong>이 변화합니다.
-            </li>
-            <li>
+            </div>
+            <div>
                 <strong>활동별 색상:</strong> 일정산행(<span style="color:#4ade80;">초록</span>), 번외산행(<span style="color:#2dd4bf;">청녹</span>), 런닝(<span style="color:#f472b6;">분홍</span>), 트레킹(<span style="color:#c084fc;">보라</span>), 산책(<span style="color:#fb923c;">주황</span>)으로 구분됩니다.
-            </li>
-            <li>
+            </div>
+            <div>
                 <strong>특별한 잔디:</strong> 정기 산행 시 계절 마크가 포함된 <strong style="color:#e2e8f0;">무지개 엠보싱 프리미엄 잔디</strong>가 생성됩니다.
-            </li>
-        </ul>
+            </div>
+        </div>
     `;
-    window.openUnifiedMwModal(title, body, event);
+    window.renderAndShowMwModal(title, body, event);
 };
-
 
 // 📊 2. 분기 성장 추이 안내
 window.openGrowthInfoModal = function(event) {
@@ -6180,10 +6180,7 @@ window.handleHostCheck = (checkbox, memberId) => {
     console.log("현재 선택된 벙주 ID 목록:", window.selectedHostIds);
 };
 
-// ==========================================================================
-// 🔄 [수정] 관리자 화면 멤버 리스트 UI 렌더링 함수 (가로 3개 배치 그리드형)
-// ==========================================================================
-// ==========================================================================
+================================================
 // 🔄 [수정] 관리자 화면 멤버 리스트 UI 렌더링 함수 (이름 왼쪽 정렬 + 체크박스만 배치)
 // ==========================================================================
 function updateAdminMemberLists() {
