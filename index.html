@@ -4937,6 +4937,103 @@ function renderGrowthChart(data) {
     });
 }
 
+// 🌿 분기 운동 잔디 전용 안내 모달
+window.openGrassInfoModal = function(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    let modal = document.getElementById('timelineInfoModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'timelineInfoModal';
+        modal.className = 'star-guide-overlay';
+        modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:10030; background:rgba(7,10,20,0.85); backdrop-filter:blur(10px); align-items:center; justify-content:center; padding:20px;';
+        modal.innerHTML = `
+            <div style="background:#1e293b; border:1px solid rgba(255,255,255,0.1); border-radius:16px; width:100%; max-width:420px; padding:24px; color:#fff; position:relative; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
+                <h3 id="tlInfoTitle" style="font-size:1.1rem; font-weight:800; margin-bottom:14px; text-align:center; color:#38bdf8;"></h3>
+                <div id="tlInfoBody" style="font-size:0.85rem; line-height:1.6; color:#cbd5e1; max-height:60vh; overflow-y:auto;"></div>
+                <button onclick="document.getElementById('timelineInfoModal').style.display='none'" style="position:absolute; top:14px; right:18px; background:none; border:none; color:#94a3b8; font-size:22px; cursor:pointer;">&times;</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // 배경 클릭 시 닫기 기능
+        modal.onclick = function() {
+            modal.style.display = 'none';
+        };
+    }
+
+    const titleEl = document.getElementById('tlInfoTitle');
+    const bodyEl = document.getElementById('tlInfoBody');
+
+    titleEl.innerText = "🌱 분기 운동 잔디 안내";
+    bodyEl.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                <strong style="color:#fb923c;">🔥 열정회원</strong>
+                <ul style="margin-top:4px; padding-left:16px; font-size:0.8rem;">
+                    <li>최근 30일 이내 4회 이상 산행 시 <span style="color:#f97316; font-weight:bold;">🔥 HOT</span> 배지 획득</li>
+                    <li>HOT 배지 획득 시 30% 확률로 잔디에 계절별 꽃 생성
+                        <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
+                            • 봄: 🌸 🌷 🌼 🪷<br>
+                            • 여름: 🌻 🏵 🌹 🌺<br>
+                            • 가을: 🍁 🍂 🌾 🪻<br>
+                            • 겨울: ❄️ 🌲 🪾 ☃️
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                <strong style="color:#4ade80;">🟩 운동 잔디</strong>
+                <ul style="margin-top:4px; padding-left:16px; font-size:0.8rem;">
+                    <li>분기 동안의 산행/운동 빈도를 잔디 색상으로 시각화</li>
+                    <li>하루 활동 횟수에 따라 3단계 색상 심화</li>
+                    <li><strong>일정산행:</strong> 초록색 / <strong>번외산행:</strong> 청녹색</li>
+                    <li><strong>런닝:</strong> 분홍색 / <strong>트레킹:</strong> 보라색 / <strong>산책:</strong> 주황색</li>
+                    <li><strong>정기산행:</strong> 계절 마크가 새겨진 무지개 프리미엄 잔디 생성</li>
+                </ul>
+            </div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+};
+
+// 📊 분기 성장 추이 전용 안내 모달
+window.openGrowthInfoModal = function(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    let modal = document.getElementById('timelineInfoModal');
+    if (!modal) {
+        window.openGrassInfoModal(event);
+        modal = document.getElementById('timelineInfoModal');
+    }
+
+    const titleEl = document.getElementById('tlInfoTitle');
+    const bodyEl = document.getElementById('tlInfoBody');
+
+    titleEl.innerText = "📊 분기 성장 추이 안내";
+    bodyEl.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:10px; background:rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
+            <ul style="padding-left:16px; font-size:0.82rem; display:flex; flex-direction:column; gap:6px;">
+                <li><strong>분기별 성과:</strong> 분기별 누적 고도, 최고봉, 분기 등산/운동 횟수 종합 표시</li>
+                <li><strong>산 성분 분석:</strong> 정복한 산의 바위(🪨), 숲(🌲), 계곡(🌊) 성분비 비율 계산</li>
+                <li><strong>계절별 테마 색상:</strong> 분기 시작 계절에 따라 그래프 막대 색상 자동 변경
+                    <div style="margin-top:4px; font-size:0.78rem; color:#cbd5e1;">
+                        • <span style="color:#ffafcc;">봄: 분홍</span> | <span style="color:#34d399;">여름: 초록</span> | <span style="color:#fb923c;">가을: 주황</span> | <span style="color:#7dd3fc;">겨울: 하늘</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+};
 
     window.toggleMapView = () => {
 const main = document.getElementById('mapViewMain');
