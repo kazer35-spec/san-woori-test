@@ -6970,14 +6970,16 @@ window.openMilkyWayInfoModal = (event) => {
     }
 
     titleEl.innerText = "🌌 은하수 비주얼 안내";
-    bodyEl.innerHTML = `
-        <ul>
-            <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
-            <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
-            <li><strong>특별한 별빛:</strong> 정기산행, 명산(100대 명산) 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
-            <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 상세 정보를 확인하실 수 있습니다.</li>
-        </ul>
-    `;
+bodyEl.innerHTML = `
+    <ul>
+        <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
+        <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
+        <li><strong>특별한 별빛:</strong> 정기산행(확률형 등급 별 생성) 및 명산(100대 명산) 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
+        <li><strong>별똥별:</strong> 가장 최근 기록된 좌표를 향해 밤하늘의 별똥별이 떨어진 후 여운을 남깁니다.</li>
+        <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 상세 정보를 확인하실 수 있습니다.</li>
+    </ul>
+`;
+
 
     modal.classList.add('active');
 };
