@@ -6795,7 +6795,6 @@ window.showMilkyWay = async (mId, mName) => {
     if (!modal || !board) return;
 
     // --- [1. 가이드 UI 주입 (ⓘ 버튼 및 은하수 가이드 모달 추가)] ---
-    if (!document.getElementById('starGuideBtn')) {
         if (!document.getElementById('starGuideBtn')) {
         const guideHTML = `
             <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010;">
