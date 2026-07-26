@@ -7276,10 +7276,11 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
         // 이하 기존 통계 계산 및 UI 렌더링 로직 동일...
 
 
-        // [C] 📊 전체 로그 데이터 기반 항목별 카운팅 계산 (정기 vs 일정 구분)
+                // [C] 📊 전체 로그 데이터 기반 항목별 카운팅 계산 (정기 vs 일정 구분)
         const counts = window.currentScrollLogs.reduce((acc, log) => {
             if (log.isRegular) {
-                acc.regular++; // 무지개 (정기산행)
+                acc.regular++;  // 무지개 (정기산행)
+                acc.schedule++; // 🔥 정기산행 횟수를 일정산행에도 포함
             } else if ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike) {
                 acc.schedule++; // 연두색 (일정산행)
             } else if (log.isExtraHike) {
@@ -7349,6 +7350,9 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                         </span>
                     </div>
                 </div>
+
+            </div>
+
 
             </div>
 
