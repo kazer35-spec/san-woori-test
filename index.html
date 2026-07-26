@@ -13,10 +13,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* 안내 버튼이 터치/클릭을 확실히 받도록 설정 */
+/* 💡 네온 ⓘ 물음표 버튼 스타일 */
+/* 안내 버튼이 클릭 영역에 묻히지 않도록 조치 */
 .info-help-btn {
-    position: relative !important;
-    z-index: 100 !important;
+    position: relative;
+    z-index: 50 !important;
     pointer-events: auto !important;
     cursor: pointer !important;
     background: rgba(255, 255, 255, 0.15);
@@ -36,18 +37,17 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 /* 도움말 모달 최상단 배치 */
 .mw-info-modal {
     display: none;
-    position: fixed !important; /* absolute 대신 fixed로 변경하여 부모 스코프 탈출 */
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.8) !important;
-    backdrop-filter: blur(5px);
-    z-index: 999999 !important;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 99999 !important;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    pointer-events: auto !important;
     transition: opacity 0.2s ease;
 }
 
@@ -64,7 +64,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     box-shadow: 0 0 10px rgba(26, 188, 156, 0.6), 0 0 15px rgba(0, 255, 255, 0.4);
     transform: scale(1.1);
 }
-
 
 
 .mw-info-card {
@@ -6472,23 +6471,23 @@ mwMountainName.innerHTML = `
     }
 };
 
-// ℹ️ 도움말 모달 제어 함수 (안전 가드 적용)
-window.openMountainInfoModal = (type, e) => {
-    // 1. 이벤트 에러 완전 방어
-    if (e) {
-        if (typeof e.stopPropagation === 'function') e.stopPropagation();
-        if (typeof e.preventDefault === 'function') e.preventDefault();
-    } else if (window.event) {
-        window.event.cancelBubble = true;
+ // ℹ️ 도움말 모달 제어 함수 (보강 버전)
+window.openMountainInfoModal = (type, event) => {
+    // 이벤트 propagation 차단 (부모 창 닫힘 방지)
+    if (event) {
+        if (event.stopPropagation) event.stopPropagation();
+        if (event.preventDefault) event.preventDefault();
     }
-
+    
     const modal = document.getElementById('mwInfoHelpModal');
     const titleEl = document.getElementById('mwInfoModalTitle');
     const bodyEl = document.getElementById('mwInfoModalBody');
 
-    if (!modal || !titleEl || !bodyEl) return;
+    if (!modal || !titleEl || !bodyEl) {
+        console.error("모달 요소를 찾을 수 없습니다. (mwInfoHelpModal)");
+        return;
+    }
 
-    // 2. 내용 세팅
     if (type === 'ring') {
         titleEl.innerText = "🌀 활동 나이테 안내";
         bodyEl.innerHTML = `
@@ -6509,39 +6508,29 @@ window.openMountainInfoModal = (type, e) => {
         `;
     }
 
-    // 3. 모달 표출
-    modal.style.setProperty('display', 'flex', 'important');
-    modal.style.setProperty('z-index', '999999', 'important');
+    // 모달을 가장 상단 레이어로 표시
+    modal.style.display = 'flex';
+    modal.style.zIndex = '99999';
     
+    // 약간의 지연 후 active 클래스 부여 (애니메이션 효과)
     setTimeout(() => {
         modal.classList.add('active');
     }, 10);
 };
 
-window.closeMountainInfoModal = (e) => {
-    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+window.closeMountainInfoModal = (event) => {
+    if (event && event.stopPropagation) event.stopPropagation();
     const modal = document.getElementById('mwInfoHelpModal');
     if (modal) {
         modal.classList.remove('active');
         setTimeout(() => {
-            modal.style.setProperty('display', 'none', 'important');
-        }, 150);
+            modal.style.display = 'none';
+        }, 200); // fade-out 애니메이션 시간 고려
     }
 };
 
 
-window.closeMountainInfoModal = (event) => {
-    if (event) {
-        if (typeof event.stopPropagation === 'function') event.stopPropagation();
-        if (typeof event.preventDefault === 'function') event.preventDefault();
-    }
-    const modal = document.getElementById('mwInfoHelpModal');
-    if (modal) {
-        modal.classList.remove('active');
-        modal.style.setProperty('display', 'none', 'important');
-    }
-};
-
+        
                         
 window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const container = document.getElementById('treeRingContainer');
@@ -7396,22 +7385,21 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
                              </script>
 
-<!-- 1. 기존 메인 모달 및 카드 구조 -->
 <div id="mountainViewModal" class="mountain-modal" onclick="this.style.display='none'">
     <div id="integratedCard" class="integrated-member-card" onclick="event.stopPropagation()">
-        <!-- [나이테 섹션] -->
-        <div class="tree-ring-section">
-            <!-- [나이테 섹션 - 헤더 부분] -->
+
+        <!-- [나이테 섹션 - 헤더 부분만 교체] -->
 <div class="ring-header" style="position: relative; z-index: 10;">
     <div class="ring-title-group">
-    <span class="ring-label">ACTIVITY HISTORY</span>
-    <h3 class="ring-main-title">
-        활동 나이테
-        <button type="button" 
-                class="info-help-btn" 
-                onclick="window.openMountainInfoModal('ring', event);" 
-                title="활동 나이테 안내">ⓘ</button>
-    </h3>
+        <span class="ring-label">ACTIVITY HISTORY</span>
+        <h3 class="ring-main-title" style="display: flex; align-items: center; gap: 6px;">
+            활동 나이테
+            <button type="button" 
+                    class="info-help-btn" 
+                    onclick="event.stopPropagation(); window.openMountainInfoModal('ring', event);" 
+                    title="활동 나이테 안내" 
+                    style="position: relative; z-index: 20; cursor: pointer;">ⓘ</button>
+        </h3>
     </div>
     <div class="ring-stats" style="text-align: right;">
         <span id="activityMonths" class="ring-months-val">0</span>
@@ -7441,21 +7429,22 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             </div>
         </div>
 
-        <button type="button" onclick="document.getElementById('mountainViewModal').style.display='none'" style="position:absolute; top:15px; right:15px; color:white; background:none; border:none; font-size:24px; cursor:pointer; z-index:201;">&times;</button>
-    </div>
-</div>
-
-<!-- 2. 🌌 도움말 안내 팝업 (3중 구조에서 완전히 탈출시켜 맨 아래 따로 배치) -->
-<div id="mwInfoHelpModal" class="mw-info-modal" onclick="closeMountainInfoModal(event)">
-    <div class="mw-info-card" onclick="event.stopPropagation()">
-        <div class="mw-info-header">
-            <span id="mwInfoModalTitle" class="mw-info-title">도움말</span>
-            <button type="button" class="mw-info-close-btn" onclick="closeMountainInfoModal(event)">&times;</button>
+        <!-- ➕ [신규 추가] 도움말 안내 팝업 모달 -->
+        <div id="mwInfoHelpModal" class="mw-info-modal" onclick="closeMountainInfoModal(event)">
+            <div class="mw-info-card" onclick="event.stopPropagation()">
+                <div class="mw-info-header">
+                    <span id="mwInfoModalTitle" class="mw-info-title">도움말</span>
+                    <button class="mw-info-close-btn" onclick="closeMountainInfoModal()">&times;</button>
+                </div>
+                <div id="mwInfoModalBody" class="mw-info-body">
+                    <!-- 자바스크립트로 동적 동기화 -->
+                </div>
+            </div>
         </div>
-        <div id="mwInfoModalBody" class="mw-info-body"></div>
+
+        <button onclick="document.getElementById('mountainViewModal').style.display='none'" style="position:absolute; top:15px; right:15px; color:white; background:none; border:none; font-size:24px; cursor:pointer; z-index:201;">&times;</button>
     </div>
 </div>
-
 
 
 <!-- [모던 산우리 운동 리포트 모달 레이어] -->
