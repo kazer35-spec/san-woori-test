@@ -13,6 +13,123 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+/* 💡 네온 ⓘ 물음표 버튼 스타일 */
+.info-help-btn {
+    background: transparent;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: #00FFFF;
+    font-size: 11px;
+    font-weight: bold;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 5px;
+    vertical-align: middle;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+    line-height: 1;
+    padding: 0;
+}
+
+.info-help-btn:hover {
+    border-color: #1ABC9C;
+    color: #1ABC9C;
+    background: rgba(26, 188, 156, 0.15);
+    box-shadow: 0 0 10px rgba(26, 188, 156, 0.6), 0 0 15px rgba(0, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+/* 🌌 네온 가이드 안내 팝업 모달 */
+.mw-info-modal {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 10, 20, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mw-info-modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.mw-info-card {
+    width: 85%;
+    max-width: 320px;
+    background: rgba(13, 23, 42, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 15px rgba(0, 255, 255, 0.05);
+    color: #e2e8f0;
+    font-family: sans-serif;
+    transform: translateY(10px);
+    transition: transform 0.3s ease;
+}
+
+.mw-info-modal.active .mw-info-card {
+    transform: translateY(0);
+}
+
+.mw-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.mw-info-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #00FFFF;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+.mw-info-close-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.mw-info-close-btn:hover {
+    color: #ffffff;
+}
+
+.mw-info-body {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #cbd5e1;
+}
+
+.mw-info-body strong {
+    color: #1ABC9C;
+}
+
+.mw-info-body ul {
+    margin: 8px 0 0 0;
+    padding-left: 16px;
+}
+
+.mw-info-body li {
+    margin-bottom: 6px;
+}
 
  
 
