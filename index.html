@@ -6472,22 +6472,21 @@ mwMountainName.innerHTML = `
     }
 };
 
-// ℹ️ 도움말 모달 제어 함수 (완전 수정본)
-window.openMountainInfoModal = (type, event) => {
-    // 1. 부모 요소로 이벤트 전파 차단 (창이 접히거나 닫히는 현상 방지)
-    if (event) {
-        if (typeof event.stopPropagation === 'function') event.stopPropagation();
-        if (typeof event.preventDefault === 'function') event.preventDefault();
+// ℹ️ 도움말 모달 제어 함수 (안전 가드 적용)
+window.openMountainInfoModal = (type, e) => {
+    // 1. 이벤트 에러 완전 방어
+    if (e) {
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+    } else if (window.event) {
+        window.event.cancelBubble = true;
     }
-    
+
     const modal = document.getElementById('mwInfoHelpModal');
     const titleEl = document.getElementById('mwInfoModalTitle');
     const bodyEl = document.getElementById('mwInfoModalBody');
 
-    if (!modal || !titleEl || !bodyEl) {
-        console.error("모달 요소를 찾을 수 없습니다. (mwInfoHelpModal)");
-        return;
-    }
+    if (!modal || !titleEl || !bodyEl) return;
 
     // 2. 내용 세팅
     if (type === 'ring') {
@@ -6510,16 +6509,26 @@ window.openMountainInfoModal = (type, event) => {
         `;
     }
 
-    // 3. 최상단 레이어 출력 강제 적용 (!important 구문 돌파)
+    // 3. 모달 표출
     modal.style.setProperty('display', 'flex', 'important');
     modal.style.setProperty('z-index', '999999', 'important');
-    modal.style.setProperty('pointer-events', 'auto', 'important');
     
-    // 약간의 딜레이로 active 클래스 바인딩 (애니메이션 출력)
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         modal.classList.add('active');
-    });
+    }, 10);
 };
+
+window.closeMountainInfoModal = (e) => {
+    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    const modal = document.getElementById('mwInfoHelpModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.style.setProperty('display', 'none', 'important');
+        }, 150);
+    }
+};
+
 
 window.closeMountainInfoModal = (event) => {
     if (event) {
@@ -7395,14 +7404,14 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             <!-- [나이테 섹션 - 헤더 부분] -->
 <div class="ring-header" style="position: relative; z-index: 10;">
     <div class="ring-title-group">
-        <span class="ring-label">ACTIVITY HISTORY</span>
-        <h3 class="ring-main-title" style="display: flex; align-items: center; gap: 6px;">
-            활동 나이테
-            <button type="button" 
-                    class="info-help-btn" 
-                    onclick="event.stopPropagation(); event.preventDefault(); window.openMountainInfoModal('ring', event);" 
-                    title="활동 나이테 안내">ⓘ</button>
-        </h3>
+    <span class="ring-label">ACTIVITY HISTORY</span>
+    <h3 class="ring-main-title">
+        활동 나이테
+        <button type="button" 
+                class="info-help-btn" 
+                onclick="window.openMountainInfoModal('ring', event);" 
+                title="활동 나이테 안내">ⓘ</button>
+    </h3>
     </div>
     <div class="ring-stats" style="text-align: right;">
         <span id="activityMonths" class="ring-months-val">0</span>
