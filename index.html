@@ -6796,10 +6796,9 @@ window.showMilkyWay = async (mId, mName) => {
 
     // --- [1. 가이드 UI 주입 (ⓘ 버튼 및 은하수 가이드 모달 추가)] ---
     if (!document.getElementById('starGuideBtn')) {
+        if (!document.getElementById('starGuideBtn')) {
         const guideHTML = `
-            <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010; display: flex; align-items: center; gap: 8px;">
-                <!-- 💡 네온 ⓘ 안내 버튼 추가 -->
-                <button class="info-help-btn" onclick="event.stopPropagation(); openMilkyWayInfoModal();" title="은하수 안내" style="position: relative; z-index: 10011; pointer-events: auto; cursor: pointer;">ⓘ</button>
+            <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010;">
                 <button id="starGuideBtn" onclick="toggleStarGuide(true)" class="star-guide-btn" style="border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.4);">
                     <span class="sparkle-icon">✨</span> 별 가이드
                 </button>
@@ -6818,6 +6817,7 @@ window.showMilkyWay = async (mId, mName) => {
         modal.insertAdjacentHTML('afterbegin', guideHTML);
     }
 
+
     // --- [2. 기초 데이터 정의] ---
     const initialHikes = {
         "오즈": 33, "지니": 24, "나스": 19, "해수": 15, "하트": 13, "아랑": 19, "쿠키": 8, "용삼": 14, 
@@ -6827,18 +6827,20 @@ window.showMilkyWay = async (mId, mName) => {
         "람쥐": 1, "몽꽁": 1, "란이": 2, "얌얌": 0, "수리": 1, "희야": 0, "성민": 0, 
     };
 
-        // --- [3. UI 초기화 및 제목 옆 ⓘ 버튼 배치] ---
+    // --- [UI 초기화: 제목 중앙 고정 & 우측 ⓘ 버튼 배치] ---
     modal.style.display = 'flex';
     if (nameLabel) {
-        // 💡 은하수 제목 옆에 ⓘ 버튼 배치 및 클릭 간섭 방지 처리
+        nameLabel.style.textAlign = 'center';
+        nameLabel.style.width = '100%';
+        
         nameLabel.innerHTML = `
-            <span style="display: inline-flex; align-items: center; gap: 6px;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; position: relative;">
                 ${mName}님의 은하수
-                <button class="info-help-btn" onclick="event.stopPropagation(); openMilkyWayInfoModal(event);" title="은하수 안내" style="position: relative; z-index: 10015; pointer-events: auto; cursor: pointer;">ⓘ</button>
+                <button class="info-help-btn" onclick="event.stopPropagation(); openMilkyWayInfoModal(event);" title="은하수 안내" style="position: relative; z-index: 10015; pointer-events: auto; cursor: pointer; margin-left: 2px;">ⓘ</button>
             </span>
         `;
     }
-    board.innerHTML = '<div class="nebula-cloud"></div>'; // 안개 레이어 유지
+    board.innerHTML = '<div class="nebula-cloud"></div>';
 
     try {
         // [4. 동행지수 계산]
