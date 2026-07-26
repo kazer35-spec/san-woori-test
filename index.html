@@ -2903,10 +2903,9 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
         <!-- 🌱 분기 운동 잔디 타이틀 영역 -->
         <div class="flex justify-between items-center mb-2.5">
             <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1">
-    🌱 분기 운동 잔디
-    <button class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ⓘ</button>
-</p>
-
+                🌱 분기 운동 잔디
+                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ⓘ</button>
+            </p>
             
             <div class="flex items-center gap-1.5">
                 <div id="passionVibeArea"></div>
@@ -2925,19 +2924,19 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
         <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
         </div>
 
-        <!-- 📊 분기 성장 추이 영역 -->
+        <!-- 📊 분기 성장 추이 영역 (원래 클래스 구조로 복구) -->
         <div id="chartBox" class="chart-container-box mb-4">
-            <div class="chart-header flex items-center justify-between mb-1">
-                <div class="chart-title-sub flex items-center gap-1 text-xs font-bold text-slate-700">
-    📊 분기 성장 추이
-    <button class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrowthInfoModal(event);" title="성장 추이 안내">ⓘ</button>
+            <div class="chart-header">
+                <div class="chart-title-sub" style="display: flex; align-items: center; gap: 4px;">
+                    📊 분기 성장 추이
+                    <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrowthInfoModal(event);" title="성장 추이 안내">ⓘ</button>
                 </div>
-                <div class="chart-legend flex items-center gap-2 text-[10px]">
-                    <div class="legend-item flex items-center gap-1"><span class="dot-bar"></span>횟수</div>
-                    <div class="legend-item flex items-center gap-1"><span class="dot-line"></span>고도</div>
+                <div class="chart-legend">
+                    <div class="legend-item"><span class="dot-bar"></span>횟수</div>
+                    <div class="legend-item"><span class="dot-line"></span>고도</div>
                 </div>
             </div>
-            <div class="chart-guide-txt text-[10px] text-slate-400 mb-2">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
+            <div class="chart-guide-txt">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
             <div style="height: 120px; position: relative;">
                 <canvas id="growthChart"></canvas>
             </div>
@@ -2956,6 +2955,7 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 
     </div> 
 </div>
+
 
 
 <!-- JS 크래시 방지용 더미 데이터 존 (숨겨짐) -->
