@@ -2928,7 +2928,7 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
         <!-- 📊 분기 성장 추이 영역 -->
         <div id="chartBox" class="chart-container-box mb-4">
             <div class="chart-header flex items-center justify-between mb-1">
-                <div class="chart-title-sub flex items-center gap-1 text-xs font-bold text-slate-700">
+                <div class="chart-title-sub flex items-center gap-1 text-xs font-bold text-slate-500">
     📊 분기 성장 추이
     <button class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrowthInfoModal(event);" title="성장 추이 안내">ⓘ</button>
                 </div>
@@ -4968,16 +4968,21 @@ function renderGrowthChart(data) {
 }
 
 
-        // 🌱 1. 분기 운동 잔디 안내 모달 (기존 네온 모달 디자인과 1:1 통일)
-window.openGrassInfoModal = function(event) {
-    const title = `<span>🌱</span> <span>분기 운동 잔디 안내</span>`;
+        // 🌱 1. 분기 운동 잔디 안내 모달
+window.openGrassInfoModal = function(e) {
+    if (e) {
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+    }
+
+    const title = "🌱 분기 운동 잔디 안내";
     const body = `
         <div style="display:flex; flex-direction:column; gap:12px;">
             <div>
                 <strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <strong style="color:#f97316;">🔥 HOT</strong> 배지를 획득하며, <strong style="color:#e2e8f0;">30% 확률</strong>로 잔디에 계절별 꽃이 생성됩니다.
                 <div style="font-size:0.75rem; color:#94a3b8; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
-                    봄: 🌸, 🌷, 🌼, 🪷 | 여름: 🌻, 🏵, 🌹, 🌺<br>
-                    가을: 🍁, 🍂, 🌾, 🪻 | 겨울: ❄️, 🌲, 🪾, ☃️
+                    🌸 봄: 🌸, 🌷, 🌼, 🪷 | 🌻 여름: 🌻, 🏵, 🌹, 🌺<br>
+                    🍁 가을: 🍁, 🍂, 🌾, 🪻 | ❄️ 겨울: ❄️, 🌲, 🪾, ☃️
                 </div>
             </div>
             <div>
@@ -4991,12 +4996,19 @@ window.openGrassInfoModal = function(event) {
             </div>
         </div>
     `;
-    window.showMwInfoModal(title, body, event);
+
+    // 기존 모달 띄우기 방식 호출
+    renderAndShowMwModal(title, body);
 };
 
-// 📊 2. 분기 성장 추이 안내 모달 (기존 네온 모달 디자인과 1:1 통일)
-window.openGrowthInfoModal = function(event) {
-    const title = `<span>📊</span> <span>분기 성장 추이 안내</span>`;
+// 📊 2. 분기 성장 추이 안내 모달
+window.openGrowthInfoModal = function(e) {
+    if (e) {
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+    }
+
+    const title = "📊 분기 성장 추이 안내";
     const body = `
         <div style="display:flex; flex-direction:column; gap:12px;">
             <div>
@@ -5013,9 +5025,49 @@ window.openGrowthInfoModal = function(event) {
             </div>
         </div>
     `;
-    window.showMwInfoModal(title, body, event);
+
+    // 기존 모달 띄우기 방식 호출
+    renderAndShowMwModal(title, body);
 };
 
+// 🌌 기존 모달 요소(mwInfoHelpModal)에 데이터를 주입하고 열어주는 공통 함수
+function renderAndShowMwModal(titleHtml, bodyHtml) {
+    let modal = document.getElementById('mwInfoHelpModal');
+    
+    // 만약 HTML에 모달이 없다면 새로 생성해줌 (안전장치)
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'mwInfoHelpModal';
+        modal.className = 'mw-info-modal';
+        modal.onclick = function(e) {
+            if (typeof window.closeMountainInfoModal === 'function') window.closeMountainInfoModal(e);
+            else modal.classList.remove('active');
+        };
+        modal.innerHTML = `
+            <div class="mw-info-card" onclick="event.stopPropagation()">
+                <div class="mw-info-header">
+                    <span id="mwInfoModalTitle" class="mw-info-title"></span>
+                    <button type="button" class="mw-info-close-btn" onclick="window.closeMountainInfoModal ? window.closeMountainInfoModal(event) : this.closest('.mw-info-modal').classList.remove('active')">&times;</button>
+                </div>
+                <div id="mwInfoModalBody" class="mw-info-body"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const titleEl = document.getElementById('mwInfoModalTitle');
+    const bodyEl = document.getElementById('mwInfoModalBody');
+
+    if (titleEl) titleEl.innerHTML = titleHtml;
+    if (bodyEl) bodyEl.innerHTML = bodyHtml;
+
+    modal.style.display = 'flex';
+    modal.style.zIndex = '999999'; // 레이어 최상단 고정
+    
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 10);
+}
 
 
     window.toggleMapView = () => {
