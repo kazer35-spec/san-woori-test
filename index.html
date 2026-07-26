@@ -4378,6 +4378,7 @@ const totalCount = snapCount.data().count;
 // ⭐ 필터링용 전역 변수에 저장 (이번 분기 로그 세팅)
 currentMemberLogs = logsQuarter; 
 
+// 4. 상단 카운트 배지 렌더링
         // 4. 상단 카운트 배지 렌더링
         const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
         const exerciseCount = logsQuarter.length;
@@ -5079,8 +5080,10 @@ window.openGrassInfoModal = function(event) {
                     🌸 봄: 🌸, 🌷, 🌼, 🪷 | 🌻 여름: 🌻, 🏵, 🌹, 🌺<br>
                     🍁 가을: 🍁, 🍂, 🌾, 🪻 | ❄️ 겨울: ❄️, 🌲, 🪾, ☃️
                 </div>
+                </div>
                 <div>
                 <strong>잔디 나비:</strong> 분기 <strong style="color:#e2e8f0;">4주 연속 일정 산행시</strong> 1~2마리의 나비가 랜덤으로 생성됩니다.
+            </div>
             </div>
             <div>
                 <strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong style="color:#e2e8f0;">3단계로 색상</strong>이 변화합니다.
@@ -6178,7 +6181,10 @@ window.handleHostCheck = (checkbox, memberId) => {
     console.log("현재 선택된 벙주 ID 목록:", window.selectedHostIds);
 };
 
-================================================
+// ==========================================================================
+// 🔄 [수정] 관리자 화면 멤버 리스트 UI 렌더링 함수 (가로 3개 배치 그리드형)
+// ==========================================================================
+// ==========================================================================
 // 🔄 [수정] 관리자 화면 멤버 리스트 UI 렌더링 함수 (이름 왼쪽 정렬 + 체크박스만 배치)
 // ==========================================================================
 function updateAdminMemberLists() {
