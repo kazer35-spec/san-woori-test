@@ -72,43 +72,40 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     transform: scale(1.1);
 }
 
- /* 🌌 네온 가이드 안내 팝업 모달 */
+/* 🌌 네온 가이드 안내 팝업 모달 */
 .mw-info-modal {
     display: none;
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background: rgba(5, 10, 20, 0.75);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 100000; /* 기존 모달(timelineModal)보다 높게 설정 */
+    z-index: 300;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    pointer-events: none; /* 꺼져있을 땐 터치/클릭 완전 통과 */
-    transition: opacity 0.25s ease;
+    transition: opacity 0.3s ease;
 }
 
 .mw-info-modal.active {
-    display: flex !important;
-    opacity: 1 !important;
-    pointer-events: auto !important; /* 열렸을 때만 클릭 받음 */
+    display: flex;
+    opacity: 1;
 }
 
 .mw-info-card {
     width: 85%;
     max-width: 320px;
-    background: rgba(13, 23, 42, 0.95);
-    border: 1px solid rgba(0, 255, 255, 0.4);
+    background: rgba(13, 23, 42, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.3);
     border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.25), inset 0 0 15px rgba(0, 255, 255, 0.08);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 15px rgba(0, 255, 255, 0.05);
     color: #e2e8f0;
     font-family: sans-serif;
     transform: translateY(10px);
-    transition: transform 0.25s ease;
+    transition: transform 0.3s ease;
 }
 
 .mw-info-modal.active .mw-info-card {
@@ -135,10 +132,9 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: none;
     border: none;
     color: #94a3b8;
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
     line-height: 1;
-    padding: 0 4px;
 }
 
 .mw-info-close-btn:hover {
@@ -163,6 +159,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .mw-info-body li {
     margin-bottom: 6px;
 }
+
+ 
 
 /* ==========================================
    1. 모달 배경 및 컨테이너 (위아래 여백 축소)
@@ -4969,31 +4967,30 @@ function renderGrowthChart(data) {
     });
 }
 
-// 🌿 통합 모달 열기 함수 (잔 잔상 및 클릭 방해 완전 제거)
+// 🌿 분기 운동 잔디 안내 모달 (네온 디자인 1:1 적용)
 window.openGrassInfoModal = function(event) {
-    if (event && event.stopPropagation) event.stopPropagation();
+    if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
 
     let modal = document.getElementById('mwInfoHelpModal');
     
+    // 모달 DOM 요소가 없다면 .mw-info-modal 구조로 동적 생성
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'mwInfoHelpModal';
         modal.className = 'mw-info-modal';
+        modal.onclick = function(e) { window.closeMwInfoModal(e); };
         modal.innerHTML = `
-            <div class="mw-info-card">
+            <div class="mw-info-card" onclick="event.stopPropagation()">
                 <div class="mw-info-header">
                     <span id="mwInfoModalTitle" class="mw-info-title">안내</span>
-                    <button type="button" class="mw-info-close-btn" onclick="window.closeMwInfoModal(event)">&times;</button>
+                    <button class="mw-info-close-btn" onclick="window.closeMwInfoModal(event)">&times;</button>
                 </div>
                 <div id="mwInfoModalBody" class="mw-info-body"></div>
             </div>
         `;
-        // 바깥 어두운 배경 클릭 시 닫기
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                window.closeMwInfoModal(e);
-            }
-        });
         document.body.appendChild(modal);
     }
 
@@ -5005,8 +5002,8 @@ window.openGrassInfoModal = function(event) {
         <ul>
             <li><strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <span style="color:#f97316; font-weight:bold;">🔥 HOT</span> 배지를 획득하며, <strong>30% 확률</strong>로 잔디에 계절별 꽃이 생성됩니다.
                 <div style="font-size: 11px; color: #94a3b8; margin-top: 4px; background: rgba(255,255,255,0.05); padding: 6px 8px; border-radius: 6px;">
-                    🌸 봄: 🌸, 🌷, 🌼, 🪷 | 🌻 여름: 🌻, 🏵, 🌹, 🌺<br>
-                    🍁 가을: 🍁, 🍂, 🌾, 🪻 | ❄️ 겨울: ❄️, 🌲, 🪾, ☃️
+                    봄: 🌸, 🌷, 🌼, 🪷 | 여름: 🌻, 🏵, 🌹, 🌺<br>
+                    가을: 🍁, 🍂, 🌾, 🪻 | 겨울: ❄️, 🌲, 🪾, ☃️
                 </div>
             </li>
             <li><strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong>3단계로 색상</strong>이 변화합니다.</li>
@@ -5015,22 +5012,27 @@ window.openGrassInfoModal = function(event) {
         </ul>
     `;
 
-    // 모달 활성화
-    modal.style.display = 'flex';
-    // pointer-events를 다시 켜줌
-    modal.style.pointerEvents = 'auto';
+    // 최상단 레이어 및 트랜지션 애니메이션 적용
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
     
     requestAnimationFrame(() => {
         modal.classList.add('active');
     });
 };
 
-// 📊 분기 성장 추이 안내 모달
+// 📊 분기 성장 추이 안내 모달 (네온 디자인 1:1 적용)
 window.openGrowthInfoModal = function(event) {
-    if (event && event.stopPropagation) event.stopPropagation();
+    if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
 
-    // 구조 생성을 위해 먼저 실행
-    window.openGrassInfoModal(event);
+    let modal = document.getElementById('mwInfoHelpModal');
+    if (!modal) {
+        window.openGrassInfoModal(event);
+        modal = document.getElementById('mwInfoHelpModal');
+    }
 
     const titleEl = document.getElementById('mwInfoModalTitle');
     const bodyEl = document.getElementById('mwInfoModalBody');
@@ -5047,18 +5049,27 @@ window.openGrowthInfoModal = function(event) {
             </li>
         </ul>
     `;
+
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('z-index', '999999', 'important');
+    
+    requestAnimationFrame(() => {
+        modal.classList.add('active');
+    });
 };
 
-// 🔒 모달 닫기 함수 (클릭 막힘 방지 핵심)
+// 모달 닫기 전용 함수
 window.closeMwInfoModal = function(event) {
-    if (event && event.stopPropagation) event.stopPropagation();
-
+    if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
     const modal = document.getElementById('mwInfoHelpModal');
     if (modal) {
         modal.classList.remove('active');
-        // 닫히는 즉시 클릭을 통과시키도록 pointer-events 제거
-        modal.style.pointerEvents = 'none';
-        modal.style.display = 'none';
+        setTimeout(() => {
+            modal.style.setProperty('display', 'none', 'important');
+        }, 300); // CSS fade-out transition 시간 고려
     }
 };
 
