@@ -4986,24 +4986,39 @@ window.closeMountainInfoModal = function(e) {
     }
 };
 
-// 🌿 공통 통합 모달 표출
-window.showUnifiedInfoModal = function(titleText, bodyHtml, e) {
-    if (e) {
-        if (typeof e.stopPropagation === 'function') e.stopPropagation();
-        if (typeof e.preventDefault === 'function') e.preventDefault();
-    } else if (window.event) {
-        window.event.cancelBubble = true;
+
+// 🔒 [통합 닫기] 모든 안내 모달 닫기 공통 함수
+window.closeMountainInfoModal = function(event) {
+    if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+    }
+    const modal = document.getElementById('mwInfoHelpModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300); // CSS 0.3s transition 완료 후 숨김
+    }
+};
+
+// 🌌 [통합 열기] 모달 데이터 주입 및 표출 공통 함수
+window.renderAndShowMwModal = function(titleHtml, bodyHtml, event) {
+    if (event) {
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+        if (typeof event.preventDefault === 'function') event.preventDefault();
     }
 
     let modal = document.getElementById('mwInfoHelpModal');
     
+    // 모달 DOM이 없으면 새로 생성 (안전장치)
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'mwInfoHelpModal';
         modal.className = 'mw-info-modal';
         
-        modal.onclick = function(event) {
-            window.closeMountainInfoModal(event);
+        modal.onclick = function(e) {
+            window.closeMountainInfoModal(e);
         };
 
         modal.innerHTML = `
@@ -5018,10 +5033,15 @@ window.showUnifiedInfoModal = function(titleText, bodyHtml, e) {
         document.body.appendChild(modal);
     }
 
+    // 최상위 body 직속 배치 보장 (타임라인 모달 z-index 탈출)
+    if (modal.parentNode !== document.body) {
+        document.body.appendChild(modal);
+    }
+
     const titleEl = document.getElementById('mwInfoModalTitle');
     const bodyEl = document.getElementById('mwInfoModalBody');
 
-    if (titleEl) titleEl.innerHTML = titleText;
+    if (titleEl) titleEl.innerHTML = titleHtml;
     if (bodyEl) bodyEl.innerHTML = bodyHtml;
 
     modal.style.display = 'flex';
@@ -5031,11 +5051,11 @@ window.showUnifiedInfoModal = function(titleText, bodyHtml, e) {
     });
 };
 
-// 🌱 1. 분기 운동 잔디 안내 모달
+// 🌱 1. 분기 운동 잔디 안내
 window.openGrassInfoModal = function(event) {
     const title = `🌱 분기 운동 잔디 안내`;
     const body = `
-        <div style="display:flex; flex-direction:column; gap:12px; padding-left:4px;">
+        <div style="display:flex; flex-direction:column; gap:12px;">
             <div>
                 <strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <strong style="color:#f97316;">🔥 HOT</strong> 배지를 획득하며, <strong style="color:#e2e8f0;">30% 확률</strong>로 잔디에 계절별 꽃이 생성됩니다.
                 <div style="font-size:11px; color:#94a3b8; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
@@ -5054,14 +5074,14 @@ window.openGrassInfoModal = function(event) {
             </div>
         </div>
     `;
-    window.showUnifiedInfoModal(title, body, event);
+    window.renderAndShowMwModal(title, body, event);
 };
 
-// 📊 2. 분기 성장 추이 안내 모달
+// 📊 2. 분기 성장 추이 안내
 window.openGrowthInfoModal = function(event) {
     const title = `📊 분기 성장 추이 안내`;
     const body = `
-        <div style="display:flex; flex-direction:column; gap:12px; padding-left:4px;">
+        <div style="display:flex; flex-direction:column; gap:12px;">
             <div>
                 <strong>분기 성과:</strong> 분기별 누적 고도, 최고봉, 분기 등산 및 운동 횟수를 한눈에 확인합니다.
             </div>
@@ -5076,12 +5096,58 @@ window.openGrowthInfoModal = function(event) {
             </div>
         </div>
     `;
-    window.showUnifiedInfoModal(title, body, event);
+    window.renderAndShowMwModal(title, body, event);
 };
 
+// 🌌 3. 은하수 안내 모달
+window.openMilkyWayInfoModal = function(event) {
+    const title = `🌌 은하수 비주얼 안내`;
+    const body = `
+        <ul>
+            <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
+            <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
+            <li><strong>특별한 별빛:</strong> 정기산행(확률형 등급 별 생성) 및 명산(100대 명산) 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
+            <li><strong>별똥별:</strong> 가장 최근 기록된 좌표를 향해 밤하늘의 별똥별이 떨어진 후 여운을 남깁니다.</li>
+            <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 상세 정보를 확인하실 수 있습니다.</li>
+        </ul>
+    `;
+    window.renderAndShowMwModal(title, body, event);
+};
 
-              
+// 🌀 4. 나이테 / 🏔️ 산맥 안내 모달
+window.openMountainInfoModal = function(type, event) {
+    let title = "";
+    let body = "";
 
+    if (type === 'ring') {
+        title = "🌀 활동 나이테 안내";
+        body = `
+            <ul>
+                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
+                <li><strong>중심 코어 모양:</strong> 회원 레벨에 따라 다채롭게 변경됩니다.
+                    <br>• 1~19 레벨: <strong>○ (원)</strong>
+                    <br>• 20~49 레벨: <strong>△ (삼각형)</strong>
+                    <br>• 50~79 레벨: <strong>◇ (다이아몬드)</strong>
+                    <br>• 80 레벨 이상: <strong>☆ (별)</strong>
+                </li>
+                <li><strong>테마 색상:</strong> 레벨 색상에 맞추어 <strong>빛줄기, 나이테, 전체 창 색상</strong>이 자동으로 변경됩니다.</li>
+                <li><strong>위성 별(Star):</strong> 정기 산행 참석 기록이 있는 달에는 해당 나이테 궤도 위에 고유한 <strong>정기산행 위성 별</strong>이 생성됩니다.</li>
+            </ul>
+        `;
+    } else if (type === 'mountain') {
+        title = "🏔️ 산맥 비주얼 안내";
+        body = `
+            <ul>
+                <li><strong>개인 산맥 높이:</strong> 정복한 산들의 해발 고도(m) 비율에 맞춰 산 봉우리가 형상화됩니다.</li>
+                <li><strong>황금빛 봉우리:</strong> 개인 기록 중 <strong>가장 높은 최정상 산</strong>은 황금빛 광원 효과로 강조됩니다.</li>
+                <li><strong>산맥 색상 변화:</strong> 누적 산행 <strong>100회 이후</strong>부터는 산맥 색상이 <strong>검붉은 색</strong>으로 변경됩니다.</li>
+                <li><strong>누적 100회 달성:</strong> 완등 횟수가 100회를 초과하면 슈퍼노바 라이트 빔 버스트 연출이 활성화됩니다.</li>
+            </ul>
+        `;
+    }
+
+    window.renderAndShowMwModal(title, body, event);
+};
 
 
     window.toggleMapView = () => {
@@ -6628,53 +6694,7 @@ mwMountainName.innerHTML = `
     }
 };
 
- // ➕ 안내 모달 열기 함수
-window.openMountainInfoModal = (type) => {
-    const modal = document.getElementById('mwInfoHelpModal');
-    const titleEl = document.getElementById('mwInfoModalTitle');
-    const bodyEl = document.getElementById('mwInfoModalBody');
 
-    if (!modal || !titleEl || !bodyEl) return;
-
-    if (type === 'ring') {
-        titleEl.innerText = "🌀 활동 나이테 안내";
-        bodyEl.innerHTML = `
-            <ul>
-                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
-                <li><strong>중심 코어 모양:</strong> 회원 레벨에 따라 다채롭게 변경됩니다.
-                    <br>• 1~19 레벨: <strong>○ (원)</strong>
-                    <br>• 20~49 레벨: <strong>△ (삼각형)</strong>
-                    <br>• 50~79 레벨: <strong>◇ (다이아몬드)</strong>
-                    <br>• 80 레벨 이상: <strong>☆ (별)</strong>
-                </li>
-                <li><strong>테마 색상:</strong> 레벨 색상에 맞추어 <strong>빛줄기, 나이테, 전체 창 색상</strong>이 자동으로 변경됩니다.</li>
-                <li><strong>위성 별(Star):</strong> 정기 산행 참석 기록이 있는 달에는 해당 나이테 궤도 위에 고유한 <strong>정기산행 위성 별</strong>이 생성됩니다.</li>
-            </ul>
-        `;
-    } else if (type === 'mountain') {
-        titleEl.innerText = "🏔️ 산맥 비주얼 안내";
-        bodyEl.innerHTML = `
-            <ul>
-                <li><strong>개인 산맥 높이:</strong> 정복한 산들의 해발 고도(m) 비율에 맞춰 산 봉우리가 형상화됩니다.</li>
-                <li><strong>황금빛 봉우리:</strong> 개인 기록 중 <strong>가장 높은 최정상 산</strong>은 황금빛 광원 효과로 강조됩니다.</li>
-                <li><strong>산맥 색상 변화:</strong> 누적 산행 <strong>100회 이후</strong>부터는 산맥 색상이 <strong>검붉은 색</strong>으로 변경됩니다.</li>
-                <li><strong>누적 100회 달성:</strong> 완등 횟수가 100회를 초과하면 슈퍼노바 라이트 빔 버스트 연출이 활성화됩니다.</li>
-            </ul>
-        `;
-    }
-
-    modal.classList.add('active');
-};
-
-// ➕ 안내 모달 닫기 함수
-window.closeMountainInfoModal = (event) => {
-    if (event && event.stopPropagation) event.stopPropagation();
-    const modal = document.getElementById('mwInfoHelpModal');
-    if (modal) modal.classList.remove('active');
-};
-
-        
-                        
 window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const container = document.getElementById('treeRingContainer');
     const monthLabel = document.getElementById('activityMonths');
@@ -7109,38 +7129,6 @@ window.showMilkyWay = async (mId, mName) => {
     }
 };
 
-// 🌌 은하수 전용 안내 모달 열기 함수 (최상위 노출 보장)
-window.openMilkyWayInfoModal = (event) => {
-    if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-
-    const modal = document.getElementById('mwInfoHelpModal');
-    const titleEl = document.getElementById('mwInfoModalTitle');
-    const bodyEl = document.getElementById('mwInfoModalBody');
-
-    if (!modal || !titleEl || !bodyEl) return;
-
-    // 부모 모달의 z-index 제한을 탈출하기 위해 body 직속으로 이동
-    if (modal.parentNode !== document.body) {
-        document.body.appendChild(modal);
-    }
-
-    titleEl.innerText = "🌌 은하수 비주얼 안내";
-bodyEl.innerHTML = `
-    <ul>
-        <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
-        <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
-        <li><strong>특별한 별빛:</strong> 정기산행(확률형 등급 별 생성) 및 명산(100대 명산) 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
-        <li><strong>별똥별:</strong> 가장 최근 기록된 좌표를 향해 밤하늘의 별똥별이 떨어진 후 여운을 남깁니다.</li>
-        <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 상세 정보를 확인하실 수 있습니다.</li>
-    </ul>
-`;
-
-
-    modal.classList.add('active');
-};
 
 
     
