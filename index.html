@@ -4378,38 +4378,30 @@ const totalCount = snapCount.data().count;
 // ⭐ 필터링용 전역 변수에 저장 (이번 분기 로그 세팅)
 currentMemberLogs = logsQuarter; 
 
-// 4. 상단 카운트 배지 렌더링
-const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
-const exerciseCount = logsQuarter.length;
+        // 4. 상단 카운트 배지 렌더링
+        const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
+        const exerciseCount = logsQuarter.length;
 
-const badge = document.getElementById('timelineCountBadge');
-if(badge) {
-    badge.innerText = `산행 ${hikeCount}회 / 운동 ${exerciseCount}회 / 전체 ${totalCount}회`;
-}
-
+        const badge = document.getElementById('timelineCountBadge');
+        if (badge) {
+            badge.innerText = `산행 ${hikeCount}회 / 운동 ${exerciseCount}회 / 전체 ${totalCount}회`;
+        }
 
         // 3. 차트 렌더링
         const chartData = await calculateGrowthData(mId);
         renderGrowthChart(chartData);
 
-        // 🔥 [중요] HOT 멤버 판별 및 변수 선언
+        // 🔥 [중요] HOT 멤버 판별 및 배지 표시
         let isHotMember = false; 
-        const thirtyDaysAgo = new Date(); 
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
         // 최근 30일 이내 '산행' 기록(isRunning, isTracking 제외)이 4회 이상인지 확인
-        const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
-const exerciseCount = logsQuarter.length;
+        const recentCount = logsRecent.filter(l => !l.isRunning && !l.isTracking).length;
 
-const badge = document.getElementById('timelineCountBadge');
-if(badge) {
-    badge.innerText = `산행 ${hikeCount}회 / 운동 ${exerciseCount}회 / 전체 ${totalCount}회`;
-}
-
-        if(recentCount >= 4) {
+        if (recentCount >= 4) {
             vibeArea.innerHTML = `<span class="hot-vibe flex items-center h-[18px] text-[9px] font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">🔥 HOT</span>`;
             isHotMember = true;
         }
+
 
         const weeklyCheck = {};
         const validHikeDays = []; // 나비가 앉을 수 있는 후보들
