@@ -2906,7 +2906,7 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
         <div class="flex justify-between items-center mb-2.5">
             <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1">
                 🌱 분기 운동 잔디
-                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ⓘ</button>
+                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
             </p>
             
             <div class="flex items-center gap-1.5">
@@ -3090,7 +3090,7 @@ async function saveMemberByName(memberData) {
     await setDoc(userRef, {
       name: cleanName,
       gender: gender || "여",
-      level: level || 1,
+      level: level ?? 0,
       count: 0,
       bonusDays: 0,
       buddyCount: 0,
@@ -5075,24 +5075,27 @@ window.openGrassInfoModal = function(event) {
     const title = `🌱 분기 운동 잔디 안내`;
     const body = `
         <div style="display:flex; flex-direction:column; gap:14px; text-align:left;">
+        <div>
+<strong>분기 선택:</strong> 메인화면 1분기 2분기 3분기 4분기 선택시 해당 분기로 이동
+  </div>
+        <div>
+    <strong>잔디 생성:</strong> 일정, 정기산행을 제외 한 <strong>모든 개인 운동 및 산행</strong>은 단톡방에 <strong>인증 사진(정상, 기록 등)</strong>만 공유해도 자동 기록·생성됩니다.
+</div>
             <div>
-                <strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <strong style="color:#f97316;">🔥 HOT</strong> 배지를 획득하며, <strong style="color:#e2e8f0;">30% 확률</strong>로 잔디에 계절별 꽃이 생성됩니다.
+                <strong>열정 회원:</strong> 최근 30일 이내 4회 이상 산행 시 <strong style="color:#f97316;">🔥 HOT</strong> 배지를 획득하며, <strong>30% 확률</strong>로 잔디에 계절별 꽃이 생성됩니다.
                 <div style="font-size:11px; color:#94a3b8; margin-top:6px; background:rgba(255, 255, 255, 0.05); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
                     봄: 🌸, 🌷, 🌼, 🪷 | 여름: 🌻, 🏵, 🌹, 🌺<br>
                     가을: 🍁, 🍂, 🌾, 🪻 | 겨울: ❄️, 🌲, 🪾, ☃️
                 </div>
             </div>
             <div>
-                <strong>잔디 나비:</strong> 분기 <strong style="color:#e2e8f0;">4주 연속 일정 산행 시</strong> 1~2마리의 나비가 랜덤으로 생성됩니다.
+                <strong>잔디 나비:</strong> 분기 <strong>4주 연속 일정 산행 시</strong> 1~2마리의 나비가 랜덤으로 생성됩니다.
             </div>
             <div>
-                <strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong style="color:#e2e8f0;">3단계로 색상</strong>이 변화합니다.
+                <strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong>3단계로 색상</strong>이 변화합니다.
             </div>
             <div>
-                <strong>활동별 색상:</strong> 일정산행(<span style="color:#4ade80;">초록</span>), 번외산행(<span style="color:#2dd4bf;">청녹</span>), 런닝(<span style="color:#f472b6;">분홍</span>), 트레킹(<span style="color:#c084fc;">보라</span>), 산책(<span style="color:#fb923c;">주황</span>)으로 구분됩니다.
-            </div>
-            <div>
-                <strong>특별한 잔디:</strong> 정기 산행 시 계절 마크가 포함된 <strong style="color:#e2e8f0;">무지개 엠보싱 프리미엄 잔디</strong>가 생성됩니다.
+                <strong>특별한 잔디:</strong> 정기 산행 시 계절 마크가 포함된 <strong>무지개 엠보싱 프리미엄 잔디</strong>가 생성됩니다.
             </div>
         </div>
     `;
@@ -5109,7 +5112,7 @@ window.openGrowthInfoModal = function(event) {
                 <strong>분기 성과:</strong> 분기별 누적 고도, 최고봉, 분기 등산 및 운동 횟수를 한눈에 확인합니다.
             </div>
             <div>
-                <strong>산 성분 분석:</strong> 정복한 산의 <strong style="color:#e2e8f0;">바위(🪨)</strong>, <strong style="color:#e2e8f0;">숲(🌲)</strong>, <strong style="color:#e2e8f0;">계곡(🌊)</strong> 성분 비율을 분석하여 표시합니다.
+                <strong>산 성분 분석:</strong> 정복한 산의 <strong>바위(🪨)</strong>, <strong>숲(🌲)</strong>, <strong>계곡(🌊)</strong> 성분 비율을 분석하여 표시합니다.
             </div>
             <div>
                 <strong>계절별 테마:</strong> 계절 변화에 따라 그래프 막대 색상이 자동으로 변경됩니다.
@@ -5146,7 +5149,7 @@ window.openMountainInfoModal = function(type, event) {
         title = "🌀 활동 나이테 안내";
         body = `
             <ul>
-                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 하나씩 추가됩니다.</li>
+                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 추가되며 1년마다 하나씩 굵어집니다.</li>
                 <li><strong>중심 코어 모양:</strong> 회원 레벨에 따라 다채롭게 변경됩니다.
                     <br>• 1~19 레벨: <strong>○ (원)</strong>
                     <br>• 20~49 레벨: <strong>△ (삼각형)</strong>
@@ -5806,7 +5809,7 @@ window.addMember = async () => {
         await setDoc(userRef, {
             name: cleanName,
             gender: gender,
-            level: 1,
+            level: 0,
             count: 0,
             bonusDays: 0,
             buddyCount: 0,
@@ -6433,8 +6436,11 @@ async function updateVibeTemp() {
   }
 }
 
-    
-        window.showMemberMountain = async (mId, mName) => {
+// 🎯 [전역 캐시 객체 선언] 최초 1회만 Firestore에서 가져오고 이후 재활용합니다.
+window.mountainDataCache = window.mountainDataCache || {};
+window.treeRingCache = window.treeRingCache || {};
+
+window.showMemberMountain = async (mId, mName) => {
     const modal = document.getElementById('mountainViewModal');
     const card = document.getElementById('integratedCard');
     const peakLayer = document.getElementById('peakLayer');
@@ -6481,16 +6487,15 @@ async function updateVibeTemp() {
         mwMountainName.style.position = 'relative';
         mwMountainName.style.opacity = '1';
 
-        // ✏️ showMemberMountain 함수 내 mwMountainName 세팅 부분 교체
-mwMountainName.innerHTML = `
-    <span style="font-size: 10.5px !important; font-weight: 700 !important; white-space: nowrap; letter-spacing: -0.3px; display: inline-flex; align-items: center;">
-        ${mName}님의 산맥
-        <button class="info-help-btn" onclick="openMountainInfoModal('mountain')" title="산맥 안내">ⓘ</button>
-    </span>
-    <span id="mwHikeTotalWrapper" style="position: relative; display: inline-block;">
-        <span id="mwHikeTotalCount" style="font-size: 9px !important; font-weight: 700 !important; white-space: nowrap; margin-right: -12px !important; opacity: 0; transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🏔️TOTAL: --회</span>
-    </span>
-`;
+        mwMountainName.innerHTML = `
+            <span style="font-size: 10.5px !important; font-weight: 700 !important; white-space: nowrap; letter-spacing: -0.3px; display: inline-flex; align-items: center;">
+                ${mName}님의 산맥
+                <button class="info-help-btn" onclick="openMountainInfoModal('mountain')" title="산맥 안내">ⓘ</button>
+            </span>
+            <span id="mwHikeTotalWrapper" style="position: relative; display: inline-block;">
+                <span id="mwHikeTotalCount" style="font-size: 9px !important; font-weight: 700 !important; white-space: nowrap; margin-right: -12px !important; opacity: 0; transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🏔️TOTAL: --회</span>
+            </span>
+        `;
     }
 
     const initializeBeam = (b) => {
@@ -6535,15 +6540,12 @@ mwMountainName.innerHTML = `
         ringLaunchedEl.style.transition = 'opacity 0.4s ease-out';
     }
 
-            try {
-        // 🎯 [TOTAL 카운터 대상 보정]
+    try {
         let pureHikeCount = 0;
-        let hasQuarterlyHike = false; // 분기 hike 데이터 존재 여부 플래그
+        let hasQuarterlyHike = false;
         
         if (memberInfo && memberInfo.quarterlyStats) {
             const stats = memberInfo.quarterlyStats;
-            
-            // 1. 2026_q2를 베이스로 지정
             const baseCount = (stats['2026_q2'] && typeof stats['2026_q2'].hike === 'number') 
                 ? stats['2026_q2'].hike 
                 : 0;
@@ -6551,7 +6553,6 @@ mwMountainName.innerHTML = `
             if (baseCount > 0) hasQuarterlyHike = true;
             pureHikeCount += baseCount;
 
-            // 2. 2026_q3 포함 그 이후 분기 데이터 누적 합산
             Object.keys(stats).forEach(key => {
                 if (key >= '2026_q3') {
                     const quarter = stats[key];
@@ -6563,9 +6564,7 @@ mwMountainName.innerHTML = `
             });
         }
 
-        // 🎯 [핵심 예외 처리] 분기 기록이 없는 경우 'count' 필드를 토탈로 표기합니다.
         if (!hasQuarterlyHike || pureHikeCount === 0) {
-            // qCount 대신 이미지에 명시된 실제 필드명 'count'로 정확히 스위칭합니다.
             pureHikeCount = (memberInfo && typeof memberInfo.count === 'number') ? memberInfo.count : 0;
         }
 
@@ -6576,16 +6575,21 @@ mwMountainName.innerHTML = `
             totalCountEl.innerHTML = `🏔️TOTAL: ${pureHikeCount}회`;
         }
 
-        // 🎯 [산맥 그리기 대상] 100개 limit 쿼리 유지
-        const q = query(
-            collection(db, `sanwoori/${mId}/logs`),
-            limit(100)
-        );
-        const snap = await getDocs(q);
-        const allLogs = snap.docs.map(d => d.data());
+        // 🎯 [캐시 로직 적용] 캐시에 저장된 로그가 있으면 사용, 없으면 Firestore 1회 조회
+        let allLogs;
+        if (window.mountainDataCache[mId]) {
+            allLogs = window.mountainDataCache[mId];
+        } else {
+            const q = query(
+                collection(db, `sanwoori/${mId}/logs`),
+                limit(100)
+            );
+            const snap = await getDocs(q);
+            allLogs = snap.docs.map(d => d.data());
+            window.mountainDataCache[mId] = allLogs; // 캐시에 보관
+        }
         
         let logs = allLogs.filter(l => (l.height || 0) > 0 && (!l.isSpecial || l.isExtraHike));
-
 
         // [Case A] 산맥 데이터가 하나라도 잡히는 일반 유저군
         if (logs.length > 0) {
@@ -6726,12 +6730,10 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
     if (!container) return;
 
-    // [1] 초기화: 기존 내용 비우기 및 스타일 적용
     container.innerHTML = "";
     if (mainTitle) mainTitle.classList.add('cosmic-neon-text');
     if (mountainName) mountainName.classList.add('cosmic-neon-text');
 
-    // [2] 배경 별빛 생성
     const bgStarColors = ["#ffffff", "#facc15", "#3b82f6", "#ef4444"];
     for (let i = 0; i < 100; i++) {
         const star = document.createElement('div');
@@ -6754,7 +6756,6 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         container.appendChild(star);
     }
 
-        // [3] 날짜 및 나이테 개수 계산 (만 개월수 로직 통합)
     const fixedList = ["오즈","나스","해수","용삼","지니","아랑","민이","몰랑","길치","등초","무니","식이","구름","뚜벅","윤윤","햄찌","이구","후후","튜브","피치","송돌","호프","애플","얌얌","태리","희야","멸치","성민","섭섭","하트"];
     const now = new Date();
     let jDate;
@@ -6763,70 +6764,76 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     if (fixedList.includes(memberName)) {
         jDate = new Date('2025-11-24T00:00:00');
     } else if (regDate?.toDate) {
-        // regDate가 있으면 사용
         jDate = regDate.toDate();
     } else {
-        // B. regDate가 없으면? 첫 로그 날짜를 조회 (통합 로직)
-        try {
-            const logsSnap = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "asc"), limit(1)));
-            if (!logsSnap.empty) {
-                jDate = logsSnap.docs[0].data().date.toDate();
-            } else {
-                jDate = new Date(); // 로그도 없으면 오늘 날짜
+        // B. regDate가 없을 경우: DB 조회 전 캐시 데이터를 우선 탐색
+        const cachedLogs = window.mountainDataCache[mId] || [];
+        if (cachedLogs.length > 0) {
+            // 캐시 로그 중 가장 오래된 날짜 추출
+            const sortedDates = cachedLogs
+                .filter(l => l.date)
+                .map(l => l.date.toDate ? l.date.toDate() : new Date(l.date))
+                .sort((a, b) => a - b);
+            jDate = sortedDates[0] || new Date();
+        } else {
+            // 캐시에도 없을 때만 최소 1회 조회 후 캐싱
+            try {
+                const logsSnap = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "asc"), limit(1)));
+                if (!logsSnap.empty) {
+                    jDate = logsSnap.docs[0].data().date.toDate();
+                } else {
+                    jDate = new Date();
+                }
+            } catch (e) {
+                console.error("가입일 자동 산출 에러:", e);
+                jDate = new Date();
             }
-        } catch (e) {
-            console.error("가입일 자동 산출 에러:", e);
-            jDate = new Date();
         }
     }
 
-    // 만 개월 수 계산 함수
     function getFullMonths(start, end) {
         let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-        // 오늘 일자가 가입일보다 작으면 한 달이 아직 안 찬 것이므로 -1
         if (end.getDate() < start.getDate()) {
             months--;
         }
-        return Math.max(0, months); // 음수 방지
+        return Math.max(0, months);
     }
 
     const elapsedMonths = getFullMonths(jDate, now);
-    // 나이테 개수: 가입 직후(0개월) 1개, 한 달 경과(1개월) 2개... 방식 적용
     const diffMonths = Math.max(1, elapsedMonths + 1);
 
-    // 레벨별 스타일 및 색상 추출
     const style = getLevelStyle(memberLevel);
-    const ringColor = style.border; // 레벨 고유의 테두리 색상
+    const ringColor = style.border;
 
-    // 🪐 [수정] 가입일 텍스트 매핑 및 반짝임(애니메이션) 없이 색상만 고정 적용
     const ringLaunchedEl = document.getElementById('ringLaunchedDate');
-    // renderTreeRings 함수 내부 [3]번 영역 중 Launched 텍스트 세팅 부분 보정
-if (ringLaunchedEl && jDate) {
-    const yyyy = jDate.getFullYear();
-    const mm = String(jDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(jDate.getDate()).padStart(2, '0');
-    
-    ringLaunchedEl.innerText = `LAUNCHED: ${yyyy}.${mm}.${dd}`;
-    
-    ringLaunchedEl.style.color = ringColor;
-    ringLaunchedEl.style.textShadow = `0 0 5px ${ringColor}, 0 0 10px ${ringColor}`;
-    ringLaunchedEl.style.animation = "none"; 
-    // 💡 초기 선언 시 opacity를 건드리지 않고, 위의 showMemberMountain에서 
-    // glow-active 시점에 1로 켜주도록 열어둡니다.
-}
+    if (ringLaunchedEl && jDate) {
+        const yyyy = jDate.getFullYear();
+        const mm = String(jDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(jDate.getDate()).padStart(2, '0');
+        
+        ringLaunchedEl.innerText = `LAUNCHED: ${yyyy}.${mm}.${dd}`;
+        ringLaunchedEl.style.color = ringColor;
+        ringLaunchedEl.style.textShadow = `0 0 5px ${ringColor}, 0 0 10px ${ringColor}`;
+        ringLaunchedEl.style.animation = "none"; 
+    }
 
     const regularStarColors = ["#00FFFF", "#FF8C00", "#D32F2F", "#7C4DFF", "#A020F0", "#00FF7F"]; 
 
-
-    // [4] 정기산행 데이터 로드
+    // 🎯 [캐시 로직 적용] 정기산행 수거 시 DB 전체 조회를 하지 않고 메모리의 캐시 데이터를 활용
     let regularHikesByMonth = {};
     try {
-        const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
-        snap.forEach(doc => {
-            const data = doc.data();
+        let rawLogs = window.mountainDataCache[mId];
+        
+        // 만약 캐시가 없으면 1회 로드하여 저장
+        if (!rawLogs) {
+            const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
+            rawLogs = snap.docs.map(doc => doc.data());
+            window.mountainDataCache[mId] = rawLogs;
+        }
+
+        rawLogs.forEach(data => {
             if (data.isRegular && data.date) {
-                const hikeDate = data.date.toDate();
-                // 해당 산행이 가입일로부터 몇 번째 '만 개월' 영역에 있는지 계산
+                const hikeDate = data.date.toDate ? data.date.toDate() : new Date(data.date);
                 const monthIdx = getFullMonths(jDate, hikeDate);
                 if (monthIdx >= 0 && monthIdx < diffMonths) {
                     if (!regularHikesByMonth[monthIdx]) regularHikesByMonth[monthIdx] = [];
@@ -6847,42 +6854,35 @@ if (ringLaunchedEl && jDate) {
     svg.setAttribute("viewBox", "0 0 240 240");
     svg.style.cssText = "width:100%; height:100%; overflow:visible;";
 
-    // --- [중앙 코어 생성: 레벨별 모양 변경 로직] ---
-let coreShape;
-const cx = 120, cy = 120, r = 6; // 중심 좌표와 크기
+    let coreShape;
+    const cx = 120, cy = 120, r = 6;
 
-if (memberLevel >= 80) {
-// 80레벨 이상: 별 모양 (Polygon)
-coreShape = document.createElementNS(svgNS, "polygon");
-let points = "";
-for (let i = 0; i < 10; i++) {
-let angle = (i * Math.PI) / 5 - Math.PI / 2;
-let currR = (i % 2 === 0) ? r * 1.5 : r * 0.6;
-points += `${cx + currR * Math.cos(angle)},${cy + currR * Math.sin(angle)} `;
-}
-coreShape.setAttribute("points", points);
-} else if (memberLevel >= 50) {
-// 50~79레벨: 다이아몬드 (Polygon)
-coreShape = document.createElementNS(svgNS, "polygon");
-coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy} ${cx},${cy+r*1.2} ${cx-r*1.2},${cy}`);
-} else if (memberLevel >= 20) {
-// 20~49레벨: 삼각형 (Polygon)
-coreShape = document.createElementNS(svgNS, "polygon");
-coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy+r} ${cx-r*1.2},${cy+r}`);
-} else {
-// 1~19레벨: 원형 (Circle)
-coreShape = document.createElementNS(svgNS, "circle");
-coreShape.setAttribute("cx", cx);
-coreShape.setAttribute("cy", cy);
-coreShape.setAttribute("r", r);
-}
+    if (memberLevel >= 80) {
+        coreShape = document.createElementNS(svgNS, "polygon");
+        let points = "";
+        for (let i = 0; i < 10; i++) {
+            let angle = (i * Math.PI) / 5 - Math.PI / 2;
+            let currR = (i % 2 === 0) ? r * 1.5 : r * 0.6;
+            points += `${cx + currR * Math.cos(angle)},${cy + currR * Math.sin(angle)} `;
+        }
+        coreShape.setAttribute("points", points);
+    } else if (memberLevel >= 50) {
+        coreShape = document.createElementNS(svgNS, "polygon");
+        coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy} ${cx},${cy+r*1.2} ${cx-r*1.2},${cy}`);
+    } else if (memberLevel >= 20) {
+        coreShape = document.createElementNS(svgNS, "polygon");
+        coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy+r} ${cx-r*1.2},${cy+r}`);
+    } else {
+        coreShape = document.createElementNS(svgNS, "circle");
+        coreShape.setAttribute("cx", cx);
+        coreShape.setAttribute("cy", cy);
+        coreShape.setAttribute("r", r);
+    }
 
-// 공통 스타일 및 애니메이션 적용
-coreShape.setAttribute("fill", ringColor);
-coreShape.classList.add('tree-ring-core-moving');
-coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
-svg.appendChild(coreShape);
-// --- [교체 완료] ---
+    coreShape.setAttribute("fill", ringColor);
+    coreShape.classList.add('tree-ring-core-moving');
+    coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
+    svg.appendChild(coreShape);
 
     // [6] 나이테 및 위성 별 생성
     const rings = [];
@@ -6986,8 +6986,8 @@ svg.appendChild(coreShape);
         }
     }, 100);
 };
-
-     
+    
+        
 window.showMilkyWay = async (mId, mName) => {
     const modal = document.getElementById('milkyWayModal');
     const board = document.getElementById('constellationBoard');
@@ -6996,38 +6996,42 @@ window.showMilkyWay = async (mId, mName) => {
     if (!modal || !board) return;
 
     // --- [1. 가이드 UI 주입 (ⓘ 버튼 및 은하수 가이드 모달 추가)] ---
-        if (!document.getElementById('starGuideBtn')) {
-        const guideHTML = `
-            <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010;">
-                <button id="starGuideBtn" onclick="toggleStarGuide(true)" class="star-guide-btn" style="border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.4);">
-                    <span class="sparkle-icon">✨</span> 별 가이드
-                </button>
-            </div>
-            <div id="starGuideModal" class="star-guide-overlay" style="display: none; position: absolute; top:0; left:0; width:100%; height:100%; z-index:10020; border-radius:inherit; background: rgba(7, 10, 20, 0.98); backdrop-filter: blur(15px); transition: opacity 0.3s ease;" onclick="toggleStarGuide(false)">
-                <div class="star-guide-content" style="width: 100%; height: 100%; padding: 30px 20px; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
-                    <div class="guide-header" style="text-align: center; margin-bottom: 15px; flex-shrink: 0;">
-                        <h3 style="color: #fff; font-size: 1.2rem; font-weight: 900; letter-spacing: 3px; text-shadow: 0 0 10px rgba(255,255,255,0.3);">STAR GALLERY</h3>
-                        <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 5px;">산우리의 밤하늘을 수놓는 특별한 별빛들</p>
-                    </div>
-                    <div class="guide-grid" id="guideGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex-grow: 1; align-content: center;">
-                    </div>
-                    <button onclick="toggleStarGuide(false)" class="guide-close-btn" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; opacity: 0.6;">&times;</button>
+if (!document.getElementById('starGuideBtn')) {
+    const guideHTML = `
+        <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010;">
+            <button id="starGuideBtn" onclick="toggleStarGuide(true)" class="star-guide-btn" style="border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.4);">
+                <span class="sparkle-icon">✨</span> 별 가이드
+            </button>
+        </div>
+        <!-- 반투명 오버레이 -->
+        <div id="starGuideModal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10020; border-radius: inherit; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(14px); justify-content: center; align-items: center; opacity: 0; transition: opacity 0.25s ease;" onclick="toggleStarGuide(false)">
+            
+            <div style="width: 90%; max-width: 340px; height: auto; background: linear-gradient(160deg, #0f172a 0%, #080d1a 100%); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; padding: 26px 20px 20px 20px; position: relative; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(99, 102, 241, 0.15); box-sizing: border-box; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
+                
+                <!-- 상단 타이틀 -->
+                <div style="text-align: center; margin-bottom: 20px; flex-shrink: 0; position: relative;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 35px; background: rgba(99, 102, 241, 0.2); filter: blur(20px); border-radius: 50%; pointer-events: none;"></div>
+                    <h3 style="color: #fff; font-size: 1.1rem; font-weight: 900; letter-spacing: 3px; margin: 0; text-shadow: 0 0 12px rgba(165, 180, 252, 0.6); position: relative;">STAR GALLERY</h3>
+                    <p style="color: #94a3b8; font-size: 0.68rem; margin: 6px 0 0 0; opacity: 0.85; font-weight: 500; position: relative;">산우리의 밤하늘을 수놓는 특별한 별빛들</p>
                 </div>
-            </div>`;
-        modal.insertAdjacentHTML('afterbegin', guideHTML);
-    }
 
+                <!-- 아이템 그리드 -->
+                <div id="guideGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); row-gap: 10px; column-gap: 10px;">
+                </div>
 
-    // --- [2. 기초 데이터 정의] ---
-    const initialHikes = {
-        "오즈": 33, "지니": 24, "나스": 19, "해수": 15, "하트": 13, "아랑": 19, "쿠키": 8, "용삼": 14, 
-        "식이": 6, "몰랑": 10, "길치": 7, "등초": 7, "구름": 5, "튜브": 4, "햄찌": 5, "로드": 3, 
-        "애플": 5, "민이": 3, "운해": 5, "윤윤": 2, "무니": 3, "태리": 2, "이구": 2, "영규": 2, 
-        "후후": 6, "피치": 2, "호프": 2, "멸치": 1, "섭섭": 1, "뚜벅": 3, "송돌": 2, "여록": 1, 
-        "람쥐": 1, "몽꽁": 1, "란이": 2, "얌얌": 0, "수리": 1, "희야": 0, "성민": 0, 
-    };
+                <!-- 하단 블랙 네온 블루 확인 버튼 (팁 문구 제거됨) -->
+                <div style="margin-top: 18px;">
+                    <button onclick="toggleStarGuide(false)" style="width: 100%; background: linear-gradient(135deg, #090d16 0%, #0f1c3f 50%, #1e293b 100%); border: 1px solid rgba(56, 189, 248, 0.4); color: #e0f2fe; font-size: 0.88rem; font-weight: 800; letter-spacing: 2px; padding: 12px 0; border-radius: 14px; cursor: pointer; box-shadow: 0 0 15px rgba(56, 189, 248, 0.25), inset 0 0 10px rgba(56, 189, 248, 0.15); text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); transition: all 0.3s ease; box-sizing: border-box;" onmouseover="this.style.borderColor='rgba(56, 189, 248, 0.8)'; this.style.boxShadow='0 0 22px rgba(56, 189, 248, 0.5), inset 0 0 15px rgba(56, 189, 248, 0.3)';" onmouseout="this.style.borderColor='rgba(56, 189, 248, 0.4)'; this.style.boxShadow='0 0 15px rgba(56, 189, 248, 0.25), inset 0 0 10px rgba(56, 189, 248, 0.15)';">
+                        확인
+                    </button>
+                </div>
 
-     // --- [UI 초기화: 글씨 완벽 중앙 고정 & 버튼 오른쪽 우회 배치] ---
+            </div>
+        </div>`;
+    modal.insertAdjacentHTML('afterbegin', guideHTML);
+}
+
+    // --- [2. UI 초기화: 글씨 완벽 중앙 고정 & 버튼 오른쪽 우회 배치] ---
     modal.style.display = 'flex';
     if (nameLabel) {
         nameLabel.style.textAlign = 'center';
@@ -7044,13 +7048,35 @@ window.showMilkyWay = async (mId, mName) => {
     board.innerHTML = '<div class="nebula-cloud"></div>';
 
     try {
-        // [4. 동행지수 계산]
-        const memberInfo = (typeof currentData !== 'undefined') ? currentData.find(m => m.id === mId) : null;
-        const baseHikes = initialHikes[mName] || 0;
-        const myMultiHikes = (memberInfo && memberInfo.buddyCount !== undefined) ? memberInfo.buddyCount : 0;
-        const finalSynergy = baseHikes > 0 ? Math.min(100, Math.round((myMultiHikes / baseHikes) * 100)) : 0;
+        // --- [3. DB 회원 데이터 조회 및 동행지수 연산] ---
+        let memberInfo = null;
+        
+        // 1순위: 전역 currentData에서 mId로 검색
+        if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+            memberInfo = currentData.find(m => m.id === mId || m.name === mName);
+        }
 
-        // [5. 동행지수 60% 이상일 때만 배경 효과 실행]
+        // 2순위: currentData에 없으면 DB 개별 문서 직접 조회 (읽기 최소화)
+        if (!memberInfo && mId) {
+            const mDoc = await getDoc(doc(db, "sanwoori", mId));
+            if (mDoc.exists()) {
+                memberInfo = { id: mDoc.id, ...mDoc.data() };
+            }
+        }
+
+        // DB 필드 값 매칭 (count: 전체 산행, buddyCount: 동행 산행)
+        const finalTotalHikes = memberInfo ? (memberInfo.count || 0) : 0; 
+        const myMultiHikes = memberInfo ? (memberInfo.buddyCount || 0) : 0;
+        
+        // 동행 횟수가 전체 산행 횟수보다 크게 잡히는 구조적 예외 방어
+        const adjustedTotalHikes = Math.max(finalTotalHikes, myMultiHikes);
+        
+        // 동행지수 연산 (%)
+        const finalSynergy = adjustedTotalHikes > 0 ? Math.min(100, Math.round((myMultiHikes / adjustedTotalHikes) * 100)) : 0;
+
+        console.log(`🌌 [은하수 동행지수] ${mName}님 - 총 산행: ${adjustedTotalHikes}회 / 동행: ${myMultiHikes}회 / 동행지수: ${finalSynergy}%`);
+
+        // --- [4. 동행지수 60% 이상일 때 오로라 및 배경 별빛 효과 실행] ---
         if (finalSynergy >= 60) {
             const starColors = ["#E0F7FA", "#FFF0F5", "#FFECB3", "#F3E5F5", "#FFFFFF", "#80CBC4", "#FFAB91"];
             
@@ -7080,7 +7106,7 @@ window.showMilkyWay = async (mId, mName) => {
             requestAnimationFrame(() => aurora.classList.add('aurora-active'));
         }
      
-        // --- [6. 별자리 데이터 로드 및 그리기] ---
+        // --- [5. 별자리 데이터 로드 및 그리기] ---
         const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
         const logs = snap.docs
             .map(d => d.data())
@@ -7150,77 +7176,116 @@ window.showMilkyWay = async (mId, mName) => {
     } catch (e) {
         console.error("은하수 로딩 에러:", e);
     }
-};
-
-
-
+}
     
-    
-// --- [가이드 렌더링 함수] ---
-window.toggleStarGuide = (show) => {
+// --- [가이드backgroun
+    window.toggleStarGuide = (show) => {
     const gModal = document.getElementById('starGuideModal');
     if (!gModal) return;
     if (show) {
         renderStarGuideItems();
-        gModal.style.display = 'flex';
-        gModal.style.opacity = '0';
+        gModal.style.display = 'flex'; // 중앙 정렬 flex 적용
         setTimeout(() => { gModal.style.opacity = '1'; }, 10);
     } else {
         gModal.style.opacity = '0';
-        setTimeout(() => { gModal.style.display = 'none'; }, 300);
+        setTimeout(() => { gModal.style.display = 'none'; }, 250);
     }
 };
 
-function renderStarGuideItems() {
+
+    function renderStarGuideItems() {
     const grid = document.getElementById('guideGrid');
     if (!grid) return;
+
     const stars = [
-        { name: "슈퍼별", prob: "3%", desc: "타오르는 태양의 전설", style: "background: radial-gradient(circle, #FF0000 10%, #FFFF00 70%, #fff 100%); box-shadow: 0 0 15px 4px #FF0000, 0 0 30px 8px #FFFF00;", twinkle: true },
-        { name: "스페셜별", prob: "7%", desc: "신비로운 에픽 오로라", style: "background: radial-gradient(circle, #A020F0 10%, #00FF7F 70%, #fff 100%); box-shadow: 0 0 15px 4px #A020F0, 0 0 30px 8px #00FF7F;", twinkle: true },
-        { name: "정기 1호", prob: "22.5%", desc: "청명한 시안 블루", style: "background: #00FFFF; box-shadow: 0 0 12px #00FFFF;", twinkle: true },
-        { name: "정기 2호", prob: "22.5%", desc: "정열의 오렌지", style: "background: #D35400; box-shadow: 0 0 12px #D35400;", twinkle: true },
-        { name: "정기 3호", prob: "22.5%", desc: "위엄있는 다크레드", style: "background: #D32F2F; box-shadow: 0 0 12px #D32F2F;", twinkle: true },
-        { name: "정기 4호", prob: "22.5%", desc: "진하고 우아한 퍼플", style: "background: #7C4DFF; box-shadow: 0 0 12px #7C4DFF;", twinkle: true },
-        { name: "산림청100대", prob: "인증", desc: "영광의 샴페인 골드", style: "background: #F7E7CE; box-shadow: 0 0 8px #F7E7CE;", twinkle: false },
-        { name: "일반 <br>산행", prob: "상시", desc: "소중한 일상의 기록", style: "background: #FFFFFF; box-shadow: 0 0 6px #FFFFFF;", twinkle: false }
+        { 
+            name: "슈퍼별", prob: "3%", desc: "타오르는 태양의 전설", 
+            style: "background: radial-gradient(circle, #FF0000 10%, #FFFF00 70%, #fff 100%); box-shadow: 0 0 10px 2px #FF0000, 0 0 18px 5px #FFFF00;", 
+            cardBg: "background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.35);",
+            tagBg: "background: rgba(239, 68, 68, 0.25); color: #fca5a5;",
+            twinkle: true 
+        },
+        { 
+            name: "스페셜별", prob: "7%", desc: "신비로운 에픽 오로라", 
+            style: "background: radial-gradient(circle, #A020F0 10%, #00FF7F 70%, #fff 100%); box-shadow: 0 0 10px 2px #A020F0, 0 0 18px 5px #00FF7F;", 
+            cardBg: "background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px solid rgba(168, 85, 247, 0.35);",
+            tagBg: "background: rgba(168, 85, 247, 0.25); color: #e9d5ff;",
+            twinkle: true 
+        },
+        { name: "정기 1호", prob: "22.5%", desc: "청명한 시안 블루", style: "background: #00FFFF; box-shadow: 0 0 8px #00FFFF;", twinkle: true },
+        { name: "정기 2호", prob: "22.5%", desc: "정열의 오렌지", style: "background: #D35400; box-shadow: 0 0 8px #D35400;", twinkle: true },
+        { name: "정기 3호", prob: "22.5%", desc: "위엄있는 다크레드", style: "background: #D32F2F; box-shadow: 0 0 8px #D32F2F;", twinkle: true },
+        { name: "정기 4호", prob: "22.5%", desc: "진하고 우아한 퍼플", style: "background: #7C4DFF; box-shadow: 0 0 8px #7C4DFF;", twinkle: true },
+        { name: "산림청100대", prob: "인증", desc: "영광의 샴페인 골드", style: "background: #F7E7CE; box-shadow: 0 0 6px #F7E7CE;", twinkle: false },
+        { name: "일반 산행", prob: "상시", desc: "소중한 일상의 기록", style: "background: #FFFFFF; box-shadow: 0 0 5px #FFFFFF;", twinkle: false }
     ];
 
-    grid.innerHTML = stars.map(s => `
-        <div class="star-info-card" style="background: rgba(255,255,255,0.04); border-radius: 14px; padding: 20px 15px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255,255,255,0.08); min-height: 90px;">
-            <div style="width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
+    const createDivider = (label) => `
+        <div style="grid-column: 1 / -1; margin: 4px 0 1px 0; display: flex; align-items: center; gap: 10px;">
+            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0) 0%, rgba(56, 189, 248, 0.3) 50%, rgba(56, 189, 248, 0) 100%);"></div>
+            <span style="color: #38bdf8; font-size: 8px; font-weight: 800; letter-spacing: 1.5px; opacity: 0.7; text-transform: uppercase;">${label}</span>
+            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0) 0%, rgba(56, 189, 248, 0.3) 50%, rgba(56, 189, 248, 0) 100%);"></div>
+        </div>
+    `;
+
+    grid.innerHTML = stars.map((s, index) => {
+        const bgStyle = s.cardBg || "background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);";
+        const tagStyle = s.tagBg || "background: rgba(59,130,246,0.15); color: #60a5fa;";
+
+        const cardHTML = `
+        <div class="star-info-card" style="${bgStyle} border-radius: 14px; padding: 10px 10px; display: flex; align-items: center; gap: 10px; min-height: 52px; box-sizing: border-box; backdrop-filter: blur(4px); transition: all 0.25s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(56, 189, 248, 0.5)';" onmouseout="this.style.transform='translateY(0)';">
+            <div style="width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
                 <div class="star-preview ${s.twinkle ? 'animate-twinkle' : ''}" style="width: 12px; height: 12px; border-radius: 50%; ${s.style}"></div>
             </div>
-            <div style="display: flex; flex-direction: column; justify-content: center;">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="color: #fff; font-size: 14px; font-weight: 800; letter-spacing: 0.5px;">${s.name}</span>
-                    <span style="color: #3b82f6; font-size: 10px; font-weight: 900; background: rgba(59,130,246,0.15); padding: 2px 6px; border-radius: 4px;">${s.prob}</span>
+            <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                    <span style="color: #fff; font-size: 11px; font-weight: 800; letter-spacing: -0.2px; white-space: nowrap;">${s.name}</span>
+                    <span style="${tagStyle} font-size: 8px; font-weight: 900; padding: 1px 4.5px; border-radius: 4px; flex-shrink: 0;">${s.prob}</span>
                 </div>
-                <span style="color: #94a3b8; font-size: 11px; line-height: 1.4; opacity: 0.8;">${s.desc}</span>
+                <span style="color: #94a3b8; font-size: 8.5px; line-height: 1.2; opacity: 0.85; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.desc}</span>
             </div>
-        </div>`).join('');
+        </div>`;
+
+        // 1. 맨 위 (슈퍼별 바로 위)
+        if (index === 0) {
+            return createDivider('SPECIAL STARS') + cardHTML;
+        }
+        // 2. 스페셜별 바로 밑
+        if (index === 1) {
+            return cardHTML + createDivider('REGULAR STARS');
+        }
+        // 3. 정기 4호 바로 밑
+        if (index === 5) {
+            return cardHTML + createDivider('GENERAL RECORDS');
+        }
+
+        return cardHTML;
+    }).join('');
 }
 
+
+
 function createShootingStar(board, tx, ty) {
-const s = document.createElement('div');
-s.className = 'shooting-star';
-const startX = tx - 20;
-const startY = ty - 20;
-s.style.left = startX + "%";
-s.style.top = startY + "%";
-s.style.transform = "rotate(45deg)";
-board.appendChild(s);
+    const s = document.createElement('div');
+    s.className = 'shooting-star';
+    const startX = tx - 20;
+    const startY = ty - 20;
+    s.style.left = startX + "%";
+    s.style.top = startY + "%";
+    s.style.transform = "rotate(45deg)";
+    board.appendChild(s);
 
-setTimeout(() => {
-s.style.transition = "all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)";
-s.style.left = tx + "%";
-s.style.top = ty + "%";
-s.style.opacity = "1";
-}, 50);
+    setTimeout(() => {
+        s.style.transition = "all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)";
+        s.style.left = tx + "%";
+        s.style.top = ty + "%";
+        s.style.opacity = "1";
+    }, 50);
 
-setTimeout(() => {
-s.style.opacity = "0";
-setTimeout(() => s.remove(), 500);
-}, 850);
+    setTimeout(() => {
+        s.style.opacity = "0";
+        setTimeout(() => s.remove(), 500);
+    }, 850);
 }
 
  
