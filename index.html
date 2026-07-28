@@ -2090,6 +2090,24 @@ padding-right: 4px;
 .glow-silver { color: #64748b; animation: silver-shine 1.5s infinite; }
 .glow-bronze { color: #92400e; animation: bronze-shine 1.5s infinite; }
 
+/* 타임라인 레이아웃 최적화 */
+.timeline-scroll-area {
+max-height: 450px; /* 일지 약 10개 높이로 조정 */
+overflow-y: auto;
+background: #f8fafc;
+padding: 16px;
+border-radius: 16px;
+border: 1px solid #f1f5f9;
+}
+.timeline-container { position: relative; padding-left: 20px; }
+.timeline-container::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 1.5px; background: #e2e8f0; }
+.timeline-item { position: relative; margin-bottom: 16px; }
+.timeline-dot { position: absolute; left: -16px; top: 4px; width: 6px; height: 6px; background: #3b82f6; border: 1.5px solid white; border-radius: 50%; z-index: 1; }
+.timeline-date { font-size: 0.7rem; font-weight: 800; color: #1e293b; line-height: 1; margin-bottom: 5px; }
+.timeline-desc { font-size: 0.75rem; color: #334155; font-weight: 700; line-height: 1.3; }
+.bac-txt { color: #ef4444; font-weight: 900; margin-right: 4px; }
+
+.height-badge { font-size: 10px; font-weight: 900; color: #059669; background: #ecfdf5; border: 1px solid #10b981; padding: 2px 6px; border-radius: 8px; cursor: pointer; }
 
 /* 출처 문구 스타일 */
 .map-source-txt {
@@ -2158,6 +2176,46 @@ background: white;
 .dot-bar { width: 6px; height: 6px; background: #3b82f6; border-radius: 2px; }
 .dot-line { width: 6px; height: 1.5px; background: #ef4444; }
 
+/* 신규 추가: 타임라인 팝업용 세련된 버튼 */
+.btn-open-log {
+width: 100%;
+background: #ffffff;
+border: 1.5px solid #bae6fd;
+color: #0369a1;
+padding: 12px;
+border-radius: 16px;
+font-size: 0.8rem;
+font-weight: 900;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+box-shadow: 0 4px 12px rgba(14, 165, 233, 0.08);
+transition: 0.2s;
+margin-top: 10px;
+}
+.btn-open-log:active { transform: scale(0.97); background: #f0f9ff; }
+.log-popup-overlay {
+position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+display: none; justify-content: center; align-items: center; z-index: 200; padding: 20px;
+}
+
+/* 개인 누적, 산우리 합산 글씨 (기존보다 2단계 작게) */
+.info-label-small {
+font-size: 10px !important;
+font-weight: 700 !important;
+color: #cbd5e1 !important;
+display: inline-block;
+}
+
+/* 누적고도 숫자 그린네온 (기존보다 1단계 작게) */
+.neon-value-green {
+font-size: 14px !important; /* 숫자가 너무 작으면 13~15px 사이로 조절하세요 */
+color: #4ade80 !important; /* 밝은 초록 */
+font-weight: 900 !important;
+text-shadow: 0 0 8px rgba(74, 222, 128, 0.8) !important; /* 그린 네온 효과 */
+margin: 0 2px !important;
+}
 
 /* 레벨업 알림 팝업 전용 */
 .levelup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; padding: 30px; }
@@ -4344,6 +4402,162 @@ function setupTimelineTabs() {
     
     container.innerHTML = tabsHtml;
     
+    // 기본 'all' 상태로 리스트 출력
+    window.filterMemberLogs('all');
+}
+
+// 🌟 [추가 함수 2] 탭 클릭 시 클라이언트 사이드 즉시 필터링
+
+
+  window.filterMemberLogs = (category) => {
+    const tabs = {
+        all: document.getElementById('mTab-all'),
+        hiking: document.getElementById('mTab-hiking'),
+        running: document.getElementById('mTab-running')
+    };
+
+    // 1. 탭 UI 활성화 클래스 조절
+    Object.keys(tabs).forEach(key => {
+        if (!tabs[key]) return;
+        if (key === category) {
+            tabs[key].classList.add('border-sky-500', 'text-sky-600');
+            tabs[key].classList.remove('border-transparent', 'text-gray-400');
+        } else {
+            tabs[key].classList.remove('border-sky-500', 'text-sky-600');
+            tabs[key].classList.add('border-transparent', 'text-gray-400');
+        }
+    });
+
+        // 2. 카테고리 필터 기준 정의 (이 부분만 교체하세요)
+    let filtered = [];
+    if (category === 'all') {
+        filtered = currentMemberLogs;
+    } else if (category === 'hiking') {
+        // 순수산행 (런닝, 트레킹, 산책, 번외산행 모두 제외)
+        filtered = currentMemberLogs.filter(log => 
+            (!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike
+        );
+    } else if (category === 'running') {
+        // 번외산행 및 런닝/트레킹/산책 포함
+        filtered = currentMemberLogs.filter(log => 
+            log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
+        );
+    }
+
+
+            // 🎨 [수정] 범례 가이드 영역 조율 (도트 크기 8px, 텍스트 10px로 축소)
+    const legendArea = document.getElementById('timelineLegend');
+    if (legendArea) {
+        // 범례 조각 정의 (w-2 h-2로 도트 크기 축소, text-[10px]로 폰트 축소, 간격 정밀 조정)
+        const legends = {
+
+            hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
+                <span>일정산행</span>
+            </div>`,
+            extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
+                <span>개인산행</span>
+            </div>`,
+            trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
+                <span>트레킹</span>
+            </div>`,
+            run: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFD1DC]"></span>
+                <span>런닝</span>
+            </div>`,
+            walk: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFCC80]"></span>
+                <span>산책</span>
+            </div>`
+        };
+
+        // 탭 종류에 따라 알맞은 범례 아이템 배치
+        if (category === 'hiking') {
+            legendArea.innerHTML = [legends.regular, legends.hike, legends.extraHike].join('');
+            legendArea.style.display = 'flex';
+        } else if (category === 'running') {
+            legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
+            legendArea.style.display = 'flex';
+        } else {
+            legendArea.innerHTML = Object.values(legends).join('');
+            legendArea.style.display = 'flex';
+        }
+    }
+
+
+    // 3. 필터링된 영역만 리렌더링
+    const listArea = document.getElementById('filteredTimelineList');
+    if (!listArea) return;
+
+    if (filtered.length === 0) {
+        listArea.innerHTML = "<p class='text-center text-[10px] py-10 text-gray-400'>기록 없음</p>";
+        return;
+    }
+
+    listArea.innerHTML = filtered.map(log => {
+        const dayName = ['일','월','화','수','목','금','토'][log.date.getDay()];
+        const top100Class = log.isTop100 ? 'text-blue-600 font-black' : '';
+        const bacTag = log.isBAC ? '<span class="bac-txt">BAC</span>' : '';
+        
+        const heightVal = log.height || 0;
+        const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
+        const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
+        const displayMountain = log.mountain || (log.isExtraHike ? "번외 산행" : "기록");
+
+        // 🎨 운동 종류별 잔디 색상 도트 생성 로직
+        let dotStyle = "";
+        
+        if (log.isRegular) {
+            // 정기산행: 프리미엄 그라데이션
+            dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
+        } else {
+            // 일반 활동별 정의된 잔디 색상
+            const colors = {
+                hike: "#2ecc71",      // 등산 기본 (초록)
+                extraHike: "#5CE1D6", // 번외산행 (민트)
+                walk: "#FFCC80",      // 산책 (주황)
+                trek: "#E0B0FF",      // 트레킹 (보라)
+                run: "#FFD1DC"        // 런닝 (분홍)
+            };
+
+            let activeColors = [];
+            if (log.isExtraHike) activeColors.push(colors.extraHike);
+            else if (log.isRunning) activeColors.push(colors.run);
+            else if (log.isTracking) activeColors.push(colors.trek);
+            else if (log.isWalking) activeColors.push(colors.walk);
+            else activeColors.push(colors.hike);
+
+            if (activeColors.length >= 2) {
+                if (activeColors.length === 2) {
+                    dotStyle = `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`;
+                } else {
+                    dotStyle = `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
+                }
+            } else {
+                dotStyle = `background: ${activeColors[0]};`;
+            }
+        }
+
+        // 🎯 텍스트(산 이름) 바로 앞에 오도록 여백 수정 (mr-1.5)
+        const colorDotTag = `<span class="inline-block w-2.5 h-2.5 rounded-full mr-1.5 align-middle shadow-sm border border-black/5" style="${dotStyle}"></span>`;
+
+        return `
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date">
+                    ${log.date.getFullYear()}.${log.date.getMonth()+1}.${log.date.getDate()} (${dayName})
+                </div>
+                <div class="timeline-desc ${top100Class}">
+                    ${colorDotTag}${bacTag}${displayMountain} (${heightVal}${unit}) ${log.isTop100 ? '⭐' : '✔️'}
+                </div>
+            </div>`;
+    }).join('');
+};
+      
+    
+
 
 
 // 1. 계절 색상 판별 함수 (파일 상단에 위치)
