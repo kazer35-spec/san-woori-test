@@ -1390,271 +1390,94 @@ table tbody tr td {
     padding-top: 12px !important; /* 위쪽 click 텍스트 공간 확보 */
 }
 
-/* 하단 정보 바 전체 설정 */
-.mountain-info-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 45px;
-    background: rgba(15, 23, 42, 0.9) !important;
-    border-top: 1px solid #1e293b;
-    display: flex;
-    justify-content: space-between;
+ /* ==========================================
+   1. 통합 모달 (Modal Base & Card Container)
+   ========================================== */
+.mountain-modal {
+    display: none;
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
     align-items: center;
-    padding: 0 20px;
-    z-index: 1000 !important; /* 다른 요소보다 확실히 위에 오도록 */
+    justify-content: center;
+    flex-direction: column;
 }
 
-/* 1. 라벨 글씨 (개인 누적, 산우리 합산 등) */
-.info-item, 
-.info-label-small { 
-    color: #94a3b8 !important; 
-    font-size: 9px !important; 
-    font-weight: 600 !important; 
+/* 닫기 버튼 */
+.mountain-modal button[onclick*="display='none'"] {
+    position: absolute;
+    top: 10px !important;
+    right: 20px !important;
+    font-size: 28px !important;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 201;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-/* 2. 누적고도 숫자 (그린 네온 강제 적용) */
-/* 클래스명이 info-val이든 neon-value-green이든, 혹은 ID값이든 모두 적용 */
-.info-val, 
-.neon-value-green,
-#myTotalH, 
-#globalTotalH { 
-    color: #2ecc71 !important; 
-    font-size: 10px !important; 
-    margin-left: 5px; 
-    font-weight: 800 !important;
-    text-shadow: 0 0 8px rgba(46, 204, 113, 0.8),
-                 0 0 15px rgba(46, 204, 113, 0.4) !important;
-    display: inline-block;
+.integrated-member-card {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    background: #0f172a;
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
-/* 가려진 창 (충돌 전 코어) */
-.planet-core-group {
-/* 1번 레이어: 응축된 우주의 색 */
-background: radial-gradient(circle, #1e2a4a 0%, #050b18 100%);
-box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1); /* 내부로 모이는 빛 */
-overflow: hidden;
+/* 테두리 네온 활성화 효과 */
+.integrated-member-card.glow-active {
+    border: 2px solid var(--glow-color) !important;
+    animation: borderGlow 2s infinite;
 }
 
-/* 사라진 후 보일 배경 (전체 우주) */
-#mountainViewModal {
-/* 2번 레이어: 무한한 밤하늘색 */
-background: #030712;
+@keyframes borderGlow {
+    0%, 100% { box-shadow: 0 0 5px var(--glow-color); }
+    50% { box-shadow: 0 0 25px var(--glow-color); }
 }
 
-/* 기존 info-bar 레이아웃 살짝 조정 */
-.mountain-info-bar {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(5px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* 나이테창 별빛과 동일한 반짝임 효과 */
-.tree-ring-star {
-    animation: twinkle var(--duration, 3s) infinite ease-in-out;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-.animate-twinkle {
-  animation: twinkle 1.5s infinite ease-in-out;
-}
-
-    /* 두 섹션의 배경색을 짙은 심해/우주색으로 통일 */
-.tree-ring-section, .mountain-section {
+/* ==========================================
+   2. 공통 배경 및 텍스트 효과 (Cosmic Theme)
+   ========================================== */
+.tree-ring-section, 
+.mountain-section {
     background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important;
     position: relative;
     overflow: hidden;
 }
 
-/* 빛줄기가 배경색에 영향을 덜 받도록 투명도 보정 */
-.light-beam, .light-beam-ring {
-    mix-blend-mode: screen; /* 그대로 유지하되 */
-    filter: blur(4px) brightness(1.2); /* 밝기를 강제로 조금 끌어올림 */
-}
-
-/* 1. 산맥창 빛줄기 스타일 */
-.light-beam {
+/* 별빛 입자 */
+.tree-ring-star, 
+.sky-star {
     position: absolute;
-    bottom: 0;
-    width: 10px !important; /* 두께 10px 강제 적용 */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    pointer-events: none;
-    filter: blur(4px); /* 부드러운 빛 효과 */
-    /* 광채 효과 (나이테창과 동일하게) */
-    box-shadow: 0 0 20px var(--beam-color); 
-}
-
-/* 2. 나이테창 빛줄기 스타일 */
-.light-beam-ring {
-    position: absolute;
-    bottom: -50px; /* 시작점을 더 아래로 내려 연결성 강화 */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 10px !important; /* 두께 10px 강제 적용 */
-    z-index: 100;
-    pointer-events: none;
-    filter: blur(4px);
-    box-shadow: 0 0 20px var(--beam-color);
-}
-
-/* 다른 어떤 효과보다 최우선으로 적용되도록 수정 */
-.tree-ring-section .planet-core-group.planet-impact-active {
-    animation: planet-flare 0.6s cubic-bezier(0.15, 0.85, 0.35, 1) !important;
-    transform-origin: center !important;
-    display: inline-block; /* transform이 잘 먹도록 설정 */
-    will-change: transform, filter; /* 브라우저에게 미리 알려서 성능 최적화 */
-}
-
-@keyframes planet-flare {
-    0% { 
-        filter: brightness(1) blur(0px); 
-        transform: scale(1); 
-    }
-    10% { 
-        /* 찰나의 순간에 압도적인 광량과 크기 */
-        filter: brightness(15) blur(10px); 
-        transform: scale(4.5); 
-    }
-    100% { 
-        filter: brightness(1) blur(0px); 
-        transform: scale(1); 
-    }
-}
-
-/* 나이테 섹션이 빛줄기의 기준점이 되도록 설정 */
-.tree-ring-section {
-    position: relative;
-    overflow: hidden; /* 빛줄기가 영역 밖으로 나가지 않게 */
-}
-
-/* 우주적인 네온 텍스트 스타일 통일 */
-.cosmic-neon-text {
-    font-family: 'Pretendard', sans-serif; /* 혹은 사용 중인 폰트 */
-    color: #fff !important;
-    text-shadow: 0 0 10px var(--glow-color, #3b82f6), 
-                 0 0 20px var(--glow-color, #3b82f6);
-    transition: all 0.5s ease;
-    letter-spacing: 1px;
-}
-
-/* 빛줄기 애니메이션 수정 */
-.light-beam {
-    pointer-events: none;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(to top, var(--beam-color), transparent);
-    filter: blur(5px); /* 두께가 얇아지므로 블러도 약간 줄임 */
-    z-index: 100;
-}
-
-/* 광선(Beam) 스타일 강화 */
-.light-beam {
-    position: absolute;
-    bottom: 0;
-    left: 30%;
-    transform: translateX(-50%);
-    width: 50px; /* 더 넓은 광선 */
-    background: linear-gradient(to top, var(--beam-color), transparent);
-    filter: blur(1px);
-    opacity: 0;
-    z-index: 150;
-    pointer-events: none;
-}
-
-/* 산맥 밝기 보정 */
-.mountain-layer {
-    filter: brightness(1.2); /* 전체적인 베이스 밝기 상향 */
-}
-
-
-/* 배경(산우리) 산맥: 가시성 확보 */
-#bgLayersContainer .mountain-layer {
-    opacity: 0.3 !important; /* 기존 0.15에서 상향 */
-}
-
-/* 최고봉 광원 효과 */
-.peak.max-height {
-    position: relative;
-}
-
-.peak.max-height::after {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 30px;
-    background: radial-gradient(circle, #fff 0%, transparent 70%);
-    box-shadow: 0 0 20px 5px #fff;
+    background: white;
     border-radius: 50%;
-    animation: peak-glow 2s infinite alternate;
+    pointer-events: none;
+    animation: twinkle var(--duration, 3s) infinite ease-in-out;
 }
 
-@keyframes peak-glow {
-    from { opacity: 0.5; transform: translateX(-50%) scale(0.8); }
-    to { opacity: 1; transform: translateX(-50%) scale(1.2); }
+.animate-twinkle {
+    animation: twinkle 1.5s infinite ease-in-out;
 }
 
-/* 1. 중앙 행성(코어)이 부드럽게 원을 그리며 움직임 */
-@keyframes planetOrbit {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(1.5px, 1.5px); }
-    50% { transform: translate(0, 2.5px); }
-    75% { transform: translate(-1.5px, 1.5px); }
-    100% { transform: translate(0, 0); }
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
-.planet-core-group {
-    animation: planetOrbit 5s ease-in-out infinite;
-    transform-origin: 120px 120px; /* SVG의 정중앙 기준 */
-}
-
-/* 2. 나이테가 나타날 때 투명도가 부드럽게 변함 */
-.tree-ring-path {
-    transition: stroke-opacity 1s ease-out, stroke-width 0.5s ease;
-}
-
-/* 3. 우주 느낌의 네온 텍스트 */
+/* 네온 타이틀 텍스트 */
 .cosmic-neon-text {
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 15px currentColor;
-}
-
-/* 중앙 행성(코어) 애니메이션 */
-@keyframes planetFloat {
-    0% { transform: translate(0, 0); }
-    50% { transform: translate(2px, -3px); } /* 약간 위로 이동 */
-    100% { transform: translate(0, 0); }
-}
-
-.planet-core {
-    animation: planetFloat 4s ease-in-out infinite;
-    transform-origin: center;
-}
-
-/* 나이테가 밝아질 때의 효과 */
-.ring-path {
-    transition: stroke-opacity 0.8s ease, stroke-width 0.5s ease;
-}
-
-/* 산맥 이름 및 활동 나이테 공통 네온 스타일 */
-.cosmic-neon-text {
-    font-size: 1rem !important; /* 기존 크기의 절반 수준으로 조정 */
-    color: #00f2ff; /* 밝은 시안 네온 컬러 */
+    font-family: 'Pretendard', sans-serif;
+    color: #00f2ff !important;
     text-transform: uppercase;
     letter-spacing: 1px;
-    /* 푸른 네온 광원 효과 */
     text-shadow: 
         0 0 5px #00f2ff,
         0 0 10px #00f2ff,
@@ -1663,24 +1486,53 @@ background: #030712;
     transition: all 0.3s ease;
 }
 
-/* 활동 나이테 전용 (더 작게) */
-.ring-main-title.cosmic-neon-text {
+.ring-main-title.cosmic-neon-text,
+#mwMountainName.cosmic-neon-text {
     font-size: 0.6rem !important;
     font-weight: bold;
 }
 
-/* ㅇㅇ님의 산맥 전용 */
-#mwMountainName.cosmic-neon-text {
-    font-size: 0.6rem !important;
-}
-
-/* 우주적인 타이틀 텍스트 효과 */
 .cosmic-title {
     background: linear-gradient(to bottom, #fff 30%, #94a3b8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 15px rgba(255,255,255,0.3);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
     letter-spacing: 2px;
+}
+
+/* ==========================================
+   3. 상단: 활동 나이테 섹션 (Tree Ring)
+   ========================================== */
+.tree-ring-section {
+    padding: 25px 25px 10px 25px;
+    background: linear-gradient(to bottom, #1e293b, #0f172a);
+    border-radius: 24px 24px 0 0;
+}
+
+.tree-ring-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0));
+    background-size: 150px 150px;
+    opacity: 0.3;
+}
+
+.ring-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-end; 
+    margin-bottom: 20px; 
+}
+
+.ring-label { 
+    font-size: 9px; 
+    color: #64748b; 
+    font-weight: 800; 
+    letter-spacing: 2px; 
 }
 
 .ring-label-cosmic {
@@ -1690,280 +1542,203 @@ background: #030712;
     letter-spacing: 3px;
 }
 
-/* 별빛 배경 애니메이션 */
-@keyframes star-twinkle {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
+.ring-main-title { 
+    font-size: 16px; 
+    color: #f1f5f9; 
+    margin: 4px 0 0 0; 
 }
 
-.tree-ring-star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: star-twinkle var(--duration) infinite ease-in-out;
+.ring-months-val { 
+    font-size: 22px; 
+    color: #3b82f6; 
+    font-weight: 900; 
 }
 
-/* 나이테 섹션 배경을 별밤 느낌으로 */
-.tree-ring-section {
-    position: relative;
-    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); /* 진한 우주색 */
-    overflow: hidden;
-    border-radius: 24px 24px 0 0;
+.ring-unit { 
+    font-size: 10px; 
+    color: #94a3b8; 
+    margin-left: 4px; 
 }
-
-/* 별밤 효과 (가상 산맥과 동일한 별 입자) */
-.tree-ring-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
-                      radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
-                      radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0));
-    background-size: 150px 150px;
-    opacity: 0.3;
-}
-
-/* 닫기 버튼 위치 상향 조정 */
-.mountain-modal button[onclick*="display='none'"] {
-    top: 10px !important; /* 기존 15px에서 더 위로 */
-    right: 20px !important;
-    font-size: 28px !important;
-    text-shadow: 0 0 10px rgba(0,0,0,0.5);
-}
-
-/* 중앙 행성 글로우 효과 */
-.core-planet {
-    filter: blur(2px);
-    animation: pulse 3s infinite ease-in-out;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 0.8; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
-}
-
-/* 빛 줄기 효과 */
-.light-beam {
-position: absolute;
-bottom: 0;
-left: 50%;
-width: 2px;
-height: 0;
-background: linear-gradient(to top, transparent, #fff, transparent);
-box-shadow: 0 0 15px #fff;
-z-index: 150;
-opacity: 0;
-transform: translateX(-50%);
-}
-
-/* 최고봉 이름 스타일 */
-.highest-peak-label {
-position: absolute;
-bottom: 55px; /* 정보 바 위쪽 */
-left: 0;
-width: 100%;
-text-align: center;
-font-size: 11px;
-font-weight: 900;
-color: #fbbf24;
-text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
-z-index: 160;
-}
-
-/* 테두리 빛 애니메이션 */
-@keyframes borderGlow {
-0% { box-shadow: 0 0 5px var(--glow-color); }
-50% { box-shadow: 0 0 25px var(--glow-color); }
-100% { box-shadow: 0 0 5px var(--glow-color); }
-}
-
-.integrated-member-card.glow-active {
-border: 2px solid var(--glow-color) !important;
-animation: borderGlow 2s infinite;
-}
-
-/* 산맥 내부 요소 높이 조정 */
-.mountain-info-bar {
-padding: 5px 15px;
-font-size: 9px;
-}
-​
-/* 나이테 정중앙 시작점 강조 */
-.ring-center-flash {
-filter: brightness(3) !important;
-stroke-width: 5 !important;
-transition: all 0.5s;
-}
-
-/* 통합 카드 스타일 */
-.integrated-member-card {
-position: relative;
-width: 90%;
-max-width: 400px;
-background: #0f172a; /* 어두운 밤하늘 배경으로 통일 */
-border-radius: 30px;
-overflow: hidden;
-border: 1px solid rgba(255,255,255,0.1);
-box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
-
-/* 나이테 섹션 */
-.tree-ring-section {
-padding: 25px 25px 10px 25px;
-background: linear-gradient(to bottom, #1e293b, #0f172a);
-}
-
-/* 산맥 섹션 */
-.mountain-section {
-position: relative;
-height: 250px; /* 높이는 적절히 조절 가능 */
-width: 100%;
-overflow: hidden;
-background: #0f172a;
-}
-
-/* 기존 불필요한 클래스 제거용 */
-.tree-ring-card, .mountain-container {
-width: 100% !important;
-margin: 0 !important;
-border-radius: 0 !important;
-box-shadow: none !important;
-}
-
-/* 삭제 요청하신 하단 설명부 제거 */
-.ring-footer, .ring-desc {
-display: none !important;
-}
-
-/* 나이테 카드 전체 스타일 */
-.tree-ring-card {
-position: relative;
-width: 100%; /* 산맥 컨테이너와 동일한 너비 */
-max-width: 450px;
-margin-top: 15px;
-background: rgba(15, 23, 42, 0.7);
-border: 1px solid rgba(255, 255, 255, 0.1);
-border-radius: 24px;
-padding: 20px;
-overflow: hidden;
-backdrop-filter: blur(12px);
-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
-.ring-glass-effect {
-position: absolute;
-top: -50%; left: -50%; width: 200%; height: 200%;
-background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%);
-pointer-events: none;
-}
-
-.ring-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
-.ring-label { font-size: 9px; color: #64748b; font-weight: 800; letter-spacing: 2px; }
-.ring-main-title { font-size: 16px; color: #f1f5f9; margin: 4px 0 0 0; }
-.ring-months-val { font-size: 22px; color: #3b82f6; font-weight: 900; }
-.ring-unit { font-size: 10px; color: #94a3b8; margin-left: 4px; }
 
 .ring-canvas {
-width: 100%;
-height: 180px;
-display: flex;
-justify-content: center;
-align-items: center;
+    width: 100%;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.ring-footer { margin-top: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-.ring-desc { font-size: 10px; color: #475569; }
-
-/* 나이테 선 기본 스타일 */
+/* SVG 나이테 라인 스타일 */
+.tree-ring-path, 
 .ring-path {
-fill: none;
-stroke-linecap: round;
-transition: all 0.4s ease;
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-opacity 0.8s ease, stroke-width 0.5s ease;
 }
 
-/* 모달 설정: 내부 요소들을 세로로 정렬 */
-.mountain-modal {
-display: none;
-position: fixed;
-top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(0, 0, 0, 0.85);
-z-index: 1000;
-flex-direction: column; /* 세로 정렬 중요 */
-justify-content: center;
-align-items: center;
-}
-
-/* 산맥 창과 나이테 창 사이의 간격과 애니메이션 */
-.tree-ring-window {
-animation: slideUp 0.5s ease-out;
-}
-
-@keyframes slideUp {
-from { opacity: 0; transform: translateY(20px); }
-to { opacity: 1; transform: translateY(0); }
-}
-
-.ring-path {
-fill: none;
-transition: stroke-opacity 0.5s;
-}
-
-/* 나이테가 하나씩 반짝이며 나타나는 애니메이션 */
 @keyframes ring-glow {
-0% { stroke-opacity: 0.2; filter: brightness(1); }
-50% { stroke-opacity: 1; filter: brightness(2.5); stroke-width: 2px; }
-100% { stroke-opacity: 0.6; filter: brightness(1); }
-}
-.ring-animating { animation: ring-glow 0.8s ease-in-out; }
-
-/* 산맥 모달 스타일 수정 */
-.mountain-modal {
-display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center;
-}
-.mountain-container {
-width: 95%; max-width: 800px; height: 260px; /* 높이를 2/3로 축소 */
-background: #070b14; border-radius: 15px; position: relative; overflow: hidden;
-box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid #1e293b;
+    0% { stroke-opacity: 0.2; filter: brightness(1); }
+    50% { stroke-opacity: 1; filter: brightness(2.5); stroke-width: 2px; }
+    100% { stroke-opacity: 0.6; filter: brightness(1); }
 }
 
-/* 밤하늘 별 */
-.sky-star {
-position: absolute; background: white; border-radius: 50%; opacity: 0.4;
-animation: twinkle var(--duration) infinite;
+.ring-animating { 
+    animation: ring-glow 0.8s ease-in-out; 
 }
-@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
 
-/* 산맥 공통 */
+.ring-center-flash {
+    filter: brightness(3) !important;
+    stroke-width: 5 !important;
+    transition: all 0.5s;
+}
+
+/* ==========================================
+   4. 하단: 산맥 비주얼 섹션 (Mountain View)
+   ========================================== */
+.mountain-section {
+    position: relative;
+    height: 250px;
+    width: 100%;
+    overflow: hidden;
+    background: #0f172a;
+}
+
+.mountain-header {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    right: 20px;
+    z-index: 200;
+    color: white;
+}
+
+/* 산맥 레이어 및 봉우리 */
 .mountain-layer {
-position: absolute; bottom: 45px; /* 글씨 공간 확보를 위해 바닥에서 띄움 */
-left: 0; width: 100%; display: flex; align-items: flex-end; pointer-events: none;
+    position: absolute;
+    bottom: 45px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+    filter: brightness(1.2);
 }
+
+#bgLayersContainer .mountain-layer {
+    opacity: 0.3 !important;
+}
+
 .peak {
-position: relative; flex: 1; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-background: linear-gradient(to bottom, #1e293b, #070b14); margin-left: -3%;
-transition: height 1s ease;
+    position: relative;
+    flex: 1;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background: linear-gradient(to bottom, #1e293b, #070b14);
+    margin-left: -3%;
+    transition: height 1s ease;
 }
 
-/* ✨ 최고봉 골든 이펙트 (강화) */
+/* 최고봉 골든이펙트 */
 .peak.max-height {
-background: linear-gradient(to bottom, #f59e0b, #78350f) !important;
-z-index: 100 !important; /* 산맥 중 최상단 */
-overflow: visible !important;
+    background: linear-gradient(to bottom, #f59e0b, #78350f) !important;
+    z-index: 100 !important;
+    overflow: visible !important;
 }
 
-/* 방사형 광채 + 화이트 스타 */
 .golden-glow-effect {
-position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);
-width: 60px; height: 60px;
-background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(245,158,11,0.4) 30%, transparent 70%);
-border-radius: 50%; z-index: 110;
+    position: absolute; 
+    top: 0; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    width: 60px; 
+    height: 60px;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(245,158,11,0.4) 30%, transparent 70%);
+    border-radius: 50%; 
+    z-index: 110;
 }
+
 .white-star-core {
-position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);
-width: 6px; height: 6px; background: white; border-radius: 50%;
-box-shadow: 0 0 10px 2px white, 0 0 20px 5px #fbbf24; z-index: 120;
+    position: absolute; 
+    top: 0; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    width: 6px; 
+    height: 6px; 
+    background: white; 
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px white, 0 0 20px 5px #fbbf24; 
+    z-index: 120;
+}
+
+.highest-peak-label {
+    position: absolute;
+    bottom: 55px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 900;
+    color: #fbbf24;
+    text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+    z-index: 160;
+}
+
+/* 광선 (Light Beam) 효과 */
+.light-beam, 
+.light-beam-ring {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px !important;
+    z-index: 100;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    filter: blur(4px) brightness(1.2);
+    box-shadow: 0 0 20px var(--beam-color);
+}
+
+.light-beam-ring {
+    bottom: -50px;
+}
+
+/* ==========================================
+   5. 하단 정보 바 (Mountain Info Bar)
+   ========================================== */
+.mountain-info-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 45px;
+    background: rgba(15, 23, 42, 0.9) !important;
+    backdrop-filter: blur(5px);
+    border-top: 1px solid #1e293b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 20px;
+    z-index: 1000 !important;
+}
+
+.info-item, 
+.info-label-small { 
+    color: #94a3b8 !important; 
+    font-size: 9px !important; 
+    font-weight: 600 !important; 
+}
+
+.info-val, 
+.neon-value-green,
+#myTotalH, 
+#globalTotalH { 
+    color: #2ecc71 !important; 
+    font-size: 10px !important; 
+    margin-left: 5px; 
+    font-weight: 800 !important;
+    text-shadow: 
+        0 0 8px rgba(46, 204, 113, 0.8),
+        0 0 15px rgba(46, 204, 113, 0.4) !important;
+    display: inline-block;
 }
 
     /* 헤더 글씨 */
