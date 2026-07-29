@@ -5861,21 +5861,17 @@ window.addMultiActivity = async () => {
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
 
-                // ⚡ saveHikeLog 호출 부분의 logPayload를 찾아서 isRegular가 전달되도록 수정합니다.
-const logPayload = {
-    date: ts, 
-    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
-    height, coords: safeCoords,
-    isTop100, isBAC, 
-    isRegular: isRegular, // 🎯 [핵심 수정] 러닝/트레킹/산책이어도 정기 체크박스가 켜져있다면 true로 저장되도록 보장
-    isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
-    starType, author: member.name,
-    isSpecial: isSpecial,
-    pRock, pForest, pValley
-};
+                const logPayload = {
+                    date: ts, 
+                    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
+                    height, coords: safeCoords,
+                    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+                    starType, author: member.name,
+                    isSpecial: isSpecial,
+                    pRock, pForest, pValley
+                };
 
-await saveHikeLog(id, logPayload);
-
+                await saveHikeLog(id, logPayload);
             }
         } 
 
@@ -7845,7 +7841,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🎯 정기 체크(isRegular)된 번외운동 및 순수 일정산행 노출
+            // 정기 체크(isRegular)가 된 활동 및 순수 일정산행 노출
             filtered = window.currentScrollLogs.filter(log => 
                 log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
@@ -7875,13 +7871,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
-            // 1. 러닝, 트레킹, 산책 여부 판단
-            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
-
-            // 2. 도트 색상 판단
             let dotStyle = "";
-            // 🎯 러닝/트레킹/산책이 아닐 때만 정기산행(isRegular) 무지개 도트 적용
-            if (log.isRegular && !isKmActivity) {
+            if (log.isRegular) {
+                // 정기산행: 무지개 그래디언트
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
                 const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
@@ -7890,7 +7882,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 else if (log.isRunning) activeColors.push(colors.run);
                 else if (log.isTracking) activeColors.push(colors.trek);
                 else if (log.isWalking) activeColors.push(colors.walk);
-                else activeColors.push(colors.hike);
+                else activeColors.push(colors.hike); // 일정산행: 연두색 (#2ecc71)
 
                 if (activeColors.length >= 2) {
                     dotStyle = activeColors.length === 2 
@@ -7902,7 +7894,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             }
 
             const heightVal = log.height || 0;
-            const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
+            const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
+            const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
             
             const displayMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
             const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
@@ -7913,25 +7906,21 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [핵심] 정기(isRegular)가 체크된 러닝/트레킹/산책 기록인 경우
-            // '개인/기타' 탭 또는 '전체' 탭에서 우측 [일정] 박스 노출!
-            const isRegularGroupExercise = log.isRegular && isKmActivity;
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isRegularGroupExercise;
+            // 🎯 [핵심 분기] '개인/기타' 탭(running)이면서 정기체크(isRegular)된 활동에만 '일정' 박스 배지 표시
+            const showScheduleBadgeInOtherTab = (currentCategory === 'running' || currentCategory === 'all') && log.isRegular && (log.isRunning || log.isTracking || log.isWalking);
             
-            const scheduleBadge = showScheduleBadge 
+            const scheduleBadge = showScheduleBadgeInOtherTab 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
 
             return `
                 <div class="scroll-timeline-item">
                     <div class="scroll-item-date">${dateStr} (${dayName})</div>
-                    <div class="scroll-item-body" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                            <span class="scroll-item-dot" style="${dotStyle}"></span>
-                            ${bacTag}
-                            <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
-                            ${starTag}
-                        </div>
+                    <div class="scroll-item-body" style="display: flex; align-items: center;">
+                        <span class="scroll-item-dot" style="${dotStyle}"></span>
+                        ${bacTag}
+                        <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
+                        ${starTag}
                         ${scheduleBadge}
                     </div>
                 </div>
@@ -7961,8 +7950,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
-
-
 
 
             
