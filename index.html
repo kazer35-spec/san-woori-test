@@ -3453,7 +3453,8 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
-window.renderStatusTable = () => {
+
+        window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3464,14 +3465,14 @@ window.renderStatusTable = () => {
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
     let processedData = currentData.map(m => {
-        // [기존 코드] 마지막 산행 기준 D-Day 계산
+        // [기존 코드 그대로] 창 열었을 때 보여줄 마지막 산행 기준 계산
         const last = m.lastDate ? m.lastDate.toDate() : new Date();
         const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
         const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
         const baseLimit = (m.level === 0 ? 30 : 122);
         const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
-        // ⭐ [추가] 가입일 기준 D+Day 계산 (나이테)
+        // ⭐ 메인화면 겉에만 표시해줄 들어온 날짜(가입일) 기준 계산 (내부 데이터 보존)
         let dPlusVal = 0;
         if (m.regDate) {
             const reg = m.regDate.toDate();
@@ -3479,14 +3480,15 @@ window.renderStatusTable = () => {
             dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1; // 당일 1일 기준
         }
 
+        // 기존 껍데기에 ddayVal과 dPlusVal을 둘 다 안전하게 담아서 보냅니다.
         return { 
             ...m, 
-            ddayVal: ddayVal,   // 모달창용
-            dPlusVal: dPlusVal  // 메인 화면 표시용 (D+Day)
+            ddayVal: ddayVal,   // 모달창에 넘겨줄 값
+            dPlusVal: dPlusVal  // 메인화면 데이터용
         };
     });
 
-    // 정렬 로직
+    // [기존 코드 그대로] 정렬 로직
     processedData.sort((a, b) => {
         if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
         if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
@@ -3496,19 +3498,21 @@ window.renderStatusTable = () => {
         return 0;
     });
 
-    // 탑 3 회원 추출
+    // [기존 코드 그대로] 탑 이름 추출
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
+    // 첫 번째 노출되는 행에만 CLICK 문구를 넣기 위한 플래그
     let isFirstVisible = true;
 
     processedData.forEach((m) => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
+        // ✨ 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
             clickTag = `<span class="click-neon">CLICK</span>`;
-            isFirstVisible = false;
+            isFirstVisible = false; // 한 번 그렸으면 플래그 해제
         }
 
         let rankT = ""; 
@@ -3516,17 +3520,26 @@ window.renderStatusTable = () => {
         if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
             const idx = topNames.indexOf(m.name);
             
-            let activeQuarter = 1;
+            // 1. 현재 HTML에서 활성화(active)된 분기 버튼을 찾거나, 버튼들의 클래스 상태를 통해 선택된 분기를 가져옵니다.
+            let activeQuarter = 1; // 기본값
+            
+            // qBtn1 ~ qBtn4 중 'active' 클래스를 가지고 있는 버튼을 찾습니다.
             const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
             if (activeBtn) {
-                const btnId = activeBtn.id;
+                // active 상태인 버튼의 id나 onclick 텍스트에서 분기 숫자를 추출합니다.
+                const btnId = activeBtn.id; // 'qBtn1', 'qBtn2' 등
                 activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
             } else {
+                // 혹시 active 클래스가 아직 매핑 안 되었을 경우를 대비해, 
+                // 전역 변수(currentQuarter 또는 selectedQuarter)가 있는지 체크합니다.
                 activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
                                 ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
             }
             
+            // 2. 현재 선택된 연도 가져오기 (기본값은 2026년으로 설정하되, 연도 선택 변수가 있다면 활용)
             const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+            
+            // 3. 2026년도이면서 선택된 분기가 1분기 또는 2분기인지 판별
             const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
             if (idx === 0) { 
@@ -3543,33 +3556,31 @@ window.renderStatusTable = () => {
             }
         }
 
-        // 레벨 스타일 및 칭호 가져오기
-        const levelStyle = getLevelStyle(m.level);
-        const levelBadge = getLevelBadge(m.level);
+        // 요청하신 변수 조합
+        const style = getLevelStyle(m.level);
+        const ddayClass = getDDayStyle(m.ddayVal, m.level);
+        const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
         // 테이블 행 생성
         const tr = document.createElement('tr');
         if (m.isHidden) tr.classList.add('opacity-40', 'bg-gray-100');
-
-        // D+Day (나이테) 텍스트 
-        const dPlusText = m.dPlusVal > 0 ? `D+${m.dPlusVal}` : '-';
 
         tr.innerHTML = `
             <td class="text-center font-bold" onclick="showBondingForestModal('${m.name}')">
                 <div class="flex flex-col items-center">
                     <div class="flex items-center gap-1">
                         ${rankT ? `<span class="text-[9px] px-1 rounded font-black ${rankC}">${rankT}</span>` : ''}
-                        <span class="text-xs text-slate-800 font-black">${m.name}</span>
+                        <span class="text-xs font-black ${nameColor}">${m.name}</span>
                         ${clickTag}
                     </div>
-                    <!-- 🌲 나이테 (가입 경과일 D+Day) -->
-                    <span class="text-[9px] text-emerald-600 font-extrabold mt-0.5">🌱 ${dPlusText}</span>
+                    <!-- 🌲 D+Day 대신 기록보기 문구 노출 -->
+                    <span class="text-[9px] text-emerald-600 font-extrabold mt-0.5 cursor-pointer">🌱 기록보기</span>
                 </div>
             </td>
             <td class="text-center" onclick="openMilkyWayModal('${m.id}')">
-                <div class="inline-block px-2 py-0.5 rounded-full text-[10px] font-black border ${levelStyle.blink}" 
-                     style="background:${levelStyle.bg}; border-color:${levelStyle.border}; color:${levelStyle.text};">
-                    ${levelBadge} (Lv.${m.level})
+                <div class="inline-block px-2 py-0.5 rounded-full text-[10px] font-black border ${style.blink || ''}" 
+                     style="background:${style.bg}; border-color:${style.border}; color:${style.text};">
+                    ${getLevelBadge(m.level)} (Lv.${m.level})
                 </div>
             </td>
             <td class="text-center font-black text-slate-700 text-xs">
@@ -3588,6 +3599,7 @@ window.renderStatusTable = () => {
         list.appendChild(tr);
     });
 };
+
 
 
         // =========================================================
