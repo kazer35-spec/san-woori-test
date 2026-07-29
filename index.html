@@ -5850,32 +5850,34 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // 세부 로그 적재
-            const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
-            for(let i = 0; i < finalLogLoopCount; i++) {
-                let starType = null;
-                if (isRegular) {
-                    const rand = Math.random() * 100;
-                    if (rand <= 3) starType = "super";
-                    else if (rand <= 10) starType = "special";
-                    else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
-                }
+            // ─── addMultiActivity 함수 내 세부 로그 적재 부분 ───
+const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
+for(let i = 0; i < finalLogLoopCount; i++) {
+    let starType = null;
+    if (isRegular) {
+        const rand = Math.random() * 100;
+        if (rand <= 3) starType = "super";
+        else if (rand <= 10) starType = "special";
+        else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
+    }
 
-                // ─── addMultiActivity 내 logPayload 부분 ───
-const logPayload = {
-    date: ts, 
-    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
-    height, coords: safeCoords,
-    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
-    isQuarterOnlyOne, // 👈 🔥 이 부분이 누락되어 있었습니다! 추가해 주세요.
-    starType, author: member.name,
-    isSpecial: isSpecial,
-    pRock, pForest, pValley
-};
+    const logPayload = {
+        date: ts, 
+        mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
+        height, coords: safeCoords,
+        isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+        
+        // 🎯 [핵심] UP 옆 체크박스 값 및 화면 체크박스 id 대응
+        isQuarterOnlyOne: isQuarterOnlyOne || isQuarterCheck, 
+        isQuarterCheck: isQuarterOnlyOne || isQuarterCheck,
 
-await saveHikeLog(id, logPayload);
+        starType, author: member.name,
+        isSpecial: isSpecial,
+        pRock, pForest, pValley
+    };
 
-            }
+    await saveHikeLog(id, logPayload);
+}
         } 
 
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
@@ -7821,7 +7823,7 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
- // [클라이언트 페이징 처리]
+// [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7844,14 +7846,17 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🎯 [일정산행 탭] 정기산행 OR 순수 일정산행 OR UP옆 체크박스(isQuarterOnlyOne)가 체크된 활동 전체 포함
-            filtered = window.currentScrollLogs.filter(log => 
-                log.isRegular || 
-                log.isQuarterOnlyOne || 
-                ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
-            );
+            // 🎯 [일정산행 탭] 
+            // 1) 정기산행(isRegular) 
+            // 2) UP옆 체크박스(isQuarterOnlyOne / isQuarterCheck) 
+            // 3) pure 일정산행(러닝/트레킹/산책/번외가 아닌 것)
+            filtered = window.currentScrollLogs.filter(log => {
+                const isQuarter = log.isQuarterOnlyOne || log.isQuarterCheck;
+                const isPureHike = (!log.isRunning && !log.isTracking && !log.isWalking && !log.isExtraHike);
+                return log.isRegular || isQuarter || isPureHike;
+            });
         } else if (currentCategory === 'running') {
-            // 🎯 [개인/기타 탭] 번외산행, 러닝, 트레킹, 산책 전체
+            // 🎯 [개인/기타 탭] 러닝, 트레킹, 산책, 번외산행 전체
             filtered = window.currentScrollLogs.filter(log => 
                 log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
             );
@@ -7911,11 +7916,11 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 UP 옆 체크박스(isQuarterOnlyOne) 또는 정기(isRegular) 체크 상태로 등록된 활동 여부 판단
-            const isScheduleGroupExercise = (log.isQuarterOnlyOne || log.isRegular) && (log.isRunning || log.isTracking || log.isWalking || log.isExtraHike);
-
-            // 🎯 요청 반영: '개인/기타' 탭이나 '전체' 탭에서만 [일정] 박스 뱃지 노출 (일정산행 탭에서는 안 보여줌)
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isScheduleGroupExercise;
+            // 🎯 UP 옆 체크박스 또는 정기 체크 여부 확인
+            const isQuarterChecked = log.isQuarterOnlyOne || log.isQuarterCheck || log.isRegular;
+            
+            // 🎯 [개인/기타] 탭이나 [전체] 탭일 때, UP옆 체크박스가 체크되어 등록된 활동이면 [일정] 뱃지 표시
+            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isQuarterChecked;
             
             const scheduleBadge = showScheduleBadge 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
@@ -7959,9 +7964,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     }
 };
 
-
-
-            
 
                              </script>
 
