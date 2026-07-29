@@ -5861,17 +5861,20 @@ window.addMultiActivity = async () => {
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
 
-                const logPayload = {
-                    date: ts, 
-                    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
-                    height, coords: safeCoords,
-                    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
-                    starType, author: member.name,
-                    isSpecial: isSpecial,
-                    pRock, pForest, pValley
-                };
+                // ─── addMultiActivity 내 logPayload 부분 ───
+const logPayload = {
+    date: ts, 
+    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
+    height, coords: safeCoords,
+    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+    isQuarterOnlyOne, // 👈 🔥 이 부분이 누락되어 있었습니다! 추가해 주세요.
+    starType, author: member.name,
+    isSpecial: isSpecial,
+    pRock, pForest, pValley
+};
 
-                await saveHikeLog(id, logPayload);
+await saveHikeLog(id, logPayload);
+
             }
         } 
 
@@ -7841,13 +7844,14 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🎯 [수정 1] isRegular(정기)뿐만 아니라 isQuarterOnlyOne(1업 옆 체크박스)으로 기록된 러닝/트레킹/산책도 '일정산행' 탭에 포함
+            // 🎯 [일정산행 탭] 정기산행 OR 순수 일정산행 OR UP옆 체크박스(isQuarterOnlyOne)가 체크된 활동 전체 포함
             filtered = window.currentScrollLogs.filter(log => 
                 log.isRegular || 
                 log.isQuarterOnlyOne || 
                 ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
+            // 🎯 [개인/기타 탭] 번외산행, 러닝, 트레킹, 산책 전체
             filtered = window.currentScrollLogs.filter(log => 
                 log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
             );
@@ -7875,7 +7879,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
             let dotStyle = "";
             if (log.isRegular) {
-                // 오직 '정기🚩' 체크박스만 무지개 그래디언트
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
                 const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
@@ -7884,7 +7887,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 else if (log.isRunning) activeColors.push(colors.run);
                 else if (log.isTracking) activeColors.push(colors.trek);
                 else if (log.isWalking) activeColors.push(colors.walk);
-                else activeColors.push(colors.hike); // 일정산행 기본 색상: 연두색 (#2ecc71)
+                else activeColors.push(colors.hike);
 
                 if (activeColors.length >= 2) {
                     dotStyle = activeColors.length === 2 
@@ -7908,10 +7911,10 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [수정 2] '일정 전용 체크박스(isQuarterOnlyOne)' 또는 '정기(isRegular)' 체크 후 기록된 번외운동(러닝/트레킹/산책) 판단
-            const isScheduleGroupExercise = (log.isQuarterOnlyOne || log.isRegular) && (log.isRunning || log.isTracking || log.isWalking);
+            // 🎯 UP 옆 체크박스(isQuarterOnlyOne) 또는 정기(isRegular) 체크 상태로 등록된 활동 여부 판단
+            const isScheduleGroupExercise = (log.isQuarterOnlyOne || log.isRegular) && (log.isRunning || log.isTracking || log.isWalking || log.isExtraHike);
 
-            // 🎯 [수정 3] '개인/기타' 탭(running) 또는 '전체' 탭(all)에서 볼 때 우측에 [일정] 박스 뱃지 노출
+            // 🎯 요청 반영: '개인/기타' 탭이나 '전체' 탭에서만 [일정] 박스 뱃지 노출 (일정산행 탭에서는 안 보여줌)
             const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isScheduleGroupExercise;
             
             const scheduleBadge = showScheduleBadge 
