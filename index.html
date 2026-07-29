@@ -7819,7 +7819,6 @@ window.switchScrollTab = (category) => {
 };
 
 // [클라이언트 페이징 처리]
- // [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7842,7 +7841,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 정기산행(무지개)과 일정산행(연두색)을 모두 일정산행 탭에서 노출
+            // 정기 체크(isRegular)가 된 활동 및 순수 일정산행 노출
             filtered = window.currentScrollLogs.filter(log => 
                 log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
@@ -7907,9 +7906,10 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [핵심 추가] 정기 + (러닝 or 트레킹 or 산책) 조합일 때 우측에 띄울 '일정' 박스 태그
-            const isRegularGroupExercise = log.isRegular && (log.isRunning || log.isTracking || log.isWalking);
-            const scheduleBadge = isRegularGroupExercise 
+            // 🎯 [핵심 분기] '개인/기타' 탭(running)이면서 정기체크(isRegular)된 활동에만 '일정' 박스 배지 표시
+            const showScheduleBadgeInOtherTab = (currentCategory === 'running' || currentCategory === 'all') && log.isRegular && (log.isRunning || log.isTracking || log.isWalking);
+            
+            const scheduleBadge = showScheduleBadgeInOtherTab 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
 
@@ -7950,6 +7950,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
+
 
             
 
