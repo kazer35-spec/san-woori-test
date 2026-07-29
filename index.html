@@ -7818,7 +7818,7 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
-// [클라이언트 페이징 처리]
+ // [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7841,9 +7841,11 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 정기 체크(isRegular)가 된 활동 및 순수 일정산행 노출
+            // 🎯 [수정 1] isRegular(정기)뿐만 아니라 isQuarterOnlyOne(1업 옆 체크박스)으로 기록된 러닝/트레킹/산책도 '일정산행' 탭에 포함
             filtered = window.currentScrollLogs.filter(log => 
-                log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
+                log.isRegular || 
+                log.isQuarterOnlyOne || 
+                ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
             filtered = window.currentScrollLogs.filter(log => 
@@ -7873,7 +7875,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
             let dotStyle = "";
             if (log.isRegular) {
-                // 정기산행: 무지개 그래디언트
+                // 오직 '정기🚩' 체크박스만 무지개 그래디언트
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
                 const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
@@ -7882,7 +7884,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 else if (log.isRunning) activeColors.push(colors.run);
                 else if (log.isTracking) activeColors.push(colors.trek);
                 else if (log.isWalking) activeColors.push(colors.walk);
-                else activeColors.push(colors.hike); // 일정산행: 연두색 (#2ecc71)
+                else activeColors.push(colors.hike); // 일정산행 기본 색상: 연두색 (#2ecc71)
 
                 if (activeColors.length >= 2) {
                     dotStyle = activeColors.length === 2 
@@ -7906,10 +7908,13 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [핵심 분기] '개인/기타' 탭(running)이면서 정기체크(isRegular)된 활동에만 '일정' 박스 배지 표시
-            const showScheduleBadgeInOtherTab = (currentCategory === 'running' || currentCategory === 'all') && log.isRegular && (log.isRunning || log.isTracking || log.isWalking);
+            // 🎯 [수정 2] '일정 전용 체크박스(isQuarterOnlyOne)' 또는 '정기(isRegular)' 체크 후 기록된 번외운동(러닝/트레킹/산책) 판단
+            const isScheduleGroupExercise = (log.isQuarterOnlyOne || log.isRegular) && (log.isRunning || log.isTracking || log.isWalking);
+
+            // 🎯 [수정 3] '개인/기타' 탭(running) 또는 '전체' 탭(all)에서 볼 때 우측에 [일정] 박스 뱃지 노출
+            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isScheduleGroupExercise;
             
-            const scheduleBadge = showScheduleBadgeInOtherTab 
+            const scheduleBadge = showScheduleBadge 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
 
@@ -7950,6 +7955,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
+
 
 
             
