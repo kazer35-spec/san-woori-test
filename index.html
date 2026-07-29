@@ -3499,46 +3499,6 @@ window.renderStatusTable = () => {
     // [기존 코드 그대로] 탑 이름 추출
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
-    // ----------------------------------------------------
-    // 안전한 렌더링 및 이벤트 바인딩
-    // ----------------------------------------------------
-    processedData.forEach(m => {
-        if (m.isHidden) return;
-        if (search && !m.name.toLowerCase().includes(search.toLowerCase())) return;
-
-        const item = document.createElement('div');
-        item.className = 'status-item';
-
-        // 1. HTML 구조 생성 ('기록보기' 버튼 포함)
-        item.innerHTML = `
-            <div class="member-info">
-                <span class="name">${m.name}</span>
-                <span class="dplus">D+${m.dPlusVal}일</span>
-            </div>
-            <button type="button" class="btn-record">기록보기</button>
-        `;
-
-        // 2. 버튼 클릭 시 기존 모달 열기 로직 연동
-        const recordBtn = item.querySelector('.btn-record');
-        recordBtn.addEventListener('click', () => {
-            // 프로젝트에서 기존에 모달을 열던 함수명을 확인 후 아래에 맞춰 쓰시면 됩니다.
-            if (typeof openMemberModal === 'function') {
-                openMemberModal(m);
-            } else if (typeof openRecordModal === 'function') {
-                openRecordModal(m);
-            } else {
-                console.log("선택된 회원 데이터:", m);
-            }
-        });
-
-        list.appendChild(item);
-    });
-};
-
-
-    // --------------------------------------------------------------------
-    
-    
     // 첫 번째 노출되는 행에만 CLICK 문구를 넣기 위한 플래그
     let isFirstVisible = true;
 
@@ -3546,116 +3506,96 @@ window.renderStatusTable = () => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
-        // ✨ [핵심 수정] 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
+        // 첫 번째 보이는 데이터 행인 경우 네온 태그 생성
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
             clickTag = `<span class="click-neon">CLICK</span>`;
-            isFirstVisible = false; // 한 번 그렸으면 플래그 해제
+            isFirstVisible = false;
         }
 
-        let rankT = ""; let rankC = "";
-if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
-    const idx = topNames.indexOf(m.name);
-    
-    // 1. 현재 HTML에서 활성화(active)된 분기 버튼을 찾거나, 버튼들의 클래스 상태를 통해 선택된 분기를 가져옵니다.
-    let activeQuarter = 1; // 기본값
-    
-    // qBtn1 ~ qBtn4 중 'active' 클래스를 가지고 있는 버튼을 찾습니다.
-    const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
-    if (activeBtn) {
-        // active 상태인 버튼의 id나 onclick 텍스트에서 분기 숫자를 추출합니다.
-        const btnId = activeBtn.id; // 'qBtn1', 'qBtn2' 등
-        activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
-    } else {
-        // 혹시 active 클래스가 아직 매핑 안 되었을 경우를 대비해, 
-        // 전역 변수(currentQuarter 또는 selectedQuarter)가 있는지 체크합니다.
-        activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
-                        ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
-    }
-    
-    // 2. 현재 선택된 연도 가져오기 (기본값은 2026년으로 설정하되, 연도 선택 변수가 있다면 활용)
-    const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
-    
-    // 3. 2026년도이면서 선택된 분기가 1분기 또는 2분기인지 판별
-    const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
+        let rankT = ""; 
+        let rankC = "";
+        if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
+            const idx = topNames.indexOf(m.name);
+            
+            // 1. 선택된 분기 확인
+            let activeQuarter = 1;
+            const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+            if (activeBtn) {
+                const btnId = activeBtn.id;
+                activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+            } else {
+                activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
+                                ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
+            }
+            
+            // 2. 선택된 연도 확인
+            const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+            
+            // 3. 2026년도 상반기(1~2분기) 판별
+            const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
-    if (idx === 0) { 
-        rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
-        rankC = "rank-1"; 
-    }
-    else if (idx === 1) { 
-        rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
-        rankC = "rank-2"; 
-    }
-    else if (idx === 2) { 
-        rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
-        rankC = "rank-3"; 
-    }
-}
+            if (idx === 0) { 
+                rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
+                rankC = "rank-1"; 
+            }
+            else if (idx === 1) { 
+                rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
+                rankC = "rank-2"; 
+            }
+            else if (idx === 2) { 
+                rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
+                rankC = "rank-3"; 
+            }
+        }
 
+        const style = getLevelStyle(m.level);
+        const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
+        // 메인 테이블 고도 축약 로직
+        const rawHeight = m.totalHeight || 0;
+        const displayHeight = rawHeight >= 10000 
+            ? (rawHeight / 1000).toFixed(1) + 'k' 
+            : rawHeight + 'm';
 
-const style = getLevelStyle(m.level);
-const ddayClass = getDDayStyle(m.ddayVal, m.level);
-const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
-
-        // =========================================================
-        // 🏔️ [메인 테이블 고도 축약 로직 추가]
-// =========================================================
-const rawHeight = m.totalHeight || 0;
-const displayHeight = rawHeight >= 10000 
-    ? (rawHeight / 1000).toFixed(1) + 'k' 
-    : rawHeight + 'm';
-// =========================================================
-
-list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-<td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
-
-    <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
-        ${clickTag}
-    </div>
-
-    <div class="flex flex-col items-center justify-center">
-        ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
-        <!-- 💡 m.id -> m.name 변경 -->
-        <span class="font-bold ${nameColor} cursor-pointer hover:underline"
-              onclick="showMemberMountain('${m.name}', '${m.name}')">
-            ${m.name}
-        </span>
-    </div>
-</td>
-<td>
-    ${clickTag}
-    <div class="badge-level">
-        <!-- 💡 m.id -> m.name 변경 -->
-        <div class="badge-icon-box ${style.blink} cursor-pointer"
-             onclick="showMilkyWay('${m.name}', '${m.name}')"
-             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
-        </div>
-        <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
-    </div>
-</td>
-<td>
-    ${clickTag}
-    <!-- 💡 m.id -> m.name 변경 -->
-    <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
-</td>
-<td>
-    ${clickTag}
-    <!-- 💡 m.id -> m.name 변경 -->
-    <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
-</td>
-<td>
-    ${clickTag}
-    <!-- 💡 m.id -> m.name 변경 (showFadingScroll 인자로 m.name 전달) -->
-    <span class="dday-box ${ddayClass} cursor-pointer"
-          onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})">
-        D+${m.dPlusVal}
-    </span>
-</td>
-</tr>`;
-
+        // 테이블 행(TR) 생성 - 마지막 TD를 '기록보기' 버튼으로 변경
+        list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
+            <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
+                <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
+                    ${clickTag}
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                    ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
+                    <span class="font-bold ${nameColor} cursor-pointer hover:underline"
+                          onclick="showMemberMountain('${m.name}', '${m.name}')">
+                        ${m.name}
+                    </span>
+                </div>
+            </td>
+            <td>
+                <div class="badge-level">
+                    <div class="badge-icon-box ${style.blink} cursor-pointer"
+                         onclick="showMilkyWay('${m.name}', '${m.name}')"
+                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                        <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
+                    </div>
+                    <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
+                </div>
+            </td>
+            <td>
+                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+            </td>
+            <td>
+                <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+            </td>
+            <td class="text-center">
+                <!-- ⭐ 기존 D+Day 대신 '기록보기' 버튼으로 변경 -->
+                <button onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                        class="px-2 py-1 text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 transition-all">
+                    기록보기
+                </button>
+            </td>
+        </tr>`;
     });
 };
 
