@@ -3453,8 +3453,7 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
-  
-        window.renderStatusTable = () => {
+ window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3500,9 +3499,18 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     // [기존 코드 그대로] 탑 이름 추출
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
+    // 첫 번째 노출되는 행에만 CLICK 문구를 넣기 위한 플래그
+    let isFirstVisible = true;
+
     processedData.forEach((m) => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
+
+        // 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
+        let clickTag = "";
+        if (isFirstVisible && !m.isHidden) {
+            clickTag = `<span class="click-neon">CLICK</span>`;
+        }
 
         let rankT = ""; 
         let rankC = "";
@@ -3550,10 +3558,14 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
         // --------------------------------------------------------
-        // CLICK 태그 관련 요소가 제거된 깔끔한 TR 렌더링
+        // ⭐ '기록보기' 버튼 디자인 변경 (글자 크기 9px + 세련된 뱃지 스타일)
         // --------------------------------------------------------
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-        <td class="text-xs text-center" style="vertical-align: middle; height: 65px;">
+        <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
+            <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
+                ${clickTag}
+            </div>
+
             <div class="flex flex-col items-center justify-center">
                 ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
                 <span class="font-bold ${nameColor} cursor-pointer hover:underline"
@@ -3562,7 +3574,8 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
                 </span>
             </div>
         </td>
-        <td>
+        <td style="position: relative;">
+            ${clickTag}
             <div class="badge-level">
                 <div class="badge-icon-box ${style.blink} cursor-pointer"
                      onclick="showMilkyWay('${m.name}', '${m.name}')"
@@ -3572,19 +3585,30 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
                 <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
             </div>
         </td>
-        <td>
+        <td style="position: relative;">
+            ${clickTag}
             <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
         </td>
-        <td>
+        <td style="position: relative;">
+            ${clickTag}
             <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
         </td>
-        <td class="text-center">
+        <td style="position: relative;" class="text-center">
+            ${clickTag}
+            <!-- 💡 9px 글자 크기, 라운드 알약 형태 & 은은한 샤이니 버튼 디자인 적용 -->
             <button onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-                    class="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap">
-                <span>기록보기</span>
-            </button>
+        class="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap">
+    <span></span>
+    <span>기록보기</span>
+</button>
+
         </td>
         </tr>`;
+
+        // 한 줄(tr)을 완전히 다 그린 후에 플래그를 꺼줍니다.
+        if (isFirstVisible && !m.isHidden) {
+            isFirstVisible = false;
+        }
     });
 };
 
