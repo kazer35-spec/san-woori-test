@@ -3558,7 +3558,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
         // --------------------------------------------------------
-        // ⭐ '기록보기' 버튼 스타일/폰트 크기 최적화 (1줄 고정 & 촘촘한 간격)
+        // ⭐ '기록보기' 버튼 디자인 변경 (글자 크기 9px + 세련된 뱃지 스타일)
         // --------------------------------------------------------
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
         <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
@@ -3595,10 +3595,10 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         </td>
         <td style="position: relative;" class="text-center">
             ${clickTag}
-            <!-- 💡 버튼 글자 크기(11px) 및 패딩 조절하여 한 줄로 딱 맞춰서 표시 -->
+            <!-- 💡 9px 글자 크기, 라운드 알약 형태 & 은은한 샤이니 버튼 디자인 적용 -->
             <button onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-                    class="px-1.5 py-1 text-[11px] font-medium text-slate-700 bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 transition-all whitespace-nowrap">
-                기록보기
+                    class="inline-flex items-center justify-center px-2 py-1 text-[9px] font-bold text-slate-600 bg-white border border-slate-200 rounded-full shadow-sm hover:bg-slate-50 hover:text-blue-600 hover:border-blue-300 active:scale-95 transition-all whitespace-nowrap">
+                📋 기록보기
             </button>
         </td>
         </tr>`;
@@ -3609,6 +3609,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         }
     });
 };
+
 
                 
 
