@@ -3471,7 +3471,7 @@ window.renderStatusTable = () => {
         const baseLimit = (m.level === 0 ? 30 : 122);
         const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
-        // ⭐ [추가] 메인화면 겉에만 표시해줄 들어온 날짜(가입일) 기준 계산
+        // 메인화면 겉에만 표시해줄 들어온 날짜(가입일) 기준 계산
         let dPlusVal = 0;
         if (m.regDate) {
             const reg = m.regDate.toDate();
@@ -3479,7 +3479,6 @@ window.renderStatusTable = () => {
             dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1; // 당일 1일 기준
         }
 
-        // 기존 껍데기에 ddayVal과 dPlusVal을 둘 다 안전하게 담아서 보냅니다.
         return { 
             ...m, 
             ddayVal: ddayVal,   // 모달창에 넘겨줄 값
@@ -3499,6 +3498,42 @@ window.renderStatusTable = () => {
 
     // [기존 코드 그대로] 탑 이름 추출
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
+
+    // ----------------------------------------------------
+    // 안전한 렌더링 및 이벤트 바인딩
+    // ----------------------------------------------------
+    processedData.forEach(m => {
+        if (m.isHidden) return;
+        if (search && !m.name.toLowerCase().includes(search.toLowerCase())) return;
+
+        const item = document.createElement('div');
+        item.className = 'status-item';
+
+        // 1. HTML 구조 생성 ('기록보기' 버튼 포함)
+        item.innerHTML = `
+            <div class="member-info">
+                <span class="name">${m.name}</span>
+                <span class="dplus">D+${m.dPlusVal}일</span>
+            </div>
+            <button type="button" class="btn-record">기록보기</button>
+        `;
+
+        // 2. 버튼 클릭 시 기존 모달 열기 로직 연동
+        const recordBtn = item.querySelector('.btn-record');
+        recordBtn.addEventListener('click', () => {
+            // 프로젝트에서 기존에 모달을 열던 함수명을 확인 후 아래에 맞춰 쓰시면 됩니다.
+            if (typeof openMemberModal === 'function') {
+                openMemberModal(m);
+            } else if (typeof openRecordModal === 'function') {
+                openRecordModal(m);
+            } else {
+                console.log("선택된 회원 데이터:", m);
+            }
+        });
+
+        list.appendChild(item);
+    });
+};
 
 
     // --------------------------------------------------------------------
