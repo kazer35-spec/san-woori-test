@@ -13,6 +13,133 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+    /* 🌌 우주 다크 네온 획득자 모달 (기존 STAR GALLERY UI 핏) */
+.sg-modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(5, 7, 15, 0.82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: sgModalFadeIn 0.2s ease-out;
+}
+
+.sg-modal-content {
+    width: 88%;
+    max-width: 340px;
+    background: linear-gradient(145deg, rgba(15, 20, 38, 0.96), rgba(8, 12, 24, 0.98));
+    border-radius: 18px;
+    padding: 22px;
+    color: #ffffff;
+    box-shadow: 0 0 30px rgba(0, 206, 209, 0.25), inset 0 0 15px rgba(0, 255, 255, 0.05);
+    box-sizing: border-box;
+    animation: sgModalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 🌟 슈퍼별 전용 테마 */
+.sg-modal-content.super {
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.25), inset 0 0 15px rgba(255, 215, 0, 0.08);
+}
+.sg-modal-content.super .sg-modal-title {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* ✨ 스페셜별 전용 테마 */
+.sg-modal-content.special {
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 30px rgba(0, 206, 209, 0.25), inset 0 0 15px rgba(0, 255, 255, 0.08);
+}
+.sg-modal-content.special .sg-modal-title {
+    color: #00FFFF;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* 모달 헤더 */
+.sg-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.sg-modal-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sg-modal-close {
+    background: transparent;
+    border: none;
+    color: #7a8b9e;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.sg-modal-close:hover { color: #ffffff; }
+
+/* 획득자 리스트 박스 */
+.sg-owner-list {
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.sg-owner-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+/* 하단 확인 버튼 */
+.sg-modal-btn {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.super .sg-modal-btn {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.3));
+    border-color: rgba(255, 215, 0, 0.5);
+    color: #ffd700;
+}
+
+.special .sg-modal-btn {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(26, 188, 156, 0.3));
+    border-color: rgba(0, 255, 255, 0.5);
+    color: #00FFFF;
+}
+
+/* 애니메이션 */
+@keyframes sgModalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sgModalPop { from { transform: scale(0.9) translateY(8px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
 
     /* 🌿/📊 타임라인 잔디&성장추이 전용 진한 안내 버튼 */
 .info-help-btn-timeline {
@@ -1390,95 +1517,271 @@ table tbody tr td {
     padding-top: 12px !important; /* 위쪽 click 텍스트 공간 확보 */
 }
 
-
-/* ==========================================
-   1. 통합 모달 (Modal Base & Card Container)
-   ========================================== */
-.mountain-modal {
-    display: none;
-    position: fixed;
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
-/* 닫기 버튼 */
-.mountain-modal button[onclick*="display='none'"] {
+/* 하단 정보 바 전체 설정 */
+.mountain-info-bar {
     position: absolute;
-    top: 10px !important;
-    right: 20px !important;
-    font-size: 28px !important;
-    color: white;
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 201;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 45px;
+    background: rgba(15, 23, 42, 0.9) !important;
+    border-top: 1px solid #1e293b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000 !important; /* 다른 요소보다 확실히 위에 오도록 */
 }
 
-.integrated-member-card {
-    position: relative;
-    width: 90%;
-    max-width: 400px;
-    background: #0f172a;
-    border-radius: 30px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+/* 1. 라벨 글씨 (개인 누적, 산우리 합산 등) */
+.info-item, 
+.info-label-small { 
+    color: #94a3b8 !important; 
+    font-size: 9px !important; 
+    font-weight: 600 !important; 
 }
 
-/* 테두리 네온 활성화 효과 */
-.integrated-member-card.glow-active {
-    border: 2px solid var(--glow-color) !important;
-    animation: borderGlow 2s infinite;
+/* 2. 누적고도 숫자 (그린 네온 강제 적용) */
+/* 클래스명이 info-val이든 neon-value-green이든, 혹은 ID값이든 모두 적용 */
+.info-val, 
+.neon-value-green,
+#myTotalH, 
+#globalTotalH { 
+    color: #2ecc71 !important; 
+    font-size: 10px !important; 
+    margin-left: 5px; 
+    font-weight: 800 !important;
+    text-shadow: 0 0 8px rgba(46, 204, 113, 0.8),
+                 0 0 15px rgba(46, 204, 113, 0.4) !important;
+    display: inline-block;
 }
 
-@keyframes borderGlow {
-    0%, 100% { box-shadow: 0 0 5px var(--glow-color); }
-    50% { box-shadow: 0 0 25px var(--glow-color); }
+/* 가려진 창 (충돌 전 코어) */
+.planet-core-group {
+/* 1번 레이어: 응축된 우주의 색 */
+background: radial-gradient(circle, #1e2a4a 0%, #050b18 100%);
+box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1); /* 내부로 모이는 빛 */
+overflow: hidden;
 }
 
-/* ==========================================
-   2. 공통 배경 및 텍스트 효과 (Cosmic Theme)
-   ========================================== */
-.tree-ring-section, 
-.mountain-section {
+/* 사라진 후 보일 배경 (전체 우주) */
+#mountainViewModal {
+/* 2번 레이어: 무한한 밤하늘색 */
+background: #030712;
+}
+
+/* 기존 info-bar 레이아웃 살짝 조정 */
+.mountain-info-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 나이테창 별빛과 동일한 반짝임 효과 */
+.tree-ring-star {
+    animation: twinkle var(--duration, 3s) infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.animate-twinkle {
+  animation: twinkle 1.5s infinite ease-in-out;
+}
+
+    /* 두 섹션의 배경색을 짙은 심해/우주색으로 통일 */
+.tree-ring-section, .mountain-section {
     background: radial-gradient(circle at center, #0f172a 0%, #020617 100%) !important;
     position: relative;
     overflow: hidden;
 }
 
-/* 별빛 입자 */
-.tree-ring-star, 
-.sky-star {
+/* 빛줄기가 배경색에 영향을 덜 받도록 투명도 보정 */
+.light-beam, .light-beam-ring {
+    mix-blend-mode: screen; /* 그대로 유지하되 */
+    filter: blur(4px) brightness(1.2); /* 밝기를 강제로 조금 끌어올림 */
+}
+
+/* 1. 산맥창 빛줄기 스타일 */
+.light-beam {
     position: absolute;
-    background: white;
-    border-radius: 50%;
+    bottom: 0;
+    width: 10px !important; /* 두께 10px 강제 적용 */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
     pointer-events: none;
-    animation: twinkle var(--duration, 3s) infinite ease-in-out;
+    filter: blur(4px); /* 부드러운 빛 효과 */
+    /* 광채 효과 (나이테창과 동일하게) */
+    box-shadow: 0 0 20px var(--beam-color); 
 }
 
-.animate-twinkle {
-    animation: twinkle 1.5s infinite ease-in-out;
+/* 2. 나이테창 빛줄기 스타일 */
+.light-beam-ring {
+    position: absolute;
+    bottom: -50px; /* 시작점을 더 아래로 내려 연결성 강화 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px !important; /* 두께 10px 강제 적용 */
+    z-index: 100;
+    pointer-events: none;
+    filter: blur(4px);
+    box-shadow: 0 0 20px var(--beam-color);
 }
 
-@keyframes twinkle {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
+/* 다른 어떤 효과보다 최우선으로 적용되도록 수정 */
+.tree-ring-section .planet-core-group.planet-impact-active {
+    animation: planet-flare 0.6s cubic-bezier(0.15, 0.85, 0.35, 1) !important;
+    transform-origin: center !important;
+    display: inline-block; /* transform이 잘 먹도록 설정 */
+    will-change: transform, filter; /* 브라우저에게 미리 알려서 성능 최적화 */
 }
 
-/* 네온 타이틀 텍스트 */
+@keyframes planet-flare {
+    0% { 
+        filter: brightness(1) blur(0px); 
+        transform: scale(1); 
+    }
+    10% { 
+        /* 찰나의 순간에 압도적인 광량과 크기 */
+        filter: brightness(15) blur(10px); 
+        transform: scale(4.5); 
+    }
+    100% { 
+        filter: brightness(1) blur(0px); 
+        transform: scale(1); 
+    }
+}
+
+/* 나이테 섹션이 빛줄기의 기준점이 되도록 설정 */
+.tree-ring-section {
+    position: relative;
+    overflow: hidden; /* 빛줄기가 영역 밖으로 나가지 않게 */
+}
+
+/* 우주적인 네온 텍스트 스타일 통일 */
 .cosmic-neon-text {
-    font-family: 'Pretendard', sans-serif;
-    color: #00f2ff !important;
+    font-family: 'Pretendard', sans-serif; /* 혹은 사용 중인 폰트 */
+    color: #fff !important;
+    text-shadow: 0 0 10px var(--glow-color, #3b82f6), 
+                 0 0 20px var(--glow-color, #3b82f6);
+    transition: all 0.5s ease;
+    letter-spacing: 1px;
+}
+
+/* 빛줄기 애니메이션 수정 */
+.light-beam {
+    pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(to top, var(--beam-color), transparent);
+    filter: blur(5px); /* 두께가 얇아지므로 블러도 약간 줄임 */
+    z-index: 100;
+}
+
+/* 광선(Beam) 스타일 강화 */
+.light-beam {
+    position: absolute;
+    bottom: 0;
+    left: 30%;
+    transform: translateX(-50%);
+    width: 50px; /* 더 넓은 광선 */
+    background: linear-gradient(to top, var(--beam-color), transparent);
+    filter: blur(1px);
+    opacity: 0;
+    z-index: 150;
+    pointer-events: none;
+}
+
+/* 산맥 밝기 보정 */
+.mountain-layer {
+    filter: brightness(1.2); /* 전체적인 베이스 밝기 상향 */
+}
+
+
+/* 배경(산우리) 산맥: 가시성 확보 */
+#bgLayersContainer .mountain-layer {
+    opacity: 0.3 !important; /* 기존 0.15에서 상향 */
+}
+
+/* 최고봉 광원 효과 */
+.peak.max-height {
+    position: relative;
+}
+
+.peak.max-height::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #fff 0%, transparent 70%);
+    box-shadow: 0 0 20px 5px #fff;
+    border-radius: 50%;
+    animation: peak-glow 2s infinite alternate;
+}
+
+@keyframes peak-glow {
+    from { opacity: 0.5; transform: translateX(-50%) scale(0.8); }
+    to { opacity: 1; transform: translateX(-50%) scale(1.2); }
+}
+
+/* 1. 중앙 행성(코어)이 부드럽게 원을 그리며 움직임 */
+@keyframes planetOrbit {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(1.5px, 1.5px); }
+    50% { transform: translate(0, 2.5px); }
+    75% { transform: translate(-1.5px, 1.5px); }
+    100% { transform: translate(0, 0); }
+}
+
+.planet-core-group {
+    animation: planetOrbit 5s ease-in-out infinite;
+    transform-origin: 120px 120px; /* SVG의 정중앙 기준 */
+}
+
+/* 2. 나이테가 나타날 때 투명도가 부드럽게 변함 */
+.tree-ring-path {
+    transition: stroke-opacity 1s ease-out, stroke-width 0.5s ease;
+}
+
+/* 3. 우주 느낌의 네온 텍스트 */
+.cosmic-neon-text {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 15px currentColor;
+}
+
+/* 중앙 행성(코어) 애니메이션 */
+@keyframes planetFloat {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(2px, -3px); } /* 약간 위로 이동 */
+    100% { transform: translate(0, 0); }
+}
+
+.planet-core {
+    animation: planetFloat 4s ease-in-out infinite;
+    transform-origin: center;
+}
+
+/* 나이테가 밝아질 때의 효과 */
+.ring-path {
+    transition: stroke-opacity 0.8s ease, stroke-width 0.5s ease;
+}
+
+/* 산맥 이름 및 활동 나이테 공통 네온 스타일 */
+.cosmic-neon-text {
+    font-size: 1rem !important; /* 기존 크기의 절반 수준으로 조정 */
+    color: #00f2ff; /* 밝은 시안 네온 컬러 */
     text-transform: uppercase;
     letter-spacing: 1px;
+    /* 푸른 네온 광원 효과 */
     text-shadow: 
         0 0 5px #00f2ff,
         0 0 10px #00f2ff,
@@ -1487,53 +1790,24 @@ table tbody tr td {
     transition: all 0.3s ease;
 }
 
-.ring-main-title.cosmic-neon-text,
-#mwMountainName.cosmic-neon-text {
+/* 활동 나이테 전용 (더 작게) */
+.ring-main-title.cosmic-neon-text {
     font-size: 0.6rem !important;
     font-weight: bold;
 }
 
+/* ㅇㅇ님의 산맥 전용 */
+#mwMountainName.cosmic-neon-text {
+    font-size: 0.6rem !important;
+}
+
+/* 우주적인 타이틀 텍스트 효과 */
 .cosmic-title {
     background: linear-gradient(to bottom, #fff 30%, #94a3b8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 15px rgba(255,255,255,0.3);
     letter-spacing: 2px;
-}
-
-/* ==========================================
-   3. 상단: 활동 나이테 섹션 (Tree Ring)
-   ========================================== */
-.tree-ring-section {
-    padding: 25px 25px 10px 25px;
-    background: linear-gradient(to bottom, #1e293b, #0f172a);
-    border-radius: 24px 24px 0 0;
-}
-
-.tree-ring-section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: 
-        radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
-        radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0));
-    background-size: 150px 150px;
-    opacity: 0.3;
-}
-
-.ring-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: flex-end; 
-    margin-bottom: 20px; 
-}
-
-.ring-label { 
-    font-size: 9px; 
-    color: #64748b; 
-    font-weight: 800; 
-    letter-spacing: 2px; 
 }
 
 .ring-label-cosmic {
@@ -1543,207 +1817,281 @@ table tbody tr td {
     letter-spacing: 3px;
 }
 
-.ring-main-title { 
-    font-size: 16px; 
-    color: #f1f5f9; 
-    margin: 4px 0 0 0; 
+/* 별빛 배경 애니메이션 */
+@keyframes star-twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
 }
 
-.ring-months-val { 
-    font-size: 22px; 
-    color: #3b82f6; 
-    font-weight: 900; 
+.tree-ring-star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: star-twinkle var(--duration) infinite ease-in-out;
 }
 
-.ring-unit { 
-    font-size: 10px; 
-    color: #94a3b8; 
-    margin-left: 4px; 
+/* 나이테 섹션 배경을 별밤 느낌으로 */
+.tree-ring-section {
+    position: relative;
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); /* 진한 우주색 */
+    overflow: hidden;
+    border-radius: 24px 24px 0 0;
 }
+
+/* 별밤 효과 (가상 산맥과 동일한 별 입자) */
+.tree-ring-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(1px 1px at 20px 30px, #eee, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+                      radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0));
+    background-size: 150px 150px;
+    opacity: 0.3;
+}
+
+/* 닫기 버튼 위치 상향 조정 */
+.mountain-modal button[onclick*="display='none'"] {
+    top: 10px !important; /* 기존 15px에서 더 위로 */
+    right: 20px !important;
+    font-size: 28px !important;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* 중앙 행성 글로우 효과 */
+.core-planet {
+    filter: blur(2px);
+    animation: pulse 3s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* 빛 줄기 효과 */
+.light-beam {
+position: absolute;
+bottom: 0;
+left: 50%;
+width: 2px;
+height: 0;
+background: linear-gradient(to top, transparent, #fff, transparent);
+box-shadow: 0 0 15px #fff;
+z-index: 150;
+opacity: 0;
+transform: translateX(-50%);
+}
+
+/* 최고봉 이름 스타일 */
+.highest-peak-label {
+position: absolute;
+bottom: 55px; /* 정보 바 위쪽 */
+left: 0;
+width: 100%;
+text-align: center;
+font-size: 11px;
+font-weight: 900;
+color: #fbbf24;
+text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+z-index: 160;
+}
+
+/* 테두리 빛 애니메이션 */
+@keyframes borderGlow {
+0% { box-shadow: 0 0 5px var(--glow-color); }
+50% { box-shadow: 0 0 25px var(--glow-color); }
+100% { box-shadow: 0 0 5px var(--glow-color); }
+}
+
+.integrated-member-card.glow-active {
+border: 2px solid var(--glow-color) !important;
+animation: borderGlow 2s infinite;
+}
+
+/* 산맥 내부 요소 높이 조정 */
+.mountain-info-bar {
+padding: 5px 15px;
+font-size: 9px;
+}
+​
+/* 나이테 정중앙 시작점 강조 */
+.ring-center-flash {
+filter: brightness(3) !important;
+stroke-width: 5 !important;
+transition: all 0.5s;
+}
+
+/* 통합 카드 스타일 */
+.integrated-member-card {
+position: relative;
+width: 90%;
+max-width: 400px;
+background: #0f172a; /* 어두운 밤하늘 배경으로 통일 */
+border-radius: 30px;
+overflow: hidden;
+border: 1px solid rgba(255,255,255,0.1);
+box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+/* 나이테 섹션 */
+.tree-ring-section {
+padding: 25px 25px 10px 25px;
+background: linear-gradient(to bottom, #1e293b, #0f172a);
+}
+
+/* 산맥 섹션 */
+.mountain-section {
+position: relative;
+height: 250px; /* 높이는 적절히 조절 가능 */
+width: 100%;
+overflow: hidden;
+background: #0f172a;
+}
+
+/* 기존 불필요한 클래스 제거용 */
+.tree-ring-card, .mountain-container {
+width: 100% !important;
+margin: 0 !important;
+border-radius: 0 !important;
+box-shadow: none !important;
+}
+
+/* 삭제 요청하신 하단 설명부 제거 */
+.ring-footer, .ring-desc {
+display: none !important;
+}
+
+/* 나이테 카드 전체 스타일 */
+.tree-ring-card {
+position: relative;
+width: 100%; /* 산맥 컨테이너와 동일한 너비 */
+max-width: 450px;
+margin-top: 15px;
+background: rgba(15, 23, 42, 0.7);
+border: 1px solid rgba(255, 255, 255, 0.1);
+border-radius: 24px;
+padding: 20px;
+overflow: hidden;
+backdrop-filter: blur(12px);
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.ring-glass-effect {
+position: absolute;
+top: -50%; left: -50%; width: 200%; height: 200%;
+background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%);
+pointer-events: none;
+}
+
+.ring-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+.ring-label { font-size: 9px; color: #64748b; font-weight: 800; letter-spacing: 2px; }
+.ring-main-title { font-size: 16px; color: #f1f5f9; margin: 4px 0 0 0; }
+.ring-months-val { font-size: 22px; color: #3b82f6; font-weight: 900; }
+.ring-unit { font-size: 10px; color: #94a3b8; margin-left: 4px; }
 
 .ring-canvas {
-    width: 100%;
-    height: 180px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+width: 100%;
+height: 180px;
+display: flex;
+justify-content: center;
+align-items: center;
 }
 
-/* SVG 나이테 라인 스타일 */
-.tree-ring-path, 
+.ring-footer { margin-top: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+.ring-desc { font-size: 10px; color: #475569; }
+
+/* 나이테 선 기본 스타일 */
 .ring-path {
-    fill: none;
-    stroke-linecap: round;
-    transition: stroke-opacity 0.8s ease, stroke-width 0.5s ease;
+fill: none;
+stroke-linecap: round;
+transition: all 0.4s ease;
 }
 
+/* 모달 설정: 내부 요소들을 세로로 정렬 */
+.mountain-modal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0, 0, 0, 0.85);
+z-index: 1000;
+flex-direction: column; /* 세로 정렬 중요 */
+justify-content: center;
+align-items: center;
+}
+
+/* 산맥 창과 나이테 창 사이의 간격과 애니메이션 */
+.tree-ring-window {
+animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.ring-path {
+fill: none;
+transition: stroke-opacity 0.5s;
+}
+
+/* 나이테가 하나씩 반짝이며 나타나는 애니메이션 */
 @keyframes ring-glow {
-    0% { stroke-opacity: 0.2; filter: brightness(1); }
-    50% { stroke-opacity: 1; filter: brightness(2.5); stroke-width: 2px; }
-    100% { stroke-opacity: 0.6; filter: brightness(1); }
+0% { stroke-opacity: 0.2; filter: brightness(1); }
+50% { stroke-opacity: 1; filter: brightness(2.5); stroke-width: 2px; }
+100% { stroke-opacity: 0.6; filter: brightness(1); }
+}
+.ring-animating { animation: ring-glow 0.8s ease-in-out; }
+
+/* 산맥 모달 스타일 수정 */
+.mountain-modal {
+display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center;
+}
+.mountain-container {
+width: 95%; max-width: 800px; height: 260px; /* 높이를 2/3로 축소 */
+background: #070b14; border-radius: 15px; position: relative; overflow: hidden;
+box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid #1e293b;
 }
 
-.ring-animating { 
-    animation: ring-glow 0.8s ease-in-out; 
+/* 밤하늘 별 */
+.sky-star {
+position: absolute; background: white; border-radius: 50%; opacity: 0.4;
+animation: twinkle var(--duration) infinite;
 }
+@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
 
-.ring-center-flash {
-    filter: brightness(3) !important;
-    stroke-width: 5 !important;
-    transition: all 0.5s;
-}
-
-/* ==========================================
-   4. 하단: 산맥 비주얼 섹션 (Mountain View)
-   ========================================== */
-.mountain-section {
-    position: relative;
-    height: 250px;
-    width: 100%;
-    overflow: hidden;
-    background: #0f172a;
-}
-
-.mountain-header {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    right: 20px;
-    z-index: 200;
-    color: white;
-}
-
-/* 산맥 레이어 및 봉우리 */
+/* 산맥 공통 */
 .mountain-layer {
-    position: absolute;
-    bottom: 45px;
-    left: 0;
-    width: 100%;
-    display: flex;
-    align-items: flex-end;
-    pointer-events: none;
-    filter: brightness(1.2);
+position: absolute; bottom: 45px; /* 글씨 공간 확보를 위해 바닥에서 띄움 */
+left: 0; width: 100%; display: flex; align-items: flex-end; pointer-events: none;
 }
-
-#bgLayersContainer .mountain-layer {
-    opacity: 0.3 !important;
-}
-
 .peak {
-    position: relative;
-    flex: 1;
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    background: linear-gradient(to bottom, #1e293b, #070b14);
-    margin-left: -3%;
-    transition: height 1s ease;
+position: relative; flex: 1; clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+background: linear-gradient(to bottom, #1e293b, #070b14); margin-left: -3%;
+transition: height 1s ease;
 }
 
-/* 최고봉 골든이펙트 */
+/* ✨ 최고봉 골든 이펙트 (강화) */
 .peak.max-height {
-    background: linear-gradient(to bottom, #f59e0b, #78350f) !important;
-    z-index: 100 !important;
-    overflow: visible !important;
+background: linear-gradient(to bottom, #f59e0b, #78350f) !important;
+z-index: 100 !important; /* 산맥 중 최상단 */
+overflow: visible !important;
 }
 
+/* 방사형 광채 + 화이트 스타 */
 .golden-glow-effect {
-    position: absolute; 
-    top: 0; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
-    width: 60px; 
-    height: 60px;
-    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(245,158,11,0.4) 30%, transparent 70%);
-    border-radius: 50%; 
-    z-index: 110;
+position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);
+width: 60px; height: 60px;
+background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(245,158,11,0.4) 30%, transparent 70%);
+border-radius: 50%; z-index: 110;
 }
-
 .white-star-core {
-    position: absolute; 
-    top: 0; 
-    left: 50%; 
-    transform: translate(-50%, -50%);
-    width: 6px; 
-    height: 6px; 
-    background: white; 
-    border-radius: 50%;
-    box-shadow: 0 0 10px 2px white, 0 0 20px 5px #fbbf24; 
-    z-index: 120;
+position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);
+width: 6px; height: 6px; background: white; border-radius: 50%;
+box-shadow: 0 0 10px 2px white, 0 0 20px 5px #fbbf24; z-index: 120;
 }
-
-.highest-peak-label {
-    position: absolute;
-    bottom: 55px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 11px;
-    font-weight: 900;
-    color: #fbbf24;
-    text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
-    z-index: 160;
-}
-
-/* 광선 (Light Beam) 효과 */
-.light-beam, 
-.light-beam-ring {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 10px !important;
-    z-index: 100;
-    pointer-events: none;
-    mix-blend-mode: screen;
-    filter: blur(4px) brightness(1.2);
-    box-shadow: 0 0 20px var(--beam-color);
-}
-
-.light-beam-ring {
-    bottom: -50px;
-}
-
-/* ==========================================
-   5. 하단 정보 바 (Mountain Info Bar)
-   ========================================== */
-.mountain-info-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 45px;
-    background: rgba(15, 23, 42, 0.9) !important;
-    backdrop-filter: blur(5px);
-    border-top: 1px solid #1e293b;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 20px;
-    z-index: 1000 !important;
-}
-
-.info-item, 
-.info-label-small { 
-    color: #94a3b8 !important; 
-    font-size: 9px !important; 
-    font-weight: 600 !important; 
-}
-
-.info-val, 
-.neon-value-green,
-#myTotalH, 
-#globalTotalH { 
-    color: #2ecc71 !important; 
-    font-size: 10px !important; 
-    margin-left: 5px; 
-    font-weight: 800 !important;
-    text-shadow: 
-        0 0 8px rgba(46, 204, 113, 0.8),
-        0 0 15px rgba(46, 204, 113, 0.4) !important;
-    display: inline-block;
-}
-
-
-
 
     /* 헤더 글씨 */
 .mountain-header {
@@ -2820,7 +3168,7 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
   getFirestore, collection, addDoc, onSnapshot, updateDoc, doc, deleteDoc, 
-  increment, query, orderBy, Timestamp, where, getDocs, getDoc, setDoc, limit, writeBatch, startAfter, getCountFromServer
+  increment, query, orderBy, Timestamp, where, getDocs, getDoc, setDoc, limit, writeBatch, startAfter, getCountFromServer, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -3116,14 +3464,14 @@ window.renderStatusTable = () => {
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
     let processedData = currentData.map(m => {
-        // [기존 코드 그대로] 창 열었을 때 보여줄 마지막 산행 기준 계산
+        // [기존 코드] 마지막 산행 기준 D-Day 계산
         const last = m.lastDate ? m.lastDate.toDate() : new Date();
         const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
         const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
         const baseLimit = (m.level === 0 ? 30 : 122);
         const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
-        // ⭐ [추가] 메인화면 겉에만 표시해줄 들어온 날짜(가입일) 기준 계산
+        // ⭐ [추가] 가입일 기준 D+Day 계산 (나이테)
         let dPlusVal = 0;
         if (m.regDate) {
             const reg = m.regDate.toDate();
@@ -3131,15 +3479,14 @@ window.renderStatusTable = () => {
             dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1; // 당일 1일 기준
         }
 
-        // 기존 껍데기에 ddayVal과 dPlusVal을 둘 다 안전하게 담아서 보냅니다.
         return { 
             ...m, 
-            ddayVal: ddayVal,   // 모달창에 넘겨줄 값
-            dPlusVal: dPlusVal  // 메인화면 글자로 보여줄 값
+            ddayVal: ddayVal,   // 모달창용
+            dPlusVal: dPlusVal  // 메인 화면 표시용 (D+Day)
         };
     });
 
-    // [기존 코드 그대로] 정렬 로직
+    // 정렬 로직
     processedData.sort((a, b) => {
         if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
         if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
@@ -3149,66 +3496,98 @@ window.renderStatusTable = () => {
         return 0;
     });
 
-    // [기존 코드 그대로] 탑 이름 추출
+    // 탑 3 회원 추출
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
-
-    // --------------------------------------------------------------------
-    
-    
-    // 첫 번째 노출되는 행에만 CLICK 문구를 넣기 위한 플래그
     let isFirstVisible = true;
 
     processedData.forEach((m) => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
-        // ✨ [핵심 수정] 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
             clickTag = `<span class="click-neon">CLICK</span>`;
-            isFirstVisible = false; // 한 번 그렸으면 플래그 해제
+            isFirstVisible = false;
         }
 
-        let rankT = ""; let rankC = "";
-if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
-    const idx = topNames.indexOf(m.name);
-    
-    // 1. 현재 HTML에서 활성화(active)된 분기 버튼을 찾거나, 버튼들의 클래스 상태를 통해 선택된 분기를 가져옵니다.
-    let activeQuarter = 1; // 기본값
-    
-    // qBtn1 ~ qBtn4 중 'active' 클래스를 가지고 있는 버튼을 찾습니다.
-    const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
-    if (activeBtn) {
-        // active 상태인 버튼의 id나 onclick 텍스트에서 분기 숫자를 추출합니다.
-        const btnId = activeBtn.id; // 'qBtn1', 'qBtn2' 등
-        activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
-    } else {
-        // 혹시 active 클래스가 아직 매핑 안 되었을 경우를 대비해, 
-        // 전역 변수(currentQuarter 또는 selectedQuarter)가 있는지 체크합니다.
-        activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
-                        ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
-    }
-    
-    // 2. 현재 선택된 연도 가져오기 (기본값은 2026년으로 설정하되, 연도 선택 변수가 있다면 활용)
-    const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
-    
-    // 3. 2026년도이면서 선택된 분기가 1분기 또는 2분기인지 판별
-    const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
+        let rankT = ""; 
+        let rankC = "";
+        if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
+            const idx = topNames.indexOf(m.name);
+            
+            let activeQuarter = 1;
+            const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+            if (activeBtn) {
+                const btnId = activeBtn.id;
+                activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+            } else {
+                activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
+                                ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
+            }
+            
+            const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+            const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
-    if (idx === 0) { 
-        rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
-        rankC = "rank-1"; 
-    }
-    else if (idx === 1) { 
-        rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
-        rankC = "rank-2"; 
-    }
-    else if (idx === 2) { 
-        rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
-        rankC = "rank-3"; 
-    }
-}
+            if (idx === 0) { 
+                rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
+                rankC = "rank-1"; 
+            }
+            else if (idx === 1) { 
+                rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
+                rankC = "rank-2"; 
+            }
+            else if (idx === 2) { 
+                rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
+                rankC = "rank-3"; 
+            }
+        }
+
+        // 레벨 스타일 및 칭호 가져오기
+        const levelStyle = getLevelStyle(m.level);
+        const levelBadge = getLevelBadge(m.level);
+
+        // 테이블 행 생성
+        const tr = document.createElement('tr');
+        if (m.isHidden) tr.classList.add('opacity-40', 'bg-gray-100');
+
+        // D+Day (나이테) 텍스트 
+        const dPlusText = m.dPlusVal > 0 ? `D+${m.dPlusVal}` : '-';
+
+        tr.innerHTML = `
+            <td class="text-center font-bold" onclick="showBondingForestModal('${m.name}')">
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center gap-1">
+                        ${rankT ? `<span class="text-[9px] px-1 rounded font-black ${rankC}">${rankT}</span>` : ''}
+                        <span class="text-xs text-slate-800 font-black">${m.name}</span>
+                        ${clickTag}
+                    </div>
+                    <!-- 🌲 나이테 (가입 경과일 D+Day) -->
+                    <span class="text-[9px] text-emerald-600 font-extrabold mt-0.5">🌱 ${dPlusText}</span>
+                </div>
+            </td>
+            <td class="text-center" onclick="openMilkyWayModal('${m.id}')">
+                <div class="inline-block px-2 py-0.5 rounded-full text-[10px] font-black border ${levelStyle.blink}" 
+                     style="background:${levelStyle.bg}; border-color:${levelStyle.border}; color:${levelStyle.text};">
+                    ${levelBadge} (Lv.${m.level})
+                </div>
+            </td>
+            <td class="text-center font-black text-slate-700 text-xs">
+                ${m.qCount}회
+            </td>
+            <td class="text-center" onclick="openMapModal('${m.id}')">
+                <span class="text-xs font-bold text-slate-600">${(m.totalHeight || 0).toLocaleString()}m</span>
+            </td>
+            <td class="text-center">
+                <button onclick="openTimelineModal('${m.id}')" class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-1 rounded-lg">
+                    기록보기
+                </button>
+            </td>
+        `;
+
+        list.appendChild(tr);
+    });
+};
 
 
 
@@ -5470,13 +5849,13 @@ window.addMultiActivity = async () => {
                 
                 updateData.bonusDays = 0;
                 
-                // ─── 🎯 [수정] 업 수치(realUpAmount)에 따른 분기 점수 계산 ───
-const groupSize = selectedMemberIds.size;
-const baseQCount = groupSize >= 3 ? 3 : groupSize; 
-const multiplier = realUpAmount > 0 ? realUpAmount : 1; // 업 수치 곱 적용 (1업=x1, 2업=x2, 3업=x3)
-const qCountIncrement = baseQCount * multiplier; 
+                // ─── 🎯 업 수치(realUpAmount)에 따른 분기 점수 계산 ───
+                const groupSize = selectedMemberIds.size;
+                const baseQCount = groupSize >= 3 ? 3 : groupSize; 
+                const multiplier = realUpAmount > 0 ? realUpAmount : 1; 
+                const qCountIncrement = baseQCount * multiplier; 
 
-updateData.qCount = _increment(qCountIncrement); 
+                updateData.qCount = _increment(qCountIncrement); 
 
                 if (isMultiHike) {
                     let pointToAdd = (isQuarterOnlyOne || isRegular) ? 100 : (100 * (realUpAmount || 1));
@@ -5502,7 +5881,7 @@ updateData.qCount = _increment(qCountIncrement);
                 }
             }
 
-            // ⚡ [벙주 체크박스 기능 추가] 만약 해당 회원이 우측 체크박스(벙주)에 체크되어 있다면 데이터 분기 누적
+            // ⚡ 벙주 체크박스 분기 누적
             if (window.selectedHostIds && window.selectedHostIds.includes(id)) {
                 updateData[`quarterlyStats.${qKey}.hosted`] = _increment(1);
             }
@@ -5546,15 +5925,39 @@ updateData.qCount = _increment(qCountIncrement);
         
         alert((isRealHike && !isExtraHike) ? "순수산행 기록 완료! ✅" : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        selectedMemberIds.clear();
+        // ─── 🧹 [수정 핵심] 저장 후 입력 수치 및 폼 요소 전체 초기화 ───
         
-        // ⚡ [벙주 체크박스 기능 추가] 완료 후 전역 배열 및 UI 체크박스 전부 초기화
+        // 1. 선택된 회원 및 벙주 목록 초기화
+        selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false); // UI 체크박스 해제
 
+        // 2. 텍스트/숫자 입력 폼 초기화
+        const resetInputIds = ['mountainName', 'mountainHeight', 'pRock', 'pForest', 'pValley'];
+        resetInputIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        // 3. 지역 선택 셀렉트 박스 초기화
+        const regionSelect = document.getElementById('adminManualRegionSelect');
+        if (regionSelect) regionSelect.selectedIndex = 0;
+
+        // 4. 활동 특성 체크박스 초기화
+        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
+        checkIds.forEach(id => {
+            const cb = document.getElementById(id);
+            if (cb) cb.checked = false;
+        });
+
+        // 5. 레벨업 선택 라디오 버튼 초기화
+        document.querySelectorAll('input[name="upAmount"]').forEach(radio => radio.checked = false);
+
+        // 6. 좌표 및 날짜 초기화
         tempCoord = null; 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
-        if (typeof dateInput !== 'undefined' && dateInput) {
+        if (dateInput) {
             dateInput.value = kstDate.toISOString().split('T')[0];
         }
         
@@ -5564,6 +5967,9 @@ updateData.qCount = _increment(qCountIncrement);
         alert("저장 실패: " + error.message);
     }
 };
+
+                
+        
                         
    // 📌 [신규 회원 등록 함수] - 수정본
 window.addMember = async () => {
@@ -6766,7 +7172,52 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     }, 100);
 };
     
-        
+                
+  // ======================= [별 가이드 & 은하수 모듈 통합 - 연도 자동 저장 & 모달 최신화] =======================
+
+// 1. 회원 DB 문서(sanwoori/{memberId})에 레전드 별 획득 기록 저장하는 함수 (최초 1회만 등록)
+async function saveSpecialStarToMember(memberId, starType, quarterText, memberInfo) {
+    if (starType === "super" || starType === "special") {
+        try {
+            // 이미 획득 기록(specialStars)이 존재하는지 확인 (중복 등록 및 수정값 덮어쓰기 방지)
+            const currentSpecialStars = memberInfo?.specialStars || [];
+            const isAlreadySaved = currentSpecialStars.some(item => item.starType === starType);
+
+            // 최초 등록이 아닐 경우(이미 저장된 기록이 있으면) 자동 저장 로직 실행 안 함
+            if (isAlreadySaved) return;
+
+            const currentYear = new Date().getFullYear(); // 🎯 획득 연도 자동 추출
+
+            const newRecord = {
+                starType: starType,
+                quarter: quarterText || "1Q",
+                year: currentYear, // 🎯 연도(year) 필드 추가 자동 저장
+                timestamp: Date.now()
+            };
+
+            const memberRef = doc(db, "sanwoori", memberId);
+            await updateDoc(memberRef, {
+                specialStars: arrayUnion(newRecord)
+            });
+            
+            // 로컬 메모리(currentData & memberInfo)에도 즉시 반영하여 UI 최신화
+            if (!memberInfo.specialStars) memberInfo.specialStars = [];
+            memberInfo.specialStars.push(newRecord);
+
+            if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+                const target = currentData.find(m => m.id === memberId);
+                if (target) {
+                    if (!target.specialStars) target.specialStars = [];
+                    target.specialStars.push(newRecord);
+                }
+            }
+        } catch (err) {
+            console.error("레전드 별 기록 최초 업데이트 실패:", err);
+        }
+    }
+}
+
+// 2. 은하수 메인 실행 함수
 window.showMilkyWay = async (mId, mName) => {
     const modal = document.getElementById('milkyWayModal');
     const board = document.getElementById('constellationBoard');
@@ -6774,49 +7225,42 @@ window.showMilkyWay = async (mId, mName) => {
 
     if (!modal || !board) return;
 
-    // --- [1. 가이드 UI 주입 (ⓘ 버튼 및 은하수 가이드 모달 추가)] ---
-if (!document.getElementById('starGuideBtn')) {
-    const guideHTML = `
-        <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010;">
-            <button id="starGuideBtn" onclick="toggleStarGuide(true)" class="star-guide-btn" style="border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.4);">
-                <span class="sparkle-icon">✨</span> 별 가이드
-            </button>
-        </div>
-        <!-- 반투명 오버레이 -->
-        <div id="starGuideModal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10020; border-radius: inherit; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(14px); justify-content: center; align-items: center; opacity: 0; transition: opacity 0.25s ease;" onclick="toggleStarGuide(false)">
-            
-            <div style="width: 90%; max-width: 340px; height: auto; background: linear-gradient(160deg, #0f172a 0%, #080d1a 100%); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; padding: 26px 20px 20px 20px; position: relative; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(99, 102, 241, 0.15); box-sizing: border-box; display: flex; flex-direction: column;" onclick="event.stopPropagation()">
-                
-                <!-- 상단 타이틀 -->
-                <div style="text-align: center; margin-bottom: 20px; flex-shrink: 0; position: relative;">
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 35px; background: rgba(99, 102, 241, 0.2); filter: blur(20px); border-radius: 50%; pointer-events: none;"></div>
-                    <h3 style="color: #fff; font-size: 1.1rem; font-weight: 900; letter-spacing: 3px; margin: 0; text-shadow: 0 0 12px rgba(165, 180, 252, 0.6); position: relative;">STAR GALLERY</h3>
-                    <p style="color: #94a3b8; font-size: 0.68rem; margin: 6px 0 0 0; opacity: 0.85; font-weight: 500; position: relative;">산우리의 밤하늘을 수놓는 특별한 별빛들</p>
-                </div>
-
-                <!-- 아이템 그리드 -->
-                <div id="guideGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); row-gap: 10px; column-gap: 10px;">
-                </div>
-
-                <!-- 하단 블랙 네온 블루 확인 버튼 (팁 문구 제거됨) -->
-                <div style="margin-top: 18px;">
-                    <button onclick="toggleStarGuide(false)" style="width: 100%; background: linear-gradient(135deg, #090d16 0%, #0f1c3f 50%, #1e293b 100%); border: 1px solid rgba(56, 189, 248, 0.4); color: #e0f2fe; font-size: 0.88rem; font-weight: 800; letter-spacing: 2px; padding: 12px 0; border-radius: 14px; cursor: pointer; box-shadow: 0 0 15px rgba(56, 189, 248, 0.25), inset 0 0 10px rgba(56, 189, 248, 0.15); text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); transition: all 0.3s ease; box-sizing: border-box;" onmouseover="this.style.borderColor='rgba(56, 189, 248, 0.8)'; this.style.boxShadow='0 0 22px rgba(56, 189, 248, 0.5), inset 0 0 15px rgba(56, 189, 248, 0.3)';" onmouseout="this.style.borderColor='rgba(56, 189, 248, 0.4)'; this.style.boxShadow='0 0 15px rgba(56, 189, 248, 0.25), inset 0 0 10px rgba(56, 189, 248, 0.15)';">
-                        확인
-                    </button>
-                </div>
-
+    // --- [ 가이드 UI 주입 ] ---
+    if (!document.getElementById('starGuideBtn')) {
+        const guideHTML = `
+            <div class="mw-header-controls" style="position: absolute; top: 60px; right: 20px; z-index: 10010;">
+                <button id="starGuideBtn" onclick="toggleStarGuide(true)" class="star-guide-btn" style="border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.4);">
+                    <span class="sparkle-icon">✨</span> 별 가이드
+                </button>
             </div>
-        </div>`;
-    modal.insertAdjacentHTML('afterbegin', guideHTML);
-}
+            <div id="starGuideModal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10020; border-radius: inherit; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(14px); justify-content: center; align-items: center; opacity: 0; transition: opacity 0.25s ease;" onclick="toggleStarGuide(false)">
+                <div style="width: 90%; max-width: 360px; max-height: 85vh; background: linear-gradient(160deg, #0f172a 0%, #080d1a 100%); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 24px; padding: 22px 18px 18px 18px; position: relative; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(99, 102, 241, 0.15); box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;" onclick="event.stopPropagation()">
+                    
+                    <div style="text-align: center; margin-bottom: 16px; flex-shrink: 0; position: relative;">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 35px; background: rgba(99, 102, 241, 0.2); filter: blur(20px); border-radius: 50%; pointer-events: none;"></div>
+                        <h3 style="color: #fff; font-size: 1.1rem; font-weight: 900; letter-spacing: 3px; margin: 0; text-shadow: 0 0 12px rgba(165, 180, 252, 0.6); position: relative;">STAR GALLERY</h3>
+                        <p style="color: #94a3b8; font-size: 0.68rem; margin: 4px 0 0 0; opacity: 0.85; font-weight: 500; position: relative;">산우리의 밤하늘을 수놓는 특별한 별빛들</p>
+                    </div>
 
-    // --- [2. UI 초기화: 글씨 완벽 중앙 고정 & 버튼 오른쪽 우회 배치] ---
+                    <div id="guideGrid" style="display: grid; grid-template-columns: repeat(1, 1fr); row-gap: 10px; overflow-y: auto; padding-right: 4px; max-height: 60vh;">
+                    </div>
+
+                    <div style="margin-top: 14px; flex-shrink: 0;">
+                        <button onclick="toggleStarGuide(false)" style="width: 100%; background: linear-gradient(135deg, #090d16 0%, #0f1c3f 50%, #1e293b 100%); border: 1px solid rgba(56, 189, 248, 0.4); color: #e0f2fe; font-size: 0.88rem; font-weight: 800; letter-spacing: 2px; padding: 12px 0; border-radius: 14px; cursor: pointer; box-shadow: 0 0 15px rgba(56, 189, 248, 0.25), inset 0 0 10px rgba(56, 189, 248, 0.15); text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); transition: all 0.3s ease; box-sizing: border-box;">
+                            확인
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        modal.insertAdjacentHTML('afterbegin', guideHTML);
+    }
+
+    // --- [ UI 초기화 ] ---
     modal.style.display = 'flex';
     if (nameLabel) {
         nameLabel.style.textAlign = 'center';
         nameLabel.style.width = '100%';
         nameLabel.style.position = 'relative';
-        
         nameLabel.innerHTML = `
             <span style="position: relative; display: inline-block;">
                 ${mName}님의 은하수
@@ -6827,65 +7271,40 @@ if (!document.getElementById('starGuideBtn')) {
     board.innerHTML = '<div class="nebula-cloud"></div>';
 
     try {
-        // --- [3. DB 회원 데이터 조회 및 동행지수 연산] ---
-        let memberInfo = null;
-        
-        // 1순위: 전역 currentData에서 mId로 검색
-        if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-            memberInfo = currentData.find(m => m.id === mId || m.name === mName);
-        }
+        let memberInfo = (typeof currentData !== 'undefined' && Array.isArray(currentData)) 
+            ? currentData.find(m => m.id === mId || m.name === mName) : null;
 
-        // 2순위: currentData에 없으면 DB 개별 문서 직접 조회 (읽기 최소화)
         if (!memberInfo && mId) {
             const mDoc = await getDoc(doc(db, "sanwoori", mId));
-            if (mDoc.exists()) {
-                memberInfo = { id: mDoc.id, ...mDoc.data() };
-            }
+            if (mDoc.exists()) memberInfo = { id: mDoc.id, ...mDoc.data() };
         }
 
-        // DB 필드 값 매칭 (count: 전체 산행, buddyCount: 동행 산행)
         const finalTotalHikes = memberInfo ? (memberInfo.count || 0) : 0; 
         const myMultiHikes = memberInfo ? (memberInfo.buddyCount || 0) : 0;
-        
-        // 동행 횟수가 전체 산행 횟수보다 크게 잡히는 구조적 예외 방어
         const adjustedTotalHikes = Math.max(finalTotalHikes, myMultiHikes);
-        
-        // 동행지수 연산 (%)
         const finalSynergy = adjustedTotalHikes > 0 ? Math.min(100, Math.round((myMultiHikes / adjustedTotalHikes) * 100)) : 0;
 
-        console.log(`🌌 [은하수 동행지수] ${mName}님 - 총 산행: ${adjustedTotalHikes}회 / 동행: ${myMultiHikes}회 / 동행지수: ${finalSynergy}%`);
-
-        // --- [4. 동행지수 60% 이상일 때 오로라 및 배경 별빛 효과 실행] ---
         if (finalSynergy >= 60) {
             const starColors = ["#E0F7FA", "#FFF0F5", "#FFECB3", "#F3E5F5", "#FFFFFF", "#80CBC4", "#FFAB91"];
-            
             for (let i = 0; i < 70; i++) {
                 const bgStar = document.createElement('div');
                 bgStar.className = 'bg-star';
-                
                 const size = Math.random() * 1.5 + 0.5;
-                bgStar.style.width = `${size}px`;
-                bgStar.style.height = `${size}px`;
-                bgStar.style.left = `${Math.random() * 100}%`;
-                bgStar.style.top = `${Math.random() * 100}%`;
-                
+                bgStar.style.width = `${size}px`; bgStar.style.height = `${size}px`;
+                bgStar.style.left = `${Math.random() * 100}%`; bgStar.style.top = `${Math.random() * 100}%`;
                 const pickedColor = starColors[Math.floor(Math.random() * starColors.length)];
                 bgStar.style.backgroundColor = pickedColor;
                 bgStar.style.boxShadow = `0 0 3px ${pickedColor}`;
-                
                 bgStar.style.animationDuration = `${Math.random() * 5 + 5}s`;
                 bgStar.style.animationDelay = `${Math.random() * 10}s`;
-                
                 board.appendChild(bgStar);
             }
-            
             const aurora = document.createElement('div');
             aurora.className = 'aurora-layer';
             board.prepend(aurora); 
             requestAnimationFrame(() => aurora.classList.add('aurora-active'));
         }
      
-        // --- [5. 별자리 데이터 로드 및 그리기] ---
         const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
         const logs = snap.docs
             .map(d => d.data())
@@ -6902,6 +7321,13 @@ if (!document.getElementById('starGuideBtn')) {
 
             if (log.starType) {
                 shouldTwinkle = true;
+                
+                // ⭐ [수정 핵심]: 레전드 별 발견 시 최초 1회만 자동 저장 (이미 존재하면 자동 저장 건너뜀)
+                if (log.starType === "super" || log.starType === "special") {
+                    const defaultQuarter = log.quarter || (log.date ? `${Math.floor(log.date.toDate().getMonth() / 3) + 1}Q` : "1Q");
+                    saveSpecialStarToMember(mId, log.starType, defaultQuarter, memberInfo);
+                }
+
                 if (log.starType === "super") {
                     starSize = "w-2 h-2";
                     customStyle = `background: radial-gradient(circle, #FF0000 20%, #FFFF00 100%); box-shadow: 0 0 15px 5px rgba(255, 0, 0, 0.7), 0 0 35px 12px rgba(255, 255, 0, 0.5);`;
@@ -6922,10 +7348,8 @@ if (!document.getElementById('starGuideBtn')) {
             const star = document.createElement('div');
             star.className = `absolute ${starSize} rounded-full z-10`;
             star.style.cssText += customStyle || `background-color: ${starColor}; box-shadow: 0 0 6px ${shadowColor}, 0 0 12px ${shadowColor}`;
-            star.style.left = log.coords.x + "%";
-            star.style.top = log.coords.y + "%";
-            star.style.opacity = "0";
-            star.style.transition = "opacity 1s ease";
+            star.style.left = log.coords.x + "%"; star.style.top = log.coords.y + "%";
+            star.style.opacity = "0"; star.style.transition = "opacity 1s ease";
             board.appendChild(star);
 
             let line = null;
@@ -6939,8 +7363,7 @@ if (!document.getElementById('starGuideBtn')) {
                 line.style.height = '0.5px'; line.style.width = dist + "%";
                 line.style.left = x1 + "%"; line.style.top = y1 + "%";
                 line.style.transform = `rotate(${angle}deg)`;
-                line.style.opacity = "0";
-                line.style.transition = "opacity 1s ease";
+                line.style.opacity = "0"; line.style.transition = "opacity 1s ease";
                 board.appendChild(line);
             }
 
@@ -6955,15 +7378,15 @@ if (!document.getElementById('starGuideBtn')) {
     } catch (e) {
         console.error("은하수 로딩 에러:", e);
     }
-}
-    
-// --- [가이드backgroun
-    window.toggleStarGuide = (show) => {
+};
+
+// 3. 가이드 모달 토글 함수
+window.toggleStarGuide = async (show) => {
     const gModal = document.getElementById('starGuideModal');
     if (!gModal) return;
     if (show) {
-        renderStarGuideItems();
-        gModal.style.display = 'flex'; // 중앙 정렬 flex 적용
+        await renderStarGuideItems();
+        gModal.style.display = 'flex';
         setTimeout(() => { gModal.style.opacity = '1'; }, 10);
     } else {
         gModal.style.opacity = '0';
@@ -6971,93 +7394,227 @@ if (!document.getElementById('starGuideBtn')) {
     }
 };
 
+// 4. 로컬 currentData 메모리 기반 수집 함수 (Firestore Read: 0건)
+function getLegendStarHistoryFromLocal() {
+    const legendHistory = { "super": [], "special": [] };
 
-    function renderStarGuideItems() {
-    const grid = document.getElementById('guideGrid');
-    if (!grid) return;
+    if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+        currentData.forEach(member => {
+            if (member.specialStars && Array.isArray(member.specialStars)) {
+                member.specialStars.forEach(item => {
+                    if (item.starType === "super" || item.starType === "special") {
+                        legendHistory[item.starType].push({
+                            name: member.name || "익명",
+                            quarter: item.quarter || "1Q",
+                            year: item.year || (item.timestamp ? new Date(item.timestamp).getFullYear() : member.specialStarYear) || new Date().getFullYear(), // 🎯 year 우선 추출
+                            timestamp: item.timestamp || 0
+                        });
+                    }
+                });
+            }
+            // 레거시 필드 호환 대응
+            if (member.hasSuperStar && !member.specialStars) {
+                legendHistory.super.push({ name: member.name, quarter: member.superStarQuarter || "1Q", year: member.superStarYear || new Date().getFullYear(), timestamp: 0 });
+            }
+            if (member.hasSpecialStar && !member.specialStars) {
+                legendHistory.special.push({ name: member.name, quarter: member.specialStarQuarter || "1Q", year: member.specialStarYear || new Date().getFullYear(), timestamp: 0 });
+            }
+        });
+    }
 
-    const stars = [
-        { 
-            name: "슈퍼별", prob: "3%", desc: "타오르는 태양의 전설", 
-            style: "background: radial-gradient(circle, #FF0000 10%, #FFFF00 70%, #fff 100%); box-shadow: 0 0 10px 2px #FF0000, 0 0 18px 5px #FFFF00;", 
-            cardBg: "background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%); border: 1px solid rgba(239, 68, 68, 0.35);",
-            tagBg: "background: rgba(239, 68, 68, 0.25); color: #fca5a5;",
-            twinkle: true 
-        },
-        { 
-            name: "스페셜별", prob: "7%", desc: "신비로운 에픽 오로라", 
-            style: "background: radial-gradient(circle, #A020F0 10%, #00FF7F 70%, #fff 100%); box-shadow: 0 0 10px 2px #A020F0, 0 0 18px 5px #00FF7F;", 
-            cardBg: "background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px solid rgba(168, 85, 247, 0.35);",
-            tagBg: "background: rgba(168, 85, 247, 0.25); color: #e9d5ff;",
-            twinkle: true 
-        },
-        { name: "정기 1호", prob: "22.5%", desc: "청명한 시안 블루", style: "background: #00FFFF; box-shadow: 0 0 8px #00FFFF;", twinkle: true },
-        { name: "정기 2호", prob: "22.5%", desc: "정열의 오렌지", style: "background: #D35400; box-shadow: 0 0 8px #D35400;", twinkle: true },
-        { name: "정기 3호", prob: "22.5%", desc: "위엄있는 다크레드", style: "background: #D32F2F; box-shadow: 0 0 8px #D32F2F;", twinkle: true },
-        { name: "정기 4호", prob: "22.5%", desc: "진하고 우아한 퍼플", style: "background: #7C4DFF; box-shadow: 0 0 8px #7C4DFF;", twinkle: true },
-        { name: "산림청100대", prob: "인증", desc: "영광의 샴페인 골드", style: "background: #F7E7CE; box-shadow: 0 0 6px #F7E7CE;", twinkle: false },
-        { name: "일반 산행", prob: "상시", desc: "소중한 일상의 기록", style: "background: #FFFFFF; box-shadow: 0 0 5px #FFFFFF;", twinkle: false }
-    ];
+    legendHistory["super"].sort((a, b) => b.timestamp - a.timestamp);
+    legendHistory["special"].sort((a, b) => b.timestamp - a.timestamp);
 
-    const createDivider = (label) => `
-        <div style="grid-column: 1 / -1; margin: 4px 0 1px 0; display: flex; align-items: center; gap: 10px;">
-            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0) 0%, rgba(56, 189, 248, 0.3) 50%, rgba(56, 189, 248, 0) 100%);"></div>
-            <span style="color: #38bdf8; font-size: 8px; font-weight: 800; letter-spacing: 1.5px; opacity: 0.7; text-transform: uppercase;">${label}</span>
-            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0) 0%, rgba(56, 189, 248, 0.3) 50%, rgba(56, 189, 248, 0) 100%);"></div>
+    return legendHistory;
+}
+
+// 5. 🌌 스타 갤러리 커스텀 모달 닫기 함수 (닫기 동작 보장)
+window.closeSgModal = function(e) {
+    const modal = document.getElementById('sgCustomModal');
+    if (modal) modal.remove();
+};
+
+// 6. 🌌 스타 갤러리 커스텀 모달 열기 함수 (X 버튼 제거 및 우측 연도 배치)
+function showStarGalleryModal(type, titleText, items) {
+    const oldModal = document.getElementById('sgCustomModal');
+    if (oldModal) oldModal.remove();
+
+    const isSuper = type === 'super';
+    const icon = isSuper ? "🌟" : "✨";
+    const themeClass = isSuper ? "super" : "special";
+
+    // 이름 + 우측 연도 레이아웃
+    const listHtml = items.map(item => `
+        <div class="sg-owner-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <span style="font-weight: 600;">[${item.quarter}] ${item.name}</span>
+            <span style="font-size: 0.82rem; color: rgba(255, 255, 255, 0.55); font-weight: 500;">${item.displayYear}</span>
+        </div>
+    `).join('');
+
+    const modalHtml = `
+        <div id="sgCustomModal" class="sg-modal-overlay" onclick="window.closeSgModal(event)" style="position: fixed; top:0; left:0; width:100%; height:100%; z-index: 10050; background: rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; backdrop-filter: blur(8px);">
+            <div class="sg-modal-content ${themeClass}" onclick="event.stopPropagation()" style="width: 85%; max-width: 320px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+                <div class="sg-modal-header" style="margin-bottom: 14px; text-align: center;">
+                    <div class="sg-modal-title" style="color:#fff; font-size: 1.05rem; font-weight:800;">
+                        <span>${icon}</span> ${titleText}
+                    </div>
+                </div>
+                <div class="sg-owner-list" style="max-height: 220px; overflow-y: auto; margin-bottom: 16px;">
+                    ${listHtml}
+                </div>
+                <button class="sg-modal-btn" onclick="window.closeSgModal()" style="width:100%; background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid rgba(56,189,248,0.4); color:#38bdf8; font-weight:800; padding:10px 0; border-radius: 12px; cursor:pointer;">확인</button>
+            </div>
         </div>
     `;
 
-    grid.innerHTML = stars.map((s, index) => {
-        const bgStyle = s.cardBg || "background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);";
-        const tagStyle = s.tagBg || "background: rgba(59,130,246,0.15); color: #60a5fa;";
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// 7. 🎯 전체 획득자 더보기 버튼 연동 함수
+window.showAllHolders = (starName, holdersJson) => {
+    const list = JSON.parse(decodeURIComponent(holdersJson));
+    
+    const formattedItems = list.map(h => ({
+        quarter: h.quarter || '1Q',
+        name: h.name || '무명',
+        displayYear: h.year ? `${h.year}년` : (h.timestamp ? `${new Date(h.timestamp).getFullYear()}년` : '')
+    }));
+
+    const isSuper = starName.includes("슈퍼");
+    const starType = isSuper ? "super" : "special";
+    const modalTitle = `${starName} 전체 획득자 목록`;
+
+    showStarGalleryModal(starType, modalTitle, formattedItems);
+};
+
+// 8. 가이드 항목 랜더링 함수
+async function renderStarGuideItems() {
+    const grid = document.getElementById('guideGrid');
+    if (!grid) return;
+
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+    grid.style.gap = '8px';
+
+    const legendHolders = getLegendStarHistoryFromLocal();
+
+    const stars = [
+        { 
+            id: "super", 
+            name: "슈퍼별", 
+            prob: "3%", 
+            desc: "타오르는 태양의 전설", 
+            style: "background: radial-gradient(circle, #FF0000 10%, #FFFF00 70%, #fff 100%); box-shadow: 0 0 12px 3px #FF0000, 0 0 20px 6px rgba(255, 255, 0, 0.6);", 
+            cardBg: "background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(245, 158, 11, 0.08) 100%); border: 1px solid rgba(239, 68, 68, 0.45);", 
+            tagBg: "background: rgba(239, 68, 68, 0.3); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.5);", 
+            twinkle: true,
+            glowAnimation: "animation: superGlow 1.8s infinite alternate ease-in-out;" 
+        },
+        { 
+            id: "special", 
+            name: "스페셜별", 
+            prob: "7%", 
+            desc: "신비로운 에픽 오로라", 
+            style: "background: radial-gradient(circle, #A020F0 10%, #00FF7F 70%, #fff 100%); box-shadow: 0 0 12px 3px #A020F0, 0 0 20px 6px rgba(0, 255, 127, 0.6);", 
+            cardBg: "background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(16, 185, 129, 0.08) 100%); border: 1px solid rgba(168, 85, 247, 0.45);", 
+            tagBg: "background: rgba(168, 85, 247, 0.3); color: #e9d5ff; border: 1px solid rgba(168, 85, 247, 0.5);", 
+            twinkle: true,
+            glowAnimation: "animation: specialGlow 2s infinite alternate ease-in-out;" 
+        },
+        { id: "regular_1", name: "정기 1호", prob: "22.5%", desc: "청명한 시안 블루", style: "background: #00FFFF; box-shadow: 0 0 8px #00FFFF;", twinkle: true },
+        { id: "regular_2", name: "정기 2호", prob: "22.5%", desc: "정열의 오렌지", style: "background: #D35400; box-shadow: 0 0 8px #D35400;", twinkle: true },
+        { id: "regular_3", name: "정기 3호", prob: "22.5%", desc: "위엄있는 다크레드", style: "background: #D32F2F; box-shadow: 0 0 8px #D32F2F;", twinkle: true },
+        { id: "regular_4", name: "정기 4호", prob: "22.5%", desc: "진하고 우아한 퍼플", style: "background: #7C4DFF; box-shadow: 0 0 8px #7C4DFF;", twinkle: true },
+        { id: "top100", name: "산림청100대", prob: "인증", desc: "영광의 샴페인 골드", style: "background: #F7E7CE; box-shadow: 0 0 8px #F7E7CE;", twinkle: false },
+        { id: "normal", name: "일반 산행", prob: "상시", desc: "소중한 일상의 기록", style: "background: #FFFFFF; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);", twinkle: false }
+    ];
+
+    const createDivider = (label) => `
+        <div style="grid-column: 1 / -1; margin: 8px 0 2px 0; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 4px; height: 4px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></div>
+            <span style="color: #38bdf8; font-size: 8px; font-weight: 900; letter-spacing: 2px; opacity: 0.9; text-transform: uppercase;">${label}</span>
+            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0.4) 0%, rgba(56, 189, 248, 0) 100%);"></div>
+        </div>
+    `;
+
+    let cardsHTML = stars.map((s, index) => {
+        const bgStyle = s.cardBg || "background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);";
+        const tagStyle = s.tagBg || "background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);";
+        const animStyle = s.glowAnimation || "";
+
+        let legendHoldersSection = "";
+        if (s.id === "super" || s.id === "special") {
+            const list = legendHolders[s.id] || [];
+            let holdersHTML = "";
+
+            if (list.length > 0) {
+                const latest = list[0]; 
+                holdersHTML = `
+                    <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #f8fafc; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">
+                        <span style="color: #38bdf8; font-weight: 900; font-size: 7.5px;">${latest.quarter}</span> ${latest.name}
+                    </span>
+                `;
+
+                if (list.length > 1) {
+                    const extraCount = list.length - 1;
+                    const encodedList = encodeURIComponent(JSON.stringify(list));
+                    holdersHTML += `
+                        <button onclick="showAllHolders('${s.name}', '${encodedList}')" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 7.5px; font-weight: 800; padding: 1px 5px; border-radius: 4px; cursor: pointer;">
+                            +${extraCount}명 보기
+                        </button>
+                    `;
+                }
+            } else {
+                holdersHTML = `<span style="color: #64748b; font-size: 8px; font-style: italic;">아직 획득자 없음</span>`;
+            }
+
+            legendHoldersSection = `
+                <div style="display: flex; justify-content: center; align-items: center; gap: 4px; padding-top: 5px; margin-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.08); width: 100%;">
+                    <span style="color: #94a3b8; font-size: 8px; font-weight: 700;">획득자:</span>
+                    ${holdersHTML}
+                </div>
+            `;
+        }
 
         const cardHTML = `
-        <div class="star-info-card" style="${bgStyle} border-radius: 14px; padding: 10px 10px; display: flex; align-items: center; gap: 10px; min-height: 52px; box-sizing: border-box; backdrop-filter: blur(4px); transition: all 0.25s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(56, 189, 248, 0.5)';" onmouseout="this.style.transform='translateY(0)';">
-            <div style="width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
-                <div class="star-preview ${s.twinkle ? 'animate-twinkle' : ''}" style="width: 12px; height: 12px; border-radius: 50%; ${s.style}"></div>
-            </div>
-            <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
-                    <span style="color: #fff; font-size: 11px; font-weight: 800; letter-spacing: -0.2px; white-space: nowrap;">${s.name}</span>
-                    <span style="${tagStyle} font-size: 8px; font-weight: 900; padding: 1px 4.5px; border-radius: 4px; flex-shrink: 0;">${s.prob}</span>
+        <div style="${bgStyle} border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box; backdrop-filter: blur(6px); min-height: 52px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 20px; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin: 0; padding: 0;">
+                    <div class="${s.twinkle ? 'animate-twinkle' : ''}" style="width: 12px; height: 12px; border-radius: 50%; box-sizing: border-box; ${s.style} ${animStyle}"></div>
                 </div>
-                <span style="color: #94a3b8; font-size: 8.5px; line-height: 1.2; opacity: 0.85; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.desc}</span>
+                <div style="display: flex; flex-direction: column; justify-content: center; min-width: 0; flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px;">
+                        <span style="color: #ffffff; font-size: 13px; font-weight: 800; letter-spacing: -0.3px; white-space: nowrap;">${s.name}</span>
+                        <span style="${tagStyle} font-size: 8px; font-weight: 800; padding: 1px 5px; border-radius: 6px; flex-shrink: 0;">${s.prob}</span>
+                    </div>
+                    <span style="color: #94a3b8; font-size: 9.5px; opacity: 0.9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.desc}</span>
+                </div>
             </div>
+            ${legendHoldersSection}
         </div>`;
 
-        // 1. 맨 위 (슈퍼별 바로 위)
-        if (index === 0) {
-            return createDivider('SPECIAL STARS') + cardHTML;
-        }
-        // 2. 스페셜별 바로 밑
-        if (index === 1) {
-            return cardHTML + createDivider('REGULAR STARS');
-        }
-        // 3. 정기 4호 바로 밑
-        if (index === 5) {
-            return cardHTML + createDivider('GENERAL RECORDS');
-        }
+        if (index === 0) return createDivider('LEGEND STARS') + cardHTML;
+        if (index === 1) return cardHTML + createDivider('REGULAR STARS');
+        if (index === 5) return cardHTML + createDivider('GENERAL RECORDS');
 
         return cardHTML;
     }).join('');
+
+    grid.innerHTML = cardsHTML;
 }
 
-
-
+// 9. 슈팅스타(유성) 애니메이션 생성 함수
 function createShootingStar(board, tx, ty) {
     const s = document.createElement('div');
     s.className = 'shooting-star';
-    const startX = tx - 20;
-    const startY = ty - 20;
-    s.style.left = startX + "%";
-    s.style.top = startY + "%";
+    const startX = tx - 20; const startY = ty - 20;
+    s.style.left = startX + "%"; s.style.top = startY + "%";
     s.style.transform = "rotate(45deg)";
     board.appendChild(s);
 
     setTimeout(() => {
         s.style.transition = "all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)";
-        s.style.left = tx + "%";
-        s.style.top = ty + "%";
+        s.style.left = tx + "%"; s.style.top = ty + "%";
         s.style.opacity = "1";
     }, 50);
 
@@ -7067,8 +7624,12 @@ function createShootingStar(board, tx, ty) {
     }, 850);
 }
 
- 
-  
+             
+            
+                
+
+                    
+    
 
         
             // 필터링 및 페이징 처리를 위해 모달 전용 로그 목록을 임시 저장할 전역 변수 (캐시)
