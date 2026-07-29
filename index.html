@@ -7819,7 +7819,6 @@ window.switchScrollTab = (category) => {
 };
 
 // [클라이언트 페이징 처리]
-// [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7842,11 +7841,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🎯 [수정 1] isRegular(정기)뿐만 아니라 isQuarterOnlyOne(1업 옆 체크박스)으로 기록된 러닝/트레킹/산책도 '일정산행' 탭에 포함
+            // 정기 체크(isRegular)가 된 활동 및 순수 일정산행 노출
             filtered = window.currentScrollLogs.filter(log => 
-                log.isRegular || 
-                log.isQuarterOnlyOne || 
-                ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
+                log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
             filtered = window.currentScrollLogs.filter(log => 
@@ -7874,9 +7871,13 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
+            // 1. 운동 종류 판별 (러닝, 트레킹, 산책)
+            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
+
+            // 2. 도트 색상 결정
             let dotStyle = "";
-            if (log.isRegular) {
-                // 오직 '정기🚩' 체크박스만 무지개 그래디언트
+            // 순수 정기산행일 때만 무지개 도트, 러닝/트레킹/산책은 각 운동 전용 색상
+            if (log.isRegular && !isKmActivity) {
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
                 const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
@@ -7885,7 +7886,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 else if (log.isRunning) activeColors.push(colors.run);
                 else if (log.isTracking) activeColors.push(colors.trek);
                 else if (log.isWalking) activeColors.push(colors.walk);
-                else activeColors.push(colors.hike); // 일정산행 기본 색상: 연두색 (#2ecc71)
+                else activeColors.push(colors.hike);
 
                 if (activeColors.length >= 2) {
                     dotStyle = activeColors.length === 2 
@@ -7897,8 +7898,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             }
 
             const heightVal = log.height || 0;
-            const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
-            const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
+            const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
             
             const displayMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
             const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
@@ -7909,11 +7909,10 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [수정 2] '일정 전용 체크박스(isQuarterOnlyOne)' 또는 '정기(isRegular)' 체크 후 기록된 번외운동(러닝/트레킹/산책) 판단
-            const isScheduleGroupExercise = (log.isQuarterOnlyOne || log.isRegular) && (log.isRunning || log.isTracking || log.isWalking);
-
-            // 🎯 [수정 3] '개인/기타' 탭(running) 또는 '전체' 탭(all)에서 볼 때 우측에 [일정] 박스 뱃지 노출
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isScheduleGroupExercise;
+            // 🎯 [핵심 수정] 정기 체크(isRegular)된 '러닝/트레킹/산책' 기록이고, 
+            // 현재 탭이 '개인/기타(running)' 또는 '전체(all)'일 때 우측에 [일정] 박스 무조건 생성!
+            const isRegularGroupExercise = log.isRegular && isKmActivity;
+            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isRegularGroupExercise;
             
             const scheduleBadge = showScheduleBadge 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
@@ -7922,11 +7921,13 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             return `
                 <div class="scroll-timeline-item">
                     <div class="scroll-item-date">${dateStr} (${dayName})</div>
-                    <div class="scroll-item-body" style="display: flex; align-items: center;">
-                        <span class="scroll-item-dot" style="${dotStyle}"></span>
-                        ${bacTag}
-                        <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
-                        ${starTag}
+                    <div class="scroll-item-body" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                            <span class="scroll-item-dot" style="${dotStyle}"></span>
+                            ${bacTag}
+                            <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
+                            ${starTag}
+                        </div>
                         ${scheduleBadge}
                     </div>
                 </div>
@@ -7956,6 +7957,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
+
 
 
             
