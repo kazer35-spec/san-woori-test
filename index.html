@@ -7819,6 +7819,7 @@ window.switchScrollTab = (category) => {
 };
 
 // [클라이언트 페이징 처리]
+ // [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7906,14 +7907,21 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
+            // 🎯 [핵심 추가] 정기 + (러닝 or 트레킹 or 산책) 조합일 때 우측에 띄울 '일정' 박스 태그
+            const isRegularGroupExercise = log.isRegular && (log.isRunning || log.isTracking || log.isWalking);
+            const scheduleBadge = isRegularGroupExercise 
+                ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
+                : '';
+
             return `
                 <div class="scroll-timeline-item">
                     <div class="scroll-item-date">${dateStr} (${dayName})</div>
-                    <div class="scroll-item-body">
+                    <div class="scroll-item-body" style="display: flex; align-items: center;">
                         <span class="scroll-item-dot" style="${dotStyle}"></span>
                         ${bacTag}
                         <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
                         ${starTag}
+                        ${scheduleBadge}
                     </div>
                 </div>
             `;
@@ -7942,7 +7950,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
-
 
             
 
