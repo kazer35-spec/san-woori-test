@@ -3453,7 +3453,7 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
-window.renderStatusTable = () => {
+ window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3506,11 +3506,10 @@ window.renderStatusTable = () => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
-        // 첫 번째 보이는 데이터 행인 경우 네온 태그 생성
+        // 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
             clickTag = `<span class="click-neon">CLICK</span>`;
-            isFirstVisible = false;
         }
 
         let rankT = ""; 
@@ -3518,21 +3517,21 @@ window.renderStatusTable = () => {
         if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
             const idx = topNames.indexOf(m.name);
             
-            // 1. 선택된 분기 확인
-            let activeQuarter = 1;
+            // 1. 현재 HTML에서 활성화된 분기 버튼 상태 확인
+            let activeQuarter = 1; 
             const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
             if (activeBtn) {
-                const btnId = activeBtn.id;
+                const btnId = activeBtn.id; 
                 activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
             } else {
                 activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
                                 ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
             }
             
-            // 2. 선택된 연도 확인
+            // 2. 현재 선택된 연도 가져오기
             const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
             
-            // 3. 2026년도 상반기(1~2분기) 판별
+            // 3. 2026년도이면서 선택된 분기가 1분기 또는 2분기인지 판별
             const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
             if (idx === 0) { 
@@ -3558,46 +3557,60 @@ window.renderStatusTable = () => {
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-        // 테이블 행(TR) 생성 - 마지막 TD를 '기록보기' 버튼으로 변경
+        // --------------------------------------------------------
+        // ⭐ '기록보기' 버튼 스타일/폰트 크기 최적화 (1줄 고정 & 촘촘한 간격)
+        // --------------------------------------------------------
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-            <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
-                <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
-                    ${clickTag}
+        <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
+            <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
+                ${clickTag}
+            </div>
+
+            <div class="flex flex-col items-center justify-center">
+                ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
+                <span class="font-bold ${nameColor} cursor-pointer hover:underline"
+                      onclick="showMemberMountain('${m.name}', '${m.name}')">
+                    ${m.name}
+                </span>
+            </div>
+        </td>
+        <td style="position: relative;">
+            ${clickTag}
+            <div class="badge-level">
+                <div class="badge-icon-box ${style.blink} cursor-pointer"
+                     onclick="showMilkyWay('${m.name}', '${m.name}')"
+                     style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                    <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
                 </div>
-                <div class="flex flex-col items-center justify-center">
-                    ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
-                    <span class="font-bold ${nameColor} cursor-pointer hover:underline"
-                          onclick="showMemberMountain('${m.name}', '${m.name}')">
-                        ${m.name}
-                    </span>
-                </div>
-            </td>
-            <td>
-                <div class="badge-level">
-                    <div class="badge-icon-box ${style.blink} cursor-pointer"
-                         onclick="showMilkyWay('${m.name}', '${m.name}')"
-                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                        <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
-                    </div>
-                    <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
-                </div>
-            </td>
-            <td>
-                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
-            </td>
-            <td>
-                <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
-            </td>
-            <td class="text-center">
-                <!-- ⭐ 기존 D+Day 대신 '기록보기' 버튼으로 변경 -->
-                <button onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-                        class="px-2 py-1 text-xs font-semibold text-slate-700 bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 transition-all">
-                    기록보기
-                </button>
-            </td>
+                <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
+            </div>
+        </td>
+        <td style="position: relative;">
+            ${clickTag}
+            <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+        </td>
+        <td style="position: relative;">
+            ${clickTag}
+            <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+        </td>
+        <td style="position: relative;" class="text-center">
+            ${clickTag}
+            <!-- 💡 버튼 글자 크기(11px) 및 패딩 조절하여 한 줄로 딱 맞춰서 표시 -->
+            <button onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                    class="px-1.5 py-1 text-[11px] font-medium text-slate-700 bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 transition-all whitespace-nowrap">
+                기록보기
+            </button>
+        </td>
         </tr>`;
+
+        // 한 줄(tr)을 완전히 다 그린 후에 플래그를 꺼줍니다.
+        if (isFirstVisible && !m.isHidden) {
+            isFirstVisible = false;
+        }
     });
 };
+
+                
 
 
     
