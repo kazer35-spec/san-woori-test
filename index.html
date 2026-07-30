@@ -3604,7 +3604,9 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 };
 
 
-// ─── 🎯 모바일 롱프레스 완벽 방어 & 뱃지 띄우기 핸들러 ───
+
+
+// ─── 🎯 해당 회원의 위치에 정확히 D+day 띄우기 & 서브창 차단 ───
 window.recordBtnTimer = null;
 window.dPlusHideTimer = null;
 
@@ -3616,13 +3618,14 @@ window.handleRecordBtnStart = (btnEl, dPlusVal, e) => {
     window.recordBtnTimer = setTimeout(() => {
         btnEl.dataset.isLongPressed = "true";
 
+        // 💡 누른 버튼과 정확히 '같은 행(tr)' 내의 4번째 열(누적고도 td)을 탐색
         const tr = btnEl.closest('tr');
         if (!tr) return;
 
-        const heightTd = tr.children[3]; // 4번째 열 (누적고도 td)
+        const heightTd = tr.children[3]; // 정확히 누른 회원의 누적고도 위치
         if (!heightTd) return;
 
-        // 기존 뱃지 중복 방지
+        // 기존에 혹시 남아있는 뱃지 제거
         const oldBadge = heightTd.querySelector('.dplus-temp-badge');
         if (oldBadge) oldBadge.remove();
 
@@ -3636,7 +3639,7 @@ window.handleRecordBtnStart = (btnEl, dPlusVal, e) => {
         heightTd.style.position = 'relative';
         heightTd.appendChild(badge);
 
-        // 3초 후 자동 소멸
+        // 3초 후 소멸
         clearTimeout(window.dPlusHideTimer);
         window.dPlusHideTimer = setTimeout(() => {
             if (badge && badge.parentNode) {
@@ -3650,14 +3653,14 @@ window.handleRecordBtnStart = (btnEl, dPlusVal, e) => {
 window.handleRecordBtnEnd = (btnEl, name, ddayVal, level, e) => {
     clearTimeout(window.recordBtnTimer);
 
-    // 1. 방금 터치에서 200ms 이상 꾹 눌러 뱃지가 생성되었던 상황이라면 해당 회원의 서브창 차단
+    // 1. 눌렀던 바로 '이 버튼'에서 롱프레스가 발동한 직후라면 서브창 방지
     if (btnEl.dataset.isLongPressed === "true") {
         btnEl.dataset.isLongPressed = "false";
         if (e && e.cancelable) e.preventDefault();
         return;
     }
 
-    // 2. 현재 해당 회원의 행(tr)에 D+day 뱃지가 '화면에 떠 있는 상태'라면 터치 차단
+    // 2. 정확히 '이 버튼이 속한 행(tr)'의 누적고도 셀에 뱃지가 떠 있는 동안만 서브창 방지
     const tr = btnEl.closest('tr');
     const heightTd = tr ? tr.children[3] : null;
     const activeBadge = heightTd ? heightTd.querySelector('.dplus-temp-badge') : null;
@@ -3667,7 +3670,7 @@ window.handleRecordBtnEnd = (btnEl, name, ddayVal, level, e) => {
         return;
     }
 
-    // 3. 짧은 탭(클릭) 및 뱃지가 없는 경우 정상 서브창 오픈!
+    // 3. 짧은 클릭 및 뱃지가 없는 다른 회원은 정상적으로 서브창 열림
     window.showFadingScroll(name, ddayVal, level);
 };
 
@@ -3675,6 +3678,7 @@ window.handleRecordBtnCancel = (btnEl) => {
     clearTimeout(window.recordBtnTimer);
     if (btnEl) btnEl.dataset.isLongPressed = "false";
 };
+
 
 
 
