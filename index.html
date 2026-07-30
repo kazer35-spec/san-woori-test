@@ -3453,7 +3453,8 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
- window.renderStatusTable = () => {
+ 
+            Window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3464,17 +3465,15 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
     let processedData = currentData.map(m => {
-        // [기존 코드 그대로] 창 열었을 때 보여줄 마지막 산행 기준 계산
         const last = m.lastDate ? m.lastDate.toDate() : new Date();
         const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
         const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
         const baseLimit = (m.level === 0 ? 30 : 122);
         const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
-        // 메인화면 겉에만 표시해줄 들어온 날짜(가입일) 기준 계산
         let dPlusVal = 0;
         if (m.regDate) {
-            const reg = m.regDate.toDate();
+            const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
             const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
             dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1; // 당일 1일 기준
         }
@@ -3486,7 +3485,6 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         };
     });
 
-    // [기존 코드 그대로] 정렬 로직
     processedData.sort((a, b) => {
         if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
         if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
@@ -3496,17 +3494,14 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         return 0;
     });
 
-    // [기존 코드 그대로] 탑 이름 추출
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
-    // 첫 번째 노출되는 행에만 CLICK 문구를 넣기 위한 플래그
     let isFirstVisible = true;
 
     processedData.forEach((m) => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
-        // 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
             clickTag = `<span class="click-neon">CLICK</span>`;
@@ -3517,7 +3512,6 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
             const idx = topNames.indexOf(m.name);
             
-            // 1. 현재 HTML에서 활성화된 분기 버튼 상태 확인
             let activeQuarter = 1; 
             const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
             if (activeBtn) {
@@ -3528,10 +3522,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
                                 ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
             }
             
-            // 2. 현재 선택된 연도 가져오기
             const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
-            
-            // 3. 2026년도이면서 선택된 분기가 1분기 또는 2분기인지 판별
             const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
             if (idx === 0) { 
@@ -3551,15 +3542,11 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         const style = getLevelStyle(m.level);
         const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
-        // 메인 테이블 고도 축약 로직
         const rawHeight = m.totalHeight || 0;
         const displayHeight = rawHeight >= 10000 
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-        // --------------------------------------------------------
-        // ⭐ '기록보기' 버튼 디자인 변경 (글자 크기 9px + 세련된 뱃지 스타일)
-        // --------------------------------------------------------
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
         <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
             <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
@@ -3595,21 +3582,65 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         </td>
         <td style="position: relative;" class="text-center">
             ${clickTag}
-            <!-- 💡 9px 글자 크기, 라운드 알약 형태 & 은은한 샤이니 버튼 디자인 적용 -->
-            <button onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-        class="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap">
-    <span></span>
-    <span>기록보기</span>
-</button>
-
+            <!-- 💡 꾹 누르면 D+Day 표시 후 떼면 서브창 열리는 롱프레스 버튼 적용 -->
+            <button onmousedown="window.handleRecordBtnStart(this, ${m.dPlusVal})"
+                    onmouseup="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level})"
+                    onmouseleave="window.handleRecordBtnCancel(this)"
+                    ontouchstart="window.handleRecordBtnStart(this, ${m.dPlusVal})"
+                    ontouchend="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level})"
+                    ontouchcancel="window.handleRecordBtnCancel(this)"
+                    class="record-btn-interactive inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[58px]">
+                <span class="record-btn-text">기록보기</span>
+            </button>
         </td>
         </tr>`;
 
-        // 한 줄(tr)을 완전히 다 그린 후에 플래그를 꺼줍니다.
         if (isFirstVisible && !m.isHidden) {
             isFirstVisible = false;
         }
     });
+};
+
+// ─── 🎯 롱프레스 / 뗌 전용 전역 핸들러 함수 ───
+window.recordBtnTimer = null;
+window.isLongPressed = false;
+
+window.handleRecordBtnStart = (btnEl, dPlusVal) => {
+    window.isLongPressed = false;
+    clearTimeout(window.recordBtnTimer);
+
+    // 0.12초 이상 누르면 D+day 텍스트로 전환
+    window.recordBtnTimer = setTimeout(() => {
+        window.isLongPressed = true;
+        const txtSpan = btnEl.querySelector('.record-btn-text');
+        if (txtSpan) {
+            txtSpan.innerText = `✨ D+${dPlusVal}일`;
+            btnEl.classList.add('bg-sky-100', 'text-sky-700', 'border-sky-300');
+        }
+    }, 120);
+};
+
+window.handleRecordBtnEnd = (btnEl, name, ddayVal, level) => {
+    clearTimeout(window.recordBtnTimer);
+    
+    // 버튼 스타일 및 문구 원복
+    const txtSpan = btnEl.querySelector('.record-btn-text');
+    if (txtSpan) {
+        txtSpan.innerText = "기록보기";
+        btnEl.classList.remove('bg-sky-100', 'text-sky-700', 'border-sky-300');
+    }
+
+    // 손을 떼는 순간 서브창(모달) 오픈
+    window.showFadingScroll(name, ddayVal, level);
+};
+
+window.handleRecordBtnCancel = (btnEl) => {
+    clearTimeout(window.recordBtnTimer);
+    const txtSpan = btnEl.querySelector('.record-btn-text');
+    if (txtSpan) {
+        txtSpan.innerText = "기록보기";
+        btnEl.classList.remove('bg-sky-100', 'text-sky-700', 'border-sky-300');
+    }
 };
 
 
