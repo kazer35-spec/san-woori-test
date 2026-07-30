@@ -3603,19 +3603,19 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
 
 
-
-        // ─── 🎯 누적고도 위치에 3초간 D+day 띄우기 (클릭 불통 현상 완벽 해결) ───
+// ─── 🎯 누적고도 위치에 3초간 D+day 띄우기 (해당 회원만 서브창 방지) ───
 window.recordBtnTimer = null;
 window.dPlusHideTimer = null;
-window.isLongPressed = false; // 💡 롱프레스 터치 판단용 전역 플래그
 
 window.handleRecordBtnStart = (btnEl, dPlusVal) => {
-    window.isLongPressed = false; // 눌렀을 때 플래그 리셋
+    // 해당 버튼의 롱프레스 상태 초기화
+    btnEl.dataset.isLongPressed = "false";
     clearTimeout(window.recordBtnTimer);
 
-    // 0.2초(200ms) 이상 누르고 있을 때만 D+day 뱃지 생성
+    // 0.2초(200ms) 이상 눌렀을 때만 D+day 뱃지 생성
     window.recordBtnTimer = setTimeout(() => {
-        window.isLongPressed = true; // 200ms 지났으므로 롱프레스 인정!
+        // 💡 해당 버튼 요소 자체에만 롱프레스 식별값 저장
+        btnEl.dataset.isLongPressed = "true";
 
         const tr = btnEl.closest('tr');
         if (!tr) return;
@@ -3645,27 +3645,27 @@ window.handleRecordBtnStart = (btnEl, dPlusVal) => {
                 setTimeout(() => badge.remove(), 200);
             }
         }, 3000);
-    }, 200); // 모바일 오동작 방지를 위해 200ms로 약간 조정
+    }, 200);
 };
 
 window.handleRecordBtnEnd = (btnEl, name, ddayVal, level) => {
     clearTimeout(window.recordBtnTimer);
 
-    // 🎯 이번 터치가 '길게 누르기(D+day 노출)'였다면 서브창을 열지 않고 종료
-    if (window.isLongPressed) {
-        window.isLongPressed = false;
-        return;
+    // 🎯 '이 버튼'에서 디데이를 띄운 터치(롱프레스)였는지 체크
+    if (btnEl.dataset.isLongPressed === "true") {
+        btnEl.dataset.isLongPressed = "false"; // 상태 원복
+        return; // 해당 회원의 서브창 열기 차단
     }
 
-    // 짧게 누른 일반 클릭일 경우 즉시 서브창 오픈!
+    // 짧게 누른 경우(또는 다른 회원의 버튼을 누른 경우) 서브창 정상 오픈
     window.showFadingScroll(name, ddayVal, level);
 };
 
 window.handleRecordBtnCancel = (btnEl) => {
     clearTimeout(window.recordBtnTimer);
+    btnEl.dataset.isLongPressed = "false";
 };
 
-                
 
 
     
