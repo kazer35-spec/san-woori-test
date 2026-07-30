@@ -5741,10 +5741,7 @@ window.addMultiActivity = async () => {
     
     const isExtraHike = isRunning && isTracking; 
     const isSpecial = isRunning || isTracking || isWalking || isOnlyLog || isExtraHike;
-    
-    // 🎯 정기 체크박스가 켜져 있더라도 운동 카테고리(러닝/트레킹/산책/번외)가 켜지면 순수 산행 카운트 제외
     const isRealHike = !isSpecial; 
-
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
     const isDdayTargetActivity = (isRunning || isTracking || isWalking) && !isExtraHike;
 
@@ -5789,15 +5786,17 @@ window.addMultiActivity = async () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
-            // ─── 🅰️ 오직 '정식 순수 일정산행'일 때만 count 및 level 상승 ───
-            if (isRealHike) {
-                const realUpAmount = up;
-                const oldLevel = member.level || 0;
-                const newLevel = oldLevel + realUpAmount; 
-                
-                updateData.level = newLevel;
-                if (realUpAmount > 0) checkLevelUpgrade(member.name, oldLevel, newLevel);
+            const realUpAmount = (isRealHike && !isExtraHike) ? up : 0;
+            const oldLevel = member.level || 0;
+            const newLevel = oldLevel + realUpAmount; 
+            
+            updateData.level = newLevel;
 
+            if (realUpAmount > 0) checkLevelUpgrade(member.name, oldLevel, newLevel);
+            selectedNames.push(member.name);
+
+            // ─── 🅰️ 오직 '정식 순수산행'일 때만 count 상승 ───
+            if (isRealHike && !isExtraHike) {
                 updateData.count = _increment(1); 
                 updateData.lastDate = ts; 
 
@@ -5810,7 +5809,7 @@ window.addMultiActivity = async () => {
                 
                 updateData.bonusDays = 0;
                 
-                // 업 수치(realUpAmount)에 따른 분기 점수 계산
+                // ─── 🎯 업 수치(realUpAmount)에 따른 분기 점수 계산 ───
                 const groupSize = selectedMemberIds.size;
                 const baseQCount = groupSize >= 3 ? 3 : groupSize; 
                 const multiplier = realUpAmount > 0 ? realUpAmount : 1; 
@@ -5825,17 +5824,12 @@ window.addMultiActivity = async () => {
                     updateData[`fp_bins.${qKey}`] = _increment(pointToAdd);
                 }
 
-            // ─── 🅱️ 러닝 / 트레킹 / 산책 / 번외산행일 때 (일정산행 Count 고정, 운동별 카운트 수집) ───
+            // ─── 🅱️ 번외산행 / 러닝 / 트레킹 / 산책 묶음일 때 (Count 고정) ───
             } else {
                 updateData[`quarterlyStats.${qKey}.total`] = _increment(1);
                 updateData[`quarterlyStats.${qKey}.hike`] = _increment(0); 
 
-                if (isRunning && !isExtraHike) updateData[`quarterlyStats.${qKey}.running`] = _increment(1);
-                if (isTracking && !isExtraHike) updateData[`quarterlyStats.${qKey}.tracking`] = _increment(1);
-                if (isWalking) updateData[`quarterlyStats.${qKey}.walking`] = _increment(1);
-                if (isExtraHike) updateData[`quarterlyStats.${qKey}.extraHike`] = _increment(1);
-
-                if (isDdayTargetActivity && isMultiHike && (member.level || 0) > 0) {
+                if (isDdayTargetActivity && isMultiHike && oldLevel > 0) {
                     const todayZero = activityDateObj.getTime();
                     const last = member.lastDate ? member.lastDate.toDate() : new Date();
                     const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
@@ -5847,8 +5841,6 @@ window.addMultiActivity = async () => {
                 }
             }
 
-            selectedNames.push(member.name);
-
             // ⚡ 벙주 체크박스 분기 누적
             if (window.selectedHostIds && window.selectedHostIds.includes(id)) {
                 updateData[`quarterlyStats.${qKey}.hosted`] = _increment(1);
@@ -5859,7 +5851,7 @@ window.addMultiActivity = async () => {
             }
             
             // 세부 로그 적재
-            const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : up;
+            const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
             for(let i = 0; i < finalLogLoopCount; i++) {
                 let starType = null;
                 if (isRegular) {
@@ -5891,31 +5883,38 @@ window.addMultiActivity = async () => {
 
         if (pendingLevelUpCards.length > 0) showCombinedLevelUpAlert();
         
-        alert(isRealHike ? "순수산행 기록 완료! ✅" : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
+        alert((isRealHike && !isExtraHike) ? "순수산행 기록 완료! ✅" : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // ─── 🧹 저장 후 입력 수치 및 폼 요소 전체 초기화 ───
+        // ─── 🧹 [수정 핵심] 저장 후 입력 수치 및 폼 요소 전체 초기화 ───
+        
+        // 1. 선택된 회원 및 벙주 목록 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false); // UI 체크박스 해제
 
+        // 2. 텍스트/숫자 입력 폼 초기화
         const resetInputIds = ['mountainName', 'mountainHeight', 'pRock', 'pForest', 'pValley'];
         resetInputIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
 
+        // 3. 지역 선택 셀렉트 박스 초기화
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
+        // 4. 활동 특성 체크박스 초기화
         const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
         });
 
+        // 5. 레벨업 선택 라디오 버튼 초기화
         document.querySelectorAll('input[name="upAmount"]').forEach(radio => radio.checked = false);
 
+        // 6. 좌표 및 날짜 초기화
         tempCoord = null; 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
@@ -5929,6 +5928,8 @@ window.addMultiActivity = async () => {
     }
 };
 
+                
+        
                         
    // 📌 [신규 회원 등록 함수] - 수정본
 window.addMember = async () => {
@@ -7818,7 +7819,7 @@ window.switchScrollTab = (category) => {
 };
 
 // [클라이언트 페이징 처리]
-            window.loadScrollLogsPage = (isFirstPage = false) => {
+window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
     let { currentCategory, isEnd } = window.scrollPagination;
@@ -7840,12 +7841,11 @@ window.switchScrollTab = (category) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🎯 순수 일정산행만 노출 (러닝/트레킹/산책/번외산행 제외)
+            // 정기 체크(isRegular)가 된 활동 및 순수 일정산행 노출
             filtered = window.currentScrollLogs.filter(log => 
-                (!log.isRunning && !log.isTracking && !log.isWalking && !log.isExtraHike)
+                log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
-            // 🎯 러닝 / 트레킹 / 산책 / 번외산행만 노출
             filtered = window.currentScrollLogs.filter(log => 
                 log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
             );
@@ -7871,11 +7871,12 @@ window.switchScrollTab = (category) => {
                 }
             }
 
-            // 1. 운동 종류 판별
+            // 1. 운동 종류 판별 (러닝, 트레킹, 산책)
             const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
 
             // 2. 도트 색상 결정
             let dotStyle = "";
+            // 순수 정기산행일 때만 무지개 도트, 러닝/트레킹/산책은 각 운동 전용 색상
             if (log.isRegular && !isKmActivity) {
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
@@ -7908,9 +7909,10 @@ window.switchScrollTab = (category) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [핵심] 오로지 '개인/기타(running)' 탭에서만 정기 체크된 운동 항목에 [일정] 박스를 노출하도록 변경
+            // 🎯 [핵심 수정] 정기 체크(isRegular)된 '러닝/트레킹/산책' 기록이고, 
+            // 현재 탭이 '개인/기타(running)' 또는 '전체(all)'일 때 우측에 [일정] 박스 무조건 생성!
             const isRegularGroupExercise = log.isRegular && isKmActivity;
-            const showScheduleBadge = (currentCategory === 'running') && isRegularGroupExercise;
+            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isRegularGroupExercise;
             
             const scheduleBadge = showScheduleBadge 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
@@ -7955,6 +7957,7 @@ window.switchScrollTab = (category) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
+
 
 
             
