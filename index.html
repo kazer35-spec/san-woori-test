@@ -7879,10 +7879,12 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
             const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
 
-            // 🎯 도트 색상 단일화 (순수 정기산행만 무지개, 나머지는 운동 독자 단색)
+                        // 🎯 도트 색상 단일화 (순수 정기산행만 무지개, 나머지는 운동 독자 단색)
             let dotStyle = "";
             const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
             
+            const isPureHike = !isKmActivity && !log.isExtraHike;
+
             if (log.isRegular && !isKmActivity) {
                 // 오직 순수 정기산행일 때만 무지개 도트
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
@@ -7896,43 +7898,30 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 dotStyle = `background: ${baseColor};`;
             }
 
-            const heightVal = log.height || 0;
-            const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
-            
-            const displayMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
-            const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
-            
-            const starTag = log.isTop100 
-                ? '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>' 
-                : '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
-                
-            const blueClass = log.isTop100 ? "top100-blue" : "";
+            // 🏷️ 활동 타입별 [일정] 배지 색상 매핑 (도트 색상 계열 연동)
+            let badgeBg = "#ecfdf5", badgeColor = "#059669", badgeBorder = "#a7f3d0"; // 기본: 순수 일정산행(연두)
 
-                                    // 정기 체크(isRegular)된 러닝/트레킹/산책 기록일 경우 우측 [일정] 태그로 구분
-            const isRegularGroupExercise = log.isRegular && isKmActivity;
-            
-            // 도트 색상 및 그에 맞춘 일정 배지 스타일 정의
-            let badgeBg = "#2ecc71", badgeColor = "#15803d", badgeBorder = "#86efac";
-
-            if (log.isRunning) {
-                badgeBg = "#FFD1DC";     // 런닝 도트 색상 (분홍)
-                badgeColor = "#9f1239";  // 진한 핑크 글자
-                badgeBorder = "#fbcfe8";
+            if (log.isRegular && !isKmActivity) {
+                // 정기산행 (무지개 톤 반영 - 소프트 라벤더)
+                badgeBg = "#fcf4ff"; badgeColor = "#a855f7"; badgeBorder = "#f0abfc";
+            } else if (log.isRunning) {
+                // 런닝 (분홍)
+                badgeBg = "#fff1f2"; badgeColor = "#e11d48"; badgeBorder = "#fecdd3";
             } else if (log.isTracking) {
-                badgeBg = "#E0B0FF";     // 트래킹 도트 색상 (보라)
-                badgeColor = "#5b21b6";  // 진한 보라 글자
-                badgeBorder = "#ddd6fe";
+                // 트레킹 (보라)
+                badgeBg = "#faf5ff"; badgeColor = "#7c3aed"; badgeBorder = "#e9d5ff";
             } else if (log.isWalking) {
-                badgeBg = "#FFCC80";     // 산책 도트 색상 (주황)
-                badgeColor = "#9a3412";  // 진한 주황 글자
-                badgeBorder = "#fed7aa";
+                // 산책 (주황)
+                badgeBg = "#fff7ed"; badgeColor = "#ea580c"; badgeBorder = "#ffedd5";
             }
 
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isRegularGroupExercise;
+            // 배지 노출 조건: 정기 체크(isRegular)가 되어있거나 순수 일정산행인 경우
+            const isScheduledActivity = log.isRegular || isPureHike;
             
-            const scheduleBadge = showScheduleBadge 
+            const scheduleBadge = isScheduledActivity 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
+
 
 
             return `
