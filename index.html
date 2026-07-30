@@ -3454,12 +3454,20 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
  
-              window.renderStatusTable = () => {
+               
+        
+        window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
     if(!list) return;
     list.innerHTML = "";
+
+    // 💡 기존에 실행 중이던 타이머가 있다면 깔끔히 정리 (중복 실행 방지)
+    if (window.recordBtnToggleInterval) {
+        clearInterval(window.recordBtnToggleInterval);
+        window.recordBtnToggleInterval = null;
+    }
 
     const today = new Date();
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
@@ -3471,17 +3479,18 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         const baseLimit = (m.level === 0 ? 30 : 122);
         const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
+        // D+일수 계산 (가입일 기준)
         let dPlusVal = 0;
         if (m.regDate) {
             const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
             const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
-            dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1; // 당일 1일 기준
+            dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
         }
 
         return { 
             ...m, 
-            ddayVal: ddayVal,   // 모달창에 넘겨줄 값
-            dPlusVal: dPlusVal  // 메인화면 글자로 보여줄 값
+            ddayVal: ddayVal,
+            dPlusVal: dPlusVal
         };
     });
 
@@ -3582,9 +3591,10 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         </td>
         <td style="position: relative;" class="text-center">
             ${clickTag}
-            <button onclick="window.toggleRecordBtnText(this, '${m.name}', ${m.ddayVal}, ${m.level}, ${m.dPlusVal})" 
-                    class="inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[62px]">
-                <span class="record-btn-label">기록보기</span>
+            <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                    data-dplus="D+${m.dPlusVal}"
+                    class="record-auto-toggle-btn inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[60px]">
+                <span class="record-btn-txt">기록보기</span>
             </button>
         </td>
         </tr>`;
@@ -3593,34 +3603,28 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             isFirstVisible = false;
         }
     });
+
+    // ─── 🎯 3초 간격으로 모든 인원의 버튼 텍스트 자동 무한 체인지 (기록보기 ↔ D+254) ───
+    let showDPlus = false;
+    window.recordBtnToggleInterval = setInterval(() => {
+        showDPlus = !showDPlus;
+        const toggleBtns = document.querySelectorAll('.record-auto-toggle-btn');
+        
+        toggleBtns.forEach(btn => {
+            const txtSpan = btn.querySelector('.record-btn-txt');
+            const dplusTxt = btn.dataset.dplus;
+            if (!txtSpan) return;
+
+            if (showDPlus) {
+                txtSpan.innerText = dplusTxt; // 예: D+254
+                btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
+            } else {
+                txtSpan.innerText = "기록보기";
+                btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
+            }
+        });
+    }, 3000); // 3초 간격
 };
-
-// ─── 🎯 클릭 시 서브창을 열고 3초 간격 텍스트 체인지 스크립트 ───
-window.toggleRecordBtnText = (btnEl, name, ddayVal, level, dPlusVal) => {
-    // 1. 기존 동작대로 서브창은 즉시 정상 오픈
-    window.showFadingScroll(name, ddayVal, level);
-
-    // 2. 이미 해당 버튼에서 타이머가 동작 중이라면 중복 실행 방지
-    if (btnEl.dataset.isToggling === "true") return;
-    btnEl.dataset.isToggling = "true";
-
-    const labelSpan = btnEl.querySelector('.record-btn-label');
-    if (!labelSpan) return;
-
-    // [3초 후] D+Day 표시로 체인지
-    setTimeout(() => {
-        labelSpan.innerText = `✨ D+${dPlusVal}일`;
-        btnEl.classList.add('bg-sky-100', 'text-sky-700', 'border-sky-300');
-
-        // [다시 3초 후] 기록보기로 원복 후 상태 리셋
-        setTimeout(() => {
-            labelSpan.innerText = "기록보기";
-            btnEl.classList.remove('bg-sky-100', 'text-sky-700', 'border-sky-300');
-            btnEl.dataset.isToggling = "false";
-        }, 3000);
-    }, 3000);
-};
-
 
 
 
