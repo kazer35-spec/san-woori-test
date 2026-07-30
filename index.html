@@ -3603,17 +3603,20 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
 
 
-// ─── 🎯 누적고도 위치에 3초간 D+day 띄우는 전역 핸들러 (롱프레스 시 서브창 방지) ───
 
-// ─── 🎯 누적고도 위치에 3초간 세련된 D+day 뱃지 띄우기 (깜빡임 X, 서브창 방지) ───
+        // ─── 🎯 누적고도 위치에 3초간 D+day 띄우기 (클릭 불통 현상 완벽 해결) ───
 window.recordBtnTimer = null;
 window.dPlusHideTimer = null;
+window.isLongPressed = false; // 💡 롱프레스 터치 판단용 전역 플래그
 
 window.handleRecordBtnStart = (btnEl, dPlusVal) => {
+    window.isLongPressed = false; // 눌렀을 때 플래그 리셋
     clearTimeout(window.recordBtnTimer);
 
-    // 0.15초(150ms) 이상 꾹 누르고 있을 때만 D+day 뱃지 생성
+    // 0.2초(200ms) 이상 누르고 있을 때만 D+day 뱃지 생성
     window.recordBtnTimer = setTimeout(() => {
+        window.isLongPressed = true; // 200ms 지났으므로 롱프레스 인정!
+
         const tr = btnEl.closest('tr');
         if (!tr) return;
 
@@ -3624,7 +3627,6 @@ window.handleRecordBtnStart = (btnEl, dPlusVal) => {
         const oldBadge = heightTd.querySelector('.dplus-temp-badge');
         if (oldBadge) oldBadge.remove();
 
-        // 💡 [변경] 깜빡임(animate-pulse) 제거 및 세련된 차콜/다크메탈 디자인 적용
         const badge = document.createElement('div');
         badge.className = 'dplus-temp-badge absolute inset-0 m-auto flex items-center justify-center bg-slate-800 text-cyan-300 border border-slate-600/80 font-extrabold text-[11px] rounded-lg shadow-lg z-30 transition-all duration-200';
         badge.style.width = '88%';
@@ -3643,30 +3645,25 @@ window.handleRecordBtnStart = (btnEl, dPlusVal) => {
                 setTimeout(() => badge.remove(), 200);
             }
         }, 3000);
-    }, 150);
+    }, 200); // 모바일 오동작 방지를 위해 200ms로 약간 조정
 };
 
 window.handleRecordBtnEnd = (btnEl, name, ddayVal, level) => {
     clearTimeout(window.recordBtnTimer);
 
-    const tr = btnEl.closest('tr');
-    const heightTd = tr ? tr.children[3] : null;
-    
-    // D+day 뱃지가 뜬 상태면 서브창 방지
-    const hasDPlusBadge = heightTd ? heightTd.querySelector('.dplus-temp-badge') : null;
-
-    if (hasDPlusBadge) {
+    // 🎯 이번 터치가 '길게 누르기(D+day 노출)'였다면 서브창을 열지 않고 종료
+    if (window.isLongPressed) {
+        window.isLongPressed = false;
         return;
     }
 
-    // 짧게 누른 경우에만 서브창 오픈
+    // 짧게 누른 일반 클릭일 경우 즉시 서브창 오픈!
     window.showFadingScroll(name, ddayVal, level);
 };
 
 window.handleRecordBtnCancel = (btnEl) => {
     clearTimeout(window.recordBtnTimer);
 };
-
 
                 
 
