@@ -3471,10 +3471,7 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
  
-               
-        
-            
-            window.renderStatusTable = () => {
+    window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3608,11 +3605,10 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         </td>
         <td style="position: relative;" class="text-center">
             ${clickTag}
-            <!-- 💡 [디자인 수정] 세련된 딥 슬레이트 & 글로우 뱃지 스타일 적용 -->
             <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
                     data-dplus="D+${m.dPlusVal}"
-                    class="record-auto-toggle-btn inline-flex items-center justify-center px-2.5 py-1 text-[10.5px] font-extrabold text-slate-100 bg-slate-800 border border-slate-600/80 rounded-lg shadow-sm hover:bg-slate-700 active:scale-95 transition-all duration-300 whitespace-nowrap min-w-[62px]">
-                <span class="record-btn-txt tracking-tight">기록보기</span>
+                    class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-1.5 py-0.5 text-[9.5px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[54px]">
+                <span class="record-btn-txt">기록보기</span>
             </button>
         </td>
         </tr>`;
@@ -3622,7 +3618,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         }
     });
 
-    // ─── 🎯 3초 간격 세련된 상태 전환 (기록보기 ↔ D+254) ───
+    // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
     let showDPlus = false;
     window.recordBtnToggleInterval = setInterval(() => {
         showDPlus = !showDPlus;
@@ -3634,20 +3630,24 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             if (!txtSpan) return;
 
             if (showDPlus) {
-                // D+254 상태: 은은한 포인트를 주는 프리미엄 네이비/사이언 글로우 톤
+                // D+254 일 때: 반짝임 해제 및 차분한 스카이블루 톤
                 txtSpan.innerText = dplusTxt;
-                btn.classList.remove('bg-slate-800', 'text-slate-100', 'border-slate-600/80');
-                btn.classList.add('bg-slate-900', 'text-cyan-300', 'border-cyan-500/50', 'shadow-[0_0_8px_rgba(6,182,212,0.25)]');
+                btn.classList.remove('record-glow-active');
+                btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
             } else {
-                // 기록보기 상태: 깔끔하고 모던한 세련된 다크 메탈 톤
+                // 기록보기 일 때: 기존 반짝임(Glow) 적용
                 txtSpan.innerText = "기록보기";
-                btn.classList.remove('bg-slate-900', 'text-cyan-300', 'border-cyan-500/50', 'shadow-[0_0_8px_rgba(6,182,212,0.25)]');
-                btn.classList.add('bg-slate-800', 'text-slate-100', 'border-slate-600/80');
+                btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
+                btn.classList.add('record-glow-active');
             }
         });
     }, 3000);
 };
-
+           
+        
+            
+            
+            
 
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
