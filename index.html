@@ -3604,41 +3604,38 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
 
 // ─── 🎯 누적고도 위치에 3초간 D+day 띄우는 전역 핸들러 (롱프레스 시 서브창 방지) ───
+
+// ─── 🎯 누적고도 위치에 3초간 세련된 D+day 뱃지 띄우기 (깜빡임 X, 서브창 방지) ───
 window.recordBtnTimer = null;
 window.dPlusHideTimer = null;
-window.isLongPressed = false; // 롱프레스 동작 여부 플래그
 
 window.handleRecordBtnStart = (btnEl, dPlusVal) => {
-    window.isLongPressed = false; // 누르기 시작할 때 플래그 초기화
     clearTimeout(window.recordBtnTimer);
 
-    // 0.15초(150ms) 이상 누르고 있으면 롱프레스로 판단 -> D+day 노출
+    // 0.15초(150ms) 이상 꾹 누르고 있을 때만 D+day 뱃지 생성
     window.recordBtnTimer = setTimeout(() => {
-        window.isLongPressed = true; // 롱프레스 상태 온!
-
-        // 기록보기 버튼이 속한 tr(행) 찾기
         const tr = btnEl.closest('tr');
         if (!tr) return;
 
-        // 4번째 열(누적고도 td) 선택
-        const heightTd = tr.children[3];
+        const heightTd = tr.children[3]; // 4번째 열 (누적고도 td)
         if (!heightTd) return;
 
-        // 기존에 떠있는 D+day 뱃지가 있다면 제거
+        // 기존 뱃지 중복 방지
         const oldBadge = heightTd.querySelector('.dplus-temp-badge');
         if (oldBadge) oldBadge.remove();
 
-        // 누적고도 버튼 위에 깔끔하게 얹어질 D+day 뱃지 생성
+        // 💡 [변경] 깜빡임(animate-pulse) 제거 및 세련된 차콜/다크메탈 디자인 적용
         const badge = document.createElement('div');
-        badge.className = 'dplus-temp-badge absolute inset-0 m-auto flex items-center justify-center bg-sky-500 text-white font-bold text-[11px] rounded-md shadow-md z-30 transition-all animate-pulse';
-        badge.style.width = '85%';
-        badge.style.height = '75%';
+        badge.className = 'dplus-temp-badge absolute inset-0 m-auto flex items-center justify-center bg-slate-800 text-cyan-300 border border-slate-600/80 font-extrabold text-[11px] rounded-lg shadow-lg z-30 transition-all duration-200';
+        badge.style.width = '88%';
+        badge.style.height = '78%';
+        badge.style.boxShadow = '0 2px 8px rgba(15, 23, 42, 0.35)';
         badge.innerText = `✨ D+${dPlusVal}일`;
 
         heightTd.style.position = 'relative';
         heightTd.appendChild(badge);
 
-        // 3초 뒤에 자동으로 자연스럽게 사라짐
+        // 3초 후 부드럽게 소멸
         clearTimeout(window.dPlusHideTimer);
         window.dPlusHideTimer = setTimeout(() => {
             if (badge && badge.parentNode) {
@@ -3651,20 +3648,23 @@ window.handleRecordBtnStart = (btnEl, dPlusVal) => {
 
 window.handleRecordBtnEnd = (btnEl, name, ddayVal, level) => {
     clearTimeout(window.recordBtnTimer);
+
+    const tr = btnEl.closest('tr');
+    const heightTd = tr ? tr.children[3] : null;
     
-    // 🎯 롱프레스로 D+day가 떠있는 상황이었다면 서브창을 열지 않고 종료
-    if (window.isLongPressed) {
-        window.isLongPressed = false;
+    // D+day 뱃지가 뜬 상태면 서브창 방지
+    const hasDPlusBadge = heightTd ? heightTd.querySelector('.dplus-temp-badge') : null;
+
+    if (hasDPlusBadge) {
         return;
     }
 
-    // 짧게 '클릭'했을 때만 서브창(모달) 오픈
+    // 짧게 누른 경우에만 서브창 오픈
     window.showFadingScroll(name, ddayVal, level);
 };
 
 window.handleRecordBtnCancel = (btnEl) => {
     clearTimeout(window.recordBtnTimer);
-    window.isLongPressed = false;
 };
 
 
