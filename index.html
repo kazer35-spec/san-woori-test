@@ -3584,14 +3584,16 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             ${clickTag}
             <!-- 💡 꾹 누르면 D+Day 표시 후 떼면 서브창 열리는 롱프레스 버튼 적용 -->
             <button onmousedown="window.handleRecordBtnStart(this, ${m.dPlusVal})"
-                    onmouseup="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level})"
-                    onmouseleave="window.handleRecordBtnCancel(this)"
-                    ontouchstart="window.handleRecordBtnStart(this, ${m.dPlusVal})"
-                    ontouchend="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level})"
-                    ontouchcancel="window.handleRecordBtnCancel(this)"
-                    class="record-btn-interactive inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[58px]">
-                <span class="record-btn-text">기록보기</span>
-            </button>
+        onmouseup="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level})"
+        onmouseleave="window.handleRecordBtnCancel(this)"
+        ontouchstart="window.handleRecordBtnStart(this, ${m.dPlusVal}, event)"
+        ontouchend="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level}, event)"
+        ontouchcancel="window.handleRecordBtnCancel(this)"
+        style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"
+        class="record-btn-interactive inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[58px]">
+    <span class="record-btn-text">기록보기</span>
+</button>
+
         </td>
         </tr>`;
 
@@ -3602,26 +3604,28 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 };
 
 
-
-// ─── 🎯 해당 인원의 D+day 뱃지가 떠있는 동안만 그 인원만 클릭 차단 ───
+// ─── 🎯 모바일 롱프레스 완벽 방어 & 뱃지 띄우기 핸들러 ───
 window.recordBtnTimer = null;
+window.dPlusHideTimer = null;
 
-window.handleRecordBtnStart = (btnEl, dPlusVal) => {
+window.handleRecordBtnStart = (btnEl, dPlusVal, e) => {
     clearTimeout(window.recordBtnTimer);
+    btnEl.dataset.isLongPressed = "false";
 
-    // 0.2초(200ms) 이상 꾹 누르고 있을 때만 D+day 뱃지 생성
+    // 0.2초(200ms) 이상 눌렀을 때만 D+day 뱃지 생성
     window.recordBtnTimer = setTimeout(() => {
+        btnEl.dataset.isLongPressed = "true";
+
         const tr = btnEl.closest('tr');
         if (!tr) return;
 
         const heightTd = tr.children[3]; // 4번째 열 (누적고도 td)
         if (!heightTd) return;
 
-        // 기존 뱃지가 떠 있다면 제거
+        // 기존 뱃지 중복 방지
         const oldBadge = heightTd.querySelector('.dplus-temp-badge');
         if (oldBadge) oldBadge.remove();
 
-        // D+day 뱃지 생성
         const badge = document.createElement('div');
         badge.className = 'dplus-temp-badge absolute inset-0 m-auto flex items-center justify-center bg-slate-800 text-cyan-300 border border-slate-600/80 font-extrabold text-[11px] rounded-lg shadow-lg z-30 transition-all duration-200';
         badge.style.width = '88%';
@@ -3632,11 +3636,9 @@ window.handleRecordBtnStart = (btnEl, dPlusVal) => {
         heightTd.style.position = 'relative';
         heightTd.appendChild(badge);
 
-        // 💡 롱프레스가 실제로 발동했음을 버튼에 기록
-        btnEl.dataset.justLongPressed = "true";
-
-        // 3초 후 뱃지 삭제
-        setTimeout(() => {
+        // 3초 후 자동 소멸
+        clearTimeout(window.dPlusHideTimer);
+        window.dPlusHideTimer = setTimeout(() => {
             if (badge && badge.parentNode) {
                 badge.style.opacity = '0';
                 setTimeout(() => badge.remove(), 200);
@@ -3645,28 +3647,33 @@ window.handleRecordBtnStart = (btnEl, dPlusVal) => {
     }, 200);
 };
 
-window.handleRecordBtnEnd = (btnEl, name, ddayVal, level) => {
+window.handleRecordBtnEnd = (btnEl, name, ddayVal, level, e) => {
     clearTimeout(window.recordBtnTimer);
 
-    const tr = btnEl.closest('tr');
-    const heightTd = tr ? tr.children[3] : null;
-    
-    // 1. 해당 행(tr)의 누적고도 칸에 D+day 뱃지가 '지금' 떠 있는지 확인
-    const activeBadge = heightTd ? heightTd.querySelector('.dplus-temp-badge') : null;
-
-    // 2. 방금 꾹 누르고 뗀 직후이거나, 화면에 해당 인원의 뱃지가 떠 있는 상태라면 차단
-    if (btnEl.dataset.justLongPressed === "true" || activeBadge) {
-        btnEl.dataset.justLongPressed = "false";
-        return; // 해당 인원의 서브창 안 열림
+    // 1. 방금 터치에서 200ms 이상 꾹 눌러 뱃지가 생성되었던 상황이라면 해당 회원의 서브창 차단
+    if (btnEl.dataset.isLongPressed === "true") {
+        btnEl.dataset.isLongPressed = "false";
+        if (e && e.cancelable) e.preventDefault();
+        return;
     }
 
-    // 3. 뱃지가 없거나 (또는 다른 사람 클릭 시) 서브창 정상 오픈!
+    // 2. 현재 해당 회원의 행(tr)에 D+day 뱃지가 '화면에 떠 있는 상태'라면 터치 차단
+    const tr = btnEl.closest('tr');
+    const heightTd = tr ? tr.children[3] : null;
+    const activeBadge = heightTd ? heightTd.querySelector('.dplus-temp-badge') : null;
+
+    if (activeBadge) {
+        if (e && e.cancelable) e.preventDefault();
+        return;
+    }
+
+    // 3. 짧은 탭(클릭) 및 뱃지가 없는 경우 정상 서브창 오픈!
     window.showFadingScroll(name, ddayVal, level);
 };
 
 window.handleRecordBtnCancel = (btnEl) => {
     clearTimeout(window.recordBtnTimer);
-    if (btnEl) btnEl.dataset.justLongPressed = "false";
+    if (btnEl) btnEl.dataset.isLongPressed = "false";
 };
 
 
