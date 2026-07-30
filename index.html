@@ -13,6 +13,23 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+    /* 💡 기록보기 강조용 반짝임(글로우 & 펄스) 애니메이션 */
+@keyframes recordBtnShine {
+    0%, 100% {
+        box-shadow: 0 0 0px rgba(59, 130, 246, 0);
+        border-color: rgba(203, 213, 225, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        border-color: rgba(96, 165, 250, 0.9);
+        background-color: rgba(239, 246, 255, 1);
+    }
+}
+
+.record-glow-active {
+    animation: recordBtnShine 1.5s infinite ease-in-out;
+}
+
     /* 🌌 우주 다크 네온 획득자 모달 (기존 STAR GALLERY UI 핏) */
 .sg-modal-overlay {
     position: fixed;
@@ -3455,15 +3472,14 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
                
-        
-        window.renderStatusTable = () => {
+        Window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
     if(!list) return;
     list.innerHTML = "";
 
-    // 💡 기존에 실행 중이던 타이머가 있다면 깔끔히 정리 (중복 실행 방지)
+    // 💡 기존 타이머 정리
     if (window.recordBtnToggleInterval) {
         clearInterval(window.recordBtnToggleInterval);
         window.recordBtnToggleInterval = null;
@@ -3479,7 +3495,6 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         const baseLimit = (m.level === 0 ? 30 : 122);
         const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
-        // D+일수 계산 (가입일 기준)
         let dPlusVal = 0;
         if (m.regDate) {
             const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
@@ -3593,7 +3608,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             ${clickTag}
             <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
                     data-dplus="D+${m.dPlusVal}"
-                    class="record-auto-toggle-btn inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[60px]">
+                    class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[60px]">
                 <span class="record-btn-txt">기록보기</span>
             </button>
         </td>
@@ -3604,7 +3619,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         }
     });
 
-    // ─── 🎯 3초 간격으로 모든 인원의 버튼 텍스트 자동 무한 체인지 (기록보기 ↔ D+254) ───
+    // ─── 🎯 3초 간격 전환 & [기록보기] 시에만 반짝임(Glow) 효과 추가 ───
     let showDPlus = false;
     window.recordBtnToggleInterval = setInterval(() => {
         showDPlus = !showDPlus;
@@ -3616,14 +3631,18 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             if (!txtSpan) return;
 
             if (showDPlus) {
-                txtSpan.innerText = dplusTxt; // 예: D+254
+                // D+254 일 때: 반짝임 해제 및 차분한 스카이블루 톤
+                txtSpan.innerText = dplusTxt;
+                btn.classList.remove('record-glow-active');
                 btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
             } else {
+                // 기록보기 일 때: 반짝임(Glow) 효과 적용 및 시선 집중
                 txtSpan.innerText = "기록보기";
                 btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
+                btn.classList.add('record-glow-active');
             }
         });
-    }, 3000); // 3초 간격
+    }, 3000);
 };
 
 
