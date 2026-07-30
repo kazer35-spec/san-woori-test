@@ -2801,117 +2801,122 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 <button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
 </div>
 
-<div class="card">
-<div class="card-title text-blue-600 font-bold flex justify-between">
-<span>📅 등산 기록 및 좌표 정복 관리</span>
-<button onclick="globalSyncMountainInfo()" class="text-[9px] bg-red-50 text-red-500 border border-red-200 px-2 rounded-lg font-black">⛰️ 산 정보 일괄수정</button>
-</div>
-<input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 px-4 rounded-xl w-full mb-2 text-xs bg-blue-50 border-blue-100 outline-none border">
-<div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
-
-<div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
-<div class="flex items-center justify-between mb-2">
-<div class="flex items-center justify-between mb-2">
-  <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-  <div class="flex gap-2">
-    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-      <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-      <span class="text-[10px] font-black text-blue-600">100대명산</span>
-    </label>
-    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-      <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-      <span class="text-[10px] font-black text-red-500">BAC인증지</span>
-    </label>
+ <div class="card">
+  <div class="card-title text-blue-600 font-bold flex justify-between mb-2">
+    <span>📅 등산 기록 및 좌표 정복 관리</span>
+    <button onclick="globalSyncMountainInfo()" class="text-[9px] bg-red-50 text-red-500 border border-red-200 px-2 rounded-lg font-black">⛰️ 산 정보 일괄수정</button>
   </div>
-</div>
+  
+  <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 px-4 rounded-xl w-full mb-2 text-xs bg-blue-50 border-blue-100 outline-none border">
+  <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
 
-<div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+  <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
+    <!-- 🎯 [수정] 중복 개봉 태그 정리 및 상단 헤더 정렬 -->
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+      <div class="flex gap-2">
+        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+          <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+          <span class="text-[10px] font-black text-blue-600">100대명산</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+          <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+          <span class="text-[10px] font-black text-red-500">BAC인증지</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 활동 종류 체크박스 라인 (일정🗓️ 포함) -->
+    <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto gap-1">
+      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
-    </label>
-    <!-- 🔥 신규 추가: 위성별을 생성하지 않는 일정 전용 체크박스 -->
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+      </label>
+      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
-    </label>
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+      </label>
+      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
-    </label>
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+      </label>
+      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
-    </label>
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+      </label>
+      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
-    </label>
-</div>
+      </label>
+    </div>
 
-
-<div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
-    <div class="flex-1 flex items-center gap-1">
+    <!-- 지형 비율 입력 -->
+    <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
+      <div class="flex-1 flex items-center gap-1">
         <span class="text-[9px] text-gray-400 shrink-0">🪨바위</span>
         <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
-    </div>
-    <div class="flex-1 flex items-center gap-1">
+      </div>
+      <div class="flex-1 flex items-center gap-1">
         <span class="text-[9px] text-gray-400 shrink-0">🌿숲</span>
         <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
-    </div>
-    <div class="flex-1 flex items-center gap-1">
+      </div>
+      <div class="flex-1 flex items-center gap-1">
         <span class="text-[9px] text-gray-400 shrink-0">🌊계곡</span>
         <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+      </div>
     </div>
+
+    <input type="text" id="mountainName" 
+           onblur="autoFindCoords(); autoFindMountainStats();" 
+           placeholder="등산한 산 이름 (예: 관악산)" 
+           class="mb-2 h-9 text-xs w-full border rounded px-2">
+
+    <div class="flex gap-2 mb-2">
+      <select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border text-xs">
+        <option value="기타">📍 수동 지역 선택 (선택 안함)</option>
+        <option value="서울특별시">서울특별시</option>
+        <option value="인천광역시">인천광역시</option>
+        <option value="경기도">경기도</option>
+        <option value="강원도">강원도</option>
+        <option value="충청북도">충청북도</option>
+        <option value="충청남도">충청남도</option>
+        <option value="대전/세종">대전/세종</option>
+        <option value="전라북도">전라북도</option>
+        <option value="전라남도">전라남도</option>
+        <option value="광주광역시">광주광역시</option>
+        <option value="경상북도">경상북도</option>
+        <option value="경상남도">경상남도</option>
+        <option value="대구광역시">대구광역시</option>
+        <option value="울산광역시">울산광역시</option>
+        <option value="부산광역시">부산광역시</option>
+        <option value="제주도">제주도</option>
+      </select>
+    </div>
+
+    <div class="flex gap-2 mb-2">
+      <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
+      
+      <!-- 🎯 [수정] UP 선택기 및 분기 체크박스 레이아웃 정돈 -->
+      <div class="flex-1 flex gap-1 items-center justify-between bg-white px-2 rounded-lg border">
+        <span class="text-[9px] font-bold text-gray-400 shrink-0">UP:</span>
+        <div class="up-amount-group flex items-center gap-1.5 !mb-0 !h-[30px] !p-0.5 border-none">
+          <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="1" checked>1</label>
+          <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="2">2</label>
+          <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="3">3</label>
+          <label class="flex items-center cursor-pointer ml-1" title="분기 인정">
+            <input type="checkbox" id="isQuarterCheck" class="w-3.5 h-3.5 accent-red-500">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 지도 및 좌표 표시 영역 -->
+    <div class="map-container" onclick="setAdminCoordinate(event)">
+      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+      <div id="adminMapMarker" class="map-point hidden"></div>
+    </div>
+    <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
+  </div>
+
+  <input type="date" id="activityDate" class="input-gap">
+  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
 </div>
 
-<input type="text" id="mountainName" 
-       onblur="autoFindCoords(); autoFindMountainStats();" 
-       placeholder="등산한 산 이름 (예: 관악산)" 
-       class="mb-2 h-9 text-xs w-full border rounded px-2">
-
-<div class="flex gap-2 mb-2">
-<select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
-<option value="기타">📍 수동 지역 선택 (선택 안함)</option>
-<option value="서울특별시">서울특별시</option>
-<option value="인천광역시">인천광역시</option>
-<option value="경기도">경기도</option>
-<option value="강원도">강원도</option>
-<option value="충청북도">충청북도</option>
-<option value="충청남도">충청남도</option>
-<option value="대전/세종">대전/세종</option>
-<option value="전라북도">전라북도</option>
-<option value="전라남도">전라남도</option>
-<option value="광주광역시">광주광역시</option>
-<option value="경상북도">경상북도</option>
-<option value="경상남도">경상남도</option>
-<option value="대구광역시">대구광역시</option>
-<option value="울산광역시">울산광역시</option>
-<option value="부산광역시">부산광역시</option>
-<option value="제주도">제주도</option>
-</select>
-</div>
-
-<div class="flex gap-2 mb-2">
-<input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
-<div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
-<span class="text-[9px] font-bold text-gray-400">UP:</span>
-<div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
-<label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
-<label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
-<label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
-
-<label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
-<input type="checkbox" id="isQuarterCheck">
-</label>
-</div>
-</div>
-</div>
-<div class="map-container" onclick="setAdminCoordinate(event)">
-<img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
-<div id="adminMapMarker" class="map-point hidden"></div>
-</div>
-<div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
-</div>
-
-<input type="date" id="activityDate" class="input-gap">
-<button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-</div>
 
 <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
   <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
@@ -5781,7 +5786,11 @@ window.addMultiActivity = async () => {
     const height = parseInt(document.getElementById('mountainHeight')?.value) || 0;
     const isTop100 = document.getElementById('isTop100Check')?.checked || false;
     const isBAC = document.getElementById('isBACCheck')?.checked || false;
-    const isRegular = document.getElementById('isRegularCheck')?.checked || false;
+    
+    // 🎯 [수정] 정기산행과 일정 체크박스 수집 분리
+    const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
+    const isSchedule = document.getElementById('isScheduleCheck')?.checked || false; // 🔥 [신규] 일정 체크
+
     const isRunning = document.getElementById('isRunningCheck')?.checked || false;
     const isTracking = document.getElementById('isTrackingCheck')?.checked || false;
     const isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
@@ -5796,6 +5805,10 @@ window.addMultiActivity = async () => {
     const isExtraHike = isRunning && isTracking; 
     const isSpecial = isRunning || isTracking || isWalking || isOnlyLog || isExtraHike;
     const isRealHike = !isSpecial; 
+
+    // 🔥 정기산행 방어 logic: 특수활동(런닝/트레킹 등)일 경우 정기위성별(isRegular) 생성 방지
+    const isRegular = isRegularRaw && isRealHike; 
+
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
     const isDdayTargetActivity = (isRunning || isTracking || isWalking) && !isExtraHike;
 
@@ -5904,14 +5917,12 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // ─── 🎯 [핵심 수정] 한글 Document ID 생성 및 세부 로그 적재 ───
+            // ─── 🎯 세부 로그 적재 ───
             const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
 
-            // 1. 산 이름 및 기본 Doc ID 결정
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
             const baseDocId = rawMountainName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동")));
 
-            // 2. 해당 회원의 기존 log 문서 목록을 불러와 중복 체크
             const existingLogsRef = collection(db, `sanwoori/${id}/logs`);
             const existingSnap = await getDocs(existingLogsRef);
 
@@ -5931,13 +5942,15 @@ window.addMultiActivity = async () => {
                     date: ts, 
                     mountain: baseDocId, 
                     height, coords: safeCoords,
-                    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+                    isTop100, isBAC, 
+                    isRegular, // 순수 정기산행 위성별용
+                    isSchedule, // 🔥 [신규] 일정 배지 및 분류용
+                    isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
                     isSpecial: isSpecial,
                     pRock, pForest, pValley
                 };
 
-                // 3. 고유한 한글 Document ID 생성 ('북한산', '북한산_1', '북한산_2'...)
                 let customLogDocId = baseDocId;
                 let seq = 1;
                 while (existingDocIds.has(customLogDocId)) {
@@ -5947,10 +5960,9 @@ window.addMultiActivity = async () => {
                 
                 existingDocIds.add(customLogDocId);
 
-                // 4. 지정한 한글 문서 ID로 Firestore에 저장
                 await setDoc(doc(db, `sanwoori/${id}/logs`, customLogDocId), logPayload);
             }
-        } // 👈 ⚠️ 회원 loop(for...of) 닫는 괄호 정상 위치!
+        } 
 
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
             await addDoc(collection(db, "bondingForest"), {
@@ -5977,7 +5989,7 @@ window.addMultiActivity = async () => {
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
-        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
+        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
@@ -5997,8 +6009,8 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
-
-                            
+            
+        
         
                         
    // 📌 [신규 회원 등록 함수] - 수정본
@@ -7816,6 +7828,9 @@ function createShootingStar(board, tx, ty) {
 
         
             // 필터링 및 페이징 처리를 위해 모달 전용 로그 목록을 임시 저장할 전역 변수 (캐시)
+
+                       
+
 window.currentScrollLogs = []; 
 
 window.scrollPagination = {
@@ -7892,24 +7907,24 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // [C] 📊 정확한 운동 카운팅 계산 (정기산행/일정산행은 오직 순수산행 기준)
+        // [C] 📊 운동 카운팅 계산 (일정 체크 isSchedule 기준으로 집계)
         const counts = window.currentScrollLogs.reduce((acc, log) => {
             const isKm = log.isRunning || log.isTracking || log.isWalking;
             const isPureHike = !isKm && !log.isExtraHike;
 
             if (log.isRegular && isPureHike) {
                 acc.regular++; // 무지개 (순수 정기산행)
-                acc.schedule++; // 순수 일정산행 카운트에도 정기산행 포함
-            } else if (isPureHike) {
-                acc.schedule++; // 연두색 (순수 일정산행)
+                acc.schedule++; // 일정 카운트에도 정기산행 포함
+            } else if (isPureHike || log.isSchedule) {
+                acc.schedule++; // 연두색 (순수 일정산행 및 일정체크 운동)
             } else if (log.isExtraHike) {
                 acc.extra++; // 개인산행
             } else if (log.isRunning) {
-                acc.running++; // 런닝 (정기 체크 여부와 상관없이 런닝으로 카운트)
+                acc.running++; // 런닝
             } else if (log.isTracking) {
-                acc.trekking++; // 트래킹 (정기 체크 여부와 상관없이 트래킹으로 카운트)
+                acc.trekking++; // 트래킹
             } else if (log.isWalking) {
-                acc.walking++; // 산책 (정기 체크 여부와 상관없이 산책으로 카운트)
+                acc.walking++; // 산책
             }
             return acc;
         }, { regular: 0, schedule: 0, extra: 0, trekking: 0, running: 0, walking: 0 });
@@ -8046,9 +8061,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 정기 체크(isRegular)가 지정된 러닝/트레킹/산책 및 순수 일정/정기 산행 노출
+            // 🔥 [수정] 일정 체크(isSchedule) 또는 정기체크(isRegular)된 활동 및 순수 일정산행 노출
             filtered = window.currentScrollLogs.filter(log => 
-                log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
+                log.isSchedule || log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
             filtered = window.currentScrollLogs.filter(log => 
@@ -8065,7 +8080,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         const startIndex = isFirstPage ? 0 : targetSize - MORE_PAGE_SIZE;
         const finalItems = filtered.slice(startIndex, targetSize);
          
-                       const htmlContent = finalItems.map(log => {
+        const htmlContent = finalItems.map(log => {
             let dateStr = "----.--.--";
             let dayName = "";
             if (log.date) {
@@ -8101,7 +8116,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
             const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
             
-            // 🎯 정기산행 시 맨 뒤 v체크(✔) 제거, Top100 별(★)은 원래 황금색 유지
             let starTag = '';
             if (log.isTop100) {
                 starTag = '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>';
@@ -8111,8 +8125,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = (log.isTop100 && !isPureRegularHike) ? "top100-blue" : "";
 
-            // 정기 체크(isRegular)된 러닝/트레킹/산책 기록용 태그
-            const isRegularGroupExercise = log.isRegular && isKmActivity;
+            // 🔥 [수정] 정기 대신 일정 체크(isSchedule)가 적용된 러닝/트레킹/산책 기록용 배지 지정
+            const isScheduleGroupExercise = log.isSchedule && isKmActivity;
             let badgeBg = '#ecfdf5', badgeColor = '#10b981', badgeBorder = '#a7f3d0';
             
             if (log.isRunning) {
@@ -8123,13 +8137,14 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 badgeBg = '#fff7ed'; badgeColor = '#c2410c'; badgeBorder = '#ffedd5';
             }
 
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isRegularGroupExercise;
+            // 🔥 [수정] isScheduleGroupExercise 조건일 때 일정 배지 표시
+            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isScheduleGroupExercise;
             
             const scheduleBadge = showScheduleBadge 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
 
-            // 🍀🌸🍁❄️ 계절 이모지 분리 로직
+            // 계절 이모지 분리
             let seasonEmoji = '';
             let textBody = rawMountain;
 
@@ -8141,17 +8156,16 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
-            // 🌈 움직이는 무지개 글씨 스타일
+            // 무지개 글씨 스타일 (순수 정기산행용)
             const rainbowTextStyle = isPureRegularHike 
                 ? 'background: linear-gradient(90deg, #ff007f, #8a2be2, #0055ff, #00d2ff, #ff007f); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; animation: rainbowMove 3s linear infinite;' 
                 : '';
 
-            // ✨ 무지개 글씨 바로 뒤 반짝이 별 (그라데이션 색상 제외)
             const regularSparkle = isPureRegularHike 
                 ? '<span style="font-size: 11px; margin-left: 3px;">✨</span>' 
                 : '';
 
-            // 🎨 [신규] 정기산행 우측 전용 그라데이션 뱃지
+            // 정기산행 전용 배지
             const regularBadge = isPureRegularHike
                 ? `<span style="margin-left: auto; background: linear-gradient(135deg, rgba(255, 105, 180, 0.15), rgba(160, 32, 240, 0.15)); color: #7e22ce; border: 1px solid rgba(160, 32, 240, 0.35); font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; display: inline-flex; align-items: center; line-height: 1; flex-shrink: 0;">정기산행</span>`
                 : '';
@@ -8178,9 +8192,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             `;
         }).join('');
 
-
-
-
         if (isFirstPage) {
             listBox.innerHTML = htmlContent;
         } else {
@@ -8204,6 +8215,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
+
 
                  
     
