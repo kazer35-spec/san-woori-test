@@ -2811,21 +2811,27 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 
 <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
 <div class="flex items-center justify-between mb-2">
-<p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-<div class="flex gap-2">
-<label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-<input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-<span class="text-[10px] font-black text-blue-600">100대명산</span>
-</label>
-<label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-<input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-<span class="text-[10px] font-black text-red-500">BAC인증지</span>
-</label>
+<div class="flex items-center justify-between mb-2">
+  <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+  <div class="flex gap-2">
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+      <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+      <span class="text-[10px] font-black text-blue-600">100대명산</span>
+    </label>
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+      <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+      <span class="text-[10px] font-black text-red-500">BAC인증지</span>
+    </label>
+  </div>
 </div>
-</div>
+
 <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
     <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
+    </label>
+    <!-- 🔥 신규 추가: 위성별을 생성하지 않는 일정 전용 체크박스 -->
+    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
     </label>
     <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
@@ -2837,6 +2843,7 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
         <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
     </label>
 </div>
+
 
 <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
     <div class="flex-1 flex items-center gap-1">
