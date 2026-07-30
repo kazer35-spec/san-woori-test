@@ -3603,44 +3603,41 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
 // ─── 🎯 롱프레스 / 뗌 전용 전역 핸들러 함수 ───
 window.recordBtnTimer = null;
-window.isLongPressed = false;
 
 window.handleRecordBtnStart = (btnEl, dPlusVal) => {
-    window.isLongPressed = false;
     clearTimeout(window.recordBtnTimer);
 
-    // 0.12초 이상 누르면 D+day 텍스트로 전환
+    // 0.1초 누르면 버튼 바로 위에 둥둥 뜨는 툴팁 생성
     window.recordBtnTimer = setTimeout(() => {
-        window.isLongPressed = true;
-        const txtSpan = btnEl.querySelector('.record-btn-text');
-        if (txtSpan) {
-            txtSpan.innerText = `✨ D+${dPlusVal}일`;
-            btnEl.classList.add('bg-sky-100', 'text-sky-700', 'border-sky-300');
-        }
-    }, 120);
+        // 이미 떠있는 툴팁이 있다면 제거
+        const existing = document.getElementById('active-dplus-tooltip');
+        if (existing) existing.remove();
+
+        const tooltip = document.createElement('div');
+        tooltip.id = 'active-dplus-tooltip';
+        tooltip.className = 'absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[11px] font-bold px-2 py-0.5 rounded shadow-lg pointer-events-none z-50 animate-bounce';
+        tooltip.innerText = `✨ D+${dPlusVal}일`;
+
+        btnEl.style.position = 'relative';
+        btnEl.appendChild(tooltip);
+    }, 100);
 };
 
 window.handleRecordBtnEnd = (btnEl, name, ddayVal, level) => {
     clearTimeout(window.recordBtnTimer);
     
-    // 버튼 스타일 및 문구 원복
-    const txtSpan = btnEl.querySelector('.record-btn-text');
-    if (txtSpan) {
-        txtSpan.innerText = "기록보기";
-        btnEl.classList.remove('bg-sky-100', 'text-sky-700', 'border-sky-300');
-    }
+    // 툴팁 제거
+    const tooltip = document.getElementById('active-dplus-tooltip');
+    if (tooltip) tooltip.remove();
 
-    // 손을 떼는 순간 서브창(모달) 오픈
+    // 서브창 오픈
     window.showFadingScroll(name, ddayVal, level);
 };
 
 window.handleRecordBtnCancel = (btnEl) => {
     clearTimeout(window.recordBtnTimer);
-    const txtSpan = btnEl.querySelector('.record-btn-text');
-    if (txtSpan) {
-        txtSpan.innerText = "기록보기";
-        btnEl.classList.remove('bg-sky-100', 'text-sky-700', 'border-sky-300');
-    }
+    const tooltip = document.getElementById('active-dplus-tooltip');
+    if (tooltip) tooltip.remove();
 };
 
 
