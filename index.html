@@ -7785,7 +7785,8 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
-// ─── 3. 페이징 및 타임라인 렌더링 ───
+
+            // ─── 3. 모달용 페이징 및 타임라인 렌더링 (수정 완료) ───
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7806,15 +7807,18 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
+            // 🌟 핵심 수정: 정기산행 OR UP/분기 체크(isQuarter) OR 순수 산행인 경우 모두 "일정산행" 탭으로 분류
             filtered = window.currentScrollLogs.filter(log => {
-                const hasQuarterCheck = checkIsQuarter(log);
+                const isQuarter = checkIsQuarter(log);
                 const isPureHike = (!log.isRunning && !log.isTracking && !log.isWalking && !log.isExtraHike);
-                return log.isRegular || hasQuarterCheck || isPureHike;
+                return log.isRegular || isQuarter || isPureHike;
             });
         } else if (currentCategory === 'running') {
-            filtered = window.currentScrollLogs.filter(log => 
-                log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
-            );
+            // 개인/기타 탭: UP/분기 체크가 없는 순수 개인 운동만 분류
+            filtered = window.currentScrollLogs.filter(log => {
+                const isQuarter = checkIsQuarter(log);
+                return !isQuarter && (log.isExtraHike || log.isRunning || log.isTracking || log.isWalking);
+            });
         }
 
         if (!filtered || filtered.length === 0) {
@@ -7849,13 +7853,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 else if (log.isWalking) activeColors.push(colors.walk);
                 else activeColors.push(colors.hike);
 
-                if (activeColors.length >= 2) {
-                    dotStyle = activeColors.length === 2 
-                        ? `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`
-                        : `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
-                } else {
-                    dotStyle = `background: ${activeColors[0] || colors.hike};`;
-                }
+                dotStyle = `background: ${activeColors[0] || colors.hike};`;
             }
 
             const heightVal = log.height || 0;
@@ -7869,23 +7867,24 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 : '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
+            // 🌟 핵심 수정: isQuarterCheck가 켜진 모든 운동 기록에 무조건 [일정] 연두색 뱃지 표시
             const isQuarterChecked = checkIsQuarter(log);
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isQuarterChecked;
-            
-            const scheduleBadge = showScheduleBadge 
+            const scheduleBadge = isQuarterChecked 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
 
             return `
-                <div class="scroll-timeline-item">
-                    <div class="scroll-item-date">${dateStr} (${dayName})</div>
-                    <div class="scroll-item-body" style="display: flex; align-items: center;">
-                        <span class="scroll-item-dot" style="${dotStyle}"></span>
-                        ${bacTag}
-                        <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
-                        ${starTag}
-                        ${scheduleBadge}
+                <div class="scroll-timeline-item" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">
+                    <div>
+                        <div class="scroll-item-date" style="font-size: 10px; color: #94a3b8;">${dateStr} (${dayName})</div>
+                        <div class="scroll-item-body" style="display: flex; align-items: center; font-size: 12px;">
+                            <span class="scroll-item-dot" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; ${dotStyle}"></span>
+                            ${bacTag}
+                            <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
+                            ${starTag}
+                        </div>
                     </div>
+                    ${scheduleBadge}
                 </div>
             `;
         }).join('');
