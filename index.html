@@ -3454,7 +3454,7 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
  
-            window.renderStatusTable = () => {
+              window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3582,18 +3582,10 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         </td>
         <td style="position: relative;" class="text-center">
             ${clickTag}
-            <!-- 💡 꾹 누르면 D+Day 표시 후 떼면 서브창 열리는 롱프레스 버튼 적용 -->
-            <button onmousedown="window.handleRecordBtnStart(this, ${m.dPlusVal})"
-        onmouseup="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level})"
-        onmouseleave="window.handleRecordBtnCancel(this)"
-        ontouchstart="window.handleRecordBtnStart(this, ${m.dPlusVal}, event)"
-        ontouchend="window.handleRecordBtnEnd(this, '${m.name}', ${m.ddayVal}, ${m.level}, event)"
-        ontouchcancel="window.handleRecordBtnCancel(this)"
-        style="-webkit-touch-callout: none; -webkit-user-select: none; user-select: none;"
-        class="record-btn-interactive inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[58px]">
-    <span class="record-btn-text">기록보기</span>
-</button>
-
+            <button onclick="window.toggleRecordBtnText(this, '${m.name}', ${m.ddayVal}, ${m.level}, ${m.dPlusVal})" 
+                    class="inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[62px]">
+                <span class="record-btn-label">기록보기</span>
+            </button>
         </td>
         </tr>`;
 
@@ -3603,80 +3595,30 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     });
 };
 
-
-
-
-// ─── 🎯 해당 회원의 위치에 정확히 D+day 띄우기 & 서브창 차단 ───
-window.recordBtnTimer = null;
-window.dPlusHideTimer = null;
-
-window.handleRecordBtnStart = (btnEl, dPlusVal, e) => {
-    clearTimeout(window.recordBtnTimer);
-    btnEl.dataset.isLongPressed = "false";
-
-    // 0.2초(200ms) 이상 눌렀을 때만 D+day 뱃지 생성
-    window.recordBtnTimer = setTimeout(() => {
-        btnEl.dataset.isLongPressed = "true";
-
-        // 💡 누른 버튼과 정확히 '같은 행(tr)' 내의 4번째 열(누적고도 td)을 탐색
-        const tr = btnEl.closest('tr');
-        if (!tr) return;
-
-        const heightTd = tr.children[3]; // 정확히 누른 회원의 누적고도 위치
-        if (!heightTd) return;
-
-        // 기존에 혹시 남아있는 뱃지 제거
-        const oldBadge = heightTd.querySelector('.dplus-temp-badge');
-        if (oldBadge) oldBadge.remove();
-
-        const badge = document.createElement('div');
-        badge.className = 'dplus-temp-badge absolute inset-0 m-auto flex items-center justify-center bg-slate-800 text-cyan-300 border border-slate-600/80 font-extrabold text-[11px] rounded-lg shadow-lg z-30 transition-all duration-200';
-        badge.style.width = '88%';
-        badge.style.height = '78%';
-        badge.style.boxShadow = '0 2px 8px rgba(15, 23, 42, 0.35)';
-        badge.innerText = `✨ D+${dPlusVal}일`;
-
-        heightTd.style.position = 'relative';
-        heightTd.appendChild(badge);
-
-        // 3초 후 소멸
-        clearTimeout(window.dPlusHideTimer);
-        window.dPlusHideTimer = setTimeout(() => {
-            if (badge && badge.parentNode) {
-                badge.style.opacity = '0';
-                setTimeout(() => badge.remove(), 200);
-            }
-        }, 3000);
-    }, 200);
-};
-
-window.handleRecordBtnEnd = (btnEl, name, ddayVal, level, e) => {
-    clearTimeout(window.recordBtnTimer);
-
-    // 1. 눌렀던 바로 '이 버튼'에서 롱프레스가 발동한 직후라면 서브창 방지
-    if (btnEl.dataset.isLongPressed === "true") {
-        btnEl.dataset.isLongPressed = "false";
-        if (e && e.cancelable) e.preventDefault();
-        return;
-    }
-
-    // 2. 정확히 '이 버튼이 속한 행(tr)'의 누적고도 셀에 뱃지가 떠 있는 동안만 서브창 방지
-    const tr = btnEl.closest('tr');
-    const heightTd = tr ? tr.children[3] : null;
-    const activeBadge = heightTd ? heightTd.querySelector('.dplus-temp-badge') : null;
-
-    if (activeBadge) {
-        if (e && e.cancelable) e.preventDefault();
-        return;
-    }
-
-    // 3. 짧은 클릭 및 뱃지가 없는 다른 회원은 정상적으로 서브창 열림
+// ─── 🎯 클릭 시 서브창을 열고 3초 간격 텍스트 체인지 스크립트 ───
+window.toggleRecordBtnText = (btnEl, name, ddayVal, level, dPlusVal) => {
+    // 1. 기존 동작대로 서브창은 즉시 정상 오픈
     window.showFadingScroll(name, ddayVal, level);
-};
 
-window.handleRecordBtnCancel = (btnEl) => {
-    clearTimeout(window.recordBtnTimer);
-    if (btnEl) btnEl.dataset.isLongPressed = "false";
+    // 2. 이미 해당 버튼에서 타이머가 동작 중이라면 중복 실행 방지
+    if (btnEl.dataset.isToggling === "true") return;
+    btnEl.dataset.isToggling = "true";
+
+    const labelSpan = btnEl.querySelector('.record-btn-label');
+    if (!labelSpan) return;
+
+    // [3초 후] D+Day 표시로 체인지
+    setTimeout(() => {
+        labelSpan.innerText = `✨ D+${dPlusVal}일`;
+        btnEl.classList.add('bg-sky-100', 'text-sky-700', 'border-sky-300');
+
+        // [다시 3초 후] 기록보기로 원복 후 상태 리셋
+        setTimeout(() => {
+            labelSpan.innerText = "기록보기";
+            btnEl.classList.remove('bg-sky-100', 'text-sky-700', 'border-sky-300');
+            btnEl.dataset.isToggling = "false";
+        }, 3000);
+    }, 3000);
 };
 
 
