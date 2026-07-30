@@ -5733,8 +5733,8 @@ window.addMultiActivity = async () => {
     const region = document.getElementById('adminManualRegionSelect')?.value || "";
     
     // 🎯 [수정 1] HTML id인 'isQuarterCheck'를 확실히 참조
-    const isQuarterCheck = document.getElementById('isQuarterCheck')?.checked || false; 
-    
+    const isQuarterCheck = Boolean(document.getElementById('isQuarterCheck')?.checked);
+
     const pRock = parseInt(document.getElementById('pRock')?.value) || 0;
     const pForest = parseInt(document.getElementById('pForest')?.value) || 0;
     const pValley = parseInt(document.getElementById('pValley')?.value) || 0;
@@ -5860,21 +5860,21 @@ window.addMultiActivity = async () => {
                 }
 
                 const logPayload = {
-                    date: ts, 
-                    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
-                    height, coords: safeCoords,
-                    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
-                    
-                    // 🎯 [수정 2] DB 문서에 isQuarterCheck 필드를 명확하게 보충 저장!
-                    isQuarterCheck: isQuarterCheck,
-                    isQuarterOnlyOne: isQuarterCheck,
+    date: ts, 
+    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
+    height, coords: safeCoords,
+    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+    
+    // 🎯 [핵심 FIX 1] 어떤 형태든 true/false로 명확히 적재
+    isQuarterCheck: isQuarterCheck,
+    isQuarterOnlyOne: isQuarterCheck,
 
-                    starType, author: member.name,
-                    isSpecial: isSpecial,
-                    pRock, pForest, pValley
-                };
+    starType, author: member.name,
+    isSpecial: isSpecial,
+    pRock, pForest, pValley
+};
 
-                await saveHikeLog(id, logPayload);
+await saveHikeLog(id, logPayload);
             }
         } 
 
@@ -7832,26 +7832,31 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     try {
         let filtered = [];
         
+        // Helper: DB에서 값이 boolean, string("true"), number(1) 어떤 형태로 넘어와도 true 판별
+        const checkIsQuarter = (log) => {
+            return log.isQuarterCheck === true || log.isQuarterCheck === "true" || log.isQuarterCheck === 1 ||
+                   log.isQuarterOnlyOne === true || log.isQuarterOnlyOne === "true" || log.isQuarterOnlyOne === 1;
+        };
+
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🎯 [일정산행 탭]
-            // - 정기산행(isRegular)
-            // - isQuarterCheck 체크된 활동 (러닝/트레킹/산책 포함)
-            // - 순수 일정산행
+            // 🎯 [일정산행 탭 필터링 FIX]
+            // UP 옆 체크박스가 체크된 모든 활동(러닝/트레킹/산책 포함)은 무조건 일정산행 탭에 등장!
             filtered = window.currentScrollLogs.filter(log => {
-                const isQuarter = log.isQuarterCheck || log.isQuarterOnlyOne;
+                const hasQuarterCheck = checkIsQuarter(log);
                 const isPureHike = (!log.isRunning && !log.isTracking && !log.isWalking && !log.isExtraHike);
-                return log.isRegular || isQuarter || isPureHike;
+                
+                return log.isRegular || hasQuarterCheck || isPureHike;
             });
         } else if (currentCategory === 'running') {
-            // 🎯 [개인/기타 탭] 번외산행, 러닝, 트레킹, 산책
+            // 🎯 [개인/기타 탭 필터링]
             filtered = window.currentScrollLogs.filter(log => 
                 log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
             );
         }
 
-        if (filtered.length === 0) {
+        if (!filtered || filtered.length === 0) {
             listBox.innerHTML = `<p style="text-align:center; padding:40px 0; font-size:11px; color:#a0aec0;">기록이 없습니다.</p>`;
             moreBtnArea.innerHTML = '';
             return;
@@ -7864,10 +7869,11 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             let dateStr = "----.--.--";
             let dayName = "";
             if (log.date) {
-                const jsDate = new Date(log.date);
-                if (!isNaN(jsDate)) {
-                    dateStr = `${jsDate.getFullYear()}.${String(jsDate.getMonth() + 1).padStart(2, '0')}.${String(jsDate.getDate()).padStart(2, '0')}`;
-                    dayName = ['일','월','화','수','목','금','토'][jsDate.getDay()];
+                // Timestamp 개체거나 일반 문자열/Date 개체일 때 모두 대응
+                const rawDate = log.date.toDate ? log.date.toDate() : new Date(log.date);
+                if (!isNaN(rawDate)) {
+                    dateStr = `${rawDate.getFullYear()}.${String(rawDate.getMonth() + 1).padStart(2, '0')}.${String(rawDate.getDate()).padStart(2, '0')}`;
+                    dayName = ['일','월','화','수','목','금','토'][rawDate.getDay()];
                 }
             }
 
@@ -7888,7 +7894,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                         ? `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`
                         : `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
                 } else {
-                    dotStyle = `background: ${activeColors[0]};`;
+                    dotStyle = `background: ${activeColors[0] || colors.hike};`;
                 }
             }
 
@@ -7903,10 +7909,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 : '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 UP 옆 체크박스(isQuarterCheck)가 체크된 기록인지 체크
-            const isQuarterChecked = log.isQuarterCheck || log.isQuarterOnlyOne;
-
-            // 🎯 [개인/기타] 탭이나 [전체] 탭일 때만 [일정] 박스 뱃지 노출 (일정산행 탭에서는 노출X)
+            // 🎯 [핵심 FIX 2] 일정 뱃지 노출 판단
+            const isQuarterChecked = checkIsQuarter(log);
             const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isQuarterChecked;
             
             const scheduleBadge = showScheduleBadge 
