@@ -5782,6 +5782,7 @@ window.addMultiActivity = async () => {
     const isTop100 = document.getElementById('isTop100Check')?.checked || false;
     const isBAC = document.getElementById('isBACCheck')?.checked || false;
     
+    // 🎯 정기산행 체크박스를 '일정 체크박스'로 적용
     const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
     const isSchedule = document.getElementById('isScheduleCheck')?.checked || false; 
 
@@ -5796,12 +5797,11 @@ window.addMultiActivity = async () => {
     const pForest = parseInt(document.getElementById('pForest')?.value) || 0;
     const pValley = parseInt(document.getElementById('pValley')?.value) || 0;
     
-    // 🔥 런닝과 트레킹을 동시에 체크하면 번외산행(개인산행)
     const isExtraHike = isRunning && isTracking; 
     const isSpecial = isRunning || isTracking || isWalking || isOnlyLog || isExtraHike;
     const isRealHike = !isSpecial; 
 
-    // 정기산행 방어 logic: 특수활동일 경우 정기위성별(isRegular) 생성 방지
+    // 🔥 정기산행 방어 logic
     const isRegular = isRegularRaw && isRealHike; 
 
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
@@ -5903,7 +5903,7 @@ window.addMultiActivity = async () => {
                 }
             }
 
-            // 벙주 체크박스 분기 누적
+            // ⚡ 벙주 체크박스 분기 누적
             if (window.selectedHostIds && window.selectedHostIds.includes(id)) {
                 updateData[`quarterlyStats.${qKey}.hosted`] = _increment(1);
             }
@@ -5933,7 +5933,6 @@ window.addMultiActivity = async () => {
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
 
-                // 💡 [수정] logPayload에 isExtraHike 필드를 누락 없이 명시
                 const logPayload = {
                     date: ts, 
                     mountain: baseDocId, 
@@ -5941,9 +5940,7 @@ window.addMultiActivity = async () => {
                     isTop100, isBAC, 
                     isRegular,   
                     isSchedule,  
-                    isRunning, isTracking, isWalking, 
-                    isExtraHike: !!isExtraHike, // 🔥 DB에 true/false 상태 저장 필수
-                    isOnlyLog, region,
+                    isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
                     isSpecial: isSpecial,
                     pRock, pForest, pValley
@@ -6007,6 +6004,8 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
+
+     
         
                         
    // 📌 [신규 회원 등록 함수] - 수정본
@@ -7817,6 +7816,7 @@ function createShootingStar(board, tx, ty) {
 
              
 
+   
 window.currentScrollLogs = []; 
 
 window.scrollPagination = {
@@ -7893,28 +7893,24 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // 🔥 [수정완료] 카운트 집계 시 isExtraHike를 최우선으로 선점하도록 분기
+        // 🔥 [수정] 순수산행(일반산행) + 정기산행 = 일정산행 횟수로 집계
         const counts = window.currentScrollLogs.reduce((acc, log) => {
-            // 1. 번외산행(개인산행) 카운트 (isExtraHike가 true이거나 런닝+트레킹 동시 체크된 기록)
-            if (log.isExtraHike || (log.isRunning && log.isTracking)) {
+            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
+            const isPureHike = !isKmActivity && !log.isExtraHike;
+
+            if (isPureHike) {
+                acc.schedule++; // 순수산행(일반산행)이면 일정산행 +1
+                if (log.isRegular) {
+                    acc.regular++; // 그중 정기산행이면 정기산행 +1
+                }
+            } else if (log.isExtraHike) {
                 acc.extra++;
-            // 2. 단독 런닝
             } else if (log.isRunning) {
                 acc.running++;
-            // 3. 단독 트레킹
             } else if (log.isTracking) {
                 acc.trekking++;
-            // 4. 단독 산책
             } else if (log.isWalking) {
                 acc.walking++;
-            // 5. 순수 산행 (정기산행 및 일정산행)
-            } else {
-                if (log.isRegular) {
-                    acc.regular++;  
-                    acc.schedule++; 
-                } else if (log.isSchedule) {
-                    acc.schedule++; 
-                }
             }
             return acc;
         }, { regular: 0, schedule: 0, extra: 0, trekking: 0, running: 0, walking: 0 });
@@ -8080,9 +8076,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
-            const isExtra = log.isExtraHike || (log.isRunning && log.isTracking);
-            const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !isExtra;
-            const isPureRegularHike = log.isRegular && !isKmActivity && !isExtra; 
+            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
+            const isPureRegularHike = log.isRegular && !isKmActivity; 
 
             // 🎯 도트 색상
             let dotStyle = "";
@@ -8092,7 +8087,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
                 let baseColor = colors.hike;
-                if (isExtra) baseColor = colors.extraHike;
+                if (log.isExtraHike) baseColor = colors.extraHike;
                 else if (log.isRunning) baseColor = colors.run;
                 else if (log.isTracking) baseColor = colors.trek;
                 else if (log.isWalking) baseColor = colors.walk;
@@ -8101,9 +8096,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             }
 
             const heightVal = log.height || 0;
-            const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
+            const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
             
-            const rawMountain = log.mountain || (isExtra ? "번외 산행" : "활동 기록");
+            const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
             const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
             
             let starTag = '';
@@ -8199,7 +8194,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
-
+                         
                  
     
 
