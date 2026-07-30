@@ -7908,16 +7908,24 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-                        // 정기 체크(isRegular)된 러닝/트레킹/산책 기록일 경우 우측 [일정] 태그로 구분 및 색상 세분화
+                                    // 정기 체크(isRegular)된 러닝/트레킹/산책 기록일 경우 우측 [일정] 태그로 구분
             const isRegularGroupExercise = log.isRegular && isKmActivity;
-            let badgeBg = '#ecfdf5', badgeColor = '#10b981', badgeBorder = '#a7f3d0';
             
+            // 도트 색상 및 그에 맞춘 일정 배지 스타일 정의
+            let badgeBg = "#2ecc71", badgeColor = "#15803d", badgeBorder = "#86efac";
+
             if (log.isRunning) {
-                badgeBg = '#fdf2f8'; badgeColor = '#db2777'; badgeBorder = '#fbcfe8'; // 런닝: 분홍색
+                badgeBg = "#FFD1DC";     // 런닝 도트 색상 (분홍)
+                badgeColor = "#9f1239";  // 진한 핑크 글자
+                badgeBorder = "#fbcfe8";
             } else if (log.isTracking) {
-                badgeBg = '#f5f3ff'; badgeColor = '#7c3aed'; badgeBorder = '#ddd6fe'; // 트래킹: 보라색
+                badgeBg = "#E0B0FF";     // 트래킹 도트 색상 (보라)
+                badgeColor = "#5b21b6";  // 진한 보라 글자
+                badgeBorder = "#ddd6fe";
             } else if (log.isWalking) {
-                badgeBg = '#fff7ed'; badgeColor = '#c2410c'; badgeBorder = '#ffedd5'; // 산책: 주황색
+                badgeBg = "#FFCC80";     // 산책 도트 색상 (주황)
+                badgeColor = "#9a3412";  // 진한 주황 글자
+                badgeBorder = "#fed7aa";
             }
 
             const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isRegularGroupExercise;
@@ -7925,6 +7933,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const scheduleBadge = showScheduleBadge 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
+
 
             return `
                 <div class="scroll-timeline-item">
