@@ -5698,7 +5698,8 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 2. 기록 저장 핵심 로직    
-window.addMultiActivity = async () => {
+
+                            window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -5885,36 +5886,29 @@ window.addMultiActivity = async () => {
         
         alert((isRealHike && !isExtraHike) ? "순수산행 기록 완료! ✅" : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // ─── 🧹 [수정 핵심] 저장 후 입력 수치 및 폼 요소 전체 초기화 ───
-        
-        // 1. 선택된 회원 및 벙주 목록 초기화
+        // 입력 폼 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false); // UI 체크박스 해제
+        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false);
 
-        // 2. 텍스트/숫자 입력 폼 초기화
         const resetInputIds = ['mountainName', 'mountainHeight', 'pRock', 'pForest', 'pValley'];
         resetInputIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
 
-        // 3. 지역 선택 셀렉트 박스 초기화
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
-        // 4. 활동 특성 체크박스 초기화
         const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
         });
 
-        // 5. 레벨업 선택 라디오 버튼 초기화
         document.querySelectorAll('input[name="upAmount"]').forEach(radio => radio.checked = false);
 
-        // 6. 좌표 및 날짜 초기화
         tempCoord = null; 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
@@ -5927,9 +5921,6 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
-
-                
-        
                         
    // 📌 [신규 회원 등록 함수] - 수정본
 window.addMember = async () => {
@@ -7595,7 +7586,6 @@ function createShootingStar(board, tx, ty) {
             // 필터링 및 페이징 처리를 위해 모달 전용 로그 목록을 임시 저장할 전역 변수 (캐시)
 window.currentScrollLogs = []; 
 
-// 페이징 처리를 위해 상태를 기억할 전역 객체
 window.scrollPagination = {
     currentCategory: 'all',
     mId: null,
@@ -7603,7 +7593,6 @@ window.scrollPagination = {
     currentPageSize: 6
 };
 
-// showFadingScroll 인자에 regDate를 전달받을 수 있도록 추가 (옵션)
 window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
     const modal = document.getElementById('scrollModal');
     const content = document.getElementById('scrollContent');
@@ -7635,7 +7624,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     let formattedRegDateKo = "--년 --월 --일";
 
     try {
-        // [A] 가입일 정보: 외부에서 전달받은 값이 있으면 getDoc 생략! (서버 읽기 1회 절약)
         let rDate = passedRegDate;
         
         if (!rDate) {
@@ -7659,7 +7647,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             }
         }
 
-        // [B] 🔥 유저 전체 일지 데이터 1회 통합 조회 (메모리 캐스)
         const logsRef = collection(db, `sanwoori/${safeMemberId}/logs`);
         const q = query(logsRef, orderBy("date", "desc"));
         const snap = await getDocs(q);
@@ -7673,33 +7660,31 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // 이하 기존 통계 계산 및 UI 렌더링 로직 동일...
-
-
-                // [C] 📊 전체 로그 데이터 기반 항목별 카운팅 계산 (정기 vs 일정 구분)
+        // [C] 📊 정확한 운동 카운팅 계산 (정기산행/일정산행은 오직 순수산행 기준)
         const counts = window.currentScrollLogs.reduce((acc, log) => {
-            if (log.isRegular) {
-                acc.regular++;  // 무지개 (정기산행)
-                acc.schedule++; // 🔥 정기산행 횟수를 일정산행에도 포함
-            } else if ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike) {
-                acc.schedule++; // 연두색 (일정산행)
+            const isKm = log.isRunning || log.isTracking || log.isWalking;
+            const isPureHike = !isKm && !log.isExtraHike;
+
+            if (log.isRegular && isPureHike) {
+                acc.regular++; // 무지개 (순수 정기산행)
+                acc.schedule++; // 순수 일정산행 카운트에도 정기산행 포함
+            } else if (isPureHike) {
+                acc.schedule++; // 연두색 (순수 일정산행)
             } else if (log.isExtraHike) {
-                acc.extra++;    // 개인산행
-            } else if (log.isTracking) {
-                acc.trekking++; // 트래킹
+                acc.extra++; // 개인산행
             } else if (log.isRunning) {
-                acc.running++;  // 런닝
+                acc.running++; // 런닝 (정기 체크 여부와 상관없이 런닝으로 카운트)
+            } else if (log.isTracking) {
+                acc.trekking++; // 트래킹 (정기 체크 여부와 상관없이 트래킹으로 카운트)
             } else if (log.isWalking) {
-                acc.walking++;  // 산책
+                acc.walking++; // 산책 (정기 체크 여부와 상관없이 산책으로 카운트)
             }
             return acc;
         }, { regular: 0, schedule: 0, extra: 0, trekking: 0, running: 0, walking: 0 });
 
-        // 2. 🎯 [개선] D-Day와 운동 횟수가 하나의 상자(카드)로 통합 렌더링
         content.innerHTML = `
             <div class="user-report-summary-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 14px; margin: 6px 0 12px 0;">
                 
-                <!-- [1구역] D-Day & 가입일 영역 -->
                 <div class="user-status-row-bar" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;">
                     <div class="dday-count-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px;">
                         D-Day ${dday !== undefined ? dday : 0}
@@ -7710,9 +7695,7 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                     </div>
                 </div>
 
-                <!-- [2구역] 운동 횟수 요약 영역 (3열 정렬 및 도트 라인 수직 맞춤) -->
                 <div class="activity-summary-grid" style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px; font-size: 11px; color: #475569; font-weight: 500;">
-                    <!-- 1줄: 산행 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0); display: inline-block; flex-shrink: 0;"></i>
@@ -7731,7 +7714,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                         </span>
                     </div>
 
-                    <!-- 2줄: 기타 운동 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: #FFD1DC; display: inline-block; flex-shrink: 0;"></i>
@@ -7753,9 +7735,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
 
             </div>
 
-
-            </div>
-
             <div class="tab-scroll-container">
                 <div class="tab-header-buttons">
                     <button type="button" onclick="window.switchScrollTab('all')" id="sTab-all" class="tab-btn active">전체</button>
@@ -7763,14 +7742,11 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                     <button type="button" onclick="window.switchScrollTab('running')" id="sTab-running" class="tab-btn">개인/기타</button>
                 </div>
                 
-                <!-- 로그가 쌓일 박스 -->
                 <div id="scrollFilteredList" class="scroll-filtered-list-box"></div>
-                <!-- 더보기 버튼 영역 -->
                 <div id="scrollMoreBtnArea" style="text-align:center; margin-top:15px;"></div>
             </div>
         `;
 
-        // 첫 페이지 로드
         window.loadScrollLogsPage(true);
 
     } catch (e) {
@@ -7791,8 +7767,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     }
 };
 
-
-// [탭 전환 함수]
 window.switchScrollTab = (category) => {
     if (window.scrollPagination.currentCategory === category) return;
     
@@ -7818,7 +7792,6 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
-// [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7841,7 +7814,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 정기 체크(isRegular)가 된 활동 및 순수 일정산행 노출
+            // 정기 체크(isRegular)가 지정된 러닝/트레킹/산책 및 순수 일정/정기 산행 노출
             filtered = window.currentScrollLogs.filter(log => 
                 log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
@@ -7871,30 +7844,23 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
-            // 1. 운동 종류 판별 (러닝, 트레킹, 산책)
             const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
 
-            // 2. 도트 색상 결정
+            // 🎯 도트 색상 단일화 (순수 정기산행만 무지개, 나머지는 운동 독자 단색)
             let dotStyle = "";
-            // 순수 정기산행일 때만 무지개 도트, 러닝/트레킹/산책은 각 운동 전용 색상
+            const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
+            
             if (log.isRegular && !isKmActivity) {
+                // 오직 순수 정기산행일 때만 무지개 도트
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
-                const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
-                let activeColors = [];
-                if (log.isExtraHike) activeColors.push(colors.extraHike);
-                else if (log.isRunning) activeColors.push(colors.run);
-                else if (log.isTracking) activeColors.push(colors.trek);
-                else if (log.isWalking) activeColors.push(colors.walk);
-                else activeColors.push(colors.hike);
+                let baseColor = colors.hike;
+                if (log.isExtraHike) baseColor = colors.extraHike;
+                else if (log.isRunning) baseColor = colors.run;
+                else if (log.isTracking) baseColor = colors.trek;
+                else if (log.isWalking) baseColor = colors.walk;
 
-                if (activeColors.length >= 2) {
-                    dotStyle = activeColors.length === 2 
-                        ? `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`
-                        : `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
-                } else {
-                    dotStyle = `background: ${activeColors[0]};`;
-                }
+                dotStyle = `background: ${baseColor};`;
             }
 
             const heightVal = log.height || 0;
@@ -7909,10 +7875,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [핵심 수정] 정기 체크(isRegular)된 '러닝/트레킹/산책' 기록이고, 
-            // 현재 탭이 '개인/기타(running)' 또는 '전체(all)'일 때 우측에 [일정] 박스 무조건 생성!
+            // 정기 체크(isRegular)된 러닝/트레킹/산책 기록일 경우 우측 [일정] 태그로 구분
             const isRegularGroupExercise = log.isRegular && isKmActivity;
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isRegularGroupExercise;
+            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isRegularGroupExercise;
             
             const scheduleBadge = showScheduleBadge 
                 ? `<span class="schedule-tag-badge" style="margin-left: auto; background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
@@ -7958,7 +7923,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     }
 };
 
-
+                 
+    
 
             
 
