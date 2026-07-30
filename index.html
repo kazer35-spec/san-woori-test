@@ -5752,10 +5752,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 2. 기록 저장 핵심 로직    
-
-    
-
-        window.addMultiActivity = async () => {
+window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -5799,11 +5796,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const pForest = parseInt(document.getElementById('pForest')?.value) || 0;
     const pValley = parseInt(document.getElementById('pValley')?.value) || 0;
     
+    // 🔥 런닝과 트레킹을 동시에 체크하면 번외산행(개인산행)
     const isExtraHike = isRunning && isTracking; 
     const isSpecial = isRunning || isTracking || isWalking || isOnlyLog || isExtraHike;
     const isRealHike = !isSpecial; 
 
-    // 🔥 정기산행 방어 logic: 특수활동(런닝/트레킹 등)일 경우 정기위성별(isRegular) 생성 방지
+    // 정기산행 방어 logic: 특수활동일 경우 정기위성별(isRegular) 생성 방지
     const isRegular = isRegularRaw && isRealHike; 
 
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
@@ -5905,7 +5903,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // ⚡ 벙주 체크박스 분기 누적
+            // 벙주 체크박스 분기 누적
             if (window.selectedHostIds && window.selectedHostIds.includes(id)) {
                 updateData[`quarterlyStats.${qKey}.hosted`] = _increment(1);
             }
@@ -5935,14 +5933,17 @@ window.addEventListener('DOMContentLoaded', () => {
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
 
+                // 💡 [수정] logPayload에 isExtraHike 필드를 누락 없이 명시
                 const logPayload = {
                     date: ts, 
                     mountain: baseDocId, 
                     height, coords: safeCoords,
                     isTop100, isBAC, 
-                    isRegular, // 순수 정기산행 위성별용
-                    isSchedule, // 🔥 일정 배지 및 분류용
-                    isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+                    isRegular,   
+                    isSchedule,  
+                    isRunning, isTracking, isWalking, 
+                    isExtraHike: !!isExtraHike, // 🔥 DB에 true/false 상태 저장 필수
+                    isOnlyLog, region,
                     starType, author: member.name,
                     isSpecial: isSpecial,
                     pRock, pForest, pValley
@@ -7817,6 +7818,11 @@ function createShootingStar(board, tx, ty) {
              
 
 
+
+
+         ${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`
+         
+
 window.currentScrollLogs = []; 
 
 window.scrollPagination = {
@@ -7893,26 +7899,27 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // 🔥 [수정완료] 카운팅 집계 분기 조건 엄격화
+        // 🔥 [수정완료] 카운트 집계 시 isExtraHike를 최우선으로 선점하도록 분기
         const counts = window.currentScrollLogs.reduce((acc, log) => {
-            const isKm = log.isRunning || log.isTracking || log.isWalking;
-            const isPureHike = !isKm && !log.isExtraHike;
-
-            if (log.isRunning) {
-                acc.running++; // 런닝 (일정 여부 상관없이 무조건 런닝으로 독립 카운트)
+            // 1. 번외산행(개인산행) 카운트 (isExtraHike가 true이거나 런닝+트레킹 동시 체크된 기록)
+            if (log.isExtraHike || (log.isRunning && log.isTracking)) {
+                acc.extra++;
+            // 2. 단독 런닝
+            } else if (log.isRunning) {
+                acc.running++;
+            // 3. 단독 트레킹
             } else if (log.isTracking) {
-                acc.trekking++; // 트래킹
+                acc.trekking++;
+            // 4. 단독 산책
             } else if (log.isWalking) {
-                acc.walking++; // 산책
-            } else if (log.isExtraHike) {
-                acc.extra++; // 개인산행
-            } else if (isPureHike) {
-                // 순수 산행 카테고리만 산행으로 분류
+                acc.walking++;
+            // 5. 순수 산행 (정기산행 및 일정산행)
+            } else {
                 if (log.isRegular) {
-                    acc.regular++; // 정기산행
-                    acc.schedule++; // 정기산행도 일정산행 포함
-                } else {
-                    acc.schedule++; // 일정산행
+                    acc.regular++;  
+                    acc.schedule++; 
+                } else if (log.isSchedule) {
+                    acc.schedule++; 
                 }
             }
             return acc;
@@ -8050,12 +8057,10 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🔥 [일정운동 탭]: 일정 체크(isSchedule)가 되어있는 모든 활동(런닝/트레킹/산책/산행) + 정기/순수일정산행 노출
             filtered = window.currentScrollLogs.filter(log => 
                 log.isSchedule || log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
-            // 🔥 [개인/기타 탭]: 번외산행 및 런닝/트레킹/산책 노출
             filtered = window.currentScrollLogs.filter(log => 
                 log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
             );
@@ -8081,8 +8086,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
-            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
-            const isPureRegularHike = log.isRegular && !isKmActivity; 
+            const isExtra = log.isExtraHike || (log.isRunning && log.isTracking);
+            const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !isExtra;
+            const isPureRegularHike = log.isRegular && !isKmActivity && !isExtra; 
 
             // 🎯 도트 색상
             let dotStyle = "";
@@ -8092,7 +8098,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
                 let baseColor = colors.hike;
-                if (log.isExtraHike) baseColor = colors.extraHike;
+                if (isExtra) baseColor = colors.extraHike;
                 else if (log.isRunning) baseColor = colors.run;
                 else if (log.isTracking) baseColor = colors.trek;
                 else if (log.isWalking) baseColor = colors.walk;
@@ -8101,9 +8107,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             }
 
             const heightVal = log.height || 0;
-            const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
+            const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
             
-            const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
+            const rawMountain = log.mountain || (isExtra ? "번외 산행" : "활동 기록");
             const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
             
             let starTag = '';
@@ -8115,7 +8121,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 
             const blueClass = (log.isTop100 && !isPureRegularHike) ? "top100-blue" : "";
 
-            // 🔥 일정 체크(isSchedule)된 운동 항목 배지 설정
             const isScheduleGroupExercise = log.isSchedule && isKmActivity;
             let badgeBg = '#ecfdf5', badgeColor = '#10b981', badgeBorder = '#a7f3d0';
             
@@ -8200,7 +8205,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
-    
+
                  
     
 
