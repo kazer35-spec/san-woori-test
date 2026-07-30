@@ -3601,17 +3601,21 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     });
 };
 
-// ─── 🎯 롱프레스 / 뗌 전용 전역 핸들러 함수 ───
-window.recordBtnTimer = null;
-// ─── 🎯 누적고도 위치에 3초간 D+day 띄우는 전역 핸들러 ───
+
+
+// ─── 🎯 누적고도 위치에 3초간 D+day 띄우는 전역 핸들러 (롱프레스 시 서브창 방지) ───
 window.recordBtnTimer = null;
 window.dPlusHideTimer = null;
+window.isLongPressed = false; // 롱프레스 동작 여부 플래그
 
 window.handleRecordBtnStart = (btnEl, dPlusVal) => {
+    window.isLongPressed = false; // 누르기 시작할 때 플래그 초기화
     clearTimeout(window.recordBtnTimer);
 
-    // 0.1초 누르고 있으면 누적고도 위치(바로 앞 td)에 D+day 뱃지 노출
+    // 0.15초(150ms) 이상 누르고 있으면 롱프레스로 판단 -> D+day 노출
     window.recordBtnTimer = setTimeout(() => {
+        window.isLongPressed = true; // 롱프레스 상태 온!
+
         // 기록보기 버튼이 속한 tr(행) 찾기
         const tr = btnEl.closest('tr');
         if (!tr) return;
@@ -3642,18 +3646,25 @@ window.handleRecordBtnStart = (btnEl, dPlusVal) => {
                 setTimeout(() => badge.remove(), 200);
             }
         }, 3000);
-    }, 100);
+    }, 150);
 };
 
 window.handleRecordBtnEnd = (btnEl, name, ddayVal, level) => {
     clearTimeout(window.recordBtnTimer);
     
-    // 손을 떼는 즉시 서브창(모달) 오픈
+    // 🎯 롱프레스로 D+day가 떠있는 상황이었다면 서브창을 열지 않고 종료
+    if (window.isLongPressed) {
+        window.isLongPressed = false;
+        return;
+    }
+
+    // 짧게 '클릭'했을 때만 서브창(모달) 오픈
     window.showFadingScroll(name, ddayVal, level);
 };
 
 window.handleRecordBtnCancel = (btnEl) => {
     clearTimeout(window.recordBtnTimer);
+    window.isLongPressed = false;
 };
 
 
