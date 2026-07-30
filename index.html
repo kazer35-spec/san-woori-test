@@ -4725,178 +4725,6 @@ currentMemberLogs = logsQuarter;
     }
 };
 
-// 🌟 [추가 함수 1] 타임라인 상단 탭 배치 & 초기화
-function setupTimelineTabs() {
-    const container = document.getElementById('timelineContent');
-    
-    // 타임라인 상단에 들어갈 탭 디자인 구성 (Tailwind class 적용)
-    const tabsHtml = `
-        <div class="flex border-b border-gray-100 mb-4 text-xs font-bold text-gray-400 sticky top-0 bg-white z-10 py-2">
-            <button onclick="window.filterMemberLogs('all')" id="mTab-all" class="flex-1 pb-2 border-b-2 border-sky-500 text-sky-600 transition-all text-center">전체</button>
-            <button onclick="window.filterMemberLogs('hiking')" id="mTab-hiking" class="flex-1 pb-2 border-b-2 border-transparent hover:text-gray-600 transition-all text-center">일정산행</button>
-            <button onclick="window.filterMemberLogs('running')" id="mTab-running" class="flex-1 pb-2 border-b-2 border-transparent hover:text-gray-600 transition-all text-center">개인/기타</button>
-        </div>
-        <div id="filteredTimelineList"></div>
-    `;
-    
-    container.innerHTML = tabsHtml;
-    
-    // 기본 'all' 상태로 리스트 출력
-    window.filterMemberLogs('all');
-}
-
-// 🌟 [추가 함수 2] 탭 클릭 시 클라이언트 사이드 즉시 필터링
-
-
-  window.filterMemberLogs = (category) => {
-    const tabs = {
-        all: document.getElementById('mTab-all'),
-        hiking: document.getElementById('mTab-hiking'),
-        running: document.getElementById('mTab-running')
-    };
-
-    // 1. 탭 UI 활성화 클래스 조절
-    Object.keys(tabs).forEach(key => {
-        if (!tabs[key]) return;
-        if (key === category) {
-            tabs[key].classList.add('border-sky-500', 'text-sky-600');
-            tabs[key].classList.remove('border-transparent', 'text-gray-400');
-        } else {
-            tabs[key].classList.remove('border-sky-500', 'text-sky-600');
-            tabs[key].classList.add('border-transparent', 'text-gray-400');
-        }
-    });
-
-        // 2. 카테고리 필터 기준 정의 (이 부분만 교체하세요)
-    let filtered = [];
-    if (category === 'all') {
-        filtered = currentMemberLogs;
-    } else if (category === 'hiking') {
-        // 순수산행 (런닝, 트레킹, 산책, 번외산행 모두 제외)
-        filtered = currentMemberLogs.filter(log => 
-            (!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike
-        );
-    } else if (category === 'running') {
-        // 번외산행 및 런닝/트레킹/산책 포함
-        filtered = currentMemberLogs.filter(log => 
-            log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
-        );
-    }
-
-
-            // 🎨 [수정] 범례 가이드 영역 조율 (도트 크기 8px, 텍스트 10px로 축소)
-    const legendArea = document.getElementById('timelineLegend');
-    if (legendArea) {
-        // 범례 조각 정의 (w-2 h-2로 도트 크기 축소, text-[10px]로 폰트 축소, 간격 정밀 조정)
-        const legends = {
-
-            hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
-                <span>일정산행</span>
-            </div>`,
-            extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
-                <span>개인산행</span>
-            </div>`,
-            trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
-                <span>트레킹</span>
-            </div>`,
-            run: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFD1DC]"></span>
-                <span>런닝</span>
-            </div>`,
-            walk: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFCC80]"></span>
-                <span>산책</span>
-            </div>`
-        };
-
-        // 탭 종류에 따라 알맞은 범례 아이템 배치
-        if (category === 'hiking') {
-            legendArea.innerHTML = [legends.regular, legends.hike, legends.extraHike].join('');
-            legendArea.style.display = 'flex';
-        } else if (category === 'running') {
-            legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
-            legendArea.style.display = 'flex';
-        } else {
-            legendArea.innerHTML = Object.values(legends).join('');
-            legendArea.style.display = 'flex';
-        }
-    }
-
-
-    // 3. 필터링된 영역만 리렌더링
-    const listArea = document.getElementById('filteredTimelineList');
-    if (!listArea) return;
-
-    if (filtered.length === 0) {
-        listArea.innerHTML = "<p class='text-center text-[10px] py-10 text-gray-400'>기록 없음</p>";
-        return;
-    }
-
-    listArea.innerHTML = filtered.map(log => {
-        const dayName = ['일','월','화','수','목','금','토'][log.date.getDay()];
-        const top100Class = log.isTop100 ? 'text-blue-600 font-black' : '';
-        const bacTag = log.isBAC ? '<span class="bac-txt">BAC</span>' : '';
-        
-        const heightVal = log.height || 0;
-        const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
-        const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
-        const displayMountain = log.mountain || (log.isExtraHike ? "번외 산행" : "기록");
-
-        // 🎨 운동 종류별 잔디 색상 도트 생성 로직
-        let dotStyle = "";
-        
-        if (log.isRegular) {
-            // 정기산행: 프리미엄 그라데이션
-            dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
-        } else {
-            // 일반 활동별 정의된 잔디 색상
-            const colors = {
-                hike: "#2ecc71",      // 등산 기본 (초록)
-                extraHike: "#5CE1D6", // 번외산행 (민트)
-                walk: "#FFCC80",      // 산책 (주황)
-                trek: "#E0B0FF",      // 트레킹 (보라)
-                run: "#FFD1DC"        // 런닝 (분홍)
-            };
-
-            let activeColors = [];
-            if (log.isExtraHike) activeColors.push(colors.extraHike);
-            else if (log.isRunning) activeColors.push(colors.run);
-            else if (log.isTracking) activeColors.push(colors.trek);
-            else if (log.isWalking) activeColors.push(colors.walk);
-            else activeColors.push(colors.hike);
-
-            if (activeColors.length >= 2) {
-                if (activeColors.length === 2) {
-                    dotStyle = `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`;
-                } else {
-                    dotStyle = `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
-                }
-            } else {
-                dotStyle = `background: ${activeColors[0]};`;
-            }
-        }
-
-        // 🎯 텍스트(산 이름) 바로 앞에 오도록 여백 수정 (mr-1.5)
-        const colorDotTag = `<span class="inline-block w-2.5 h-2.5 rounded-full mr-1.5 align-middle shadow-sm border border-black/5" style="${dotStyle}"></span>`;
-
-        return `
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-date">
-                    ${log.date.getFullYear()}.${log.date.getMonth()+1}.${log.date.getDate()} (${dayName})
-                </div>
-                <div class="timeline-desc ${top100Class}">
-                    ${colorDotTag}${bacTag}${displayMountain} (${heightVal}${unit}) ${log.isTop100 ? '⭐' : '✔️'}
-                </div>
-            </div>`;
-    }).join('');
-};
-      
-    
-
 
 
 // 1. 계절 색상 판별 함수 (파일 상단에 위치)
@@ -7581,17 +7409,176 @@ function createShootingStar(board, tx, ty) {
 }
 
              
-            
-                
+// ─── [공통 헬퍼] isQuarterCheck 상태 완벽 판별 ───
+const checkIsQuarter = (log) => {
+    if (!log) return false;
+    return log.isQuarterCheck === true || log.isQuarterCheck === "true" || log.isQuarterCheck === 1 ||
+           log.isQuarterOnlyOne === true || log.isQuarterOnlyOne === "true" || log.isQuarterOnlyOne === 1;
+};
 
-                    
+// 🌟 [추가 함수 1] 타임라인 상단 탭 배치 & 초기화
+function setupTimelineTabs() {
+    const container = document.getElementById('timelineContent');
+    if (!container) return;
     
+    // 타임라인 상단에 들어갈 탭 디자인 구성 (Tailwind class 적용)
+    const tabsHtml = `
+        <div class="flex border-b border-gray-100 mb-4 text-xs font-bold text-gray-400 sticky top-0 bg-white z-10 py-2">
+            <button onclick="window.filterMemberLogs('all')" id="mTab-all" class="flex-1 pb-2 border-b-2 border-sky-500 text-sky-600 transition-all text-center">전체</button>
+            <button onclick="window.filterMemberLogs('hiking')" id="mTab-hiking" class="flex-1 pb-2 border-b-2 border-transparent hover:text-gray-600 transition-all text-center">일정산행</button>
+            <button onclick="window.filterMemberLogs('running')" id="mTab-running" class="flex-1 pb-2 border-b-2 border-transparent hover:text-gray-600 transition-all text-center">개인/기타</button>
+        </div>
+        <div id="filteredTimelineList"></div>
+    `;
+    
+    container.innerHTML = tabsHtml;
+    
+    // 기본 'all' 상태로 리스트 출력
+    window.filterMemberLogs('all');
+}
 
+// ─── 1. 회원 카드 상세 타임라인 필터 ───
+window.filterMemberLogs = (category) => {
+    const tabs = {
+        all: document.getElementById('mTab-all'),
+        hiking: document.getElementById('mTab-hiking'),
+        running: document.getElementById('mTab-running')
+    };
+
+    Object.keys(tabs).forEach(key => {
+        if (!tabs[key]) return;
+        if (key === category) {
+            tabs[key].classList.add('border-sky-500', 'text-sky-600');
+            tabs[key].classList.remove('border-transparent', 'text-gray-400');
+        } else {
+            tabs[key].classList.remove('border-sky-500', 'text-sky-600');
+            tabs[key].classList.add('border-transparent', 'text-gray-400');
+        }
+    });
+
+    // currentMemberLogs가 없을 경우 window.currentScrollLogs로 안전하게 바인딩
+    const targetLogs = (typeof currentMemberLogs !== 'undefined' && currentMemberLogs.length > 0) 
+        ? currentMemberLogs 
+        : (window.currentScrollLogs || []);
+
+    let filtered = [];
+    if (category === 'all') {
+        filtered = targetLogs;
+    } else if (category === 'hiking') {
+        // 순수산행 + UP 옆 체크박스(isQuarterCheck) 체크된 러닝/트레킹/산책 포함
+        filtered = targetLogs.filter(log => {
+            const hasQuarter = checkIsQuarter(log);
+            const isPureHike = (!log.isRunning && !log.isTracking && !log.isWalking && !log.isExtraHike);
+            return log.isRegular || hasQuarter || isPureHike;
+        });
+    } else if (category === 'running') {
+        filtered = targetLogs.filter(log => 
+            log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
+        );
+    }
+
+    const legendArea = document.getElementById('timelineLegend');
+    if (legendArea) {
+        const legends = {
+            hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
+                <span>일정산행</span>
+            </div>`,
+            extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
+                <span>개인산행</span>
+            </div>`,
+            trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
+                <span>트레킹</span>
+            </div>`,
+            run: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFD1DC]"></span>
+                <span>런닝</span>
+            </div>`,
+            walk: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFCC80]"></span>
+                <span>산책</span>
+            </div>`
+        };
+
+        if (category === 'hiking') {
+            legendArea.innerHTML = [legends.hike, legends.extraHike].join('');
+            legendArea.style.display = 'flex';
+        } else if (category === 'running') {
+            legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
+            legendArea.style.display = 'flex';
+        } else {
+            legendArea.innerHTML = Object.values(legends).join('');
+            legendArea.style.display = 'flex';
+        }
+    }
+
+    const listArea = document.getElementById('filteredTimelineList');
+    if (!listArea) return;
+
+    if (filtered.length === 0) {
+        listArea.innerHTML = "<p class='text-center text-[10px] py-10 text-gray-400'>기록 없음</p>";
+        return;
+    }
+
+    listArea.innerHTML = filtered.map(log => {
+        const rawDate = log.date?.toDate ? log.date.toDate() : new Date(log.date);
+        const dayName = ['일','월','화','수','목','금','토'][rawDate.getDay()];
+        const top100Class = log.isTop100 ? 'text-blue-600 font-black' : '';
+        const bacTag = log.isBAC ? '<span class="bac-txt">BAC</span>' : '';
         
-            // 필터링 및 페이징 처리를 위해 모달 전용 로그 목록을 임시 저장할 전역 변수 (캐시)
+        const heightVal = log.height || 0;
+        const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
+        const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
+        const displayMountain = log.mountain || (log.isExtraHike ? "번외 산행" : "기록");
+
+        let dotStyle = "";
+        if (log.isRegular) {
+            dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
+        } else {
+            const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
+            let activeColors = [];
+            if (log.isExtraHike) activeColors.push(colors.extraHike);
+            else if (log.isRunning) activeColors.push(colors.run);
+            else if (log.isTracking) activeColors.push(colors.trek);
+            else if (log.isWalking) activeColors.push(colors.walk);
+            else activeColors.push(colors.hike);
+
+            if (activeColors.length >= 2) {
+                dotStyle = activeColors.length === 2 
+                    ? `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`
+                    : `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
+            } else {
+                dotStyle = `background: ${activeColors[0] || colors.hike};`;
+            }
+        }
+
+        const colorDotTag = `<span class="inline-block w-2.5 h-2.5 rounded-full mr-1.5 align-middle shadow-sm border border-black/5" style="${dotStyle}"></span>`;
+        
+        // [일정] 연두색 뱃지 생성
+        const hasQuarter = checkIsQuarter(log);
+        const scheduleBadge = (category === 'running' || category === 'all') && hasQuarter
+            ? `<span class="ml-auto bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold px-1.5 py-0.5 rounded">일정</span>`
+            : '';
+
+        return `
+            <div class="timeline-item flex items-center justify-between">
+                <div>
+                    <div class="timeline-date text-[10px] text-gray-400">
+                        ${rawDate.getFullYear()}.${rawDate.getMonth()+1}.${rawDate.getDate()} (${dayName})
+                    </div>
+                    <div class="timeline-desc ${top100Class}">
+                        ${colorDotTag}${bacTag}${displayMountain} (${heightVal}${unit}) ${log.isTop100 ? '⭐' : '✔️'}
+                    </div>
+                </div>
+                ${scheduleBadge}
+            </div>`;
+    }).join('');
+};
+
 window.currentScrollLogs = []; 
 
-// 페이징 처리를 위해 상태를 기억할 전역 객체
 window.scrollPagination = {
     currentCategory: 'all',
     mId: null,
@@ -7599,7 +7586,7 @@ window.scrollPagination = {
     currentPageSize: 6
 };
 
-// showFadingScroll 인자에 regDate를 전달받을 수 있도록 추가 (옵션)
+// ─── 2. 모달 열기 및 데이터 처리 ───
 window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
     const modal = document.getElementById('scrollModal');
     const content = document.getElementById('scrollContent');
@@ -7631,7 +7618,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     let formattedRegDateKo = "--년 --월 --일";
 
     try {
-        // [A] 가입일 정보: 외부에서 전달받은 값이 있으면 getDoc 생략! (서버 읽기 1회 절약)
         let rDate = passedRegDate;
         
         if (!rDate) {
@@ -7655,7 +7641,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             }
         }
 
-        // [B] 🔥 유저 전체 일지 데이터 1회 통합 조회 (메모리 캐스)
         const logsRef = collection(db, `sanwoori/${safeMemberId}/logs`);
         const q = query(logsRef, orderBy("date", "desc"));
         const snap = await getDocs(q);
@@ -7669,33 +7654,32 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // 이하 기존 통계 계산 및 UI 렌더링 로직 동일...
-
-
-                // [C] 📊 전체 로그 데이터 기반 항목별 카운팅 계산 (정기 vs 일정 구분)
+        // 통계 카운팅 시 isQuarterCheck 반영
         const counts = window.currentScrollLogs.reduce((acc, log) => {
+            const isQuarter = checkIsQuarter(log);
+            const isPureHike = (!log.isRunning && !log.isTracking && !log.isWalking && !log.isExtraHike);
+
             if (log.isRegular) {
-                acc.regular++;  // 무지개 (정기산행)
-                acc.schedule++; // 🔥 정기산행 횟수를 일정산행에도 포함
-            } else if ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike) {
-                acc.schedule++; // 연두색 (일정산행)
-            } else if (log.isExtraHike) {
-                acc.extra++;    // 개인산행
+                acc.regular++;  
+                acc.schedule++; 
+            } else if (isPureHike || isQuarter) {
+                acc.schedule++; 
+            }
+            
+            if (log.isExtraHike) {
+                acc.extra++;    
             } else if (log.isTracking) {
-                acc.trekking++; // 트래킹
+                acc.trekking++; 
             } else if (log.isRunning) {
-                acc.running++;  // 런닝
+                acc.running++;  
             } else if (log.isWalking) {
-                acc.walking++;  // 산책
+                acc.walking++;  
             }
             return acc;
         }, { regular: 0, schedule: 0, extra: 0, trekking: 0, running: 0, walking: 0 });
 
-        // 2. 🎯 [개선] D-Day와 운동 횟수가 하나의 상자(카드)로 통합 렌더링
         content.innerHTML = `
             <div class="user-report-summary-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 14px; margin: 6px 0 12px 0;">
-                
-                <!-- [1구역] D-Day & 가입일 영역 -->
                 <div class="user-status-row-bar" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;">
                     <div class="dday-count-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px;">
                         D-Day ${dday !== undefined ? dday : 0}
@@ -7706,9 +7690,7 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                     </div>
                 </div>
 
-                <!-- [2구역] 운동 횟수 요약 영역 (3열 정렬 및 도트 라인 수직 맞춤) -->
                 <div class="activity-summary-grid" style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px; font-size: 11px; color: #475569; font-weight: 500;">
-                    <!-- 1줄: 산행 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0); display: inline-block; flex-shrink: 0;"></i>
@@ -7727,7 +7709,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                         </span>
                     </div>
 
-                    <!-- 2줄: 기타 운동 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: #FFD1DC; display: inline-block; flex-shrink: 0;"></i>
@@ -7746,10 +7727,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                         </span>
                     </div>
                 </div>
-
-            </div>
-
-
             </div>
 
             <div class="tab-scroll-container">
@@ -7758,15 +7735,11 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                     <button type="button" onclick="window.switchScrollTab('hiking')" id="sTab-hiking" class="tab-btn">일정산행</button>
                     <button type="button" onclick="window.switchScrollTab('running')" id="sTab-running" class="tab-btn">개인/기타</button>
                 </div>
-                
-                <!-- 로그가 쌓일 박스 -->
                 <div id="scrollFilteredList" class="scroll-filtered-list-box"></div>
-                <!-- 더보기 버튼 영역 -->
                 <div id="scrollMoreBtnArea" style="text-align:center; margin-top:15px;"></div>
             </div>
         `;
 
-        // 첫 페이지 로드
         window.loadScrollLogsPage(true);
 
     } catch (e) {
@@ -7787,8 +7760,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     }
 };
 
-
-// [탭 전환 함수]
 window.switchScrollTab = (category) => {
     if (window.scrollPagination.currentCategory === category) return;
     
@@ -7814,7 +7785,7 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
-// [클라이언트 페이징 처리]
+// ─── 3. 페이징 및 타임라인 렌더링 ───
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7831,26 +7802,16 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
     try {
         let filtered = [];
-        
-        // Helper: DB에서 값이 boolean, string("true"), number(1) 어떤 형태로 넘어와도 true 판별
-        const checkIsQuarter = (log) => {
-            return log.isQuarterCheck === true || log.isQuarterCheck === "true" || log.isQuarterCheck === 1 ||
-                   log.isQuarterOnlyOne === true || log.isQuarterOnlyOne === "true" || log.isQuarterOnlyOne === 1;
-        };
 
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 🎯 [일정산행 탭 필터링 FIX]
-            // UP 옆 체크박스가 체크된 모든 활동(러닝/트레킹/산책 포함)은 무조건 일정산행 탭에 등장!
             filtered = window.currentScrollLogs.filter(log => {
                 const hasQuarterCheck = checkIsQuarter(log);
                 const isPureHike = (!log.isRunning && !log.isTracking && !log.isWalking && !log.isExtraHike);
-                
                 return log.isRegular || hasQuarterCheck || isPureHike;
             });
         } else if (currentCategory === 'running') {
-            // 🎯 [개인/기타 탭 필터링]
             filtered = window.currentScrollLogs.filter(log => 
                 log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
             );
@@ -7869,7 +7830,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             let dateStr = "----.--.--";
             let dayName = "";
             if (log.date) {
-                // Timestamp 개체거나 일반 문자열/Date 개체일 때 모두 대응
                 const rawDate = log.date.toDate ? log.date.toDate() : new Date(log.date);
                 if (!isNaN(rawDate)) {
                     dateStr = `${rawDate.getFullYear()}.${String(rawDate.getMonth() + 1).padStart(2, '0')}.${String(rawDate.getDate()).padStart(2, '0')}`;
@@ -7909,7 +7869,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 : '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-            // 🎯 [핵심 FIX 2] 일정 뱃지 노출 판단
             const isQuarterChecked = checkIsQuarter(log);
             const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all') && isQuarterChecked;
             
@@ -7956,6 +7915,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 };
 
             
+            
+
 
                              </script>
 
