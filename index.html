@@ -7906,36 +7906,28 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 : '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
             const blueClass = log.isTop100 ? "top100-blue" : "";
 
-                                   // 🏷️ 3. [일정] 배지 (정기산행 무지개 그라데이션 + 나머지는 도트 색상)
-            let badgeBg = "#2ecc71";    // 연두 도트
-            let badgeColor = "#14532d"; // 진한 초록 글자
+                        // 🏷️ 3. [일정] 배지 색상 및 노출 로직
+            let badgeBg = "#ecfdf5", badgeColor = "#059669", badgeBorder = "#a7f3d0"; // 기본: 순수 일정산행(연두)
 
             if (log.isRegular && !isKmActivity) {
-                // 🌈 정기산행: 무지개 도트와 동일한 그라데이션 적용
+                // 🌈 정기산행 (도트와 동일한 무지개 그라데이션)
                 badgeBg = "linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0)";
-                badgeColor = "#ffffff";
+                badgeColor = "#ffffff";    // 무지개 배경 위에서 잘 보이도록 하얀색 글자 적용
+                badgeBorder = "transparent"; // 그라데이션이 자연스럽도록 테두리 투명 처리
             } else if (log.isRunning) {
-                // 런닝: 핑크 도트 (#FFD1DC)
-                badgeBg = "#FFD1DC"; 
-                badgeColor = "#881337"; // 진한 핑크 글자
+                badgeBg = "#fff1f2"; badgeColor = "#e11d48"; badgeBorder = "#fecdd3"; // 런닝 (핑크)
             } else if (log.isTracking) {
-                // 트레킹: 보라 도트 (#E0B0FF)
-                badgeBg = "#E0B0FF"; 
-                badgeColor = "#4c1d95"; // 진한 보라 글자
+                badgeBg = "#faf5ff"; badgeColor = "#7c3aed"; badgeBorder = "#e9d5ff"; // 트래킹 (보라)
             } else if (log.isWalking) {
-                // 산책: 주황 도트 (#FFCC80)
-                badgeBg = "#FFCC80"; 
-                badgeColor = "#7c2d12"; // 진한 주황 글자
+                badgeBg = "#fff7ed"; badgeColor = "#ea580c"; badgeBorder = "#ffedd5"; // 산책 (주황)
             }
 
             const isScheduledActivity = log.isRegular || isPureHike;
-
+            
+            // 배지 HTML 생성 시 text-shadow를 더해 무지개 위에서도 글자가 또렷하게 보이게 처리
             const scheduleBadge = isScheduledActivity 
-                ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: none; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
+                ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; ${log.isRegular && !isKmActivity ? 'text-shadow: 0px 1px 2px rgba(0,0,0,0.4);' : ''}">일정</span>` 
                 : '';
-
-
-
 
             return `
                 <div class="scroll-timeline-item">
