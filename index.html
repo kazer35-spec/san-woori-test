@@ -2684,37 +2684,37 @@ overflow: hidden;
     </select>
   </div>
 
-  <!-- 분기 탭 (하단 여백 최소화) -->
-  <div id="quarterTabs" class="mb-0.5">
+  <!-- 분기 탭 (마진 제거하여 테이블과 밀착) -->
+  <div id="quarterTabs" class="mb-0">
     <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
     <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
     <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
     <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
   </div>
 
-  <!-- 스크롤 컨테이너 (회원명 위 상단 선 제거) -->
+  <!-- 스크롤 컨테이너 -->
   <div class="max-h-[calc(100vh-215px)] overflow-y-auto relative">
     <table class="w-full table-fixed border-collapse">
-      <!-- 헤더 상단 고정 -->
+      <!-- 헤더 상단 고정 (패딩 최소화) -->
       <thead class="sticky top-0 z-20 bg-white">
         <tr>
-          <th class="w-[18%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[18%] py-0.5 text-center bg-white">
             회원명
             <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
           </th>
-          <th class="w-[22%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[22%] py-0.5 text-center bg-white">
             레벨(Lv)
             <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
           </th>
-          <th class="w-[18%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[18%] py-0.5 text-center bg-white">
             활동점수
             <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
           </th>
-          <th class="w-[22%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[22%] py-0.5 text-center bg-white">
             누적고도
             <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
           </th>
-          <th class="w-[16%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[16%] py-0.5 text-center bg-white">
             개인기록
             <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
           </th>
@@ -2724,6 +2724,7 @@ overflow: hidden;
     </table>
   </div>
 </div>
+
 
 
 
@@ -3599,11 +3600,13 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-         list.innerHTML += `<tr class="border-b border-gray-100/60 ${m.isHidden ? 'opacity-40' : ''}">
+         
+
+    list.innerHTML += `<tr class="border-b border-gray-100/60 ${m.isHidden ? 'opacity-40' : ''}">
     <!-- 회원명 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-0.5 mb-1 select-none">${clickTag}</div>
+            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-2.5 mb-1 select-none">${clickTag}</div>
             <div class="flex flex-col items-center justify-center">
                 ${rankT ? `<span class="rank-badge ${rankC} mb-0.5">${rankT}</span>` : ''}
                 <span class="font-bold ${nameColor} cursor-pointer hover:underline text-xs"
@@ -3617,7 +3620,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     <!-- 레벨(Lv) -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-0.5 mb-1 select-none">${clickTag}</div>
+            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-2.5 mb-1 select-none">${clickTag}</div>
             <div class="badge-level flex flex-col items-center">
                 <div class="badge-icon-box ${style.blink} cursor-pointer"
                      onclick="showMilkyWay('${m.name}', '${m.name}')"
@@ -3632,7 +3635,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     <!-- 활동점수 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-0.5 mb-1 select-none">${clickTag}</div>
+            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-2.5 mb-1 select-none">${clickTag}</div>
             <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
         </div>
     </td>
@@ -3640,7 +3643,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     <!-- 누적고도 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-0.5 mb-1 select-none">${clickTag}</div>
+            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-2.5 mb-1 select-none">${clickTag}</div>
             <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
         </div>
     </td>
@@ -3648,7 +3651,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     <!-- 개인기록 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-0.5 mb-1 select-none">${clickTag}</div>
+            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none mt-2.5 mb-1 select-none">${clickTag}</div>
             <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
                     data-dplus="D+${m.dPlusVal}"
                     class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
@@ -3657,6 +3660,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         </div>
     </td>
 </tr>`;
+
 
 
 
