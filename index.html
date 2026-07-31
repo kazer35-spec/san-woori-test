@@ -1510,7 +1510,27 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     white-space: nowrap;
 }
 
+/* [핵심] click 텍스트 미세 조정 클래스 */
+.click-neon-adjust {
+    position: absolute;
+    
+    /* 👇 이 값을 수정하여 click 위치를 위아래로 움직이세요 */
+    top: -18px; 
+    
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 7px;
+    font-weight: 900;
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc;
+    animation: neon-blink 1.5s infinite;
+    z-index: 10;
+}
 
+@keyframes neon-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
 
 /* 테이블 셀 높이 및 정렬 규격화 */
 table tbody tr td {
@@ -2282,6 +2302,75 @@ td { padding: 12px 0; text-align: center; vertical-align: middle; position: rela
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
 .rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
 
+/* CLICK 네온 텍스트: 은은한 회색 숨쉬기 효과 */
+.click-neon {
+font-size: 6px; /* 가독성을 위해 살짝 키움 */
+font-weight: 900;
+color: #cbd5e1; /* 기본 회색 */
+text-transform: uppercase;
+position: absolute;
+top: -4px;
+left: 50%;
+transform: translateX(-50%);
+animation: neon-soft-glow 2s infinite ease-in-out; /* 부드러운 애니메이션 */
+letter-spacing: 1px;
+pointer-events: none;
+white-space: nowrap;
+z-index: 5;
+}
+
+@keyframes neon-soft-glow {
+0%, 100% {
+opacity: 1;
+/* 은색과 밝은 회색의 조화 */
+text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
+color: #f8fafc;
+}
+50% {
+opacity: 0.4;
+text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
+color: #64748b; /* 완전히 꺼지지 않고 은은하게 남음 */
+}
+}
+
+/* 2. 배지 스타일 수정 (은은한 글로우 추가) */
+.badge-level {
+display: inline-flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+}
+
+.badge-icon-box {
+padding: 2px 10px;
+border-radius: 14px;
+line-height: 1.2;
+display: flex;
+align-items: center;
+justify-content: center;
+border: 1px solid #94a3b8;
+min-width: 52px;
+background: rgba(148, 163, 184, 0.1); /* 배경에 회색기운 추가 */
+/* 박스 외곽에 은은한 회색 광택 */
+box-shadow: 0 0 8px rgba(148, 163, 184, 0.2), inset 0 0 4px rgba(255, 255, 255, 0.1);
+transition: all 0.3s ease;
+}
+
+.badge-icon-txt {
+font-size: 0.75rem;
+font-weight: 800;
+color: #f1f5f9;
+text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.badge-lv-txt {
+font-size: 0.6rem;
+font-weight: 800;
+letter-spacing: 0.5px;
+color: #94a3b8;
+opacity: 0.8;
+}
+
 /* 박스 크기 규격화: 분기 횟수 & D-Day */
 .dday-box, .qcount-box {
 padding: 4px 8px;
@@ -2558,79 +2647,99 @@ overflow: hidden;
 <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
 </div>
 
-<div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
-<div class="year-selector flex justify-between items-center mb-3">
-<h1 class="main-title">
-<img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-<span>산:우리</span>
-<span class="slogan-txt">같이 걷는 즐거움</span>
-</h1>
-<div class="flex items-center gap-2">
-<button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
 
-<button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-<svg viewBox="0 0 36 36">
-<circle class="bg" cx="18" cy="18" r="16"></circle>
-<circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-</svg>
-<span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-</button>
-<select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-<option value="2026">2026년</option>
-<option value="2027">2027년</option>
-</select>
-</div>
+        
+
+            <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+  <div class="year-selector flex justify-between items-center mb-3">
+    <h1 class="main-title">
+      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+      <span>산:우리</span>
+      <span class="slogan-txt">같이 걷는 즐거움</span>
+    </h1>
+    <div class="flex items-center gap-2">
+      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
+      <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+        <svg viewBox="0 0 36 36">
+          <circle class="bg" cx="18" cy="18" r="16"></circle>
+          <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+        </svg>
+        <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+      </button>
+      <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+        <option value="2026">2026년</option>
+        <option value="2027">2027년</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mb-2 h-10 items-center">
+    <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+    <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+    <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
+      <option value="qCount">점수순 ▼</option>
+      <option value="level">레벨순 ▼</option>
+      <option value="name">이름순 ▼</option>
+      <option value="totalHeight">높이순 ▼</option>
+      <option value="dday">날짜순 ▼</option>
+    </select>
+  </div>
+
+  <div id="quarterTabs" class="mb-1">
+    <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+    <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+    <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+    <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+  </div>
+
+  <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
+  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
+    <table class="w-full table-fixed border-collapse">
+      <thead class="sticky top-0 z-20 bg-white shadow-xs">
+        <tr class="border-b border-gray-200">
+          <!-- py-2 및 flex 정렬로 글자를 셀 정중앙으로 유착 -->
+          <th class="w-[18%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>회원명</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            </div>
+          </th>
+          <th class="w-[22%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>레벨(Lv)</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            </div>
+          </th>
+          <th class="w-[18%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>활동점수</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            </div>
+          </th>
+          <th class="w-[22%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>누적고도</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            </div>
+          </th>
+          <th class="w-[16%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>개인기록</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="statusList"></tbody>
+    </table>
+  </div>
 </div>
 
-<div class="flex gap-2 mb-3 h-10 items-center">
-<input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-<button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-<select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-<option value="qCount">점수순 ▼</option>
-<option value="level">레벨순 ▼</option>
-<option value="name">이름순 ▼</option>
-<option value="totalHeight">높이순 ▼</option>
-<option value="dday">날짜순 ▼</option>
-</select>
-</div>
 
-<div id="quarterTabs">
-<button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-<button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-<button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-<button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-</div>
 
-<div class="min-h-[300px]">
-  <table>
-    <thead>
-      <tr>
-        <th class="w-[18%]">
-          회원명
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-        </th>
-        <th class="w-[22%]">
-          레벨(Lv)
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-        </th>
-        <th class="w-[18%]">
-          활동점수
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-        </th>
-        <th class="w-[22%]">
-          누적고도
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-        </th>
-        <th class="w-[16%]">
-        개인기록
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody id="statusList"></tbody>
-  </table>
-</div>
-</div> <!-- 기존 코드의 닫는 div 태그 유지 -->
+
+
+
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
@@ -3501,7 +3610,60 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-    
+         
+list.innerHTML += `<tr class="border-b border-gray-100/80 ${m.isHidden ? 'opacity-40' : ''}">
+    <!-- 회원명 -->
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex flex-col items-center justify-center">
+            ${rankT ? `<span class="rank-badge ${rankC} mb-0.5">${rankT}</span>` : ''}
+            <span class="font-bold ${nameColor} cursor-pointer hover:underline text-xs"
+                  onclick="showMemberMountain('${m.name}', '${m.name}')">
+                ${m.name}
+            </span>
+        </div>
+    </td>
+
+    <!-- 레벨(Lv) -->
+    <td class="py-2.5 text-center align-middle">
+        <div class="badge-level flex flex-col items-center justify-center">
+            <div class="badge-icon-box ${style.blink} cursor-pointer"
+                 onclick="showMilkyWay('${m.name}', '${m.name}')"
+                 style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
+            </div>
+            <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold; margin-top: 2px;">Lv ${m.level}</span>
+        </div>
+    </td>
+
+    <!-- 활동점수 -->
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex items-center justify-center">
+            <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+        </div>
+    </td>
+
+    <!-- 누적고도 -->
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex items-center justify-center">
+            <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+        </div>
+    </td>
+
+    <!-- 개인기록 -->
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex items-center justify-center">
+            <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                    data-dplus="D+${m.dPlusVal}"
+                    class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
+                <span class="record-btn-txt">기록보기</span>
+            </button>
+        </div>
+    </td>
+</tr>`;
+
+
+
+
 
         if (isFirstVisible && !m.isHidden) {
             isFirstVisible = false;
