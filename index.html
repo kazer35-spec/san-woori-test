@@ -3508,11 +3508,14 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
      
-      window.renderStatusTable = () => {
+                  
+            
+        window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
-    const search = document.getElementById('searchInput').value.trim();
-    const sort = document.getElementById('statusSortOrder').value;
-    if(!list) return;
+    const search = document.getElementById('searchInput')?.value.trim() || '';
+    const sort = document.getElementById('statusSortOrder')?.value || 'qCount';
+    if (!list) return;
+    
     list.innerHTML = "";
 
     // 💡 기존 타이머 정리
@@ -3524,6 +3527,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     const today = new Date();
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
+    // 1. 데이터 가공
     let processedData = currentData.map(m => {
         const last = m.lastDate ? m.lastDate.toDate() : new Date();
         const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
@@ -3545,134 +3549,102 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         };
     });
 
+    // 2. 정렬 로직
     processedData.sort((a, b) => {
-        if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
-        if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
-        if (sort === 'level') return b.level - a.level || b.qCount - a.qCount;
+        if (sort === 'qCount') return (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0);
+        if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
+        if (sort === 'level') return (b.level || 0) - (a.level || 0) || (b.qCount || 0) - (a.qCount || 0);
         if (sort === 'name') return a.name.localeCompare(b.name, 'ko');
         if (sort === 'dday') return a.ddayVal - b.ddayVal;
         return 0;
     });
 
-    const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
+    const topNames = [...processedData]
+        .filter(m => !m.isHidden && m.name !== "오즈")
+        .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
+        .slice(0, 3)
+        .map(m => m.name);
 
-    let isFirstVisible = true;
+    let htmlContent = "";
+    let visibleIndex = 0;
 
+    // 3. 렌더링 HTML 생성
     processedData.forEach((m) => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
-        let clickTag = "";
-        if (isFirstVisible && !m.isHidden) {
-            clickTag = `<span class="click-neon">CLICK</span>`;
-        }
+        // 첫번째 노출되는 유저에 네온 효과 지정
+        const clickTag = (visibleIndex === 0 && !m.isHidden) ? `<span class="click-neon">CLICK</span>` : '';
 
         let rankT = ""; 
         let rankC = "";
-        if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
+        if (m.name !== "오즈" && (m.qCount || 0) > 0 && !m.isHidden) {
             const idx = topNames.indexOf(m.name);
-            
-            let activeQuarter = 1; 
-            const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
-            if (activeBtn) {
-                const btnId = activeBtn.id; 
-                activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
-            } else {
-                activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
-                                ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
-            }
-            
-            const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+            const activeQuarter = (typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1;
+            const activeYear = (typeof selectedYear !== 'undefined') ? selectedYear : 2026;
             const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
-            if (idx === 0) { 
-                rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
-                rankC = "rank-1"; 
-            }
-            else if (idx === 1) { 
-                rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
-                rankC = "rank-2"; 
-            }
-            else if (idx === 2) { 
-                rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
-                rankC = "rank-3"; 
-            }
+            if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
+            else if (idx === 1) { rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
+            else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
         }
 
-        const style = getLevelStyle(m.level);
-        const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
-
+        const style = getLevelStyle(m.level || 0);
         const rawHeight = m.totalHeight || 0;
         const displayHeight = rawHeight >= 10000 
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-         
- // 렌더링 함수 내
-displayMembers.forEach((m, index) => {
-  // 첫 번째 행(오즈 님 위치)일 때만 click-neon 출력
-  const clickTag = (index === 0) ? '<span class="click-neon">CLICK</span>' : '';
+        htmlContent += `
+        <tr class="border-b border-slate-100 text-center text-xs">
+          <!-- 1. 회원명 -->
+          <td class="py-2.5 relative">
+            ${clickTag}
+            <div class="flex flex-col items-center justify-center">
+              ${rankT ? `<span class="rank-badge ${rankC} text-[9px] px-1 rounded mb-0.5">${rankT}</span>` : ''}
+              <span class="font-bold text-slate-800 text-xs cursor-pointer" onclick="showMemberMountain('${m.name}')">${m.name}</span>
+            </div>
+          </td>
 
-  htmlContent += `
-    <tr>
-      <!-- 1. 회원명 -->
-      <td>
-        ${clickTag}
-        <div class="flex flex-col items-center justify-center">
-          ${m.rankTitle ? `<span class="rank-badge ${m.rankColor}">${m.rankTitle}</span>` : ''}
-          <span class="font-bold text-slate-800 text-xs" onclick="showMemberMountain('${m.name}')">${m.name}</span>
-        </div>
-      </td>
+          <!-- 2. 레벨(Lv) -->
+          <td class="py-2.5">
+            <div class="flex items-center justify-center gap-1">
+              <div class="px-1.5 py-0.5 rounded-full border text-[10px] font-extrabold cursor-pointer" onclick="showMilkyWay('${m.name}')" style="background-color: ${style.bg}; border-color: ${style.border}; color: ${style.text}">
+                <span>${getLevelBadge(m.level || 0)}</span>
+              </div>
+              <span class="text-[10px] font-bold" style="color:${style.text}">Lv ${m.level || 0}</span>
+            </div>
+          </td>
 
-      <!-- 2. 레벨(Lv) -->
-      <td>
-        ${clickTag}
-        <div class="badge-level">
-          <div class="badge-icon-box" onclick="showMilkyWay('${m.name}')" style="background-color: ${m.style.bg}; border-color: ${m.style.border} !important;">
-            <span class="badge-icon-txt" style="color:${m.style.text}">${getLevelBadge(m.level)}</span>
-          </div>
-          <span class="badge-lv-txt" style="color:${m.style.text}">Lv ${m.level}</span>
-        </div>
-      </td>
+          <!-- 3. 활동점수 -->
+          <td class="py-2.5">
+            <button onclick="showMemberTimeline('${m.name}')" class="bg-slate-100 active:bg-slate-200 text-slate-600 px-2 py-1 rounded-lg text-[10px] font-black transition-colors">
+              ${m.qCount || 0}점 📈
+            </button>
+          </td>
 
-      <!-- 3. 활동점수 -->
-      <td>
-        ${clickTag}
-        <button onclick="showMemberTimeline('${m.name}')" class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">
-          ${m.qCount}점 📈
-        </button>
-      </td>
+          <!-- 4. 누적고도 -->
+          <td class="py-2.5">
+            <button onclick="showMemberMap('${m.name}')" class="bg-emerald-50 active:bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-[10px] font-black transition-colors">
+              🚩 ${displayHeight}
+            </button>
+          </td>
 
-      <!-- 4. 누적고도 -->
-      <td>
-        ${clickTag}
-        <button onclick="showMemberMap('${m.name}')" class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">
-          🚩${formatHeight(m.totalHeight)}
-        </button>
-      </td>
+          <!-- 5. 개인기록 -->
+          <td class="py-2.5">
+            <button onclick="showFadingScroll('${m.name}')" class="record-auto-toggle-btn border border-slate-200 text-slate-700 px-2 py-1 rounded-full text-[9px] font-bold active:scale-95 transition-all" data-dplus="D+${m.dPlusVal}">
+              <span class="record-btn-txt">D+${m.dPlusVal}</span>
+            </button>
+          </td>
+        </tr>
+        `;
 
-      <!-- 5. 개인기록 -->
-      <td>
-        ${clickTag}
-        <button onclick="showFadingScroll('${m.name}')" class="bg-slate-100 border border-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-[9px] font-bold">
-          D+${m.dPlusVal}
-        </button>
-      </td>
-    </tr>
-  `;
-});
-
-
-
-
-
-
-        if (isFirstVisible && !m.isHidden) {
-            isFirstVisible = false;
-        }
+        visibleIndex++;
     });
 
-    // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
+    list.innerHTML = htmlContent;
+
+    // 4. 3초 간격 전환 애니메이션 타이머
     let showDPlus = false;
     window.recordBtnToggleInterval = setInterval(() => {
         showDPlus = !showDPlus;
@@ -3684,12 +3656,10 @@ displayMembers.forEach((m, index) => {
             if (!txtSpan) return;
 
             if (showDPlus) {
-                // D+254 일 때: 반짝임 해제 및 차분한 스카이블루 톤
                 txtSpan.innerText = dplusTxt;
                 btn.classList.remove('record-glow-active');
                 btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
             } else {
-                // 기록보기 일 때: 기존 반짝임(Glow) 적용
                 txtSpan.innerText = "기록보기";
                 btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
                 btn.classList.add('record-glow-active');
@@ -3698,7 +3668,6 @@ displayMembers.forEach((m, index) => {
     }, 3000);
 };
 
-        
             
             
             
