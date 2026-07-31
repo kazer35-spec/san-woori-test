@@ -2684,8 +2684,8 @@ overflow: hidden;
     </select>
   </div>
 
-  <!-- 분기 탭 (마이너스 마진으로 헤더와 완전히 딱 붙임) -->
-  <div id="quarterTabs" class="-mb-1.5">
+  <!-- 분기 탭 (마이너스 마진 강제 적용으로 테이블 상단과 밀착) -->
+  <div id="quarterTabs" style="margin-bottom: -10px !important; padding-bottom: 0px !important; position: relative !important; z-index: 30 !important;">
     <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
     <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
     <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
@@ -2693,30 +2693,29 @@ overflow: hidden;
   </div>
 
   <!-- 스크롤 영역 -->
-  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
-    <table class="w-full table-fixed border-collapse">
-      <!-- 헤더 상단 고정 (여백 및 패딩 0) -->
-      <thead class="sticky top-0 z-20 bg-white">
+  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative" style="margin-top: 0px !important; padding-top: 0px !important;">
+    <table class="w-full table-fixed border-collapse" style="margin-top: 0px !important;">
+      <thead class="sticky top-0 z-20 bg-white" style="border: none !important;">
         <tr>
-          <th class="w-[18%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[18%] bg-white" style="padding: 2px 0 0 0 !important; border: none !important;">
             회원명
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            <span class="block text-[8px] font-normal text-gray-400" style="margin-top: 1px !important;">(나이테)</span>
           </th>
-          <th class="w-[22%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[22%] bg-white" style="padding: 2px 0 0 0 !important; border: none !important;">
             레벨(Lv)
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            <span class="block text-[8px] font-normal text-gray-400" style="margin-top: 1px !important;">(은하수)</span>
           </th>
-          <th class="w-[18%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[18%] bg-white" style="padding: 2px 0 0 0 !important; border: none !important;">
             활동점수
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            <span class="block text-[8px] font-normal text-gray-400" style="margin-top: 1px !important;">(분기운동)</span>
           </th>
-          <th class="w-[22%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[22%] bg-white" style="padding: 2px 0 0 0 !important; border: none !important;">
             누적고도
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            <span class="block text-[8px] font-normal text-gray-400" style="margin-top: 1px !important;">(정복지도)</span>
           </th>
-          <th class="w-[16%] pt-1 pb-0 text-center bg-white">
+          <th class="w-[16%] bg-white" style="padding: 2px 0 0 0 !important; border: none !important;">
             개인기록
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            <span class="block text-[8px] font-normal text-gray-400" style="margin-top: 1px !important;">(D+Day)</span>
           </th>
         </tr>
       </thead>
@@ -2724,6 +2723,7 @@ overflow: hidden;
     </table>
   </div>
 </div>
+
 
 
 
@@ -3601,13 +3601,14 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
          
-
 list.innerHTML += `<tr class="border-b border-gray-100/60 ${m.isHidden ? 'opacity-40' : ''}">
     <!-- 회원명 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="pt-3 pb-0.5 text-[8px] font-bold text-gray-300 tracking-wider leading-none select-none">${clickTag}</div>
-            <div class="flex flex-col items-center justify-center">
+            <div style="transform: translateY(12px) !important; position: relative !important; top: 0 !important; margin: 0 !important; padding: 0 !important; height: auto !important; z-index: 10 !important;">
+                ${clickTag}
+            </div>
+            <div class="flex flex-col items-center justify-center" style="margin-top: 10px !important;">
                 ${rankT ? `<span class="rank-badge ${rankC} mb-0.5">${rankT}</span>` : ''}
                 <span class="font-bold ${nameColor} cursor-pointer hover:underline text-xs"
                       onclick="showMemberMountain('${m.name}', '${m.name}')">
@@ -3620,8 +3621,10 @@ list.innerHTML += `<tr class="border-b border-gray-100/60 ${m.isHidden ? 'opacit
     <!-- 레벨(Lv) -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="pt-3 pb-0.5 text-[8px] font-bold text-gray-300 tracking-wider leading-none select-none">${clickTag}</div>
-            <div class="badge-level flex flex-col items-center">
+            <div style="transform: translateY(12px) !important; position: relative !important; top: 0 !important; margin: 0 !important; padding: 0 !important; height: auto !important; z-index: 10 !important;">
+                ${clickTag}
+            </div>
+            <div class="badge-level flex flex-col items-center" style="margin-top: 10px !important;">
                 <div class="badge-icon-box ${style.blink} cursor-pointer"
                      onclick="showMilkyWay('${m.name}', '${m.name}')"
                      style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
@@ -3635,31 +3638,44 @@ list.innerHTML += `<tr class="border-b border-gray-100/60 ${m.isHidden ? 'opacit
     <!-- 활동점수 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="pt-3 pb-0.5 text-[8px] font-bold text-gray-300 tracking-wider leading-none select-none">${clickTag}</div>
-            <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+            <div style="transform: translateY(12px) !important; position: relative !important; top: 0 !important; margin: 0 !important; padding: 0 !important; height: auto !important; z-index: 10 !important;">
+                ${clickTag}
+            </div>
+            <div style="margin-top: 10px !important;">
+                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+            </div>
         </div>
     </td>
 
     <!-- 누적고도 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="pt-3 pb-0.5 text-[8px] font-bold text-gray-300 tracking-wider leading-none select-none">${clickTag}</div>
-            <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+            <div style="transform: translateY(12px) !important; position: relative !important; top: 0 !important; margin: 0 !important; padding: 0 !important; height: auto !important; z-index: 10 !important;">
+                ${clickTag}
+            </div>
+            <div style="margin-top: 10px !important;">
+                <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+            </div>
         </div>
     </td>
 
     <!-- 개인기록 -->
     <td class="py-1 text-center align-middle">
         <div class="flex flex-col items-center justify-start">
-            <div class="pt-3 pb-0.5 text-[8px] font-bold text-gray-300 tracking-wider leading-none select-none">${clickTag}</div>
-            <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-                    data-dplus="D+${m.dPlusVal}"
-                    class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
-                <span class="record-btn-txt">기록보기</span>
-            </button>
+            <div style="transform: translateY(12px) !important; position: relative !important; top: 0 !important; margin: 0 !important; padding: 0 !important; height: auto !important; z-index: 10 !important;">
+                ${clickTag}
+            </div>
+            <div style="margin-top: 10px !important;">
+                <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                        data-dplus="D+${m.dPlusVal}"
+                        class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
+                    <span class="record-btn-txt">기록보기</span>
+                </button>
+            </div>
         </div>
     </td>
 </tr>`;
+
 
 
         if (isFirstVisible && !m.isHidden) {
