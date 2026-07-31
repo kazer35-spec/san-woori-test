@@ -2649,7 +2649,8 @@ overflow: hidden;
 
 
         
-<div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+
+            <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
   <div class="year-selector flex justify-between items-center mb-3">
     <h1 class="main-title">
       <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
@@ -2684,38 +2685,48 @@ overflow: hidden;
     </select>
   </div>
 
-  <!-- 분기 탭 (하단 여백 0으로 밀착) -->
-  <div id="quarterTabs" class="mb-0">
+  <div id="quarterTabs" class="mb-1">
     <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
     <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
     <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
     <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
   </div>
 
-  <!-- 스크롤 영역 (헤더 안 가려지도록 설정) -->
+  <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
   <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
     <table class="w-full table-fixed border-collapse">
-      <thead class="sticky top-0 z-20 bg-white">
-        <tr>
-          <th class="w-[18%] pt-2 pb-1 text-center bg-white">
-            회원명
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+      <thead class="sticky top-0 z-20 bg-white shadow-xs">
+        <tr class="border-b border-gray-200">
+          <!-- py-2 및 flex 정렬로 글자를 셀 정중앙으로 유착 -->
+          <th class="w-[18%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>회원명</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            </div>
           </th>
-          <th class="w-[22%] pt-2 pb-1 text-center bg-white">
-            레벨(Lv)
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+          <th class="w-[22%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>레벨(Lv)</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            </div>
           </th>
-          <th class="w-[18%] pt-2 pb-1 text-center bg-white">
-            활동점수
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+          <th class="w-[18%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>활동점수</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            </div>
           </th>
-          <th class="w-[22%] pt-2 pb-1 text-center bg-white">
-            누적고도
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+          <th class="w-[22%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>누적고도</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            </div>
           </th>
-          <th class="w-[16%] pt-2 pb-1 text-center bg-white">
-            개인기록
-            <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+          <th class="w-[16%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>개인기록</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            </div>
           </th>
         </tr>
       </thead>
@@ -2723,6 +2734,7 @@ overflow: hidden;
     </table>
   </div>
 </div>
+
 
 
 
@@ -3599,58 +3611,47 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
          
-
-
-list.innerHTML += `<tr class="border-b border-gray-100/60 ${m.isHidden ? 'opacity-40' : ''}">
+list.innerHTML += `<tr class="border-b border-gray-100/80 ${m.isHidden ? 'opacity-40' : ''}">
     <!-- 회원명 -->
-    <td class="py-1 text-center align-middle">
-        <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none pt-1 pb-0.5 select-none">${clickTag}</div>
-            <div class="flex flex-col items-center justify-center">
-                ${rankT ? `<span class="rank-badge ${rankC} mb-0.5">${rankT}</span>` : ''}
-                <span class="font-bold ${nameColor} cursor-pointer hover:underline text-xs"
-                      onclick="showMemberMountain('${m.name}', '${m.name}')">
-                    ${m.name}
-                </span>
-            </div>
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex flex-col items-center justify-center">
+            ${rankT ? `<span class="rank-badge ${rankC} mb-0.5">${rankT}</span>` : ''}
+            <span class="font-bold ${nameColor} cursor-pointer hover:underline text-xs"
+                  onclick="showMemberMountain('${m.name}', '${m.name}')">
+                ${m.name}
+            </span>
         </div>
     </td>
 
     <!-- 레벨(Lv) -->
-    <td class="py-1 text-center align-middle">
-        <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none pt-1 pb-0.5 select-none">${clickTag}</div>
-            <div class="badge-level flex flex-col items-center">
-                <div class="badge-icon-box ${style.blink} cursor-pointer"
-                     onclick="showMilkyWay('${m.name}', '${m.name}')"
-                     style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                    <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
-                </div>
-                <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold; margin-top: 1px;">Lv ${m.level}</span>
+    <td class="py-2.5 text-center align-middle">
+        <div class="badge-level flex flex-col items-center justify-center">
+            <div class="badge-icon-box ${style.blink} cursor-pointer"
+                 onclick="showMilkyWay('${m.name}', '${m.name}')"
+                 style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
             </div>
+            <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold; margin-top: 2px;">Lv ${m.level}</span>
         </div>
     </td>
 
     <!-- 활동점수 -->
-    <td class="py-1 text-center align-middle">
-        <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none pt-1 pb-0.5 select-none">${clickTag}</div>
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex items-center justify-center">
             <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
         </div>
     </td>
 
     <!-- 누적고도 -->
-    <td class="py-1 text-center align-middle">
-        <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none pt-1 pb-0.5 select-none">${clickTag}</div>
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex items-center justify-center">
             <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
         </div>
     </td>
 
     <!-- 개인기록 -->
-    <td class="py-1 text-center align-middle">
-        <div class="flex flex-col items-center justify-start">
-            <div class="text-[8px] font-bold text-gray-300 tracking-wider leading-none pt-1 pb-0.5 select-none">${clickTag}</div>
+    <td class="py-2.5 text-center align-middle">
+        <div class="flex items-center justify-center">
             <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
                     data-dplus="D+${m.dPlusVal}"
                     class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
@@ -3659,6 +3660,8 @@ list.innerHTML += `<tr class="border-b border-gray-100/60 ${m.isHidden ? 'opacit
         </div>
     </td>
 </tr>`;
+
+
 
 
 
