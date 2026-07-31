@@ -2651,79 +2651,88 @@ overflow: hidden;
         
 
             
-          <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
-  <div class="year-selector flex justify-between items-center mb-3">
-    <h1 class="main-title">
-      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-      <span>산:우리</span>
-      <span class="slogan-txt">같이 걷는 즐거움</span>
-    </h1>
-    <div class="flex items-center gap-2">
-      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-      <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-        <svg viewBox="0 0 36 36">
-          <circle class="bg" cx="18" cy="18" r="16"></circle>
-          <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-        </svg>
-        <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-      </button>
-      <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-        <option value="2026">2026년</option>
-        <option value="2027">2027년</option>
+          <div id="viewStatus" class="view-content p-3 flex-1 flex flex-col h-full overflow-hidden">
+  
+  <!-- 상단 검색 및 탭 영역 -->
+  <div class="flex-none">
+    <div class="year-selector flex justify-between items-center mb-2">
+      <h1 class="main-title">
+        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+        <span>산:우리</span>
+        <span class="slogan-txt">같이 걷는 즐거움</span>
+      </h1>
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
+        <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+          <svg viewBox="0 0 36 36">
+            <circle class="bg" cx="18" cy="18" r="16"></circle>
+            <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+          </svg>
+          <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+        </button>
+        <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none text-xs">
+          <option value="2026">2026년</option>
+          <option value="2027">2027년</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex gap-1.5 mb-1.5 h-8 items-center">
+      <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-lg px-3 text-xs h-full border">
+      <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-lg font-bold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+      <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-lg font-bold text-[11px] h-full px-1 text-center">
+        <option value="qCount">점수순 ▼</option>
+        <option value="level">레벨순 ▼</option>
+        <option value="name">이름순 ▼</option>
+        <option value="totalHeight">높이순 ▼</option>
+        <option value="dday">날짜순 ▼</option>
       </select>
     </div>
-  </div>
 
-  <div class="flex gap-2 mb-2 h-10 items-center">
-    <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-    <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-    <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-      <option value="qCount">점수순 ▼</option>
-      <option value="level">레벨순 ▼</option>
-      <option value="name">이름순 ▼</option>
-      <option value="totalHeight">높이순 ▼</option>
-      <option value="dday">날짜순 ▼</option>
-    </select>
-  </div>
+    <!-- 분기 탭 (헤더 바로 위 밀착) -->
+    <div id="quarterTabs" class="mb-1 flex gap-1">
+      <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+      <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+      <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+      <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+    </div>
 
-  <!-- 빨간줄 간격 축소 (mb-0.5 적용) -->
-  <div id="quarterTabs" class="mb-0.5">
-    <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-    <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-    <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-    <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-  </div>
-
-  <!-- 스크롤 영역 & 헤더 밀착 -->
-  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
-    <table class="w-full table-fixed border-collapse">
-      <thead class="sticky top-0 z-20 bg-white">
+    <!-- 헤더 고정 테이블 (높이 최소화: py-0.5 적용) -->
+    <table class="w-full table-fixed border-collapse bg-white">
+      <thead>
         <tr class="border-b border-gray-200">
-          <th class="w-[18%] py-0.5 text-center bg-white leading-tight">
-            <span class="text-xs">회원명</span>
-            <span class="block text-[8px] font-normal text-gray-400">(나이테)</span>
+          <th class="w-[18%] py-0.5 text-center leading-tight">
+            <span class="text-[11px] font-bold text-gray-700">회원명</span>
+            <span class="block text-[8px] font-normal text-gray-400 leading-none">(나이테)</span>
           </th>
-          <th class="w-[22%] py-0.5 text-center bg-white leading-tight">
-            <span class="text-xs">레벨(Lv)</span>
-            <span class="block text-[8px] font-normal text-gray-400">(은하수)</span>
+          <th class="w-[22%] py-0.5 text-center leading-tight">
+            <span class="text-[11px] font-bold text-gray-700">레벨(Lv)</span>
+            <span class="block text-[8px] font-normal text-gray-400 leading-none">(은하수)</span>
           </th>
-          <th class="w-[18%] py-0.5 text-center bg-white leading-tight">
-            <span class="text-xs">활동점수</span>
-            <span class="block text-[8px] font-normal text-gray-400">(분기운동)</span>
+          <th class="w-[18%] py-0.5 text-center leading-tight">
+            <span class="text-[11px] font-bold text-gray-700">활동점수</span>
+            <span class="block text-[8px] font-normal text-gray-400 leading-none">(분기운동)</span>
           </th>
-          <th class="w-[22%] py-0.5 text-center bg-white leading-tight">
-            <span class="text-xs">누적고도</span>
-            <span class="block text-[8px] font-normal text-gray-400">(정복지도)</span>
+          <th class="w-[22%] py-0.5 text-center leading-tight">
+            <span class="text-[11px] font-bold text-gray-700">누적고도</span>
+            <span class="block text-[8px] font-normal text-gray-400 leading-none">(정복지도)</span>
           </th>
-          <th class="w-[16%] py-0.5 text-center bg-white leading-tight">
-            <span class="text-xs">개인기록</span>
-            <span class="block text-[8px] font-normal text-gray-400">(D+Day)</span>
+          <th class="w-[20%] py-0.5 text-center leading-tight">
+            <span class="text-[11px] font-bold text-gray-700">개인기록</span>
+            <span class="block text-[8px] font-normal text-gray-400 leading-none">(D+Day)</span>
           </th>
         </tr>
       </thead>
+    </table>
+  </div>
+
+  <!-- 데이터 스크롤 바디 (flex-1 min-h-0 지정으로 스크롤 정상화) -->
+  <div class="flex-1 overflow-y-auto min-h-0">
+    <table class="w-full table-fixed border-collapse">
       <tbody id="statusList"></tbody>
     </table>
   </div>
+
 </div>
 
 
@@ -3600,77 +3609,92 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
          
-// 기존 list rendering 함수 내
-list.innerHTML = ''; // 렌더링 전 초기화
+function renderStatusTable() {
+  const list = document.getElementById('statusList');
+  if (!list) return;
+  
+  let htmlContent = '';
 
-// 1. 노란줄 위치: 가로 일직선 CLICK 표시 (기존 CSS 방해 요소 무력화)
-const clickHeaderRow = `
-<tr class="bg-white">
-  <td class="text-center py-0" style="height: 14px; vertical-align: middle;">
-    <div style="position: static !important; transform: none !important; font-size: 8px; font-weight: 800; color: #cbd5e1; line-height: 1; text-align: center;">CLICK</div>
-  </td>
-  <td class="text-center py-0" style="height: 14px; vertical-align: middle;">
-    <div style="position: static !important; transform: none !important; font-size: 8px; font-weight: 800; color: #cbd5e1; line-height: 1; text-align: center;">CLICK</div>
-  </td>
-  <td class="text-center py-0" style="height: 14px; vertical-align: middle;">
-    <div style="position: static !important; transform: none !important; font-size: 8px; font-weight: 800; color: #cbd5e1; line-height: 1; text-align: center;">CLICK</div>
-  </td>
-  <td class="text-center py-0" style="height: 14px; vertical-align: middle;">
-    <div style="position: static !important; transform: none !important; font-size: 8px; font-weight: 800; color: #cbd5e1; line-height: 1; text-align: center;">CLICK</div>
-  </td>
-  <td class="text-center py-0" style="height: 14px; vertical-align: middle;">
-    <div style="position: static !important; transform: none !important; font-size: 8px; font-weight: 800; color: #cbd5e1; line-height: 1; text-align: center;">CLICK</div>
-  </td>
-</tr>`;
+  // 1. 노란줄 위치: CLICK 문구 행 (CSS 무시 인라인 고정)
+  htmlContent += `
+    <tr class="bg-white">
+      <td class="text-center py-0.5" style="height:12px; vertical-align:middle;">
+        <span style="font-size:8px; font-weight:800; color:#cbd5e1; display:block; line-height:1;">CLICK</span>
+      </td>
+      <td class="text-center py-0.5" style="height:12px; vertical-align:middle;">
+        <span style="font-size:8px; font-weight:800; color:#cbd5e1; display:block; line-height:1;">CLICK</span>
+      </td>
+      <td class="text-center py-0.5" style="height:12px; vertical-align:middle;">
+        <span style="font-size:8px; font-weight:800; color:#cbd5e1; display:block; line-height:1;">CLICK</span>
+      </td>
+      <td class="text-center py-0.5" style="height:12px; vertical-align:middle;">
+        <span style="font-size:8px; font-weight:800; color:#cbd5e1; display:block; line-height:1;">CLICK</span>
+      </td>
+      <td class="text-center py-0.5" style="height:12px; vertical-align:middle;">
+        <span style="font-size:8px; font-weight:800; color:#cbd5e1; display:block; line-height:1;">CLICK</span>
+      </td>
+    </tr>
+  `;
 
-list.innerHTML += clickHeaderRow;
+  // 2. 실제 회원 데이터 목록 반복문
+  displayMembers.forEach(m => {
+    // 칭호 및 레벨 badge 설정
+    const rankT = m.rankTitle || '';
+    const rankC = m.rankColor || '';
+    const style = getLevelStyle(m.level);
+    const displayHeight = formatHeight(m.totalHeight);
 
-// 2. 실제 데이터 행 목록
-members.forEach(m => {
-  list.innerHTML += `<tr class="border-b border-gray-100 ${m.isHidden ? 'opacity-40' : ''}">
-      <!-- 회원명 -->
-      <td class="py-2 text-center align-middle">
+    htmlContent += `
+      <tr class="border-b border-gray-100 ${m.isHidden ? 'opacity-40' : ''}">
+        <!-- 회원명 -->
+        <td class="w-[18%] py-2 text-center align-middle">
           <div class="flex flex-col items-center justify-center">
-              ${rankT ? `<span class="rank-badge ${rankC} mb-0.5">${rankT}</span>` : ''}
-              <span class="font-bold ${nameColor} cursor-pointer hover:underline text-xs"
-                    onclick="showMemberMountain('${m.name}', '${m.name}')">
-                  ${m.name}
-              </span>
+            ${rankT ? `<span class="text-[9px] font-bold ${rankC}">${rankT}</span>` : ''}
+            <span class="font-bold text-slate-700 cursor-pointer text-xs" onclick="showMemberMountain('${m.name}')">
+              ${m.name}
+            </span>
           </div>
-      </td>
+        </td>
 
-      <!-- 레벨(Lv) -->
-      <td class="py-2 text-center align-middle">
-          <div class="badge-level flex flex-col items-center justify-center">
-              <div class="badge-icon-box ${style.blink} cursor-pointer"
-                   onclick="showMilkyWay('${m.name}', '${m.name}')"
-                   style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                  <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
-              </div>
-              <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold; margin-top: 1px;">Lv ${m.level}</span>
+        <!-- 레벨(Lv) -->
+        <td class="w-[22%] py-2 text-center align-middle">
+          <div class="flex flex-col items-center justify-center">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center cursor-pointer text-xs"
+                 onclick="showMilkyWay('${m.name}')"
+                 style="background-color: ${style.bg}; border: 1.5px solid ${style.border};">
+              <span>${getLevelBadge(m.level)}</span>
+            </div>
+            <span class="text-[9px] font-bold text-slate-600 mt-0.5">Lv ${m.level}</span>
           </div>
-      </td>
+        </td>
 
-      <!-- 활동점수 -->
-      <td class="py-2 text-center align-middle">
-          <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
-      </td>
-
-      <!-- 누적고도 -->
-      <td class="py-2 text-center align-middle">
-          <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
-      </td>
-
-      <!-- 개인기록 -->
-      <td class="py-2 text-center align-middle">
-          <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-                  data-dplus="D+${m.dPlusVal}"
-                  class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
-              <span class="record-btn-txt">기록보기</span>
+        <!-- 활동점수 -->
+        <td class="w-[18%] py-2 text-center align-middle">
+          <button onclick="showMemberTimeline('${m.name}')" class="bg-slate-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-slate-600">
+            ${m.qCount}점 📈
           </button>
-      </td>
-  </tr>`;
-});
+        </td>
+
+        <!-- 누적고도 -->
+        <td class="w-[22%] py-2 text-center align-middle">
+          <button onclick="showMemberMap('${m.name}')" class="bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-bold text-emerald-700">
+            🚩${displayHeight}
+          </button>
+        </td>
+
+        <!-- 개인기록 -->
+        <td class="w-[20%] py-2 text-center align-middle">
+          <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                  class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full text-[9px] font-bold text-slate-700">
+            D+${m.dPlusVal || m.ddayVal}
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  list.innerHTML = htmlContent;
+}
 
 
 
