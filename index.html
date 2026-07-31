@@ -2647,7 +2647,8 @@ overflow: hidden;
 <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
 </div>
 
-<div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+
+        <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
 <div class="year-selector flex justify-between items-center mb-3">
 <h1 class="main-title">
 <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
@@ -2690,28 +2691,30 @@ overflow: hidden;
 <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
 </div>
 
+<!-- table-fixed와 border-collapse로 열 간격을 고정 유지하도록 수정 -->
 <div class="min-h-[300px]">
-  <table>
-    <thead>
+  <table class="w-full table-fixed border-collapse">
+    <!-- sticky top-0 bg-white 추가로 스크롤 시 헤더 고정 -->
+    <thead class="sticky top-0 z-10 bg-white shadow-xs">
       <tr>
-        <th class="w-[18%]">
+        <th class="w-[18%] py-2 text-center">
           회원명
           <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
         </th>
-        <th class="w-[22%]">
+        <th class="w-[22%] py-2 text-center">
           레벨(Lv)
           <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
         </th>
-        <th class="w-[18%]">
+        <th class="w-[18%] py-2 text-center">
           활동점수
           <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
         </th>
-        <th class="w-[22%]">
+        <th class="w-[22%] py-2 text-center">
           누적고도
           <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
         </th>
-        <th class="w-[16%]">
-        개인기록
+        <th class="w-[16%] py-2 text-center">
+          개인기록
           <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
         </th>
       </tr>
@@ -2719,7 +2722,7 @@ overflow: hidden;
     <tbody id="statusList"></tbody>
   </table>
 </div>
-</div> <!-- 기존 코드의 닫는 div 태그 유지 -->
+</div>
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
@@ -3591,21 +3594,22 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-        <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
-            <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
-                ${clickTag}
-            </div>
+    <!-- 회원명 -->
+    <td class="text-xs text-center py-3 vertical-middle" style="height: 65px;">
+        <div class="flex flex-col items-center justify-center relative">
+            <div class="mb-1">${clickTag}</div>
+            ${rankT ? `<span class="rank-badge ${rankC} mb-1">${rankT}</span>` : ''}
+            <span class="font-bold ${nameColor} cursor-pointer hover:underline"
+                  onclick="showMemberMountain('${m.name}', '${m.name}')">
+                ${m.name}
+            </span>
+        </div>
+    </td>
 
-            <div class="flex flex-col items-center justify-center">
-                ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
-                <span class="font-bold ${nameColor} cursor-pointer hover:underline"
-                      onclick="showMemberMountain('${m.name}', '${m.name}')">
-                    ${m.name}
-                </span>
-            </div>
-        </td>
-        <td style="position: relative;">
-            ${clickTag}
+    <!-- 레벨(Lv) -->
+    <td class="text-center py-3 vertical-middle">
+        <div class="flex flex-col items-center justify-center relative">
+            <div class="mb-1">${clickTag}</div>
             <div class="badge-level">
                 <div class="badge-icon-box ${style.blink} cursor-pointer"
                      onclick="showMilkyWay('${m.name}', '${m.name}')"
@@ -3614,24 +3618,36 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
                 </div>
                 <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
             </div>
-        </td>
-        <td style="position: relative;">
-            ${clickTag}
+        </div>
+    </td>
+
+    <!-- 활동점수 -->
+    <td class="text-center py-3 vertical-middle">
+        <div class="flex flex-col items-center justify-center relative">
+            <div class="mb-1">${clickTag}</div>
             <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
-        </td>
-        <td style="position: relative;">
-            ${clickTag}
+        </div>
+    </td>
+
+    <!-- 누적고도 -->
+    <td class="text-center py-3 vertical-middle">
+        <div class="flex flex-col items-center justify-center relative">
+            <div class="mb-1">${clickTag}</div>
             <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
-        </td>
-        <td style="position: relative;" class="text-center">
-    ${clickTag}
-    <!-- 🎈 누적고도 탭버튼 크기와 동일하게 수정한 알약 모양 버튼 -->
-    <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-            data-dplus="D+${m.dPlusVal}"
-            class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
-        <span class="record-btn-txt">기록보기</span>
-    </button>
-</td>
+        </div>
+    </td>
+
+    <!-- 개인기록 -->
+    <td class="text-center py-3 vertical-middle">
+        <div class="flex flex-col items-center justify-center relative">
+            <div class="mb-1">${clickTag}</div>
+            <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                    data-dplus="D+${m.dPlusVal}"
+                    class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
+                <span class="record-btn-txt">기록보기</span>
+            </button>
+        </div>
+    </td>
 </tr>`;
 
         if (isFirstVisible && !m.isHidden) {
