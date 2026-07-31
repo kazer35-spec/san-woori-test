@@ -13,6 +13,29 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+
+    @keyframes rainbowMove {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+    /* 💡 기록보기 강조용 반짝임(글로우 & 펄스) 애니메이션 */
+@keyframes recordBtnShine {
+    0%, 100% {
+        box-shadow: 0 0 0px rgba(59, 130, 246, 0);
+        border-color: rgba(203, 213, 225, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        border-color: rgba(96, 165, 250, 0.9);
+        background-color: rgba(239, 246, 255, 1);
+    }
+}
+
+.record-glow-active {
+    animation: recordBtnShine 1.5s infinite ease-in-out;
+}
+
     /* 🌌 우주 다크 네온 획득자 모달 (기존 STAR GALLERY UI 핏) */
 .sg-modal-overlay {
     position: fixed;
@@ -2689,7 +2712,7 @@ overflow: hidden;
         </th>
         <th class="w-[16%]">
         개인기록
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(기록보기)</span>
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
         </th>
       </tr>
     </thead>
@@ -2788,21 +2811,26 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 
 <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
 <div class="flex items-center justify-between mb-2">
-<p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-<div class="flex gap-2">
-<label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-<input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-<span class="text-[10px] font-black text-blue-600">100대명산</span>
-</label>
-<label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-<input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-<span class="text-[10px] font-black text-red-500">BAC인증지</span>
-</label>
+  <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+  <div class="flex gap-2">
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+      <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+      <span class="text-[10px] font-black text-blue-600">100대명산</span>
+    </label>
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+      <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+      <span class="text-[10px] font-black text-red-500">BAC인증지</span>
+    </label>
+  </div>
 </div>
-</div>
+
 <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
     <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
+    </label>
+    <!-- 일정: 런닝/트래킹/산책/산행 어느 것과도 조합 가능하도록 독립 구성 -->
+    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
     </label>
     <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
@@ -2883,31 +2911,37 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
 </div>
 
+
+
 <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
-<div class="card-title text-yellow-700 font-bold">✏️ 기록 수정 및 레벨 관리</div>
+  <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
 
-<select id="memberSelectEdit" onchange="loadMemberLogs()" class="input-gap">
-<option value="">대상 회원 선택</option>
-</select>
+  <!-- 대상 회원 선택 -->
+  <select id="memberSelectEdit" onchange="loadMemberLogs()" class="input-gap mb-3 w-full border rounded-xl p-2 text-sm">
+    <option value="">대상 회원 선택</option>
+  </select>
 
-<div class="flex gap-2 mb-3">
-<input type="text" id="editMemberNameInput" placeholder="변경할 이름 입력" class="h-10 text-sm flex-1 border rounded-xl px-3 outline-none">
-<button onclick="updateMemberName()" class="bg-indigo-500 text-white px-3 rounded-xl text-xs font-bold whitespace-nowrap">이름 수정</button>
+  <!-- 🎯 요청사항 1: 가로 입력칸 3개 -->
+  <div class="grid grid-cols-3 gap-2 mb-2">
+    <input type="text" id="editMemberNameInput" placeholder="변경할 이름" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
+    <input type="number" id="manualLevelInput" placeholder="레벨(Lv)" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
+    <input type="number" id="manualQCountInput" placeholder="분기 횟수" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
+  </div>
+
+  <!-- 🎯 요청사항 2: 가로 버튼 3개 (탭 한 줄) -->
+  <div class="grid grid-cols-3 gap-2 mb-3">
+    <button onclick="updateMemberName()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">이름 수정</button>
+    <button onclick="window.updateManualLevel()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">레벨 적용</button>
+    <button onclick="window.updateManualQCount()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">횟수 적용</button>
+  </div>
+
+  <hr class="my-3 border-amber-200">
+
+  <!-- 로그 목록 영역 -->
+  <div id="logListArea" class="log-grid"></div>
 </div>
 
-<div class="flex gap-2 mb-3">
-    <input type="number" id="manualLevelInput" placeholder="레벨(Lv) 입력" class="h-10 text-sm flex-1 border rounded-xl px-3 outline-none">
-    <button onclick="window.updateManualLevel()" class="bg-indigo-500 text-white px-3 rounded-xl text-xs font-bold whitespace-nowrap">레벨 적용</button>
-</div>
 
-<div class="flex gap-2 mb-3">
-    <input type="number" id="manualQCountInput" placeholder="분기 횟수 입력" class="h-10 text-sm flex-1 border rounded-xl px-3 outline-none">
-    <button onclick="window.updateManualQCount()" class="bg-indigo-500 text-white px-3 rounded-xl text-xs font-bold whitespace-nowrap">횟수 적용</button>
-</div>
-
-<div id="logListArea" class="log-grid"></div>
-
-</div>
 
 <div class="card" style="background-color: #fff5f5; border: 1px solid #ffe3e3;">
     <div class="card-title text-red-600 font-bold mb-3">🗑️ 회원 상태 및 보너스 관리</div>
@@ -2967,6 +3001,8 @@ Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
 </p>
 </div>
 </div>
+    
+
 
 <div id="levelModal" class="modal-overlay" onclick="toggleModal(false)">
 <div class="modal-content" onclick="event.stopPropagation()">
@@ -3453,40 +3489,45 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
- window.renderStatusTable = () => {
+ 
+     
+      window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
     if(!list) return;
     list.innerHTML = "";
 
+    // 💡 기존 타이머 정리
+    if (window.recordBtnToggleInterval) {
+        clearInterval(window.recordBtnToggleInterval);
+        window.recordBtnToggleInterval = null;
+    }
+
     const today = new Date();
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
     let processedData = currentData.map(m => {
-        // [기존 코드 그대로] 창 열었을 때 보여줄 마지막 산행 기준 계산
         const last = m.lastDate ? m.lastDate.toDate() : new Date();
         const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
         const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
         const baseLimit = (m.level === 0 ? 30 : 122);
         const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
-        // 메인화면 겉에만 표시해줄 들어온 날짜(가입일) 기준 계산
         let dPlusVal = 0;
         if (m.regDate) {
-            const reg = m.regDate.toDate();
+            const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
             const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
-            dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1; // 당일 1일 기준
+            dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
         }
 
         return { 
             ...m, 
-            ddayVal: ddayVal,   // 모달창에 넘겨줄 값
-            dPlusVal: dPlusVal  // 메인화면 글자로 보여줄 값
+            ddayVal: ddayVal,
+            dPlusVal: dPlusVal
         };
     });
 
-    // [기존 코드 그대로] 정렬 로직
     processedData.sort((a, b) => {
         if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
         if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
@@ -3496,17 +3537,14 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         return 0;
     });
 
-    // [기존 코드 그대로] 탑 이름 추출
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
-    // 첫 번째 노출되는 행에만 CLICK 문구를 넣기 위한 플래그
     let isFirstVisible = true;
 
     processedData.forEach((m) => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
-        // 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
             clickTag = `<span class="click-neon">CLICK</span>`;
@@ -3517,7 +3555,6 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
             const idx = topNames.indexOf(m.name);
             
-            // 1. 현재 HTML에서 활성화된 분기 버튼 상태 확인
             let activeQuarter = 1; 
             const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
             if (activeBtn) {
@@ -3528,10 +3565,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
                                 ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
             }
             
-            // 2. 현재 선택된 연도 가져오기
             const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
-            
-            // 3. 2026년도이면서 선택된 분기가 1분기 또는 2분기인지 판별
             const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
             if (idx === 0) { 
@@ -3551,15 +3585,11 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         const style = getLevelStyle(m.level);
         const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
-        // 메인 테이블 고도 축약 로직
         const rawHeight = m.totalHeight || 0;
         const displayHeight = rawHeight >= 10000 
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-        // --------------------------------------------------------
-        // ⭐ '기록보기' 버튼 디자인 변경 (글자 크기 9px + 세련된 뱃지 스타일)
-        // --------------------------------------------------------
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
         <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
             <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
@@ -3594,27 +3624,51 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
         </td>
         <td style="position: relative;" class="text-center">
-            ${clickTag}
-            <!-- 💡 9px 글자 크기, 라운드 알약 형태 & 은은한 샤이니 버튼 디자인 적용 -->
-            <button onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-        class="inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-md shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap">
-    <span></span>
-    <span>기록보기</span>
-</button>
+    ${clickTag}
+    <!-- 🎈 누적고도 탭버튼 크기와 동일하게 수정한 알약 모양 버튼 -->
+    <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+            data-dplus="D+${m.dPlusVal}"
+            class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
+        <span class="record-btn-txt">기록보기</span>
+    </button>
+</td>
+</tr>`;
 
-        </td>
-        </tr>`;
-
-        // 한 줄(tr)을 완전히 다 그린 후에 플래그를 꺼줍니다.
         if (isFirstVisible && !m.isHidden) {
             isFirstVisible = false;
         }
     });
+
+    // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
+    let showDPlus = false;
+    window.recordBtnToggleInterval = setInterval(() => {
+        showDPlus = !showDPlus;
+        const toggleBtns = document.querySelectorAll('.record-auto-toggle-btn');
+        
+        toggleBtns.forEach(btn => {
+            const txtSpan = btn.querySelector('.record-btn-txt');
+            const dplusTxt = btn.dataset.dplus;
+            if (!txtSpan) return;
+
+            if (showDPlus) {
+                // D+254 일 때: 반짝임 해제 및 차분한 스카이블루 톤
+                txtSpan.innerText = dplusTxt;
+                btn.classList.remove('record-glow-active');
+                btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
+            } else {
+                // 기록보기 일 때: 기존 반짝임(Glow) 적용
+                txtSpan.innerText = "기록보기";
+                btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
+                btn.classList.add('record-glow-active');
+            }
+        });
+    }, 3000);
 };
 
-
-                
-
+        
+            
+            
+            
 
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
@@ -5727,7 +5781,11 @@ window.addMultiActivity = async () => {
     const height = parseInt(document.getElementById('mountainHeight')?.value) || 0;
     const isTop100 = document.getElementById('isTop100Check')?.checked || false;
     const isBAC = document.getElementById('isBACCheck')?.checked || false;
-    const isRegular = document.getElementById('isRegularCheck')?.checked || false;
+    
+    // 🎯 정기산행 체크박스를 '일정 체크박스'로 적용
+    const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
+    const isSchedule = document.getElementById('isScheduleCheck')?.checked || false; 
+
     const isRunning = document.getElementById('isRunningCheck')?.checked || false;
     const isTracking = document.getElementById('isTrackingCheck')?.checked || false;
     const isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
@@ -5742,6 +5800,10 @@ window.addMultiActivity = async () => {
     const isExtraHike = isRunning && isTracking; 
     const isSpecial = isRunning || isTracking || isWalking || isOnlyLog || isExtraHike;
     const isRealHike = !isSpecial; 
+
+    // 🔥 정기산행 방어 logic
+    const isRegular = isRegularRaw && isRealHike; 
+
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
     const isDdayTargetActivity = (isRunning || isTracking || isWalking) && !isExtraHike;
 
@@ -5773,6 +5835,7 @@ window.addMultiActivity = async () => {
             else await setDoc(mRef, mountainData);
         }
 
+        // 🎯 [선택된 회원별 반복 업데이트 시작]
         for (const id of selectedMemberIds) {
             const member = currentData.find(m => m.id === id);
             if (!member) continue;
@@ -5809,7 +5872,6 @@ window.addMultiActivity = async () => {
                 
                 updateData.bonusDays = 0;
                 
-                // ─── 🎯 업 수치(realUpAmount)에 따른 분기 점수 계산 ───
                 const groupSize = selectedMemberIds.size;
                 const baseQCount = groupSize >= 3 ? 3 : groupSize; 
                 const multiplier = realUpAmount > 0 ? realUpAmount : 1; 
@@ -5850,9 +5912,19 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // 세부 로그 적재
+            // ─── 🎯 세부 로그 적재 ───
             const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
-            for(let i = 0; i < finalLogLoopCount; i++) {
+
+            const rawMountainName = document.getElementById('mountainName')?.value.trim();
+            const baseDocId = rawMountainName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동")));
+
+            const existingLogsRef = collection(db, `sanwoori/${id}/logs`);
+            const existingSnap = await getDocs(existingLogsRef);
+
+            const existingDocIds = new Set();
+            existingSnap.forEach(d => existingDocIds.add(d.id));
+
+            for (let i = 0; i < finalLogLoopCount; i++) {
                 let starType = null;
                 if (isRegular) {
                     const rand = Math.random() * 100;
@@ -5863,15 +5935,27 @@ window.addMultiActivity = async () => {
 
                 const logPayload = {
                     date: ts, 
-                    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
+                    mountain: baseDocId, 
                     height, coords: safeCoords,
-                    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+                    isTop100, isBAC, 
+                    isRegular,   
+                    isSchedule,  
+                    isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
                     isSpecial: isSpecial,
                     pRock, pForest, pValley
                 };
 
-                await saveHikeLog(id, logPayload);
+                let customLogDocId = baseDocId;
+                let seq = 1;
+                while (existingDocIds.has(customLogDocId)) {
+                    customLogDocId = `${baseDocId}_${seq}`;
+                    seq++;
+                }
+                
+                existingDocIds.add(customLogDocId);
+
+                await setDoc(doc(db, `sanwoori/${id}/logs`, customLogDocId), logPayload);
             }
         } 
 
@@ -5885,36 +5969,29 @@ window.addMultiActivity = async () => {
         
         alert((isRealHike && !isExtraHike) ? "순수산행 기록 완료! ✅" : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // ─── 🧹 [수정 핵심] 저장 후 입력 수치 및 폼 요소 전체 초기화 ───
-        
-        // 1. 선택된 회원 및 벙주 목록 초기화
+        // 입력 폼 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false); // UI 체크박스 해제
+        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false);
 
-        // 2. 텍스트/숫자 입력 폼 초기화
         const resetInputIds = ['mountainName', 'mountainHeight', 'pRock', 'pForest', 'pValley'];
         resetInputIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
 
-        // 3. 지역 선택 셀렉트 박스 초기화
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
-        // 4. 활동 특성 체크박스 초기화
-        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
+        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
         });
 
-        // 5. 레벨업 선택 라디오 버튼 초기화
         document.querySelectorAll('input[name="upAmount"]').forEach(radio => radio.checked = false);
 
-        // 6. 좌표 및 날짜 초기화
         tempCoord = null; 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
@@ -5928,7 +6005,7 @@ window.addMultiActivity = async () => {
     }
 };
 
-                
+     
         
                         
    // 📌 [신규 회원 등록 함수] - 수정본
@@ -5981,23 +6058,182 @@ window.addMember = async () => {
     }
 };
 
- 
-window.loadMemberLogs = async () => {
-    const id = document.getElementById('memberSelectEdit').value;
-    const area = document.getElementById('logListArea'); area.innerHTML = ""; if(!id) return;
-    const snap = await getDocs(query(collection(db, `sanwoori/${id}/logs`), orderBy("date", "desc"), limit(20)));
-    snap.forEach(ld => {
-        const logData = ld.data(); const d = logData.date.toDate(); const dateStr = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
-        const logJson = JSON.stringify({ mountain: logData.mountain || '', height: logData.height || 0, coords: logData.coords || null, isTop100: logData.isTop100 || false, isBAC: logData.isBAC || false, region: logData.region || '기타' }).replace(/"/g, '&quot;');
-        area.innerHTML += `<div class="log-item-box" onclick="selectLogToMap('${logJson}')">
-        <div class="log-info-group"><span class="log-date-txt">${dateStr}</span><span class="log-mt-txt">${logData.isBAC ? '<span class="bac-txt">BAC</span>' : ''}${logData.mountain || '기록'}</span>
-        <div class="flex items-center gap-1"><input type="number" id="h-${ld.id}" value="${logData.height || 0}" class="log-height-input border rounded-md" onclick="event.stopPropagation()">
-        <button onclick="event.stopPropagation(); updateLogHeight('${id}', '${ld.id}')" class="text-[9px] bg-slate-200 px-1 py-1 rounded">높이수정</button>
-        <button onclick="event.stopPropagation(); updateLogCoord('${id}', '${ld.id}')" class="text-[9px] bg-emerald-500 text-white px-1 py-1 rounded">좌표수정</button></div></div>
-        <div class="log-btn-group" onclick="event.stopPropagation()"><button class="del-btn-mini" onclick="deleteLog('${id}', '${ld.id}', true)">레벨-1 삭제</button>
-        <button class="del-only-btn-mini" onclick="deleteLog('${id}', '${ld.id}', false)">기록만 삭제</button></div></div>`;
-    });
+// 📌 회원 이름 변경 및 데이터 완벽 이전 함수
+window.updateMemberName = async () => {
+    const selectEl = document.getElementById('memberSelectEdit');
+    const inputEl = document.getElementById('editMemberNameInput');
+
+    const oldId = selectEl?.value;
+    const newName = inputEl?.value.trim();
+
+    if (!oldId) return alert("대상 회원을 먼저 선택해주세요.");
+    if (!newName) return alert("새로운 이름을 입력해주세요.");
+    if (oldId === newName) return alert("기존 이름과 동일합니다.");
+
+    if (!confirm(`회원 이름을 [${oldId}] ➡️ [${newName}](으)로 변경하시겠습니까?\n모든 기록과 하위 데이터가 완벽히 이전됩니다.`)) return;
+
+    try {
+        console.log(`🚀 [${oldId}] ➡️ [${newName}] 데이터 이전 시작...`);
+
+        // 1. 기존 회원 메인 문서 읽기 (모듈 상단의 db, doc, getDoc 직접 사용)
+        const oldMemberRef = doc(db, "sanwoori", oldId);
+        const oldMemberSnap = await getDoc(oldMemberRef);
+
+        if (!oldMemberSnap.exists()) return alert("선택한 회원 정보를 찾을 수 없습니다.");
+
+        const memberData = oldMemberSnap.data();
+        memberData.name = newName; // 메인 문서 내부 name 필드 수정
+
+        // 2. 새 이름으로 메인 회원 문서 생성
+        const newMemberRef = doc(db, "sanwoori", newName);
+        await setDoc(newMemberRef, memberData);
+
+        // 3. 하위 logs 컬렉션 전체 가져오기 및 새 이름 밑으로 복사
+        const oldLogsRef = collection(db, `sanwoori/${oldId}/logs`);
+        const oldLogsSnap = await getDocs(oldLogsRef);
+
+        console.log(`총 ${oldLogsSnap.docs.length}개의 로그 문서를 이관합니다.`);
+
+        for (const logDoc of oldLogsSnap.docs) {
+            const logData = logDoc.data();
+            logData.author = newName; // 작성자 필드 수정
+
+            // 새 위치(sanwoori/새이름/logs/문서ID)에 생성
+            await setDoc(doc(db, `sanwoori/${newName}/logs`, logDoc.id), logData);
+            
+            // 기존 위치(sanwoori/옛이름/logs/문서ID) 삭제
+            await deleteDoc(doc(db, `sanwoori/${oldId}/logs`, logDoc.id));
+        }
+
+        // 4. bondingForest (우정의 숲) 내 members 배열 데이터 변경
+        const bondingSnap = await getDocs(collection(db, "bondingForest"));
+        for (const bDoc of bondingSnap.docs) {
+            const bData = bDoc.data();
+            if (bData.members && Array.isArray(bData.members) && bData.members.includes(oldId)) {
+                const updatedMembers = bData.members.map(m => m === oldId ? newName : m);
+                await updateDoc(doc(db, "bondingForest", bDoc.id), { members: updatedMembers });
+            }
+        }
+
+        // 5. 로컬 스토리지 캐시 키값 이전
+        const oldStorageKey = `forest_v5_final_${oldId}`;
+        const newStorageKey = `forest_v5_final_${newName}`;
+        const cachedData = localStorage.getItem(oldStorageKey);
+        if (cachedData) {
+            localStorage.setItem(newStorageKey, cachedData);
+            localStorage.removeItem(oldStorageKey);
+        }
+
+        // 6. 이전이 모두 완료되었으므로 기존 메인 '김산' 문서 삭제
+        await deleteDoc(oldMemberRef);
+
+        alert(`🎉 [${oldId}] 님의 이름이 [${newName}](으)로 완벽히 변경 및 이전되었습니다!`);
+
+        // UI 초기화
+        if (inputEl) inputEl.value = "";
+        if (selectEl) selectEl.value = "";
+
+        // 실시간 동기화 함수 실행 또는 새로고침
+        if (typeof startRealtimeSync === 'function') {
+            startRealtimeSync();
+        } else {
+            location.reload();
+        }
+
+    } catch (error) {
+        console.error("이름 변경 오류 상세:", error);
+        alert("이름 변경 실패: " + error.message);
+    }
 };
+
+ 
+
+ // 📌 [통합] 회원 로그 목록 조회 및 수정 (레이아웃 한 줄 밀착 정렬 + 산 이름 변경 포함)
+
+                window.loadMemberLogs = async () => {
+    const id = document.getElementById('memberSelectEdit')?.value;
+    const area = document.getElementById('logListArea'); 
+    if (!area) return;
+    area.innerHTML = ""; 
+    if (!id) return;
+
+    try {
+        const snap = await getDocs(query(collection(db, `sanwoori/${id}/logs`), orderBy("date", "desc"), limit(20)));
+
+        snap.forEach(ld => {
+            const logData = ld.data(); 
+            const d = logData.date ? logData.date.toDate() : new Date(); 
+            const dateStr = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+            const currentMtName = logData.mountain || '기록';
+
+            const logJson = JSON.stringify({ 
+                mountain: currentMtName, 
+                height: logData.height || 0, 
+                coords: logData.coords || null, 
+                isTop100: logData.isTop100 || false, 
+                isBAC: logData.isBAC || false, 
+                region: logData.region || '기타' 
+            }).replace(/"/g, '&quot;');
+
+            area.innerHTML += `
+            <div class="p-2 border rounded-xl mb-2 bg-white text-xs shadow-sm" onclick="selectLogToMap('${logJson}')">
+                
+                <!-- 📌 1라인: [날짜 + 산이름] ------- [높이(40px) + 높이수정 + 좌표수정] -->
+                <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 4px !important; margin-bottom: 6px !important; width: 100% !important;">
+                    
+                    <!-- 왼쪽: 날짜 & 산이름 -->
+                    <div style="display: flex !important; align-items: center !important; gap: 4px !important; min-width: 0 !important; flex: 1 !important;">
+                        <span style="color: #64748b; font-size: 10px; font-weight: bold; white-space: nowrap;">${dateStr}</span>
+                        <span style="color: #4f46e5; font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${logData.isBAC ? '<span style="color: #ef4444; font-weight: 800; margin-right: 2px;">BAC</span>' : ''}${currentMtName}
+                        </span>
+                    </div>
+
+                    <!-- 오른쪽: 높이입력칸 (40px 고정) + 높이수정 + 좌표수정 -->
+                    <div style="display: flex !important; align-items: center !important; gap: 3px !important; flex-shrink: 0 !important;" onclick="event.stopPropagation()">
+                        <input type="number" id="h-${ld.id}" value="${logData.height || 0}" style="width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 24px !important; text-align: center !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; font-size: 10px !important; outline: none !important; padding: 0 !important;" placeholder="m">
+                        <button onclick="updateLogHeight('${id}', '${ld.id}')" style="background-color: #e2e8f0; color: #334155; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: 500; white-space: nowrap; border: none; flex-shrink: 0;">높이수정</button>
+                        <button onclick="updateLogCoord('${id}', '${ld.id}')" style="background-color: #10b981; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: 500; white-space: nowrap; border: none; flex-shrink: 0;">좌표수정</button>
+                    </div>
+                </div>
+
+                <!-- 📌 2라인: [레벨-1 삭제] [기록만 삭제] [산이름 입력칸] [산변경] -->
+                <div style="display: flex !important; align-items: center !important; gap: 3px !important; width: 100% !important;" onclick="event.stopPropagation()">
+                    <button onclick="deleteLog('${id}', '${ld.id}', true)" style="background-color: #f43f5e; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: bold; white-space: nowrap; border: none; flex-shrink: 0;">레벨-1 삭제</button>
+                    <button onclick="deleteLog('${id}', '${ld.id}', false)" style="background-color: #94a3b8; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: bold; white-space: nowrap; border: none; flex-shrink: 0;">기록만 삭제</button>
+                    <input type="text" id="mt-${ld.id}" value="${currentMtName}" placeholder="산 이름" style="flex: 1 !important; min-width: 0 !important; height: 24px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; padding: 0 5px !important; font-size: 10px !important; outline: none !important;">
+                    <button onclick="updateLogMountain('${id}', '${ld.id}')" style="background-color: #f59e0b; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: bold; white-space: nowrap; border: none; flex-shrink: 0;">산변경</button>
+                </div>
+
+            </div>`;
+        });
+    } catch (e) {
+        console.error("로그 조회 실패:", e);
+    }
+};
+
+
+
+// 📌 [통합] 산 이름 수정 함수
+window.updateLogMountain = async (mId, logId) => {
+    const inputEl = document.getElementById(`mt-${logId}`);
+    const newMountainName = inputEl ? inputEl.value.trim() : "";
+    
+    if (!newMountainName) return alert("변경할 산 이름을 입력해주세요.");
+
+    try {
+        await updateDoc(doc(db, `sanwoori/${mId}/logs`, logId), { 
+            mountain: newMountainName 
+        });
+        alert("산 이름이 성공적으로 변경되었습니다! 🏔️");
+        loadMemberLogs(); // 목록 자동 갱신
+    } catch (e) {
+        console.error("산 이름 변경 실패:", e);
+        alert("산 이름 변경 실패: " + e.message);
+    }
+};
+
+
 
 window.selectLogToMap = (logDataStr) => {
     const log = JSON.parse(logDataStr.replace(/&quot;/g, '"'));
@@ -6091,12 +6327,6 @@ window.deleteLog = async (mId, logId, shouldDownLevel) => {
     } catch (e) {
         alert("삭제 실패: " + e.message);
     }
-};
-
-window.updateMemberName = async () => {
-    const id = document.getElementById('memberSelectEdit').value;
-    const newName = document.getElementById('editMemberNameInput').value.trim();
-    if(id && newName) { await updateDoc(doc(db, "sanwoori", id), { name: newName }); alert("변경 완료"); }
 };
 
 window.changeQuarter = (q) => { selectedQuarter = q; document.querySelectorAll('.q-btn').forEach((btn, idx) => btn.classList.toggle('active-q', idx + 1 === q)); startRealtimeSync(); };
@@ -7585,17 +7815,8 @@ function createShootingStar(board, tx, ty) {
 }
 
              
-            
-                
+Window.currentScrollLogs = []; 
 
-                    
-    
-
-        
-            // 필터링 및 페이징 처리를 위해 모달 전용 로그 목록을 임시 저장할 전역 변수 (캐시)
-window.currentScrollLogs = []; 
-
-// 페이징 처리를 위해 상태를 기억할 전역 객체
 window.scrollPagination = {
     currentCategory: 'all',
     mId: null,
@@ -7603,7 +7824,6 @@ window.scrollPagination = {
     currentPageSize: 6
 };
 
-// showFadingScroll 인자에 regDate를 전달받을 수 있도록 추가 (옵션)
 window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
     const modal = document.getElementById('scrollModal');
     const content = document.getElementById('scrollContent');
@@ -7635,7 +7855,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     let formattedRegDateKo = "--년 --월 --일";
 
     try {
-        // [A] 가입일 정보: 외부에서 전달받은 값이 있으면 getDoc 생략! (서버 읽기 1회 절약)
         let rDate = passedRegDate;
         
         if (!rDate) {
@@ -7659,7 +7878,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             }
         }
 
-        // [B] 🔥 유저 전체 일지 데이터 1회 통합 조회 (메모리 캐스)
         const logsRef = collection(db, `sanwoori/${safeMemberId}/logs`);
         const q = query(logsRef, orderBy("date", "desc"));
         const snap = await getDocs(q);
@@ -7673,33 +7891,31 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // 이하 기존 통계 계산 및 UI 렌더링 로직 동일...
-
-
-                // [C] 📊 전체 로그 데이터 기반 항목별 카운팅 계산 (정기 vs 일정 구분)
+        // 🔥 순수산행(일반산행) + 정기산행 = 일정산행 횟수로 집계
         const counts = window.currentScrollLogs.reduce((acc, log) => {
-            if (log.isRegular) {
-                acc.regular++;  // 무지개 (정기산행)
-                acc.schedule++; // 🔥 정기산행 횟수를 일정산행에도 포함
-            } else if ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike) {
-                acc.schedule++; // 연두색 (일정산행)
+            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
+            const isPureHike = !isKmActivity && !log.isExtraHike;
+
+            if (isPureHike) {
+                acc.schedule++; // 순수산행(일반산행)이면 일정산행 +1
+                if (log.isRegular) {
+                    acc.regular++; // 그중 정기산행이면 정기산행 +1
+                }
             } else if (log.isExtraHike) {
-                acc.extra++;    // 개인산행
-            } else if (log.isTracking) {
-                acc.trekking++; // 트래킹
+                acc.extra++;
             } else if (log.isRunning) {
-                acc.running++;  // 런닝
+                acc.running++;
+            } else if (log.isTracking) {
+                acc.trekking++;
             } else if (log.isWalking) {
-                acc.walking++;  // 산책
+                acc.walking++;
             }
             return acc;
         }, { regular: 0, schedule: 0, extra: 0, trekking: 0, running: 0, walking: 0 });
 
-        // 2. 🎯 [개선] D-Day와 운동 횟수가 하나의 상자(카드)로 통합 렌더링
         content.innerHTML = `
             <div class="user-report-summary-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 14px; margin: 6px 0 12px 0;">
                 
-                <!-- [1구역] D-Day & 가입일 영역 -->
                 <div class="user-status-row-bar" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;">
                     <div class="dday-count-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px;">
                         D-Day ${dday !== undefined ? dday : 0}
@@ -7710,9 +7926,7 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                     </div>
                 </div>
 
-                <!-- [2구역] 운동 횟수 요약 영역 (3열 정렬 및 도트 라인 수직 맞춤) -->
                 <div class="activity-summary-grid" style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px; font-size: 11px; color: #475569; font-weight: 500;">
-                    <!-- 1줄: 산행 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0); display: inline-block; flex-shrink: 0;"></i>
@@ -7731,7 +7945,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                         </span>
                     </div>
 
-                    <!-- 2줄: 기타 운동 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: #FFD1DC; display: inline-block; flex-shrink: 0;"></i>
@@ -7753,24 +7966,18 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
 
             </div>
 
-
-            </div>
-
             <div class="tab-scroll-container">
                 <div class="tab-header-buttons">
                     <button type="button" onclick="window.switchScrollTab('all')" id="sTab-all" class="tab-btn active">전체</button>
-                    <button type="button" onclick="window.switchScrollTab('hiking')" id="sTab-hiking" class="tab-btn">일정산행</button>
+                    <button type="button" onclick="window.switchScrollTab('hiking')" id="sTab-hiking" class="tab-btn">일정운동</button>
                     <button type="button" onclick="window.switchScrollTab('running')" id="sTab-running" class="tab-btn">개인/기타</button>
                 </div>
                 
-                <!-- 로그가 쌓일 박스 -->
                 <div id="scrollFilteredList" class="scroll-filtered-list-box"></div>
-                <!-- 더보기 버튼 영역 -->
                 <div id="scrollMoreBtnArea" style="text-align:center; margin-top:15px;"></div>
             </div>
         `;
 
-        // 첫 페이지 로드
         window.loadScrollLogsPage(true);
 
     } catch (e) {
@@ -7791,8 +7998,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     }
 };
 
-
-// [탭 전환 함수]
 window.switchScrollTab = (category) => {
     if (window.scrollPagination.currentCategory === category) return;
     
@@ -7818,7 +8023,6 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
-// [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -7841,9 +8045,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
-            // 정기산행(무지개)과 일정산행(연두색)을 모두 일정산행 탭에서 노출
             filtered = window.currentScrollLogs.filter(log => 
-                log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
+                log.isSchedule || log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
             filtered = window.currentScrollLogs.filter(log => 
@@ -7871,49 +8074,106 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
+            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
+            const isPureRegularHike = log.isRegular && !isKmActivity; 
+
+            // 🎯 도트 색상
             let dotStyle = "";
-            if (log.isRegular) {
-                // 정기산행: 무지개 그래디언트
+            const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
+            
+            if (isPureRegularHike) {
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
-                const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
-                let activeColors = [];
-                if (log.isExtraHike) activeColors.push(colors.extraHike);
-                else if (log.isRunning) activeColors.push(colors.run);
-                else if (log.isTracking) activeColors.push(colors.trek);
-                else if (log.isWalking) activeColors.push(colors.walk);
-                else activeColors.push(colors.hike); // 일정산행: 연두색 (#2ecc71)
+                let baseColor = colors.hike;
+                if (log.isExtraHike) baseColor = colors.extraHike;
+                else if (log.isRunning) baseColor = colors.run;
+                else if (log.isTracking) baseColor = colors.trek;
+                else if (log.isWalking) baseColor = colors.walk;
 
-                if (activeColors.length >= 2) {
-                    dotStyle = activeColors.length === 2 
-                        ? `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`
-                        : `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
-                } else {
-                    dotStyle = `background: ${activeColors[0]};`;
-                }
+                dotStyle = `background: ${baseColor};`;
             }
 
             const heightVal = log.height || 0;
-            const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
-            const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
-            
-            const displayMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
+            const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
+            const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
             const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
             
-            const starTag = log.isTop100 
-                ? '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>' 
-                : '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
-                
-            const blueClass = log.isTop100 ? "top100-blue" : "";
+            // 🎯 100대 명산 타입 안전 검사 (Boolean/String/Number 대응)
+            const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
+
+            // 🎯 아이콘 태그 (★ / ✔)
+            let starTag = '';
+            if (isTop100Log) {
+                starTag = '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>';
+            } else if (!isPureRegularHike) {
+                starTag = '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
+            }
+
+            const isScheduleGroupExercise = log.isSchedule && isKmActivity;
+            let badgeBg = '#ecfdf5', badgeColor = '#10b981', badgeBorder = '#a7f3d0';
+            
+            if (log.isRunning) {
+                badgeBg = '#fdf2f8'; badgeColor = '#db2777'; badgeBorder = '#fbcfe8';
+            } else if (log.isTracking) {
+                badgeBg = '#f5f3ff'; badgeColor = '#7c3aed'; badgeBorder = '#ddd6fe';
+            } else if (log.isWalking) {
+                badgeBg = '#fff7ed'; badgeColor = '#c2410c'; badgeBorder = '#ffedd5';
+            }
+
+            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isScheduleGroupExercise;
+            
+            const scheduleBadge = showScheduleBadge 
+                ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
+                : '';
+
+            let seasonEmoji = '';
+            let textBody = rawMountain;
+
+            if (isPureRegularHike) {
+                const match = rawMountain.match(/^(🍀|🌸|🍁|❄️)/u);
+                if (match) {
+                    seasonEmoji = match[1];
+                    textBody = rawMountain.slice(seasonEmoji.length).trim();
+                }
+            }
+
+            const rainbowTextStyle = isPureRegularHike 
+                ? 'background: linear-gradient(90deg, #ff007f, #8a2be2, #0055ff, #00d2ff, #ff007f); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; animation: rainbowMove 3s linear infinite;' 
+                : '';
+
+            const regularSparkle = isPureRegularHike 
+                ? '<span style="font-size: 11px; margin-left: 3px;">✨</span>' 
+                : '';
+
+            const regularBadge = isPureRegularHike
+                ? `<span style="margin-left: auto; background: linear-gradient(135deg, rgba(255, 105, 180, 0.15), rgba(160, 32, 240, 0.15)); color: #7e22ce; border: 1px solid rgba(160, 32, 240, 0.35); font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; display: inline-flex; align-items: center; line-height: 1; flex-shrink: 0;">정기산행</span>`
+                : '';
+
+            // 🎯 [핵심] 100대 명산 블루글씨 및 정기산행 무지개 글씨 렌더링 분기
+            let mountainHtml = '';
+            if (isPureRegularHike) {
+                mountainHtml = `${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`;
+            } else if (isTop100Log) {
+                // top100-blue 클래스 부여 + 인라인 스타일로 파란색(#2563eb) 확실하게 고정
+                mountainHtml = `<span class="top100-blue" style="color: #2563eb !important; font-weight: 700;">${rawMountain} (${heightVal}${unit})</span>`;
+            } else {
+                mountainHtml = `<span>${rawMountain} (${heightVal}${unit})</span>`;
+            }
 
             return `
                 <div class="scroll-timeline-item">
                     <div class="scroll-item-date">${dateStr} (${dayName})</div>
-                    <div class="scroll-item-body">
-                        <span class="scroll-item-dot" style="${dotStyle}"></span>
-                        ${bacTag}
-                        <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
-                        ${starTag}
+                    <div class="scroll-item-body" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                            <span class="scroll-item-dot" style="${dotStyle}"></span>
+                            ${bacTag}
+                            <span class="scroll-item-name" style="display: inline-flex; align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                ${mountainHtml}
+                            </span>
+                            ${starTag}
+                        </div>
+                        ${regularBadge}
+                        ${scheduleBadge}
                     </div>
                 </div>
             `;
@@ -7943,6 +8203,14 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     }
 };
 
+   
+
+    
+            
+
+                                      
+                 
+    
 
             
 
@@ -8118,11 +8386,8 @@ document.addEventListener('touchstart', (e) => {
     }
 }, { passive: true });
 
-
 </script>
 </body>
     </html>
-    
-    
     
     
