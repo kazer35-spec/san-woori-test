@@ -2649,16 +2649,16 @@ overflow: hidden;
 </div>
 </div>
 
-<div class="main-container flex flex-col h-screen overflow-hidden">
+              <div class="main-container flex flex-col h-screen overflow-hidden">
   <!-- 상단 고정 영역 (탭 메뉴) -->
   <div class="tab-menu shrink-0">
     <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
     <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
   </div>
 
-  <div id="viewStatus" class="view-content flex-1 flex flex-col overflow-hidden p-4">
+  <div id="viewStatus" class="view-content flex-1 flex flex-col overflow-hidden p-4" style="padding-bottom: 0 !important;">
     <!-- 상단 고정 영역 (헤더, 컨트롤, 분기 탭) -->
-    <div class="sticky-header-wrapper shrink-0 bg-white">
+    <div class="sticky-header-wrapper shrink-0 bg-white" style="margin-bottom: 0 !important; padding-bottom: 0 !important;">
       <div class="year-selector flex justify-between items-center mb-2.5">
         <h1 class="main-title">
           <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
@@ -2694,7 +2694,8 @@ overflow: hidden;
         </select>
       </div>
 
-      <div id="quarterTabs" class="mb-1">
+      <!-- 분기 탭: 하단 마진을 완전히 제거하여 고정 -->
+      <div id="quarterTabs" style="margin-bottom: 0 !important; padding-bottom: 0 !important;">
         <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
         <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
         <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
@@ -2702,39 +2703,40 @@ overflow: hidden;
       </div>
     </div>
 
-    <!-- 스크롤 영역 (테이블 헤더 세로 중앙 정렬) -->
+    <!-- 스크롤 영역 (테이블 헤더 상하 여백 강제 고정) -->
     <div class="flex-1 overflow-y-auto">
-      <table class="w-full border-collapse">
-        <thead class="sticky top-0 bg-white z-10 border-b border-gray-100">
+      <table class="w-full border-collapse" style="margin-top: 0 !important;">
+        <thead class="sticky top-0 bg-white z-10 border-b border-gray-100" style="background-color: #ffffff !important;">
           <tr>
-            <th class="w-[18%] py-2 bg-white align-middle">
-              <div class="flex flex-col items-center justify-center h-full">
-                <span>회원명</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            <!-- padding: 상/하 동일하게 10px 부여 & 수직 중앙 정렬 강제 -->
+            <th class="w-[18%]" style="padding: 10px 0 !important; vertical-align: middle !important; background-color: #ffffff !important;">
+              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-center: center !important;">
+                <span style="line-height: 1.2 !important; display: block !important;">회원명</span>
+                <span style="font-size: 8px !important; font-weight: normal !important; color: #9ca3af !important; margin-top: 2px !important; line-height: 1 !important; display: block !important;">(나이테)</span>
               </div>
             </th>
-            <th class="w-[22%] py-2 bg-white align-middle">
-              <div class="flex flex-col items-center justify-center h-full">
-                <span>레벨(Lv)</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            <th class="w-[22%]" style="padding: 10px 0 !important; vertical-align: middle !important; background-color: #ffffff !important;">
+              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-center: center !important;">
+                <span style="line-height: 1.2 !important; display: block !important;">레벨(Lv)</span>
+                <span style="font-size: 8px !important; font-weight: normal !important; color: #9ca3af !important; margin-top: 2px !important; line-height: 1 !important; display: block !important;">(은하수)</span>
               </div>
             </th>
-            <th class="w-[18%] py-2 bg-white align-middle">
-              <div class="flex flex-col items-center justify-center h-full">
-                <span>활동점수</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            <th class="w-[18%]" style="padding: 10px 0 !important; vertical-align: middle !important; background-color: #ffffff !important;">
+              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-center: center !important;">
+                <span style="line-height: 1.2 !important; display: block !important;">활동점수</span>
+                <span style="font-size: 8px !important; font-weight: normal !important; color: #9ca3af !important; margin-top: 2px !important; line-height: 1 !important; display: block !important;">(분기운동)</span>
               </div>
             </th>
-            <th class="w-[22%] py-2 bg-white align-middle">
-              <div class="flex flex-col items-center justify-center h-full">
-                <span>누적고도</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            <th class="w-[22%]" style="padding: 10px 0 !important; vertical-align: middle !important; background-color: #ffffff !important;">
+              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-center: center !important;">
+                <span style="line-height: 1.2 !important; display: block !important;">누적고도</span>
+                <span style="font-size: 8px !important; font-weight: normal !important; color: #9ca3af !important; margin-top: 2px !important; line-height: 1 !important; display: block !important;">(정복지도)</span>
               </div>
             </th>
-            <th class="w-[16%] py-2 bg-white align-middle">
-              <div class="flex flex-col items-center justify-center h-full">
-                <span>개인기록</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            <th class="w-[16%]" style="padding: 10px 0 !important; vertical-align: middle !important; background-color: #ffffff !important;">
+              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-center: center !important;">
+                <span style="line-height: 1.2 !important; display: block !important;">개인기록</span>
+                <span style="font-size: 8px !important; font-weight: normal !important; color: #9ca3af !important; margin-top: 2px !important; line-height: 1 !important; display: block !important;">(D+Day)</span>
               </div>
             </th>
           </tr>
@@ -2744,7 +2746,6 @@ overflow: hidden;
     </div>
   </div>
 </div>
-
 
 
 
