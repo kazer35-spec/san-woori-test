@@ -3545,9 +3545,10 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
  
      
            
-// ─── 💡 초성 및 첫 글자 검색 유틸리티 ───
+// ─── 💡 한글 초성 분리 및 조합 검색 유틸리티 ───
 const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
+// 문자열 전체를 초성으로 변환 (예: "오즈" -> "ㅇㅈ")
 function getChosung(str) {
     let result = '';
     for (let i = 0; i < str.length; i++) {
@@ -3561,45 +3562,78 @@ function getChosung(str) {
     return result;
 }
 
-// 회원명의 '첫 글자'만 비교하는 검색 함수
+// 🎯 완성형 + 초성 조합 검색 함수 (예: ㅇ -> 오 -> 오ㅈ -> 오즈)
 function isMatchName(name, searchKeyword) {
     const cleanName = name.trim().toLowerCase();
     const cleanKeyword = searchKeyword.trim().toLowerCase();
 
     if (!cleanName || !cleanKeyword) return false;
 
-    // 🎯 회원명의 첫 글자만 추출
-    const firstChar = cleanName[0];
+    // 1. 일반 텍스트가 순서대로 포함되는지 (예: '오', '오즈')
+    if (cleanName.startsWith(cleanKeyword) || cleanName.includes(cleanKeyword)) {
+        return true;
+    }
 
-    // 1. 첫 글자가 검색어로 시작하는지 (예: '오' -> '오즈')
-    if (firstChar.includes(cleanKeyword)) return true;
-
-    // 2. 첫 글자의 초성이 일치하는지 (예: 'ㅇ' -> '오즈', '아랑')
-    const firstCharChosung = getChosung(firstChar);
+    // 2. 전체 초성 비교 (예: 'ㅇㅈ' -> '오즈')
+    const nameChosung = getChosung(cleanName);
     const keywordChosung = getChosung(cleanKeyword);
+    if (nameChosung.startsWith(keywordChosung) || nameChosung.includes(keywordChosung)) {
+        return true;
+    }
 
-    return firstCharChosung.includes(keywordChosung);
+    // 3. 혼합 조합 패턴 처리 (예: '오ㅈ' -> '오' + 'ㅈ' 패턴)
+    // 검색어의 각 글자별로 이름과 비교
+    let isPatternMatch = true;
+    for (let i = 0; i < cleanKeyword.length; i++) {
+        if (i >= cleanName.length) {
+            isPatternMatch = false;
+            break;
+        }
+
+        const kChar = cleanKeyword[i];
+        const nChar = cleanName[i];
+
+        // 검색어 글자가 자음(초성)인 경우 -> 이름 글자의 초성과 비교
+        if (CHOSUNG_LIST.includes(kChar)) {
+            if (getChosung(nChar) !== kChar) {
+                isPatternMatch = false;
+                break;
+            }
+        } else {
+            // 검색어 글자가 완성형인 경우 -> 이름 글자와 직접 비교
+            if (nChar !== kChar) {
+                isPatternMatch = false;
+                break;
+            }
+        }
+    }
+
+    return isPatternMatch;
 }
 
 // ─── 📡 랜더링 함수 ───
 window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
-    const search = document.getElementById('searchInput').value.trim();
-    const sort = document.getElementById('statusSortOrder').value;
-    if(!list) return;
-    list.innerHTML = "";
+    const searchInput = document.getElementById('searchInput');
+    const search = searchInput ? searchInput.value.trim() : "";
+    const sortSelect = document.getElementById('statusSortOrder');
+    const sort = sortSelect ? sortSelect.value : "qCount";
 
-    // 💡 기존 타이머 정리
+    if(!list) return;
+
+    // 타이머 정리
     if (window.recordBtnToggleInterval) {
         clearInterval(window.recordBtnToggleInterval);
         window.recordBtnToggleInterval = null;
     }
 
+    if (typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
+
     const today = new Date();
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
     let processedData = currentData.map(m => {
-        const last = m.lastDate ? m.lastDate.toDate() : new Date();
+        const last = m.lastDate ? (typeof m.lastDate.toDate === 'function' ? m.lastDate.toDate() : new Date(m.lastDate)) : new Date();
         const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
         const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
         const baseLimit = (m.level === 0 ? 30 : 122);
@@ -3631,11 +3665,12 @@ window.renderStatusTable = () => {
     const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
     let isFirstVisible = true;
+    let htmlBuilder = ""; 
 
     processedData.forEach((m) => {
-        if (!isAdminLoggedIn && m.isHidden) return;
+        if (typeof isAdminLoggedIn !== 'undefined' && !isAdminLoggedIn && m.isHidden) return;
         
-        // 🎯 회원명 '첫 글자' 한글/초성 검색 조건 적용
+        // 🎯 완성형 + 초성 + 혼합 조합 검색 적용
         if (search && !isMatchName(m.name, search)) return;
 
         let clickTag = "";
@@ -3675,7 +3710,8 @@ window.renderStatusTable = () => {
             }
         }
 
-        const style = getLevelStyle(m.level);
+        const style = (typeof getLevelStyle === 'function') ? getLevelStyle(m.level) : { bg: '#fff', border: '#ccc', text: '#000', blink: '' };
+        const badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(m.level) : m.level;
         const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
         const rawHeight = m.totalHeight || 0;
@@ -3683,8 +3719,7 @@ window.renderStatusTable = () => {
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-        list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-        <!-- 1. 회원명 -->
+        htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
         <td style="position: relative;" class="text-xs text-center">
             ${clickTag}
             <div class="flex flex-col items-center justify-center">
@@ -3695,29 +3730,25 @@ window.renderStatusTable = () => {
                 </span>
             </div>
         </td>
-        <!-- 2. 레벨 -->
         <td style="position: relative;">
             ${clickTag}
             <div class="badge-level">
                 <div class="badge-icon-box ${style.blink} cursor-pointer"
                      onclick="showMilkyWay('${m.name}', '${m.name}')"
                      style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                    <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
+                    <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
                 </div>
                 <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
             </div>
         </td>
-        <!-- 3. 활동점수 -->
         <td style="position: relative;">
             ${clickTag}
             <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
         </td>
-        <!-- 4. 누적고도 -->
         <td style="position: relative;">
             ${clickTag}
             <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
         </td>
-        <!-- 5. 개인기록 -->
         <td style="position: relative;" class="text-center">
             ${clickTag}
             <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
@@ -3733,7 +3764,8 @@ window.renderStatusTable = () => {
         }
     });
 
-    // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
+    list.innerHTML = htmlBuilder;
+
     let showDPlus = false;
     window.recordBtnToggleInterval = setInterval(() => {
         showDPlus = !showDPlus;
@@ -3757,7 +3789,7 @@ window.renderStatusTable = () => {
     }, 3000);
 };
 
-
+    
         
         
             
