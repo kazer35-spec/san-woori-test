@@ -3562,24 +3562,40 @@ function getChosung(str) {
     return result;
 }
 
-// 🎯 완성형 + 초성 조합 검색 함수 (예: ㅇ -> 오 -> 오ㅈ -> 오즈)
+// 🎯 첫 글자부터 시작하는 자음/완성형 조합 검색 함수
 function isMatchName(name, searchKeyword) {
     const cleanName = name.trim().toLowerCase();
     const cleanKeyword = searchKeyword.trim().toLowerCase();
 
     if (!cleanName || !cleanKeyword) return false;
 
-    // 1. 일반 텍스트가 순서대로 포함되는지 (예: '오', '오즈')
-    if (cleanName.startsWith(cleanKeyword) || cleanName.includes(cleanKeyword)) {
-        return true;
+    // 검색어가 이름보다 길면 매칭 불가능
+    if (cleanKeyword.length > cleanName.length) return false;
+
+    // 검색어의 각 글자 위치별로 '첫 글자부터' 순서대로 검증
+    for (let i = 0; i < cleanKeyword.length; i++) {
+        const kChar = cleanKeyword[i];
+        const nChar = cleanName[i];
+
+        // 1. 검색어가 '자음(초성)'인 경우 (예: 'ㄴ')
+        if (CHOSUNG_LIST.includes(kChar)) {
+            // 이름의 해당 위치 글자 초성과 일치하는지 비교
+            if (getChosung(nChar) !== kChar) {
+                return false;
+            }
+        } 
+        // 2. 검색어가 '완성형 글자'인 경우 (예: '나')
+        else {
+            // 이름의 해당 위치 글자와 직접 비교
+            if (nChar !== kChar) {
+                return false;
+            }
+        }
     }
 
-    // 2. 전체 초성 비교 (예: 'ㅇㅈ' -> '오즈')
-    const nameChosung = getChosung(cleanName);
-    const keywordChosung = getChosung(cleanKeyword);
-    if (nameChosung.startsWith(keywordChosung) || nameChosung.includes(keywordChosung)) {
-        return true;
-    }
+    return true;
+}
+
 
     // 3. 혼합 조합 패턴 처리 (예: '오ㅈ' -> '오' + 'ㅈ' 패턴)
     // 검색어의 각 글자별로 이름과 비교
