@@ -2695,6 +2695,8 @@ overflow: hidden;
   </div>
 
   <div id="quarterTabs" class="mb-1">
+  <!-- 분기 탭 영역 (여백 최소화 및 위아래 균등 맞춤) -->
+  <div id="quarterTabs" style="margin-bottom: 2px !important; margin-top: 2px !important;">
     <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
     <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
     <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
@@ -2702,36 +2704,36 @@ overflow: hidden;
   </div>
 
   <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
-  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
+  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative" style="margin-top: 0px !important;">
     <table class="w-full table-fixed border-collapse">
       <thead class="sticky top-0 z-20 bg-white shadow-xs">
         <tr class="border-b border-gray-200">
-          <!-- py-2 및 flex 정렬로 글자를 셀 정중앙으로 유착 -->
-          <th class="w-[18%] py-2 text-center bg-white align-middle">
+          <!-- py-1.5로 셀 내부 상하 여백도 미세 조절 -->
+          <th class="w-[18%] py-1.5 text-center bg-white align-middle">
             <div class="flex flex-col items-center justify-center">
               <span>회원명</span>
               <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
             </div>
           </th>
-          <th class="w-[22%] py-2 text-center bg-white align-middle">
+          <th class="w-[22%] py-1.5 text-center bg-white align-middle">
             <div class="flex flex-col items-center justify-center">
               <span>레벨(Lv)</span>
               <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
             </div>
           </th>
-          <th class="w-[18%] py-2 text-center bg-white align-middle">
+          <th class="w-[18%] py-1.5 text-center bg-white align-middle">
             <div class="flex flex-col items-center justify-center">
               <span>활동점수</span>
               <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
             </div>
           </th>
-          <th class="w-[22%] py-2 text-center bg-white align-middle">
+          <th class="w-[22%] py-1.5 text-center bg-white align-middle">
             <div class="flex flex-col items-center justify-center">
               <span>누적고도</span>
               <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
             </div>
           </th>
-          <th class="w-[16%] py-2 text-center bg-white align-middle">
+          <th class="w-[16%] py-1.5 text-center bg-white align-middle">
             <div class="flex flex-col items-center justify-center">
               <span>개인기록</span>
               <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
@@ -2742,7 +2744,6 @@ overflow: hidden;
       <tbody id="statusList"></tbody>
     </table>
   </div>
-</div>
 
  
           
