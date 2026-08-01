@@ -2683,7 +2683,7 @@ overflow: hidden;
       </div>
 
       <div class="flex gap-2 mb-2.5 h-10 items-center">
-        <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+        <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 회원 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
         <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
         <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
           <option value="qCount">점수순 ▼</option>
@@ -2694,7 +2694,6 @@ overflow: hidden;
         </select>
       </div>
 
-      <!-- 분기 탭: 하단 여백(mb-1)으로 최적화 -->
       <div id="quarterTabs" class="mb-1">
         <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
         <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
@@ -2703,30 +2702,40 @@ overflow: hidden;
       </div>
     </div>
 
-    <!-- 스크롤 영역 (테이블 헤더 패딩 조정) -->
+    <!-- 스크롤 영역 (테이블 헤더 세로 중앙 정렬) -->
     <div class="flex-1 overflow-y-auto">
       <table class="w-full border-collapse">
         <thead class="sticky top-0 bg-white z-10 border-b border-gray-100">
           <tr>
-            <th class="w-[18%] py-1.5 bg-white">
-              회원명
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            <th class="w-[18%] py-2 bg-white align-middle">
+              <div class="flex flex-col items-center justify-center h-full">
+                <span>회원명</span>
+                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+              </div>
             </th>
-            <th class="w-[22%] py-1.5 bg-white">
-              레벨(Lv)
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            <th class="w-[22%] py-2 bg-white align-middle">
+              <div class="flex flex-col items-center justify-center h-full">
+                <span>레벨(Lv)</span>
+                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+              </div>
             </th>
-            <th class="w-[18%] py-1.5 bg-white">
-              활동점수
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            <th class="w-[18%] py-2 bg-white align-middle">
+              <div class="flex flex-col items-center justify-center h-full">
+                <span>활동점수</span>
+                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+              </div>
             </th>
-            <th class="w-[22%] py-1.5 bg-white">
-              누적고도
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            <th class="w-[22%] py-2 bg-white align-middle">
+              <div class="flex flex-col items-center justify-center h-full">
+                <span>누적고도</span>
+                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+              </div>
             </th>
-            <th class="w-[16%] py-1.5 bg-white">
-              개인기록
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            <th class="w-[16%] py-2 bg-white align-middle">
+              <div class="flex flex-col items-center justify-center h-full">
+                <span>개인기록</span>
+                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+              </div>
             </th>
           </tr>
         </thead>
@@ -2735,6 +2744,7 @@ overflow: hidden;
     </div>
   </div>
 </div>
+
 
 
 
