@@ -1540,13 +1540,7 @@ tr td:first-child .click-neon-adjust {
     50% { opacity: 0.5; }
 }
 
-/* 테이블 셀 높이 및 정렬 규격화 */
-table tbody tr td {
-    position: relative;
-    height: 60px; /* 셀 높이를 고정하여 click 텍스트 라인을 맞춤 */
-    vertical-align: middle;
-    padding-top: 12px !important; /* 위쪽 click 텍스트 공간 확보 */
-}
+
 
 /* 하단 정보 바 전체 설정 */
 .mountain-info-bar {
@@ -2303,43 +2297,87 @@ text-align: center;
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
 /* 테이블 간격 및 정렬 최적화 */
-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; }
-td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
+/* 테이블 간격 및 정렬 최적화 */
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  table-layout: fixed; 
+}
+
+/* sticky 고정을 위한 thead 레이아웃 설정 */
+thead {
+  position: sticky;
+  top: 0;
+  background-color: #ffffff; /* 스크롤 시 뒤 내용이 비치지 않도록 흰색 배경 지정 */
+  z-index: 10;
+}
+
+th { 
+  color: #94a3b8; 
+  font-size: 0.65rem; 
+  padding-bottom: 12px; 
+  border-bottom: 2px solid #f8fafc; 
+  text-align: center; 
+  font-weight: 900; 
+}
+
+td { 
+  padding: 12px 0; 
+  text-align: center; 
+  vertical-align: middle; 
+  position: relative; 
+  border-bottom: 1px solid #f8fafc; 
+}
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
-.rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
+.rank-1 { color: #facc15 !important; } 
+.rank-2 { color: #94a3b8 !important; } 
+.rank-3 { color: #a36a00 !important; }
 
 /* CLICK 네온 텍스트: 은은한 회색 숨쉬기 효과 */
 .click-neon {
-font-size: 6px; /* 가독성을 위해 살짝 키움 */
-font-weight: 900;
-color: #cbd5e1; /* 기본 회색 */
-text-transform: uppercase;
-position: absolute;
-top: 4px;
-left: 50%;
-transform: translateX(-50%);
-animation: neon-soft-glow 2s infinite ease-in-out; /* 부드러운 애니메이션 */
-letter-spacing: 1px;
-pointer-events: none;
-white-space: nowrap;
-z-index: 5;
+  font-size: 6px;
+  font-weight: 900;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: neon-soft-glow 2s infinite ease-in-out;
+  letter-spacing: 1px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 5;
 }
 
 @keyframes neon-soft-glow {
-0%, 100% {
-opacity: 1;
-/* 은색과 밝은 회색의 조화 */
-text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
-color: #f8fafc;
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
+    color: #f8fafc;
+  }
+  50% {
+    opacity: 0.4;
+    text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
+    color: #64748b;
+  }
 }
-50% {
-opacity: 0.4;
-text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
-color: #64748b; /* 완전히 꺼지지 않고 은은하게 남음 */
+
+/* 테이블 셀 높이 및 정렬 규격화 */
+table tbody tr td {
+  position: relative;
+  height: 60px;
+  vertical-align: middle;
+  padding-top: 12px !important;
 }
+
+/* 💡 스크롤 영역 지정을 위한 클래스 추가 */
+.table-scroll-container {
+  max-height: calc(100vh - 280px); /* 화면 높이에 맞춰 수직 스크롤 영역 제한 (필요시 높이 조정 가능) */
+  overflow-y: auto;
 }
+
 
 /* 2. 배지 스타일 수정 (은은한 글로우 추가) */
 .badge-level {
@@ -2650,392 +2688,353 @@ overflow: hidden;
 </div>
 
 
-   <div class="main-container flex flex-col">
-<div class="tab-menu">
-<button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
-<button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
-</div>
+<!-- 메인 컨테이너 시작 -->
+<div class="main-container flex flex-col h-screen">
+  
+  <!-- 상단 탭 메뉴 -->
+  <div class="tab-menu">
+    <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
+    <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
+  </div>
 
+  <!-- 1. 실시간 현황 뷰 (viewStatus) -->
+  <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
+    
+    <!-- 상단 고정 헤더 영역 -->
+    <div class="year-selector flex justify-between items-center mb-3">
+      <h1 class="main-title">
+        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+        <span>산:우리</span>
+        <span class="slogan-txt">같이 걷는 즐거움</span>
+      </h1>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
+        <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+          <svg viewBox="0 0 36 36">
+            <circle class="bg" cx="18" cy="18" r="16"></circle>
+            <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+          </svg>
+          <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+        </button>
+        <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+          <option value="2026">2026년</option>
+          <option value="2027">2027년</option>
+        </select>
+      </div>
+    </div>
 
-        
-
-            <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
-  <div class="year-selector flex justify-between items-center mb-3">
-    <h1 class="main-title">
-      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-      <span>산:우리</span>
-      <span class="slogan-txt">같이 걷는 즐거움</span>
-    </h1>
-    <div class="flex items-center gap-2">
-      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-      <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-        <svg viewBox="0 0 36 36">
-          <circle class="bg" cx="18" cy="18" r="16"></circle>
-          <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-        </svg>
-        <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-      </button>
-      <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-        <option value="2026">2026년</option>
-        <option value="2027">2027년</option>
+    <!-- 검색 및 필터 컨트롤 -->
+    <div class="flex gap-2 mb-3 h-10 items-center">
+      <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 회원 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+      <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+      <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
+        <option value="qCount">점수순 ▼</option>
+        <option value="level">레벨순 ▼</option>
+        <option value="name">이름순 ▼</option>
+        <option value="totalHeight">높이순 ▼</option>
+        <option value="dday">날짜순 ▼</option>
       </select>
     </div>
-  </div>
 
-  <div class="flex gap-2 mb-2 h-10 items-center">
-    <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-    <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-    <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-      <option value="qCount">점수순 ▼</option>
-      <option value="level">레벨순 ▼</option>
-      <option value="name">이름순 ▼</option>
-      <option value="totalHeight">높이순 ▼</option>
-      <option value="dday">날짜순 ▼</option>
-    </select>
-  </div>
+    <!-- 분기 탭 -->
+    <div id="quarterTabs" class="mb-3">
+      <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+      <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+      <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+      <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+    </div>
 
-  <div id="quarterTabs" class="mb-1">
-    <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-    <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-    <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-    <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-  </div>
+    <!-- 독립 스크롤 수행 영역 -->
+    <div class="flex-1 overflow-y-auto">
+      <table>
+        <thead>
+          <tr>
+            <th class="w-[18%]">
+              회원명
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            </th>
+            <th class="w-[22%]">
+              레벨(Lv)
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            </th>
+            <th class="w-[18%]">
+              활동점수
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            </th>
+            <th class="w-[22%]">
+              누적고도
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            </th>
+            <th class="w-[16%]">
+              개인기록
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="statusList"></tbody>
+      </table>
+    </div>
 
-   <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
-<div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
-  <table class="w-full table-fixed border-collapse">
-    <thead class="sticky top-0 z-20 bg-white shadow-xs">
-      <tr class="border-b border-gray-200">
-        
-        <th class="w-[18%] py-2 text-center bg-white align-middle" style="padding-top: 10px !important; padding-bottom: 10px !important;">
-          <div class="flex flex-col items-center justify-center" style="line-height: 1.2 !important;">
-            <span>회원명</span>
-            <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+  </div> <!-- viewStatus 닫힘 -->
+
+  <!-- 2. 관리자 로그인 뷰 (viewLogin) -->
+  <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto flex-1">
+    <div class="secret-login-container text-center">
+      <div class="secret-icon">🔐</div>
+      <h2 class="text-white text-lg font-black mb-1">관리자 구역</h2>
+      <p class="text-blue-300 text-[9px] mb-4 font-medium opacity-80 uppercase tracking-widest">Authorized Personnel Only</p>
+
+      <div class="px-4">
+        <input type="password" id="adminPassword" placeholder="••••••" class="secret-input">
+        <button onclick="loginAdmin()" class="btn-submit bg-blue-600 font-black">ACCESS GRANTED</button>
+      </div>
+
+      <div class="admin-subroom-dark-card text-left mt-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-black text-white">⛺️ 산:우리 서브방</span>
           </div>
-        </th>
 
-        <th class="w-[22%] py-2 text-center bg-white align-middle" style="padding-top: 10px !important; padding-bottom: 10px !important;">
-          <div class="flex flex-col items-center justify-center" style="line-height: 1.2 !important;">
-            <span>레벨(Lv)</span>
-            <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+          <button type="button" onclick="window.location.href='https://kazer35-spec.github.io/notice/'" class="cosmic-admin-btn btn-small">
+            <div class="btn-glow-line"></div>
+            <span style="font-size: 8px;">✦</span>
+            <span style="white-space: nowrap;">일정 양식 ↗</span>
+          </button>
+        </div>
+
+        <div id="userSubRoomGrid" class="subroom-grid"></div>
+      </div>
+
+      <div class="admin-subroom-dark-card">
+        <div class="stat-header">
+          <div class="stat-title-fancy"><span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 🌲 멤버 구성 현황</div>
+          <div class="stat-badge-total">TOTAL <span id="countTotal">0</span></div>
+        </div>
+        <div class="stat-grid-premium">
+          <div class="stat-box-premium male">
+            <span class="stat-label-premium">Gentlemen</span>
+            <div class="stat-val-premium"><span id="countMale">0</span><span class="stat-unit-premium">명</span></div>
+            <div class="stat-icon-bg">👦</div>
           </div>
-        </th>
-
-        <th class="w-[18%] py-2 text-center bg-white align-middle" style="padding-top: 10px !important; padding-bottom: 10px !important;">
-          <div class="flex flex-col items-center justify-center" style="line-height: 1.2 !important;">
-            <span>활동점수</span>
-            <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+          <div class="stat-box-premium female">
+            <span class="stat-label-premium">Ladies</span>
+            <div class="stat-val-premium"><span id="countFemale">0</span><span class="stat-unit-premium">명</span></div>
+            <div class="stat-icon-bg">👧</div>
           </div>
-        </th>
+        </div>
+      </div>
 
-        <th class="w-[22%] py-2 text-center bg-white align-middle" style="padding-top: 10px !important; padding-bottom: 10px !important;">
-          <div class="flex flex-col items-center justify-center" style="line-height: 1.2 !important;">
-            <span>누적고도</span>
-            <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-          </div>
-        </th>
+      <div class="visitor-stat-card">
+        <div class="sys-log-header"><span class="live-dot"></span> SYSTEM LOG: ENCRYPTED</div>
+        <div class="v-stat-grid">
+          <div class="v-stat-item"><div class="v-stat-label">Session Today</div><div id="todayHits" class="v-stat-value">0</div></div>
+          <div class="v-stat-item"><div class="v-stat-label">System Total</div><div id="totalHits" class="v-stat-value v-stat-total">0</div></div>
+        </div>
+      </div>
 
-        <th class="w-[16%] py-2 text-center bg-white align-middle" style="padding-top: 10px !important; padding-bottom: 10px !important;">
-          <div class="flex flex-col items-center justify-center" style="line-height: 1.2 !important;">
-            <span>개인기록</span>
-            <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-          </div>
-        </th>
+      <p class="system-date-info text-[9px] text-gray-600 mt-6 leading-tight">
+        Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
+      </p>
+    </div>
+  </div> <!-- viewLogin 닫힘 -->
 
-      </tr>
-    </thead>
-    <tbody id="statusList"></tbody>
-  </table>
-</div>
-
-
-
- 
-          
-
-
-
+  <!-- 3. 관리자 설정 뷰 (viewAdmin) -->
+  <div id="viewAdmin" class="view-content hidden p-5 overflow-y-auto max-h-[92vh] flex-1">
     
-
-<div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
-<div class="secret-login-container text-center">
-<div class="secret-icon">🔐</div>
-<h2 class="text-white text-lg font-black mb-1">관리자 구역</h2>
-<p class="text-blue-300 text-[9px] mb-4 font-medium opacity-80 uppercase tracking-widest">Authorized Personnel Only</p>
-
-<div class="px-4">
-<input type="password" id="adminPassword" placeholder="••••••" class="secret-input">
-<button onclick="loginAdmin()" class="btn-submit bg-blue-600 font-black">ACCESS GRANTED</button>
-</div>
-
-<div class="admin-subroom-dark-card text-left mt-6">
-<div class="flex items-center justify-between mb-3">
-<div class="flex items-center gap-2">
-<span class="text-xs font-black text-white">⛺️ 산:우리 서브방</span>
-</div>
-
-<button type="button" onclick="window.location.href='https://kazer35-spec.github.io/notice/'" class="cosmic-admin-btn btn-small">
-  <div class="btn-glow-line"></div>
-  <span style="font-size: 8px;">✦</span>
-  <span style="white-space: nowrap;">일정 양식 ↗</span>
-</button>
-</div>
-
-<div id="userSubRoomGrid" class="subroom-grid"></div>
-</div>
-
-<div class="admin-subroom-dark-card">
-<div class="stat-header">
-<div class="stat-title-fancy"><span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 🌲 멤버 구성 현황</div>
-<div class="stat-badge-total">TOTAL <span id="countTotal">0</span></div>
-</div>
-<div class="stat-grid-premium">
-<div class="stat-box-premium male">
-<span class="stat-label-premium">Gentlemen</span>
-<div class="stat-val-premium"><span id="countMale">0</span><span class="stat-unit-premium">명</span></div>
-<div class="stat-icon-bg">👦</div>
-</div>
-<div class="stat-box-premium female">
-<span class="stat-label-premium">Ladies</span>
-<div class="stat-val-premium"><span id="countFemale">0</span><span class="stat-unit-premium">명</span></div>
-<div class="stat-icon-bg">👧</div>
-</div>
-</div>
-</div>
-
-<div class="visitor-stat-card">
-<div class="sys-log-header"><span class="live-dot"></span> SYSTEM LOG: ENCRYPTED</div>
-<div class="v-stat-grid">
-<div class="v-stat-item"><div class="v-stat-label">Session Today</div><div id="todayHits" class="v-stat-value">0</div></div>
-<div class="v-stat-item"><div class="v-stat-label">System Total</div><div id="totalHits" class="v-stat-value v-stat-total">0</div></div>
-</div>
-</div>
-
-<p class="system-date-info text-[9px] text-gray-600 mt-6 leading-tight">
-Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
-</p>
-</div>
-</div>
-
-<div id="viewAdmin" class="view-content hidden p-5 overflow-y-auto max-h-[92vh]">
-<div class="card" style="border: 1.5px solid #e2e880;">
-<div class="card-title text-blue-600 font-black flex justify-between items-center">
-<span>🛠️ 서브방 관리</span>
-</div>
-<div id="adminSubRoomList" class="admin-subroom-grid"></div>
-</div>
-
-<div class="card">
-<div class="card-title text-green-600 font-bold">🆕 신규 회원 등록</div>
-<input type="text" id="newName" placeholder="회원 이름" class="input-gap">
-<div class="gender-select-group">
-<label><input type="radio" name="newGender" value="남" checked> 남성</label>
-<label><input type="radio" name="newGender" value="여"> 여성</label>
-</div>
-<input type="date" id="regDate" class="input-gap">
-<button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
-</div>
-
-<div class="card">
-<div class="card-title text-blue-600 font-bold flex justify-between">
-<span>📅 등산 기록 및 좌표 정복 관리</span>
-<button onclick="globalSyncMountainInfo()" class="text-[9px] bg-red-50 text-red-500 border border-red-200 px-2 rounded-lg font-black">⛰️ 산 정보 일괄수정</button>
-</div>
-<input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 px-4 rounded-xl w-full mb-2 text-xs bg-blue-50 border-blue-100 outline-none border">
-<div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
-
-<div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
-<div class="flex items-center justify-between mb-2">
-  <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-  <div class="flex gap-2">
-    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-      <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-      <span class="text-[10px] font-black text-blue-600">100대명산</span>
-    </label>
-    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-      <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-      <span class="text-[10px] font-black text-red-500">BAC인증지</span>
-    </label>
-  </div>
-</div>
-
-<div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
-    </label>
-    <!-- 일정: 런닝/트래킹/산책/산행 어느 것과도 조합 가능하도록 독립 구성 -->
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
-    </label>
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
-    </label>
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
-    </label>
-    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
-    </label>
-</div>
-
-<div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
-    <div class="flex-1 flex items-center gap-1">
-        <span class="text-[9px] text-gray-400 shrink-0">🪨바위</span>
-        <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+    <!-- 서브방 관리 -->
+    <div class="card" style="border: 1.5px solid #e2e880;">
+      <div class="card-title text-blue-600 font-black flex justify-between items-center">
+        <span>🛠️ 서브방 관리</span>
+      </div>
+      <div id="adminSubRoomList" class="admin-subroom-grid"></div>
     </div>
-    <div class="flex-1 flex items-center gap-1">
-        <span class="text-[9px] text-gray-400 shrink-0">🌿숲</span>
-        <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+
+    <!-- 신규 회원 등록 -->
+    <div class="card">
+      <div class="card-title text-green-600 font-bold">🆕 신규 회원 등록</div>
+      <input type="text" id="newName" placeholder="회원 이름" class="input-gap">
+      <div class="gender-select-group">
+        <label><input type="radio" name="newGender" value="남" checked> 남성</label>
+        <label><input type="radio" name="newGender" value="여"> 여성</label>
+      </div>
+      <input type="date" id="regDate" class="input-gap">
+      <button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
     </div>
-    <div class="flex-1 flex items-center gap-1">
-        <span class="text-[9px] text-gray-400 shrink-0">🌊계곡</span>
-        <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+
+    <!-- 등산 기록 및 좌표 정복 관리 -->
+    <div class="card">
+      <div class="card-title text-blue-600 font-bold flex justify-between">
+        <span>📅 등산 기록 및 좌표 정복 관리</span>
+        <button onclick="globalSyncMountainInfo()" class="text-[9px] bg-red-50 text-red-500 border border-red-200 px-2 rounded-lg font-black">⛰️ 산 정보 일괄수정</button>
+      </div>
+      <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 px-4 rounded-xl w-full mb-2 text-xs bg-blue-50 border-blue-100 outline-none border">
+      <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
+
+      <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+          <div class="flex gap-2">
+            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+              <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+              <span class="text-[10px] font-black text-blue-600">100대명산</span>
+            </label>
+            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+              <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+              <span class="text-[10px] font-black text-red-500">BAC인증지</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
+          </label>
+        </div>
+
+        <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
+          <div class="flex-1 flex items-center gap-1">
+            <span class="text-[9px] text-gray-400 shrink-0">🪨바위</span>
+            <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+          </div>
+          <div class="flex-1 flex items-center gap-1">
+            <span class="text-[9px] text-gray-400 shrink-0">🌿숲</span>
+            <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+          </div>
+          <div class="flex-1 flex items-center gap-1">
+            <span class="text-[9px] text-gray-400 shrink-0">🌊계곡</span>
+            <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+          </div>
+        </div>
+
+        <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름 (예: 관악산)" class="mb-2 h-9 text-xs w-full border rounded px-2">
+
+        <div class="flex gap-2 mb-2">
+          <select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
+            <option value="기타">📍 수동 지역 선택 (선택 안함)</option>
+            <option value="서울특별시">서울특별시</option>
+            <option value="인천광역시">인천광역시</option>
+            <option value="경기도">경기도</option>
+            <option value="강원도">강원도</option>
+            <option value="충청북도">충청북도</option>
+            <option value="충청남도">충청남도</option>
+            <option value="대전/세종">대전/세종</option>
+            <option value="전라북도">전라북도</option>
+            <option value="전라남도">전라남도</option>
+            <option value="광주광역시">광주광역시</option>
+            <option value="경상북도">경상북도</option>
+            <option value="경상남도">경상남도</option>
+            <option value="대구광역시">대구광역시</option>
+            <option value="울산광역시">울산광역시</option>
+            <option value="부산광역시">부산광역시</option>
+            <option value="제주도">제주도</option>
+          </select>
+        </div>
+
+        <div class="flex gap-2 mb-2">
+          <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
+          <div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
+            <span class="text-[9px] font-bold text-gray-400">UP:</span>
+            <div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
+              <label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
+              <label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
+              <label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
+              <label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
+                <input type="checkbox" id="isQuarterCheck">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-container" onclick="setAdminCoordinate(event)">
+          <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+          <div id="adminMapMarker" class="map-point hidden"></div>
+        </div>
+        <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
+      </div>
+
+      <input type="date" id="activityDate" class="input-gap">
+      <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
     </div>
-</div>
 
-<input type="text" id="mountainName" 
-       onblur="autoFindCoords(); autoFindMountainStats();" 
-       placeholder="등산한 산 이름 (예: 관악산)" 
-       class="mb-2 h-9 text-xs w-full border rounded px-2">
-
-<div class="flex gap-2 mb-2">
-<select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
-<option value="기타">📍 수동 지역 선택 (선택 안함)</option>
-<option value="서울특별시">서울특별시</option>
-<option value="인천광역시">인천광역시</option>
-<option value="경기도">경기도</option>
-<option value="강원도">강원도</option>
-<option value="충청북도">충청북도</option>
-<option value="충청남도">충청남도</option>
-<option value="대전/세종">대전/세종</option>
-<option value="전라북도">전라북도</option>
-<option value="전라남도">전라남도</option>
-<option value="광주광역시">광주광역시</option>
-<option value="경상북도">경상북도</option>
-<option value="경상남도">경상남도</option>
-<option value="대구광역시">대구광역시</option>
-<option value="울산광역시">울산광역시</option>
-<option value="부산광역시">부산광역시</option>
-<option value="제주도">제주도</option>
-</select>
-</div>
-
-<div class="flex gap-2 mb-2">
-<input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
-<div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
-<span class="text-[9px] font-bold text-gray-400">UP:</span>
-<div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
-<label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
-<label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
-<label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
-
-<label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
-<input type="checkbox" id="isQuarterCheck">
-</label>
-</div>
-</div>
-</div>
-<div class="map-container" onclick="setAdminCoordinate(event)">
-<img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
-<div id="adminMapMarker" class="map-point hidden"></div>
-</div>
-<div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
-</div>
-
-<input type="date" id="activityDate" class="input-gap">
-<button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-</div>
-
-
-
-<div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
-  <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
-
-  <!-- 대상 회원 선택 -->
-  <select id="memberSelectEdit" onchange="loadMemberLogs()" class="input-gap mb-3 w-full border rounded-xl p-2 text-sm">
-    <option value="">대상 회원 선택</option>
-  </select>
-
-  <!-- 🎯 요청사항 1: 가로 입력칸 3개 -->
-  <div class="grid grid-cols-3 gap-2 mb-2">
-    <input type="text" id="editMemberNameInput" placeholder="변경할 이름" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
-    <input type="number" id="manualLevelInput" placeholder="레벨(Lv)" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
-    <input type="number" id="manualQCountInput" placeholder="분기 횟수" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
-  </div>
-
-  <!-- 🎯 요청사항 2: 가로 버튼 3개 (탭 한 줄) -->
-  <div class="grid grid-cols-3 gap-2 mb-3">
-    <button onclick="updateMemberName()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">이름 수정</button>
-    <button onclick="window.updateManualLevel()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">레벨 적용</button>
-    <button onclick="window.updateManualQCount()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">횟수 적용</button>
-  </div>
-
-  <hr class="my-3 border-amber-200">
-
-  <!-- 로그 목록 영역 -->
-  <div id="logListArea" class="log-grid"></div>
-</div>
-
-
-
-<div class="card" style="background-color: #fff5f5; border: 1px solid #ffe3e3;">
-    <div class="card-title text-red-600 font-bold mb-3">🗑️ 회원 상태 및 보너스 관리</div>
-    
-    <select id="memberSelectManage" class="input-gap w-full mb-4 bg-white border border-gray-200 rounded px-3 py-2 text-sm">
+    <!-- 기록 수정 및 레벨 관리 -->
+    <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
+      <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
+      <select id="memberSelectEdit" onchange="loadMemberLogs()" class="input-gap mb-3 w-full border rounded-xl p-2 text-sm">
         <option value="">대상 회원 선택</option>
-    </select>
+      </select>
 
-    <div class="grid grid-cols-3 gap-2 mb-2">
-    <input type="number" id="buddyCountInput" placeholder="동행 횟수" 
-           class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" 
-           inputmode="numeric">
-    
-    <input type="text" id="friendshipPointInput" placeholder="우정 포인트" 
-           class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" 
-           inputmode="text" 
-           oninput="this.value = this.value.replace(/[^0-9-]/g, '')"> 
-    
-    <input type="text" id="bonusDaysInput" placeholder="보너스 날짜" 
-           class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" 
-           inputmode="text"
-           oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
-</div>
+      <div class="grid grid-cols-3 gap-2 mb-2">
+        <input type="text" id="editMemberNameInput" placeholder="변경할 이름" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
+        <input type="number" id="manualLevelInput" placeholder="레벨(Lv)" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
+        <input type="number" id="manualQCountInput" placeholder="분기 횟수" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
+      </div>
 
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <button onclick="updateMemberName()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">이름 수정</button>
+        <button onclick="window.updateManualLevel()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">레벨 적용</button>
+        <button onclick="window.updateManualQCount()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">횟수 적용</button>
+      </div>
 
-    <div class="grid grid-cols-3 gap-2 mb-4">
-        <button onclick="updateBuddyCountManual()" 
-                class="bg-emerald-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">
-            동행 수정
-        </button>
-        <button onclick="updateFriendshipPoint()" 
-                class="bg-blue-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">
-            포인트 적용
-        </button>
-        <button onclick="updateBonusDays()" 
-                class="bg-red-500 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">
-            날짜 적용
-        </button>
+      <hr class="my-3 border-amber-200">
+      <div id="logListArea" class="log-grid"></div>
     </div>
 
-    <div class="flex gap-2">
-        <button onclick="toggleHideMember()" class="flex-1 bg-slate-600 text-white py-2 rounded text-xs font-bold">
-            숨기기/보이기
-        </button>
-        <button onclick="deleteMember()" class="flex-1 bg-red-600 text-white py-2 rounded text-xs font-bold">
-            영구 삭제
-        </button>
+    <!-- 회원 상태 및 보너스 관리 -->
+    <div class="card" style="background-color: #fff5f5; border: 1px solid #ffe3e3;">
+      <div class="card-title text-red-600 font-bold mb-3">🗑️ 회원 상태 및 보너스 관리</div>
+      <select id="memberSelectManage" class="input-gap w-full mb-4 bg-white border border-gray-200 rounded px-3 py-2 text-sm">
+        <option value="">대상 회원 선택</option>
+      </select>
+
+      <div class="grid grid-cols-3 gap-2 mb-2">
+        <input type="number" id="buddyCountInput" placeholder="동행 횟수" class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" inputmode="numeric">
+        <input type="text" id="friendshipPointInput" placeholder="우정 포인트" class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" inputmode="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '')"> 
+        <input type="text" id="bonusDaysInput" placeholder="보너스 날짜" class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" inputmode="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="updateBuddyCountManual()" class="bg-emerald-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">동행 수정</button>
+        <button onclick="updateFriendshipPoint()" class="bg-blue-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">포인트 적용</button>
+        <button onclick="updateBonusDays()" class="bg-red-500 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">날짜 적용</button>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="toggleHideMember()" class="flex-1 bg-slate-600 text-white py-2 rounded text-xs font-bold">숨기기/보이기</button>
+        <button onclick="deleteMember()" class="flex-1 bg-red-600 text-white py-2 rounded text-xs font-bold">영구 삭제</button>
+      </div>
     </div>
-</div>
-<div class="p-4 text-center"><button onclick="logoutAdmin()" class="text-gray-400 underline font-bold text-xs">로그아웃</button></div>
-<div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
-<button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
-💾 전체 데이터 원클릭 백업 (JSON 다운로드)
-</button>
-<p style="text-align: center; font-size: 11px; color: #888; margin-top: 8px;">
-※ 클릭 시 전체 멤버와 산행 기록이 파일로 저장됩니다.
-</p>
-</div>
-</div>
+
+    <div class="p-4 text-center">
+      <button onclick="logoutAdmin()" class="text-gray-400 underline font-bold text-xs">로그아웃</button>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
+      <button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+        💾 전체 데이터 원클릭 백업 (JSON 다운로드)
+      </button>
+      <p style="text-align: center; font-size: 11px; color: #888; margin-top: 8px;">
+        ※ 클릭 시 전체 멤버와 산행 기록이 파일로 저장됩니다.
+      </p>
+    </div>
+
+  </div> <!-- viewAdmin 닫힘 -->
+
+</div> <!-- main-container 닫힘 -->
+
+
+
     
 
 
@@ -3525,6 +3524,9 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
  
+     
+           
+
 // ─── 1. 한글 초성 유틸리티 ───
 const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
@@ -3753,8 +3755,9 @@ window.renderStatusTable = function() {
 
 
 
-     
-                               
+
+
+      
         
         
             
