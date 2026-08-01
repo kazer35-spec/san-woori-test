@@ -2649,7 +2649,7 @@ overflow: hidden;
 </div>
 </div>
 
-              <div class="main-container flex flex-col h-screen overflow-hidden">
+     <div class="main-container flex flex-col h-screen overflow-hidden">
   <!-- 상단 고정 영역 (탭 메뉴) -->
   <div class="tab-menu shrink-0">
     <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
@@ -2657,8 +2657,9 @@ overflow: hidden;
   </div>
 
   <div id="viewStatus" class="view-content flex-1 flex flex-col overflow-hidden p-4" style="padding-bottom: 0 !important;">
-    <!-- 상단 고정 영역 (헤더, 컨트롤, 분기 탭) -->
-    <div class="sticky-header-wrapper shrink-0 bg-white" style="margin-bottom: 0 !important; padding-bottom: 0 !important;">
+    
+    <!-- 1. 고정 헤더 영역 (로고 + 검색/버튼 + 분기 탭) -->
+    <div class="sticky-header-wrapper shrink-0 bg-white" style="background-color: #ffffff !important; z-index: 20 !important; position: relative !important; margin-bottom: 12px !important;">
       <div class="year-selector flex justify-between items-center mb-2.5">
         <h1 class="main-title">
           <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
@@ -2694,8 +2695,8 @@ overflow: hidden;
         </select>
       </div>
 
-      <!-- 분기 탭: 하단 마진을 완전히 제거하여 고정 -->
-      <div id="quarterTabs" style="margin-bottom: 0 !important; padding-bottom: 0 !important;">
+      <!-- 분기 탭 (하단 여백 및 독립 고정) -->
+      <div id="quarterTabs" style="display: flex !important; margin-bottom: 0 !important;">
         <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
         <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
         <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
@@ -2703,20 +2704,19 @@ overflow: hidden;
       </div>
     </div>
 
-    <!-- 스크롤 영역 (테이블 헤더 상하 여백 강제 고정) -->
-    <div class="flex-1 overflow-y-auto">
-      <table class="w-full border-collapse" style="margin-top: 0 !important;">
-        <thead class="sticky top-0 bg-white z-10 border-b border-gray-100" style="background-color: #ffffff !important;">
+    <!-- 2. 스크롤 영역 (테이블만 별도로 아래에서 스크롤) -->
+    <div class="flex-1 overflow-y-auto" style="position: relative !important;">
+      <table class="w-full border-collapse" style="margin-top: 0 !important; width: 100% !important;">
+        <thead class="sticky top-0 z-10" style="position: sticky !important; top: 0 !important; background-color: #ffffff !important; z-index: 10 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;">
           <tr>
-            <!-- padding: 상/하 동일하게 10px 부여 & 수직 중앙 정렬 강제 -->
             <th class="w-[18%]" style="padding: 10px 0 !important; vertical-align: middle !important; background-color: #ffffff !important;">
-              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-center: center !important;">
+              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;">
                 <span style="line-height: 1.2 !important; display: block !important;">회원명</span>
                 <span style="font-size: 8px !important; font-weight: normal !important; color: #9ca3af !important; margin-top: 2px !important; line-height: 1 !important; display: block !important;">(나이테)</span>
               </div>
             </th>
             <th class="w-[22%]" style="padding: 10px 0 !important; vertical-align: middle !important; background-color: #ffffff !important;">
-              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-center: center !important;">
+              <div style="display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;">
                 <span style="line-height: 1.2 !important; display: block !important;">레벨(Lv)</span>
                 <span style="font-size: 8px !important; font-weight: normal !important; color: #9ca3af !important; margin-top: 2px !important; line-height: 1 !important; display: block !important;">(은하수)</span>
               </div>
@@ -2746,8 +2746,7 @@ overflow: hidden;
     </div>
   </div>
 </div>
-
-
+                     
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
