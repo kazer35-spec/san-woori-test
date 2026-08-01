@@ -2650,8 +2650,7 @@ overflow: hidden;
 </div>
 
       
-<span style="line-height: 1.2 !important; display: block !important;">누적고도</span>
-<div class="main-container flex flex-col h-screen overflow-hidden">
+
   <!-- 상단 고정 영역 (탭 메뉴) -->
   <div class="tab-menu shrink-0">
     <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
@@ -3556,7 +3555,7 @@ function isMatchName(name, searchKeyword) {
 
 
 // ─── 📡 renderStatusTable ───
-Window.renderStatusTable = () => {
+window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
