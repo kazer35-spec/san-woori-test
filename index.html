@@ -8300,113 +8300,142 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     }
 };
 
-   
+  </script>
+// ==========================================
+// 1. 통합 모달/팝업 제어 및 히스토리 관리
+// ==========================================
 
-    
-            
+// 현재 열려있는 모달/팝업들을 추적하는 배열
+const activeModals = [];
 
-                                      
-                 
-    
+// 모달/팝업 열기 통합 함수
+function openCustomModal(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
 
-            
+    // 이미 열려있지 않은 경우에만 히스토리 추가
+    if (!activeModals.includes(elementId)) {
+        // 화면 표시 처리
+        if (elementId === 'grassPopup') {
+            el.classList.remove('hidden');
+            el.style.display = 'block';
+        } else {
+            el.style.display = 'flex'; // 또는 'block' (CSS 기본값에 맞춰 적용)
+        }
 
-                             </script>
+        activeModals.push(elementId);
 
-<div id="mountainViewModal" class="mountain-modal" onclick="this.style.display='none'">
-    <div id="integratedCard" class="integrated-member-card" onclick="event.stopPropagation()">
+        // 뒤로가기 감지용 가짜 state push
+        history.pushState({ modalId: elementId }, '');
+    }
+}
 
-        <!-- [나이테 섹션] -->
-        <div class="tree-ring-section">
-            <div class="ring-header">
-                <!-- [나이테 섹션] 타이틀 그룹 부분 -->
-<div class="ring-title-group">
-    <span class="ring-label">ACTIVITY HISTORY</span>
-    
-    <!-- 💡 아래 h3 태그와 버튼에 position과 z-index를 추가하여 나이테 애니메이션 위로 버튼을 완전히 빼냅니다. -->
-    <h3 class="ring-main-title" style="position: relative; z-index: 100;">
-        활동 나이테 
-        <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
-    </h3>
-</div>
+// 모달/팝업 닫기 통합 함수
+function closeCustomModal(elementId, isFromPopstate = false) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
 
-                <div class="ring-stats" style="text-align: right;">
-                    <span id="activityMonths" class="ring-months-val">0</span>
-                    <span class="ring-unit">Months</span>
-                    <div id="ringLaunchedDate" style="font-size: 9px; color: #1ABC9C; font-family: monospace; font-weight: bold; margin-top: 4px; letter-spacing: 0.5px; opacity: 0.8;">LAUNCHED: ----.--.--</div>
-                </div>
-            </div>
-            <div id="treeRingContainer" class="ring-canvas"></div>
-        </div>
+    // 화면 숨김 처리
+    if (elementId === 'grassPopup') {
+        el.classList.add('hidden');
+        el.style.display = 'none';
+    } else {
+        el.style.display = 'none';
+    }
 
-        <!-- [산맥 비주얼 섹션] -->
-        <div class="mountain-section">
-            <div id="starrySky"></div>
-            <div id="bgLayersContainer"></div>
-            <div id="lightBeam" class="light-beam"></div>
-            <div id="peakLayer" class="mountain-layer"></div>
-
-            <div class="mountain-header">
-                <h2 id="mwMountainName" style="font-size: 16px; margin: 0; font-weight: 900; color: white;"></h2>
-                <p style="font-size: 15px; color: #94a3b8; margin: 0;"></p>
-            </div>
-
-            <div id="highestPeakLabel" class="highest-peak-label"></div>
-
-            <div class="mountain-info-bar">
-                <div class="info-item">개인 누적 <span id="myTotalH" class="info-val">0</span>m</div>
-                <div class="info-item">산우리 합산 <span id="globalTotalH" class="info-val">0</span>m</div>
-            </div>
-        </div>
-
-        <!-- ➕ [신규 추가] 도움말 안내 팝업 모달 -->
-        <div id="mwInfoHelpModal" class="mw-info-modal" onclick="closeMountainInfoModal(event)">
-            <div class="mw-info-card" onclick="event.stopPropagation()">
-                <div class="mw-info-header">
-                    <span id="mwInfoModalTitle" class="mw-info-title">도움말</span>
-                    <button class="mw-info-close-btn" onclick="closeMountainInfoModal()">&times;</button>
-                </div>
-                <div id="mwInfoModalBody" class="mw-info-body">
-                    <!-- 자바스크립트로 동적 동기화 -->
-                </div>
-            </div>
-        </div>
-
-        <button onclick="document.getElementById('mountainViewModal').style.display='none'" style="position:absolute; top:15px; right:15px; color:white; background:none; border:none; font-size:24px; cursor:pointer; z-index:201;">&times;</button>
-    </div>
-</div>
-
-
-<!-- [모던 산우리 운동 리포트 모달 레이어] -->
-<div id="scrollModal" class="scroll-overlay" style="display: none;">
-    <div class="fading-scroll">
-
-        <!-- 헤더 영역 -->
-        <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center;">
-            <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
-            <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
-            <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
-            <span class="modal-close-btn" onclick="document.getElementById('scrollModal').style.display='none'">&times;</span>
-        </div>
-
-        <!-- 스크롤 컨텐츠 영역 -->
-        <div id="scrollContent" class="scroll-body"></div>
-
-        <!-- 하단 푸터 영역 -->
-        <div class="scroll-footer">
-            <button class="modal-bottom-close-btn" onclick="document.getElementById('scrollModal').style.display='none'"></button>
-        </div>
+    // 배열에서 제거
+    const index = activeModals.indexOf(elementId);
+    if (index > -1) {
+        activeModals.splice(index, 1);
         
-    </div>
-</div>
+        // 버튼 클릭/바깥 클릭으로 직접 닫은 경우 쌓인 히스토리 삭제
+        if (!isFromPopstate) {
+            history.back();
+        }
+    }
+}
 
 
+// ==========================================
+// 2. 뒤로가기(popstate) 이벤트 핸들러
+// ==========================================
+window.addEventListener('popstate', (e) => {
+    // 열려있는 모달이 있다면 가장 마지막에 열린 모달부터 하나씩 닫음
+    if (activeModals.length > 0) {
+        const lastModalId = activeModals[activeModals.length - 1];
+        closeCustomModal(lastModalId, true);
+    }
+});
 
 
-<div id="grassPopup" class="hidden" style="position: absolute; z-index: 9999; background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; shadow: 0 10px 15px -3px rgba(0,0,0,0.1); min-width: 140px; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-    <div id="popupDate" style="font-size: 10px; font-weight: bold; color: #94a3b8; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; margin-bottom: 8px;"></div>
-    <div id="popupContent" style="display: flex; flex-direction: column; gap: 4px;"></div>
-</div>
+// ==========================================
+// 3. 기존 잔디 팝업(showGrassPopup) 수정 연동
+// ==========================================
+window.showGrassPopup = (event, date, encodedAct) => {
+    if (event.stopPropagation) event.stopPropagation();
+
+    if (!encodedAct) {
+        closeCustomModal('grassPopup');
+        return;
+    }
+
+    const popup = document.getElementById('grassPopup');
+    const content = document.getElementById('popupContent');
+    const dateEl = document.getElementById('popupDate');
+
+    if (popup.parentElement !== document.body) {
+        document.body.appendChild(popup);
+    }
+
+    const act = JSON.parse(atob(encodedAct));
+    dateEl.innerText = date;
+    
+    let items = "";
+    if (act.hike > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; gap:12px;"><span>⛰️ 산행</span><b>${act.hike}회</b></div>`;
+    if (act.run > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#ec4899; gap:12px;"><span>🏃‍♀️ 런닝</span><b>${act.run}회</b></div>`;
+    if (act.trek > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#a855f7; gap:12px;"><span>👨‍🦯 트래킹</span><b>${act.trek}회</b></div>`;
+    if (act.walk > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#f97316; gap:12px;"><span>🚶 산책</span><b>${act.walk}회</b></div>`;
+    if (act.extraHike > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#00B36B; gap:12px;"><span>🏔 개인산행</span><b>${act.extraHike}회</b></div>`;
+    if (act.isRegular) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#2ecc71; gap:12px;"><span>🌈 정기산행</span><b>참석</b></div>`;
+    
+    content.innerHTML = items;
+
+    // 모달 open 처리
+    openCustomModal('grassPopup');
+
+    popup.style.position = 'fixed';
+    popup.style.zIndex = '999999';
+
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+    let left = clientX + 15;
+    let top = clientY - 85;
+
+    if (left + 160 > window.innerWidth) left = clientX - 170;
+    if (top < 10) top = clientY + 20;
+
+    popup.style.left = `${left}px`;
+    popup.style.top = `${top}px`;
+};
+
+
+// ==========================================
+// 4. 외부 영역 클릭/터치 감지
+// ==========================================
+document.addEventListener('mousedown', (e) => {
+    const popup = document.getElementById('grassPopup');
+    if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
+        closeCustomModal('grassPopup');
+    }
+});
+
+document.addEventListener('touchstart', (e) => {
+    const popup = document.getElementById('grassPopup');
+    if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
+        closeCustomModal('grassPopup');
+    }
+}, { passive: true });
 
 <script>
 // 팝업 닫기 전용 함수 (중복 호출 방지 및 공통 처리)
