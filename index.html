@@ -2302,8 +2302,7 @@ text-align: center;
 .del-btn-mini { font-size: 0.6rem; background: #ef4444; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
-: 0 !important;
-/* 1. 테이블 기본 스타일 */
+/* 1. 테이블 기본 스타일 (기존과 동일) */
 table { 
   width: 100%; 
   border-collapse: collapse; 
@@ -2317,7 +2316,6 @@ th {
   border-bottom: 2px solid #f8fafc; 
   text-align: center; 
   font-weight: 900; 
-  background-color: #ffffff;
 }
 
 td { 
@@ -2328,26 +2326,22 @@ td {
   border-bottom: 1px solid #f8fafc; 
 }
 
-/* 2. 관리자 탭 전환 충돌 방지 및 전체 스크롤 영역 설정 */
-.main-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-#viewStatus {
-  max-height: calc(100vh - 50px); /* 상단 탭 메뉴 높이 제외 */
-  overflow-y: auto !important;   /* 스크롤 생성 */
-}
-
-/* 3. 🔴 빨간 줄(테이블 제목 th)을 화면 최상단에 고정 */
-#viewStatus table thead th {
+/* 2. 🔴 관리자 설정 탭 완벽 지원 + 빨간 줄 아래로만 스크롤 고정 */
+/* 스크롤 시 상단 내용이 통째로 상단에 붙어 고정됩니다 */
+.year-selector,
+.flex.gap-2.mb-3.h-10,
+#quarterTabs,
+thead {
   position: sticky;
-  top: 0;
-  z-index: 20;
-  background-color: #ffffff; /* 스크롤 시 아래 글자가 뒤로 숨도록 처리 */
-  box-shadow: 0 1px 0 0 #f8fafc; /* 경계선 유지 */
+  background-color: #ffffff;
+  z-index: 10;
 }
+
+/* 각각의 위치를 딱 맞게 고정 */
+.year-selector { top: 0; }
+.flex.gap-2.mb-3.h-10 { top: 48px; }
+#quarterTabs { top: 96px; }
+thead { top: 138px; }
 
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
