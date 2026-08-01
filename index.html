@@ -8485,82 +8485,132 @@ document.addEventListener('touchstart', (e) => {
 
     
     // ===================================================
-// [통합] 모든 모달/팝업 뒤로가기 자동 연동 스크립트
-// 기존 코드는 수정하지 말고, 이 코드를 script 맨 밑에 붙여넣으세요.
+// [통합] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
+// 기존 코드 수정 없이 script 맨 최하단에 붙여넣으세요.
 // ===================================================
 (function() {
-    // 닫아야 할 대상 모달들의 ID 목록
+    // 닫기 처리를 할 모든 모달 ID 목록
     const MODAL_IDS = [
+        'levelModal',
+        'vibeModal',
+        'hallModal',
+        'mapModal',
+        'milkyWayModal',
+        'timelineModal',
+        'logPopup',
         'mountainViewModal',
         'scrollModal',
-        'grassPopup',
-        'mwInfoHelpModal'
+        'mwInfoHelpModal',
+        'grassPopup'
     ];
 
-    // 현재 열려있는 모달 추적 스택
-    const openModalStack = [];
+    // 열려있는 모달을 추적하는 스택
+    const modalStack = [];
 
-    // 요소가 실제 화면에 떠있는지 검사하는 함수
-    function isModalVisible(el) {
+    // 모달이 실제 화면에 보이고 있는지 판별하는 함수
+    function isVisible(el) {
         if (!el) return false;
         if (el.classList.contains('hidden')) return false;
         const style = window.getComputedStyle(el);
         return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
     }
 
-    // 화면의 모든 모달 상태 체크 및 히스토리 생성
-    function checkModals() {
+    // 각 모달을 안전하게 닫는 통합 함수 (기존 toggle/close 함수 연동)
+    function closeModalById(id) {
+        switch (id) {
+            case 'levelModal':
+                if (typeof window.toggleModal === 'function') window.toggleModal(false);
+                else hideEl(id);
+                break;
+            case 'vibeModal':
+                if (typeof window.toggleVibeModal === 'function') window.toggleVibeModal(false);
+                else hideEl(id);
+                break;
+            case 'hallModal':
+                if (typeof window.toggleHallModal === 'function') window.toggleHallModal(false);
+                else hideEl(id);
+                break;
+            case 'mapModal':
+                if (typeof window.toggleMapModal === 'function') window.toggleMapModal(false);
+                else hideEl(id);
+                break;
+            case 'timelineModal':
+                if (typeof window.toggleTimelineModal === 'function') window.toggleTimelineModal(false);
+                else hideEl(id);
+                break;
+            case 'logPopup':
+                if (typeof window.toggleLogPopup === 'function') window.toggleLogPopup(false);
+                else hideEl(id);
+                break;
+            case 'mwInfoHelpModal':
+                if (typeof window.closeMountainInfoModal === 'function') window.closeMountainInfoModal();
+                else hideEl(id);
+                break;
+            default:
+                hideEl(id);
+                break;
+        }
+    }
+
+    // 엘리먼트 수동 숨김 (fallback)
+    function hideEl(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+        }
+    }
+
+    // 화면 내 모달들의 감지 및 브라우저 history 상태 동기화
+    function syncModalHistory() {
         MODAL_IDS.forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
 
-            const visible = isModalVisible(el);
-            const stackIdx = openModalStack.indexOf(id);
+            const visible = isVisible(el);
+            const stackIndex = modalStack.indexOf(id);
 
-            // 1. 모달이 열렸는데 스택에 없으면 -> 히스토리 push
-            if (visible && stackIdx === -1) {
-                openModalStack.push(id);
-                history.pushState({ modalId: id }, '');
+            // 1. 새 모달이 열렸는데 스택에 없으면 -> 뒤로가기 히스토리 추가
+            if (visible && stackIndex === -1) {
+                modalStack.push(id);
+                history.pushState({ isSanWooriModal: true, modalId: id }, '');
             } 
-            // 2. 모달이 사용자의 직접 클릭(X버튼, 배경클릭 등)으로 닫혔으면 -> 스택에서 제거
-            else if (!visible && stackIdx !== -1) {
-                openModalStack.splice(stackIdx, 1);
+            // 2. 사용자가 X버튼이나 배경 클릭 등으로 모달을 직접 닫았으면 -> 스택에서 제거
+            else if (!visible && stackIndex !== -1) {
+                modalStack.splice(stackIndex, 1);
             }
         });
     }
 
-    // 뒤로가기 버튼(popstate) 이벤트 수신기
-    window.addEventListener('popstate', () => {
-        // 열린 모달이 있다면 가장 최근에 열린 모달부터 닫기
-        if (openModalStack.length > 0) {
-            const lastId = openModalStack.pop();
-            const el = document.getElementById(lastId);
-            
-            if (el) {
-                el.classList.add('hidden');
-                el.style.display = 'none';
-            }
+    // 모바일/브라우저 뒤로가기 버튼(popstate) 발생 시 처리
+    window.addEventListener('popstate', (e) => {
+        if (modalStack.length > 0) {
+            // 가장 마지막에 열린 모달 닫기
+            const lastModalId = modalStack.pop();
+            closeModalById(lastModalId);
         }
     });
 
-    // 화면 내 style, class 변화를 0.1초마다/변화시마다 자동 감지
-    const observer = new MutationObserver(checkModals);
-    
-    function initObserver() {
+    // DOM 변화(class, style) 실시간 감지하여 모달 열림/닫힘 추적
+    const observer = new MutationObserver(() => {
+        syncModalHistory();
+    });
+
+    function initModalObserver() {
         if (document.body) {
             observer.observe(document.body, {
                 attributes: true,
                 subtree: true,
                 attributeFilter: ['style', 'class']
             });
-            checkModals();
+            syncModalHistory();
         }
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initObserver);
+        document.addEventListener('DOMContentLoaded', initModalObserver);
     } else {
-        initObserver();
+        initModalObserver();
     }
 })();
 
