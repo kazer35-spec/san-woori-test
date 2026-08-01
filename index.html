@@ -8490,18 +8490,17 @@ document.addEventListener('touchstart', (e) => {
 
 
 // =========================================================================
-// [최종 통합본] San:Woori 모든 모달/팝업 뒤로가기(Hash) 완벽 제어 스크립트
-// 기존 뒤로가기 관련 코드는 모두 삭제하고, 스크립트 최하단에 이 코드만 붙여넣으세요.
+// [scrollModal 전용] 개인 운동 상태 리포트 & 뒤로가기(Hash) 완전 제어
 // =========================================================================
 (function() {
-    // 1. 관리할 모든 모달 ID 목록
+    // 1. 관리할 모달 ID 목록
     const TARGET_MODALS = [
-        'milkyWayModal', 'timelineModal', 'scrollModal', 'levelModal',
+        'scrollModal', 'milkyWayModal', 'timelineModal', 'levelModal',
         'starGuideModal', 'sgCustomModal', 'vibeModal', 'hallModal',
-        'mapModal', 'logPopup', 'mountainViewModal', 'mwInfoHelpModal', 'grassPopup'
+        'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup'
     ];
 
-    // 2. 모달 상태 체크 (화면에 보이는지 확실하게 확인)
+    // 2. 모달 열림 상태 체크
     function isVisible(el) {
         if (!el) return false;
         if (el.classList.contains('hidden')) return false;
@@ -8509,145 +8508,81 @@ document.addEventListener('touchstart', (e) => {
         return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0;
     }
 
-    // 3. 모달별 안전한 통합 닫기 함수
+    // 3. 안전한 닫기 처리 함수
     window.closeSanWooriModal = function(id) {
         const el = document.getElementById(id);
         if (!el) return;
 
-        // 커스텀 닫기 함수가 있다면 우선 실행
-        switch (id) {
-            case 'milkyWayModal':
-                if (typeof window.toggleMilkyWayModal === 'function') { window.toggleMilkyWayModal(false); return; }
-                break;
-            case 'timelineModal':
-            case 'scrollModal':
-                if (typeof window.toggleTimelineModal === 'function') { window.toggleTimelineModal(false); return; }
-                break;
-            case 'levelModal':
-                if (typeof window.toggleModal === 'function') { window.toggleModal(false); return; }
-                break;
-            case 'starGuideModal':
-                if (typeof window.toggleStarGuide === 'function') { window.toggleStarGuide(false); return; }
-                break;
-            case 'sgCustomModal':
-                if (typeof window.closeSgModal === 'function') { window.closeSgModal(); return; }
-                break;
-            case 'vibeModal':
-                if (typeof window.toggleVibeModal === 'function') { window.toggleVibeModal(false); return; }
-                break;
-            case 'hallModal':
-                if (typeof window.toggleHallModal === 'function') { window.toggleHallModal(false); return; }
-                break;
-            case 'mapModal':
-                if (typeof window.toggleMapModal === 'function') { window.toggleMapModal(false); return; }
-                break;
-            case 'logPopup':
-                if (typeof window.toggleLogPopup === 'function') { window.toggleLogPopup(false); return; }
-                break;
-            case 'mwInfoHelpModal':
-                if (typeof window.closeMountainInfoModal === 'function') { window.closeMountainInfoModal(); return; }
-                break;
-        }
-
-        // 기본 닫기 처리 (CSS 제어 강제 숨김)
-        el.classList.add('hidden');
-        el.style.display = 'none';
-    };
-
-    // 4. [필수 보완] 은하수 / 타임라인(스크롤) 모달 강제 토글 함수 정의
-    window.toggleMilkyWayModal = function(show) {
-        const modal = document.getElementById('milkyWayModal');
-        if (!modal) return;
-        if (show) {
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
+        if (id === 'scrollModal' || id === 'timelineModal') {
+            el.style.display = 'none';
+            el.classList.add('hidden');
+        } else if (id === 'milkyWayModal' && typeof window.toggleMilkyWayModal === 'function') {
+            window.toggleMilkyWayModal(false);
+        } else if (id === 'levelModal' && typeof window.toggleModal === 'function') {
+            window.toggleModal(false);
         } else {
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
+            el.style.display = 'none';
+            el.classList.add('hidden');
         }
     };
 
-    // 스크롤 모달과 타임라인 모달이 혼용되는 문제 해결을 위해 두 ID 동시 제어
-    window.toggleTimelineModal = function(show) {
-        ['timelineModal', 'scrollModal'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                if (show) {
-                    el.classList.remove('hidden');
-                    el.style.display = 'flex';
-                } else {
-                    el.classList.add('hidden');
-                    el.style.display = 'none';
-                }
-            }
-        });
+    // 4. scrollModal 열기 함수
+    window.showScrollModal = function() {
+        const modal = document.getElementById('scrollModal');
+        if (!modal) return;
+
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex'; // 또는 'block'
+
+        // 페이지네이션 초기화 및 리스트 로드
+        if (!window.scrollPagination) {
+            window.scrollPagination = { currentCategory: 'all', currentPageSize: 20, isEnd: false };
+        } else {
+            window.scrollPagination.currentPageSize = 20;
+            window.scrollPagination.isEnd = false;
+        }
+
+        if (typeof window.loadScrollLogsPage === 'function') {
+            window.loadScrollLogsPage(true);
+        }
     };
 
-    // 은하수 모달 실행 함수 오버라이드 (중복 실행 방지 기능 추가)
-    if (typeof window.showMilkyWay === 'function' && !window.showMilkyWay.isOverridden) {
-        const _origShowMilkyWay = window.showMilkyWay;
-        window.showMilkyWay = async function(mId, mName) {
-            window.toggleMilkyWayModal(true);
-            if (location.hash !== '#milkyWayModal') {
-                history.pushState(null, null, '#milkyWayModal');
-            }
-            await _origShowMilkyWay(mId, mName);
-        };
-        window.showMilkyWay.isOverridden = true; // 중복 덮어쓰기 방지
-    }
-
-    // 5. DOM 변화(class, style) 감지를 통한 URL Hash(뒤로가기 스택) 자동 생성 로직
+    // 5. DOM 변화 감지하여 모달이 열리면 URL Hash (#scrollModal) 부여
     const observer = new MutationObserver(() => {
-        let activeModalId = null;
-        
-        // 현재 열려있는 모달 중 가장 마지막 모달 식별
         TARGET_MODALS.forEach(id => {
             const el = document.getElementById(id);
-            if (isVisible(el)) {
-                activeModalId = id;
+            if (isVisible(el) && location.hash !== '#' + id) {
+                history.pushState(null, null, '#' + id);
             }
         });
-
-        // 열려있는 모달이 있고, 현재 URL 해시와 다르면 히스토리 추가
-        if (activeModalId && location.hash !== '#' + activeModalId) {
-            history.pushState(null, null, '#' + activeModalId);
-        }
     });
 
-    // 6. 브라우저 뒤로가기(popstate) 버튼 입력 시 처리
+    // 6. 브라우저 뒤로가기(popstate) 발생 시 모달 닫기
     window.addEventListener('popstate', function() {
-        const currentHash = location.hash;
-        
-        // 화면에 열려있는 모든 모달을 검사하여 닫아야 할 모달 식별
         TARGET_MODALS.forEach(id => {
             const el = document.getElementById(id);
-            // 모달이 열려있는데, 현재 URL 해시가 해당 모달의 해시(#id)가 아니라면 뒤로가기가 눌린 것이므로 닫음
-            if (isVisible(el) && currentHash !== '#' + id) {
+            // 모달은 열려있는데 해시가 사라진 경우(=뒤로가기를 누른 경우)
+            if (isVisible(el) && location.hash !== '#' + id) {
                 window.closeSanWooriModal(id);
             }
         });
     });
 
-    // 7. 시스템 초기화 및 DOM 감시 시작
+    // 초기화
     function init() {
         if (document.body) {
             observer.observe(document.body, {
-                attributes: true,
-                childList: true,
-                subtree: true,
-                attributeFilter: ['style', 'class']
+                attributes: true, childList: true, subtree: true, attributeFilter: ['style', 'class']
             });
         }
     }
 
-    // DOM 로드가 완료되었는지 체크 후 실행
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
 })();
-
 
 </script>
 </body>
