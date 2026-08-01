@@ -2773,10 +2773,8 @@ overflow: hidden;
 </div>
 
   
-          
-
-
-<div id="viewAdmin" class="view-content hidden p-6 overflow-y-auto">
+    <!-- 🎯 id를 viewLogin으로 지정해야 로그인이 안 된 상태에서 이 창이 열립니다. -->
+<div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
   <div class="secret-login-container text-center">
     <div class="secret-icon">🔐</div>
     <h2 class="text-white text-lg font-black mb-1">관리자 구역</h2>
@@ -2787,54 +2785,65 @@ overflow: hidden;
       <button onclick="loginAdmin()" class="btn-submit bg-blue-600 font-black">ACCESS GRANTED</button>
     </div>
 
-<div class="admin-subroom-dark-card text-left mt-6">
-<div class="flex items-center justify-between mb-3">
-<div class="flex items-center gap-2">
-<span class="text-xs font-black text-white">⛺️ 산:우리 서브방</span>
+    <div class="admin-subroom-dark-card text-left mt-6">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black text-white">⛺️ 산:우리 서브방</span>
+        </div>
+
+        <button type="button" onclick="window.location.href='https://kazer35-spec.github.io/notice/'" class="cosmic-admin-btn btn-small">
+          <div class="btn-glow-line"></div>
+          <span style="font-size: 8px;">✦</span>
+          <span style="white-space: nowrap;">일정 양식 ↗</span>
+        </button>
+      </div>
+
+      <div id="userSubRoomGrid" class="subroom-grid"></div>
+    </div>
+
+    <div class="admin-subroom-dark-card">
+      <div class="stat-header">
+        <div class="stat-title-fancy"><span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 🌲 멤버 구성 현황</div>
+        <div class="stat-badge-total">TOTAL <span id="countTotal">0</span></div>
+      </div>
+      <div class="stat-grid-premium">
+        <div class="stat-box-premium male">
+          <span class="stat-label-premium">Gentlemen</span>
+          <div class="stat-val-premium"><span id="countMale">0</span><span class="stat-unit-premium">명</span></div>
+          <div class="stat-icon-bg">👦</div>
+        </div>
+        <div class="stat-box-premium female">
+          <span class="stat-label-premium">Ladies</span>
+          <div class="stat-val-premium"><span id="countFemale">0</span><span class="stat-unit-premium">명</span></div>
+          <div class="stat-icon-bg">👧</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="visitor-stat-card">
+      <div class="sys-log-header"><span class="live-dot"></span> SYSTEM LOG: ENCRYPTED</div>
+      <div class="v-stat-grid">
+        <div class="v-stat-item"><div class="v-stat-label">Session Today</div><div id="todayHits" class="v-stat-value">0</div></div>
+        <div class="v-stat-item"><div class="v-stat-label">System Total</div><div id="totalHits" class="v-stat-value v-stat-total">0</div></div>
+      </div>
+    </div>
+
+    <p class="system-date-info text-[9px] text-gray-600 mt-6 leading-tight">
+      Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
+    </p>
+  </div>
 </div>
 
-<button type="button" onclick="window.location.href='https://kazer35-spec.github.io/notice/'" class="cosmic-admin-btn btn-small">
-  <div class="btn-glow-line"></div>
-  <span style="font-size: 8px;">✦</span>
-  <span style="white-space: nowrap;">일정 양식 ↗</span>
-</button>
+<!-- 💡 로그인 성공 후 표시될 실제 관리자 설정 화면 (viewAdmin)이 별도로 아래에 존재해야 합니다 -->
+<div id="viewAdmin" class="view-content hidden p-6 overflow-y-auto">
+  <!-- 회원 관리, 데이터 수정 등 실제 관리자 컨트롤 영역 -->
 </div>
+      
 
-<div id="userSubRoomGrid" class="subroom-grid"></div>
-</div>
 
-<div class="admin-subroom-dark-card">
-<div class="stat-header">
-<div class="stat-title-fancy"><span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 🌲 멤버 구성 현황</div>
-<div class="stat-badge-total">TOTAL <span id="countTotal">0</span></div>
-</div>
-<div class="stat-grid-premium">
-<div class="stat-box-premium male">
-<span class="stat-label-premium">Gentlemen</span>
-<div class="stat-val-premium"><span id="countMale">0</span><span class="stat-unit-premium">명</span></div>
-<div class="stat-icon-bg">👦</div>
-</div>
-<div class="stat-box-premium female">
-<span class="stat-label-premium">Ladies</span>
-<div class="stat-val-premium"><span id="countFemale">0</span><span class="stat-unit-premium">명</span></div>
-<div class="stat-icon-bg">👧</div>
-</div>
-</div>
-</div>
 
-<div class="visitor-stat-card">
-<div class="sys-log-header"><span class="live-dot"></span> SYSTEM LOG: ENCRYPTED</div>
-<div class="v-stat-grid">
-<div class="v-stat-item"><div class="v-stat-label">Session Today</div><div id="todayHits" class="v-stat-value">0</div></div>
-<div class="v-stat-item"><div class="v-stat-label">System Total</div><div id="totalHits" class="v-stat-value v-stat-total">0</div></div>
-</div>
-</div>
 
-<p class="system-date-info text-[9px] text-gray-600 mt-6 leading-tight">
-Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
-</p>
-</div>
-</div>
+
 
 <div id="viewAdmin" class="view-content hidden p-5 overflow-y-auto max-h-[92vh]">
 <div class="card" style="border: 1.5px solid #e2e880;">
