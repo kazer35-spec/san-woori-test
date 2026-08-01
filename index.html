@@ -8383,10 +8383,11 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
         <!-- 헤더 영역 -->
         <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center;">
-            <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
             <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
             <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
-            <span class="modal-close-btn" onclick="document.getElementById('scrollModal').style.display='none'">&times;</span>
+            
+            <!-- 🎯 여기 onclick 수정: closeScrollModal() 호출 -->
+            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
         </div>
 
         <!-- 스크롤 컨텐츠 영역 -->
@@ -8394,7 +8395,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
         <!-- 하단 푸터 영역 -->
         <div class="scroll-footer">
-            <button class="modal-bottom-close-btn" onclick="document.getElementById('scrollModal').style.display='none'"></button>
+            <!-- 🎯 여기 onclick 수정: closeScrollModal() 호출 -->
+            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()"></button>
         </div>
         
     </div>
@@ -8581,6 +8583,74 @@ document.addEventListener('touchstart', (e) => {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
+    }
+})();
+
+    // =========================================================================
+// [완전 해결] scrollModal 전용 뒤로가기 & 수동 닫기 동기화 스크립트
+// =========================================================================
+(function() {
+    const TARGET_MODALS = [
+        'scrollModal', 'milkyWayModal', 'timelineModal', 'levelModal',
+        'starGuideModal', 'sgCustomModal', 'vibeModal', 'hallModal',
+        'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup'
+    ];
+
+    let isInternalClosing = false;
+
+    // 모달 감지
+    function isVisible(el) {
+        if (!el) return false;
+        if (el.classList.contains('hidden')) return false;
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0;
+    }
+
+    // 🎯 핵심: 버튼/X를 눌러서 닫을 때 실행할 전역 함수
+    window.closeScrollModal = function() {
+        const modal = document.getElementById('scrollModal');
+        if (!modal) return;
+
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+
+        // 만약 주소창에 #scrollModal이 들어있다면 뒤로가기를 1회 실행해서 히스토리를 깔끔히 청소
+        if (location.hash === '#scrollModal') {
+            isInternalClosing = true;
+            history.back();
+            setTimeout(() => { isInternalClosing = false; }, 100);
+        }
+    };
+
+    // DOM 감시 ➔ 모달이 열리면 주소창에 Hash 부여
+    const observer = new MutationObserver(() => {
+        if (isInternalClosing) return;
+        
+        TARGET_MODALS.forEach(id => {
+            const el = document.getElementById(id);
+            if (isVisible(el) && location.hash !== '#' + id) {
+                history.pushState({ modalId: id }, null, '#' + id);
+            }
+        });
+    });
+
+    // 뒤로가기 버튼(popstate) 누르면 화면에서 닫기
+    window.addEventListener('popstate', function() {
+        if (isInternalClosing) return;
+
+        TARGET_MODALS.forEach(id => {
+            const el = document.getElementById(id);
+            if (isVisible(el) && location.hash !== '#' + id) {
+                el.style.display = 'none';
+                el.classList.add('hidden');
+            }
+        });
+    });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['style', 'class'] }));
+    } else {
+        observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['style', 'class'] });
     }
 })();
 
