@@ -2302,7 +2302,7 @@ text-align: center;
 .del-btn-mini { font-size: 0.6rem; background: #ef4444; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
-/* 1. 테이블 기본 스타일 (기존과 동일) */
+/* 1. 테이블 기본 스타일 */
 table { 
   width: 100%; 
   border-collapse: collapse; 
@@ -2316,6 +2316,7 @@ th {
   border-bottom: 2px solid #f8fafc; 
   text-align: center; 
   font-weight: 900; 
+  background-color: #ffffff;
 }
 
 td { 
@@ -2326,22 +2327,40 @@ td {
   border-bottom: 1px solid #f8fafc; 
 }
 
-/* 2. 🔴 관리자 설정 탭 완벽 지원 + 빨간 줄 아래로만 스크롤 고정 */
-/* 스크롤 시 상단 내용이 통째로 상단에 붙어 고정됩니다 */
+/* 2. 관리자 탭 기능 방해 안 받는 높이 제한 & 내부 스크롤 설정 */
+#viewStatus {
+  display: flex !important;
+  flex-direction: column !important;
+  height: calc(100vh - 60px) !important; /* 상단 탭메뉴 공간 확보 */
+  overflow: hidden !important; /* 외부 전체 스크롤 막기 */
+}
+
+/* 관리자 탭이 눌려서 display: none 상태일 때는 정상적으로 숨겨지도록 처리 */
+#viewStatus[style*="display: none"] {
+  display: none !important;
+}
+
+/* 3. 상단 요소들은 고정(축소 안 됨) */
 .year-selector,
 .flex.gap-2.mb-3.h-10,
 #quarterTabs,
 thead {
-  position: sticky;
-  background-color: #ffffff;
-  z-index: 10;
+  flex-shrink: 0;
 }
 
-/* 각각의 위치를 딱 맞게 고정 */
-.year-selector { top: 0; }
-.flex.gap-2.mb-3.h-10 { top: 48px; }
-#quarterTabs { top: 96px; }
-thead { top: 138px; }
+/* 4. 🔴 빨간 줄 아래 회원 리스트 영역만 독립 스크롤 */
+.min-h-\[300px\] {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+}
+
+/* 테이블 헤더가 스크롤 최상단에 딱 밀착 */
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
