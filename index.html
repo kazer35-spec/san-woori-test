@@ -2701,48 +2701,53 @@ overflow: hidden;
     <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
   </div>
 
-  <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
-  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
-    <table class="w-full table-fixed border-collapse">
-      <thead class="sticky top-0 z-20 bg-white shadow-xs">
-        <tr class="border-b border-gray-200">
-          <!-- py-2 및 flex 정렬로 글자를 셀 정중앙으로 유착 -->
-          <th class="w-[18%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>회원명</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-            </div>
-          </th>
-          <th class="w-[22%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>레벨(Lv)</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-            </div>
-          </th>
-          <th class="w-[18%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>활동점수</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-            </div>
-          </th>
-          <th class="w-[22%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>누적고도</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-            </div>
-          </th>
-          <th class="w-[16%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>개인기록</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody id="statusList"></tbody>
-    </table>
-  </div>
+   <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
+<div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
+  <table class="w-full table-fixed border-collapse">
+    <thead class="sticky top-0 z-20 bg-white shadow-xs">
+      <tr class="border-b border-gray-200">
+        
+        <th class="w-[18%] text-center align-middle bg-white" style="padding: 12px 0 !important; vertical-align: middle !important;">
+          <div style="line-height: 1.2 !important; margin: 0 !important; padding: 0 !important;">
+            <div style="font-size: 14px; font-weight: 600; color: #374151;">회원명</div>
+            <div style="font-size: 8px; font-weight: 400; color: #9ca3af; margin-top: 2px;">(나이테)</div>
+          </div>
+        </th>
+
+        <th class="w-[22%] text-center align-middle bg-white" style="padding: 12px 0 !important; vertical-align: middle !important;">
+          <div style="line-height: 1.2 !important; margin: 0 !important; padding: 0 !important;">
+            <div style="font-size: 14px; font-weight: 600; color: #374151;">레벨(Lv)</div>
+            <div style="font-size: 8px; font-weight: 400; color: #9ca3af; margin-top: 2px;">(은하수)</div>
+          </div>
+        </th>
+
+        <th class="w-[18%] text-center align-middle bg-white" style="padding: 12px 0 !important; vertical-align: middle !important;">
+          <div style="line-height: 1.2 !important; margin: 0 !important; padding: 0 !important;">
+            <div style="font-size: 14px; font-weight: 600; color: #374151;">활동점수</div>
+            <div style="font-size: 8px; font-weight: 400; color: #9ca3af; margin-top: 2px;">(분기운동)</div>
+          </div>
+        </th>
+
+        <th class="w-[22%] text-center align-middle bg-white" style="padding: 12px 0 !important; vertical-align: middle !important;">
+          <div style="line-height: 1.2 !important; margin: 0 !important; padding: 0 !important;">
+            <div style="font-size: 14px; font-weight: 600; color: #374151;">누적고도</div>
+            <div style="font-size: 8px; font-weight: 400; color: #9ca3af; margin-top: 2px;">(정복지도)</div>
+          </div>
+        </th>
+
+        <th class="w-[16%] text-center align-middle bg-white" style="padding: 12px 0 !important; vertical-align: middle !important;">
+          <div style="line-height: 1.2 !important; margin: 0 !important; padding: 0 !important;">
+            <div style="font-size: 14px; font-weight: 600; color: #374151;">개인기록</div>
+            <div style="font-size: 8px; font-weight: 400; color: #9ca3af; margin-top: 2px;">(D+Day)</div>
+          </div>
+        </th>
+
+      </tr>
+    </thead>
+    <tbody id="statusList"></tbody>
+  </table>
 </div>
+
 
  
           
