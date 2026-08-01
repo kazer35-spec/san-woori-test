@@ -2303,38 +2303,10 @@ text-align: center;
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
 
-
 /* 테이블 기본 스타일 */
-table { 
-  width: 100%; 
-  border-collapse: collapse; 
-  table-layout: fixed; 
-}
-
-th { 
-  color: #94a3b8; 
-  font-size: 0.65rem; 
-  padding-bottom: 12px; 
-  border-bottom: 2px solid #f8fafc; 
-  text-align: center; 
-  font-weight: 900; 
-}
-
-td { 
-  padding: 12px 0; 
-  text-align: center; 
-  vertical-align: middle; 
-  position: relative; 
-  border-bottom: 1px solid #f8fafc; 
-}
-
-/* 🔴 핵심: HTML/JS 전혀 안 건드리고 테이블 헤더만 상단 고정 */
-#viewStatus table thead th {
-  position: sticky;
-  top: -1.25rem; /* p-5(20px) 여백 위치에 딱 맞게 고정 */
-  background-color: #ffffff; /* 스크롤 시 아래 글자 숨김 처리 */
-  z-index: 20;
-}
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; background-color: #ffffff; }
+td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
 
 
 
@@ -2680,85 +2652,93 @@ overflow: hidden;
 </div>
 </div>
 
-    <div class="main-container flex flex-col">
-<div class="tab-menu">
-<button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
-<button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
+    <div class="main-container flex flex-col h-screen overflow-hidden">
+  <div class="tab-menu shrink-0">
+    <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
+    <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
+  </div>
+
+  <!-- viewStatus: 전체 스크롤을 막고 내부 flex 구조 형성 -->
+  <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col min-h-0 overflow-hidden">
+    
+    <!-- 📌 1. 상단 고정 영역 (로고, 검색창, 분기탭) -->
+    <div class="shrink-0">
+      <div class="year-selector flex justify-between items-center mb-3">
+        <h1 class="main-title">
+          <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+          <span>산:우리</span>
+          <span class="slogan-txt">같이 걷는 즐거움</span>
+        </h1>
+        <div class="flex items-center gap-2">
+          <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
+          <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+            <svg viewBox="0 0 36 36">
+              <circle class="bg" cx="18" cy="18" r="16"></circle>
+              <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+            </svg>
+            <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+          </button>
+          <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+            <option value="2026">2026년</option>
+            <option value="2027">2027년</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-2 mb-3 h-10 items-center">
+        <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+        <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+        <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
+          <option value="qCount">점수순 ▼</option>
+          <option value="level">레벨순 ▼</option>
+          <option value="name">이름순 ▼</option>
+          <option value="totalHeight">높이순 ▼</option>
+          <option value="dday">날짜순 ▼</option>
+        </select>
+      </div>
+
+      <div id="quarterTabs" class="mb-3">
+        <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+        <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+        <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+        <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+      </div>
+    </div>
+
+    <!-- 📌 2. 스크롤 영역 (테이블 헤더 고정 + 회원 리스트만 스크롤) -->
+    <div class="flex-1 overflow-y-auto min-h-0">
+      <table>
+        <thead class="sticky top-0 bg-white z-10">
+          <tr>
+            <th class="w-[18%]">
+              회원명
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            </th>
+            <th class="w-[22%]">
+              레벨(Lv)
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            </th>
+            <th class="w-[18%]">
+              활동점수
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            </th>
+            <th class="w-[22%]">
+              누적고도
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            </th>
+            <th class="w-[16%]">
+              개인기록
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="statusList"></tbody>
+      </table>
+    </div>
+
+  </div>
 </div>
 
-<div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
-<div class="year-selector flex justify-between items-center mb-3">
-<h1 class="main-title">
-<img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-<span>산:우리</span>
-<span class="slogan-txt">같이 걷는 즐거움</span>
-</h1>
-<div class="flex items-center gap-2">
-<button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-
-<button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-<svg viewBox="0 0 36 36">
-<circle class="bg" cx="18" cy="18" r="16"></circle>
-<circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-</svg>
-<span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-</button>
-<select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-<option value="2026">2026년</option>
-<option value="2027">2027년</option>
-</select>
-</div>
-</div>
-
-<div class="flex gap-2 mb-3 h-10 items-center">
-<input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-<button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-<select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-<option value="qCount">점수순 ▼</option>
-<option value="level">레벨순 ▼</option>
-<option value="name">이름순 ▼</option>
-<option value="totalHeight">높이순 ▼</option>
-<option value="dday">날짜순 ▼</option>
-</select>
-</div>
-
-<div id="quarterTabs">
-<button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-<button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-<button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-<button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-</div>
-
-<div class="min-h-[300px]">
-  <table>
-    <thead>
-      <tr>
-        <th class="w-[18%]">
-          회원명
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-        </th>
-        <th class="w-[22%]">
-          레벨(Lv)
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-        </th>
-        <th class="w-[18%]">
-          활동점수
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-        </th>
-        <th class="w-[22%]">
-          누적고도
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-        </th>
-        <th class="w-[16%]">
-        개인기록
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody id="statusList"></tbody>
-  </table>
-</div>
-</div>
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
