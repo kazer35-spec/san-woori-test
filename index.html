@@ -2650,97 +2650,97 @@ overflow: hidden;
 </div>
 
 
+   <div class="main-container flex flex-col">
+<div class="tab-menu">
+<button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
+<button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
+</div>
 
-          <div class="main-container flex flex-col">
-  <div class="tab-menu">
-    <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
-    <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
-  </div>
 
-  <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
-    <div class="year-selector flex justify-between items-center mb-3">
-      <h1 class="main-title">
-        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-        <span>산:우리</span>
-        <span class="slogan-txt">같이 걷는 즐거움</span>
-      </h1>
-      <div class="flex items-center gap-2">
-        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-        <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-          <svg viewBox="0 0 36 36">
-            <circle class="bg" cx="18" cy="18" r="16"></circle>
-            <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-          </svg>
-          <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-        </button>
-        <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-          <option value="2026">2026년</option>
-          <option value="2027">2027년</option>
-        </select>
-      </div>
-    </div>
+        
 
-    <div class="flex gap-2 mb-2 h-10 items-center">
-      <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-      <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-      <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-        <option value="qCount">점수순 ▼</option>
-        <option value="level">레벨순 ▼</option>
-        <option value="name">이름순 ▼</option>
-        <option value="totalHeight">높이순 ▼</option>
-        <option value="dday">날짜순 ▼</option>
+            <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+  <div class="year-selector flex justify-between items-center mb-3">
+    <h1 class="main-title">
+      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+      <span>산:우리</span>
+      <span class="slogan-txt">같이 걷는 즐거움</span>
+    </h1>
+    <div class="flex items-center gap-2">
+      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
+      <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+        <svg viewBox="0 0 36 36">
+          <circle class="bg" cx="18" cy="18" r="16"></circle>
+          <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+        </svg>
+        <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+      </button>
+      <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+        <option value="2026">2026년</option>
+        <option value="2027">2027년</option>
       </select>
     </div>
+  </div>
 
-    <!-- mb-1을 mb-0으로 변경하여 탭과 테이블 헤더 사이 불필요한 간격을 줄였습니다. -->
-    <div id="quarterTabs" class="mb-0">
-      <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-      <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-      <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-      <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-    </div>
+  <div class="flex gap-2 mb-2 h-10 items-center">
+    <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+    <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+    <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
+      <option value="qCount">점수순 ▼</option>
+      <option value="level">레벨순 ▼</option>
+      <option value="name">이름순 ▼</option>
+      <option value="totalHeight">높이순 ▼</option>
+      <option value="dday">날짜순 ▼</option>
+    </select>
+  </div>
 
-    <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
-    <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
-      <table class="w-full table-fixed border-collapse">
-        <thead class="sticky top-0 z-20 bg-white shadow-xs">
-          <tr class="border-b border-gray-200">
-            <!-- py-2 -> py-1 로 축소, mt-0.5 제거로 상하 여백을 대칭 정렬했습니다. -->
-            <th class="w-[18%] py-1 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>회원명</span>
-                <span class="text-[8px] font-normal text-gray-400">(나이테)</span>
-              </div>
-            </th>
-            <th class="w-[22%] py-1 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>레벨(Lv)</span>
-                <span class="text-[8px] font-normal text-gray-400">(은하수)</span>
-              </div>
-            </th>
-            <th class="w-[18%] py-1 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>활동점수</span>
-                <span class="text-[8px] font-normal text-gray-400">(분기운동)</span>
-              </div>
-            </th>
-            <th class="w-[22%] py-1 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>누적고도</span>
-                <span class="text-[8px] font-normal text-gray-400">(정복지도)</span>
-              </div>
-            </th>
-            <th class="w-[16%] py-1 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>개인기록</span>
-                <span class="text-[8px] font-normal text-gray-400">(D+Day)</span>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="statusList"></tbody>
-      </table>
-    </div>
+  <div id="quarterTabs" class="mb-1">
+    <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+    <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+    <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+    <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+  </div>
+
+  <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
+  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
+    <table class="w-full table-fixed border-collapse">
+      <thead class="sticky top-0 z-20 bg-white shadow-xs">
+        <tr class="border-b border-gray-200">
+          <!-- py-2 및 flex 정렬로 글자를 셀 정중앙으로 유착 -->
+          <th class="w-[18%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>회원명</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            </div>
+          </th>
+          <th class="w-[22%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>레벨(Lv)</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            </div>
+          </th>
+          <th class="w-[18%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>활동점수</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            </div>
+          </th>
+          <th class="w-[22%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>누적고도</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            </div>
+          </th>
+          <th class="w-[16%] py-2 text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center">
+              <span>개인기록</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="statusList"></tbody>
+    </table>
   </div>
 </div>
 
