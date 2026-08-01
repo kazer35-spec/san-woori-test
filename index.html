@@ -8409,10 +8409,21 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 </div>
 
 <script>
-   // --- 잔디 상세 팝업 및 이벤트 제어 (통합본) ---
+// 팝업 닫기 전용 함수 (중복 호출 방지 및 공통 처리)
+function hideGrassPopup() {
+    const popup = document.getElementById('grassPopup');
+    if (popup && !popup.classList.contains('hidden')) {
+        popup.classList.add('hidden');
+        popup.style.display = 'none';
+        
+        // 팝업이 열려 있는 상태에서 닫혔을 때 히스토리 정리
+        if (history.state && history.state.popupOpen) {
+            history.back();
+        }
+    }
+}
 
 window.showGrassPopup = (event, date, encodedAct) => {
-    // [중요] 클릭 이벤트가 body까지 퍼져서 바로 닫히는 것을 방지
     if (event.stopPropagation) event.stopPropagation();
 
     const popup = document.getElementById('grassPopup');
@@ -8420,12 +8431,10 @@ window.showGrassPopup = (event, date, encodedAct) => {
     const dateEl = document.getElementById('popupDate');
 
     if (!encodedAct) {
-        popup.classList.add('hidden');
-        popup.style.display = 'none';
+        hideGrassPopup();
         return;
     }
 
-    // 팝업 부모를 body로 강제 이동 (좌표 꼬임 방지)
     if (popup.parentElement !== document.body) {
         document.body.appendChild(popup);
     }
@@ -8443,45 +8452,58 @@ window.showGrassPopup = (event, date, encodedAct) => {
     
     content.innerHTML = items;
 
-    // 표시 및 레이어 설정
     popup.classList.remove('hidden');
     popup.style.display = 'block';
     popup.style.position = 'fixed';
     popup.style.zIndex = '999999';
 
-    // 좌표 계산
     const clientX = event.touches ? event.touches[0].clientX : event.clientX;
     const clientY = event.touches ? event.touches[0].clientY : event.clientY;
 
     let left = clientX + 15;
     let top = clientY - 85;
 
-    // 화면 밖으로 나감 방지
     if (left + 160 > window.innerWidth) left = clientX - 170;
     if (top < 10) top = clientY + 20;
 
     popup.style.left = `${left}px`;
     popup.style.top = `${top}px`;
+
+    // ----------------------------------------------------
+    // [추가] 모바일 뒤로가기 버튼 처리
+    // ----------------------------------------------------
+    // 이미 팝업 히스토리가 들어가 있지 않은 경우에만 Push
+    if (!history.state || !history.state.popupOpen) {
+        history.pushState({ popupOpen: true }, '');
+    }
 };
 
-// 화면 아무 곳이나 클릭하거나 터치하면 잔디 팝업 닫기
-document.addEventListener('mousedown', (e) => {
+// ----------------------------------------------------
+// [추가] 뒤로가기(popstate) 이벤트 감지
+// ----------------------------------------------------
+window.addEventListener('popstate', (e) => {
     const popup = document.getElementById('grassPopup');
-    // 팝업이 열려 있고, 클릭한 대상이 팝업 자체가 아닐 때만 닫음
-    if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
+    if (popup && !popup.classList.contains('hidden')) {
         popup.classList.add('hidden');
         popup.style.display = 'none';
     }
 });
 
-// 모바일 터치 대응
+// 외부 클릭 시 닫기 (공통 함수 사용)
+document.addEventListener('mousedown', (e) => {
+    const popup = document.getElementById('grassPopup');
+    if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
+        hideGrassPopup();
+    }
+});
+
 document.addEventListener('touchstart', (e) => {
     const popup = document.getElementById('grassPopup');
     if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
-        popup.classList.add('hidden');
-        popup.style.display = 'none';
+        hideGrassPopup();
     }
 }, { passive: true });
+
 
 </script>
 </body>
