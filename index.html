@@ -2650,103 +2650,111 @@ overflow: hidden;
 </div>
 
 
-   <div class="main-container flex flex-col">
-<div class="tab-menu">
-<button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
-<button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
-</div>
+    <div class="main-container flex flex-col h-screen overflow-hidden">
+  
+  <!-- [상단 고정 영역] 빨간선 위쪽 전체 -->
+  <div class="sticky-top-section shrink-0 bg-white z-10 px-4 pt-3 pb-2 border-b border-gray-100 shadow-sm">
+    
+    <!-- 1. 최상단 탭 메뉴 -->
+    <div class="tab-menu flex gap-2 mb-3">
+      <button id="tabStatus" class="tab-btn active-tab flex-1 py-2.5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-sm" onclick="showView('status')">📡 실시간 현황</button>
+      <button id="tabAdmin" class="tab-btn flex-1 py-2.5 rounded-xl font-bold text-sm bg-gray-100 text-gray-600" onclick="handleAdminTab()">🔐 관리자 설정</button>
+    </div>
 
+    <!-- 2. 브랜드 로고 & 우측 버튼 영역 -->
+    <div class="year-selector flex justify-between items-center mb-3">
+      <h1 class="main-title flex items-center gap-1.5 text-xl font-black">
+        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo w-7 h-7 object-contain">
+        <span class="text-gray-800">산:우리</span>
+        <span class="slogan-txt text-xs font-normal text-teal-600 ml-0.5">같이 걷는 즐거움</span>
+      </h1>
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn w-9 h-9 flex items-center justify-center rounded-full bg-amber-50 text-lg border border-amber-200">🏆</button>
 
+        <button onclick="toggleVibeModal(true)" class="vibe-temp-btn relative w-9 h-9 flex items-center justify-center" id="vibeCircleBtn">
+          <svg viewBox="0 0 36 36" class="w-full h-full absolute">
+            <circle class="bg text-gray-100 stroke-current" stroke-width="3" fill="none" cx="18" cy="18" r="16"></circle>
+            <circle class="progress text-orange-500 stroke-current" stroke-width="3" stroke-linecap="round" fill="none" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+          </svg>
+          <span id="vibeCircleIcon" class="text-base z-10">🔥</span>
+        </button>
         
+        <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none bg-gray-100 text-gray-700 font-bold text-xs px-2.5 py-1.5 rounded-xl border-none">
+          <option value="2026">2026년</option>
+          <option value="2027">2027년</option>
+        </select>
+      </div>
+    </div>
 
-            <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
-  <div class="year-selector flex justify-between items-center mb-3">
-    <h1 class="main-title">
-      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-      <span>산:우리</span>
-      <span class="slogan-txt">같이 걷는 즐거움</span>
-    </h1>
-    <div class="flex items-center gap-2">
-      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-      <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-        <svg viewBox="0 0 36 36">
-          <circle class="bg" cx="18" cy="18" r="16"></circle>
-          <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-        </svg>
-        <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-      </button>
-      <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-        <option value="2026">2026년</option>
-        <option value="2027">2027년</option>
+    <!-- 3. 검색 및 필터 영역 -->
+    <div class="flex gap-1.5 mb-3 h-9 items-center">
+      <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2.5] bg-gray-50 border-gray-200 outline-none rounded-xl px-3 text-xs h-full border">
+      <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-bold text-[11px] h-full text-center flex items-center justify-center px-1 text-gray-600">📊 레벨표</button>
+      <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-bold text-[11px] h-full px-1 text-center text-gray-600 outline-none">
+        <option value="qCount">점수순 ▼</option>
+        <option value="level">레벨순 ▼</option>
+        <option value="name">이름순 ▼</option>
+        <option value="totalHeight">높이순 ▼</option>
+        <option value="dday">날짜순 ▼</option>
       </select>
     </div>
-  </div>
 
-  <div class="flex gap-2 mb-2 h-10 items-center">
-    <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-    <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-    <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-      <option value="qCount">점수순 ▼</option>
-      <option value="level">레벨순 ▼</option>
-      <option value="name">이름순 ▼</option>
-      <option value="totalHeight">높이순 ▼</option>
-      <option value="dday">날짜순 ▼</option>
-    </select>
-  </div>
+    <!-- 4. 분기 탭 버튼 -->
+    <div id="quarterTabs" class="grid grid-cols-4 gap-1 mb-2 bg-gray-100 p-1 rounded-xl text-center text-xs">
+      <button id="qBtn1" class="q-btn py-1.5 font-medium rounded-lg text-gray-500" onclick="changeQuarter(1)">1분기</button>
+      <button id="qBtn2" class="q-btn py-1.5 font-medium rounded-lg text-gray-500" onclick="changeQuarter(2)">2분기</button>
+      <button id="qBtn3" class="q-btn py-1.5 font-bold rounded-lg text-blue-600 bg-white shadow-sm" onclick="changeQuarter(3)">3분기</button>
+      <button id="qBtn4" class="q-btn py-1.5 font-medium rounded-lg text-gray-500" onclick="changeQuarter(4)">4분기</button>
+    </div>
 
-  <div id="quarterTabs" class="mb-1">
-  <!-- 분기 탭 영역 (여백 최소화 및 위아래 균등 맞춤) -->
-  <div id="quarterTabs" style="margin-bottom: 2px !important; margin-top: 2px !important;">
-    <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-    <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-    <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-    <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-  </div>
-
-  <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
-  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative" style="margin-top: 0px !important;">
-    <table class="w-full table-fixed border-collapse">
-      <thead class="sticky top-0 z-20 bg-white shadow-xs">
-        <tr class="border-b border-gray-200">
-          <!-- py-1.5로 셀 내부 상하 여백도 미세 조절 -->
-          <th class="w-[18%] py-1.5 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>회원명</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-            </div>
+    <!-- 5. 테이블 헤더 (빨간 선 바로 위 고정) -->
+    <table class="w-full border-collapse">
+      <thead>
+        <tr class="text-center text-gray-400 font-bold text-[11px]">
+          <th class="w-[20%] py-1">
+            회원명
+            <span class="block text-[8px] font-normal text-gray-300">(나이테)</span>
           </th>
-          <th class="w-[22%] py-1.5 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>레벨(Lv)</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-            </div>
+          <th class="w-[22%] py-1">
+            레벨(Lv)
+            <span class="block text-[8px] font-normal text-gray-300">(은하수)</span>
           </th>
-          <th class="w-[18%] py-1.5 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>활동점수</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-            </div>
+          <th class="w-[18%] py-1">
+            활동점수
+            <span class="block text-[8px] font-normal text-gray-300">(분기운동)</span>
           </th>
-          <th class="w-[22%] py-1.5 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>누적고도</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-            </div>
+          <th class="w-[22%] py-1">
+            누적고도
+            <span class="block text-[8px] font-normal text-gray-300">(정복지도)</span>
           </th>
-          <th class="w-[16%] py-1.5 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>개인기록</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-            </div>
+          <th class="w-[18%] py-1">
+            개인기록
+            <span class="block text-[8px] font-normal text-gray-300">(D+Day)</span>
           </th>
         </tr>
       </thead>
-      <tbody id="statusList"></tbody>
+    </table>
+
+  </div>
+
+  <!-- [하단 스크롤 영역] 빨간선 아래 목록만 스크롤 -->
+  <div id="viewStatus" class="view-content flex-1 overflow-y-auto px-4 py-2">
+    <table class="w-full border-collapse">
+      <!-- 너비 비율을 헤더와 통일하기 위해 colgroup 적용 -->
+      <colgroup>
+        <col class="w-[20%]">
+        <col class="w-[22%]">
+        <col class="w-[18%]">
+        <col class="w-[22%]">
+        <col class="w-[18%]">
+      </colgroup>
+      <tbody id="statusList" class="divide-y divide-gray-50">
+        <!-- 스크롤될 리스트 항목들이 여기에 동적으로 들어갑니다 -->
+      </tbody>
     </table>
   </div>
 
- 
-          
+</div>
 
 
 
