@@ -2705,38 +2705,36 @@ overflow: hidden;
       </div>
     </div>
 
-<!-- 🔴 기존: <div class="min-h-[300px]"> -->
-<!-- 🟢 수정: 아래처럼 클래스 2개만 뒤에 추가 -->
-<div class="min-h-[300px] max-h-[60vh] overflow-y-auto">
-  <table>
-    <thead class="sticky top-0 bg-white z-10">
-      <tr>
-        <th class="w-[18%]">
-          회원명
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-        </th>
-        <th class="w-[22%]">
-          레벨(Lv)
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-        </th>
-        <th class="w-[18%]">
-          활동점수
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-        </th>
-        <th class="w-[22%]">
-          누적고도
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-        </th>
-        <th class="w-[16%]">
-          개인기록
-          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-        </th>
-      </tr>
-    </thead>
-    <tbody id="statusList"></tbody>
-  </table>
-</div>
-
+    <!-- 📌 2. 스크롤 영역 (테이블 헤더 고정 + 회원 리스트만 스크롤) -->
+    <div class="flex-1 overflow-y-auto min-h-0">
+      <table>
+        <thead class="sticky top-0 bg-white z-10">
+          <tr>
+            <th class="w-[18%]">
+              회원명
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            </th>
+            <th class="w-[22%]">
+              레벨(Lv)
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            </th>
+            <th class="w-[18%]">
+              활동점수
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            </th>
+            <th class="w-[22%]">
+              누적고도
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            </th>
+            <th class="w-[16%]">
+              개인기록
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="statusList"></tbody>
+      </table>
+    </div>
 
   </div>
 </div>
