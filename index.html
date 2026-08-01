@@ -1514,18 +1514,21 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .click-neon-adjust {
     position: absolute;
     
-    /* 👇 이 값을 수정하여 click 위치를 위아래로 움직이세요 */
-    top: -1px; 
+    /* 👇 이 값을 수정하면 5개 CLICK 위치가 한 번에 다 같이 움직입니다 */
+    top: 2px; /* 화면 보시면서 -2px ~ 4px 사이로 맞춰보세요 */
     
     left: 50%;
     transform: translateX(-50%);
     font-size: 7px;
     font-weight: 900;
-    color: #00ffcc;
-    text-shadow: 0 0 5px #00ffcc;
-    animation: neon-blink 1.5s infinite;
+    color: #cbd5e1; /* 은은한 회색 원하시면 유지, 네온이면 #00ffcc */
+    letter-spacing: 1px;
+    pointer-events: none;
+    white-space: nowrap;
     z-index: 10;
+    animation: neon-blink 1.5s infinite;
 }
+
 
 @keyframes neon-blink {
     0%, 100% { opacity: 1; }
@@ -3491,7 +3494,9 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
      
-      window.renderStatusTable = () => {
+      
+        
+        window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3547,7 +3552,8 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
-            clickTag = `<span class="click-neon">CLICK</span>`;
+            // 통합된 click-neon-adjust 클래스 적용
+            clickTag = `<span class="click-neon-adjust">CLICK</span>`;
         }
 
         let rankT = ""; 
@@ -3591,12 +3597,10 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-        <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
-    <div style="position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 100%;">
-        ${clickTag}
-    </div>
-
-            <div class="flex flex-col items-center justify-center">
+        <!-- 1. 회원명 (다른 td와 동일 구조로 정렬 맞춤) -->
+        <td style="position: relative;" class="text-xs text-center">
+            ${clickTag}
+            <div class="flex flex-col items-center justify-center pt-2">
                 ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
                 <span class="font-bold ${nameColor} cursor-pointer hover:underline"
                       onclick="showMemberMountain('${m.name}', '${m.name}')">
@@ -3604,6 +3608,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
                 </span>
             </div>
         </td>
+        <!-- 2. 레벨 -->
         <td style="position: relative;">
             ${clickTag}
             <div class="badge-level">
@@ -3615,29 +3620,32 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
                 <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
             </div>
         </td>
+        <!-- 3. 활동점수 -->
         <td style="position: relative;">
             ${clickTag}
             <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
         </td>
+        <!-- 4. 누적고도 -->
         <td style="position: relative;">
             ${clickTag}
             <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
         </td>
+        <!-- 5. 개인기록 -->
         <td style="position: relative;" class="text-center">
-    ${clickTag}
-    <!-- 🎈 누적고도 탭버튼 크기와 동일하게 수정한 알약 모양 버튼 -->
-    <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
-            data-dplus="D+${m.dPlusVal}"
-            class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
-        <span class="record-btn-txt">기록보기</span>
-    </button>
-</td>
-</tr>`;
+            ${clickTag}
+            <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                    data-dplus="D+${m.dPlusVal}"
+                    class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
+                <span class="record-btn-txt">기록보기</span>
+            </button>
+        </td>
+        </tr>`;
 
         if (isFirstVisible && !m.isHidden) {
             isFirstVisible = false;
         }
     });
+};
 
     // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
     let showDPlus = false;
