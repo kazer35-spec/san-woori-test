@@ -1540,7 +1540,13 @@ tr td:first-child .click-neon-adjust {
     50% { opacity: 0.5; }
 }
 
-
+/* 테이블 셀 높이 및 정렬 규격화 */
+table tbody tr td {
+    position: relative;
+    height: 60px; /* 셀 높이를 고정하여 click 텍스트 라인을 맞춤 */
+    vertical-align: middle;
+    padding-top: 12px !important; /* 위쪽 click 텍스트 공간 확보 */
+}
 
 /* 하단 정보 바 전체 설정 */
 .mountain-info-bar {
@@ -2297,87 +2303,43 @@ text-align: center;
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
 /* 테이블 간격 및 정렬 최적화 */
-/* 테이블 간격 및 정렬 최적화 */
-table { 
-  width: 100%; 
-  border-collapse: collapse; 
-  table-layout: fixed; 
-}
-
-/* sticky 고정을 위한 thead 레이아웃 설정 */
-thead {
-  position: sticky;
-  top: 0;
-  background-color: #ffffff; /* 스크롤 시 뒤 내용이 비치지 않도록 흰색 배경 지정 */
-  z-index: 10;
-}
-
-th { 
-  color: #94a3b8; 
-  font-size: 0.65rem; 
-  padding-bottom: 12px; 
-  border-bottom: 2px solid #f8fafc; 
-  text-align: center; 
-  font-weight: 900; 
-}
-
-td { 
-  padding: 12px 0; 
-  text-align: center; 
-  vertical-align: middle; 
-  position: relative; 
-  border-bottom: 1px solid #f8fafc; 
-}
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; }
+td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
-.rank-1 { color: #facc15 !important; } 
-.rank-2 { color: #94a3b8 !important; } 
-.rank-3 { color: #a36a00 !important; }
+.rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
 
 /* CLICK 네온 텍스트: 은은한 회색 숨쉬기 효과 */
 .click-neon {
-  font-size: 6px;
-  font-weight: 900;
-  color: #cbd5e1;
-  text-transform: uppercase;
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: neon-soft-glow 2s infinite ease-in-out;
-  letter-spacing: 1px;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 5;
+font-size: 6px; /* 가독성을 위해 살짝 키움 */
+font-weight: 900;
+color: #cbd5e1; /* 기본 회색 */
+text-transform: uppercase;
+position: absolute;
+top: 4px;
+left: 50%;
+transform: translateX(-50%);
+animation: neon-soft-glow 2s infinite ease-in-out; /* 부드러운 애니메이션 */
+letter-spacing: 1px;
+pointer-events: none;
+white-space: nowrap;
+z-index: 5;
 }
 
 @keyframes neon-soft-glow {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
-    color: #f8fafc;
-  }
-  50% {
-    opacity: 0.4;
-    text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
-    color: #64748b;
-  }
+0%, 100% {
+opacity: 1;
+/* 은색과 밝은 회색의 조화 */
+text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
+color: #f8fafc;
 }
-
-/* 테이블 셀 높이 및 정렬 규격화 */
-table tbody tr td {
-  position: relative;
-  height: 60px;
-  vertical-align: middle;
-  padding-top: 12px !important;
+50% {
+opacity: 0.4;
+text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
+color: #64748b; /* 완전히 꺼지지 않고 은은하게 남음 */
 }
-
-/* 💡 스크롤 영역 지정을 위한 클래스 추가 */
-.table-scroll-container {
-  max-height: calc(100vh - 280px); /* 화면 높이에 맞춰 수직 스크롤 영역 제한 (필요시 높이 조정 가능) */
-  overflow-y: auto;
 }
-
 
 /* 2. 배지 스타일 수정 (은은한 글로우 추가) */
 .badge-level {
@@ -2687,92 +2649,85 @@ overflow: hidden;
 </div>
 </div>
 
+<div class="main-container flex flex-col">
+<div class="tab-menu">
+<button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
+<button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
+</div>
 
-  <div class="main-container flex flex-col h-screen">
-  <!-- 탭 메뉴 -->
-  <div class="tab-menu">
-    <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
-    <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
-  </div>
+<div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+<div class="year-selector flex justify-between items-center mb-3">
+<h1 class="main-title">
+<img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+<span>산:우리</span>
+<span class="slogan-txt">같이 걷는 즐거움</span>
+</h1>
+<div class="flex items-center gap-2">
+<button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
 
-  <!-- 1. 실시간 현황 뷰 (viewStatus) -->
-  <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
-    
-    <!-- 상단 고정 영역 -->
-    <div class="year-selector flex justify-between items-center mb-3">
-      <h1 class="main-title">
-        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-        <span>산:우리</span>
-        <span class="slogan-txt">같이 걷는 즐거움</span>
-      </h1>
-      <div class="flex items-center gap-2">
-        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-        <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-          <svg viewBox="0 0 36 36">
-            <circle class="bg" cx="18" cy="18" r="16"></circle>
-            <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-          </svg>
-          <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-        </button>
-        <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-          <option value="2026">2026년</option>
-          <option value="2027">2027년</option>
-        </select>
-      </div>
-    </div>
+<button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+<svg viewBox="0 0 36 36">
+<circle class="bg" cx="18" cy="18" r="16"></circle>
+<circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+</svg>
+<span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+</button>
+<select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+<option value="2026">2026년</option>
+<option value="2027">2027년</option>
+</select>
+</div>
+</div>
 
-    <div class="flex gap-2 mb-3 h-10 items-center">
-      <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 회원 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-      <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-      <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-        <option value="qCount">점수순 ▼</option>
-        <option value="level">레벨순 ▼</option>
-        <option value="name">이름순 ▼</option>
-        <option value="totalHeight">높이순 ▼</option>
-        <option value="dday">날짜순 ▼</option>
-      </select>
-    </div>
+<div class="flex gap-2 mb-3 h-10 items-center">
+<input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+<button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+<select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
+<option value="qCount">점수순 ▼</option>
+<option value="level">레벨순 ▼</option>
+<option value="name">이름순 ▼</option>
+<option value="totalHeight">높이순 ▼</option>
+<option value="dday">날짜순 ▼</option>
+</select>
+</div>
 
-    <div id="quarterTabs" class="mb-3">
-      <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-      <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-      <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-      <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-    </div>
+<div id="quarterTabs">
+<button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+<button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+<button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+<button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+</div>
 
-    <!-- 하단 독립 스크롤 영역 -->
-    <div class="flex-1 overflow-y-auto">
-      <table>
-        <thead>
-          <tr>
-            <th class="w-[18%]">
-              회원명
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-            </th>
-            <th class="w-[22%]">
-              레벨(Lv)
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-            </th>
-            <th class="w-[18%]">
-              활동점수
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-            </th>
-            <th class="w-[22%]">
-              누적고도
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-            </th>
-            <th class="w-[16%]">
-              개인기록
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="statusList"></tbody>
-      </table>
-    </div> <!-- /독립 스크롤 영역 닫기 -->
-
-  
-
+<div class="min-h-[300px]">
+  <table>
+    <thead>
+      <tr>
+        <th class="w-[18%]">
+          회원명
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+        </th>
+        <th class="w-[22%]">
+          레벨(Lv)
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+        </th>
+        <th class="w-[18%]">
+          활동점수
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+        </th>
+        <th class="w-[22%]">
+          누적고도
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+        </th>
+        <th class="w-[16%]">
+        개인기록
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="statusList"></tbody>
+  </table>
+</div>
+</div> <!-- 기존 코드의 닫는 div 태그 유지 -->
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
@@ -3544,239 +3499,179 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
      
-           
+   window.renderStatusTable = () => {
+    const list = document.getElementById('statusList');
+    const search = document.getElementById('searchInput').value.trim();
+    const sort = document.getElementById('statusSortOrder').value;
+    if(!list) return;
+    list.innerHTML = "";
 
-// ─── 1. 한글 초성 유틸리티 ───
-const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
-
-function getChosung(str) {
-    if (!str) return '';
-    let result = '';
-    for (let i = 0; i < str.length; i++) {
-        const code = str.charCodeAt(i) - 44032;
-        if (code >= 0 && code <= 11172) {
-            result += CHOSUNG_LIST[Math.floor(code / 588)];
-        } else {
-            result += str[i];
-        }
+    // 💡 기존 타이머 정리
+    if (window.recordBtnToggleInterval) {
+        clearInterval(window.recordBtnToggleInterval);
+        window.recordBtnToggleInterval = null;
     }
-    return result;
-}
 
-// ─── 2. 첫 글자부터 접두사 방식 자음/완성형 매칭 ───
-function isMatchName(name, searchKeyword) {
-    if (!name || !searchKeyword) return false;
-    
-    const cleanName = String(name).trim().toLowerCase();
-    const cleanKeyword = String(searchKeyword).trim().toLowerCase();
+    const today = new Date();
+    const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-    if (!cleanKeyword) return true;
-    if (cleanKeyword.length > cleanName.length) return false;
+    let processedData = currentData.map(m => {
+        const last = m.lastDate ? m.lastDate.toDate() : new Date();
+        const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
+        const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
+        const baseLimit = (m.level === 0 ? 30 : 122);
+        const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
 
-    for (let i = 0; i < cleanKeyword.length; i++) {
-        const kChar = cleanKeyword[i];
-        const nChar = cleanName[i];
-
-        if (CHOSUNG_LIST.includes(kChar)) {
-            if (getChosung(nChar) !== kChar) return false;
-        } else {
-            if (nChar !== kChar) return false;
-        }
-    }
-    return true;
-}
-
-// ─── 3. 실시간 현황 테이블 랜더링 ───
-window.renderStatusTable = function() {
-    try {
-        const list = document.getElementById('statusList');
-        const searchInput = document.getElementById('searchInput');
-        const sortSelect = document.getElementById('statusSortOrder');
-
-        if (!list) return;
-
-        const search = searchInput ? searchInput.value.trim() : "";
-        const sort = sortSelect ? sortSelect.value : "qCount";
-
-        if (window.recordBtnToggleInterval) {
-            clearInterval(window.recordBtnToggleInterval);
-            window.recordBtnToggleInterval = null;
+        let dPlusVal = 0;
+        if (m.regDate) {
+            const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
+            const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
+            dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
         }
 
-        if (typeof currentData === 'undefined' || !Array.isArray(currentData)) {
-            console.warn("currentData 배열이 정의되지 않았습니다.");
-            return;
+        return { 
+            ...m, 
+            ddayVal: ddayVal,
+            dPlusVal: dPlusVal
+        };
+    });
+
+    processedData.sort((a, b) => {
+        if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
+        if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
+        if (sort === 'level') return b.level - a.level || b.qCount - a.qCount;
+        if (sort === 'name') return a.name.localeCompare(b.name, 'ko');
+        if (sort === 'dday') return a.ddayVal - b.ddayVal;
+        return 0;
+    });
+
+    const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
+
+    let isFirstVisible = true;
+
+    processedData.forEach((m) => {
+        if (!isAdminLoggedIn && m.isHidden) return;
+        if (search && !m.name.includes(search)) return;
+
+        let clickTag = "";
+        if (isFirstVisible && !m.isHidden) {
+            clickTag = `<span class="click-neon-adjust">CLICK</span>`;
         }
 
-        const today = new Date();
-        const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-
-        let processedData = currentData.map(m => {
-            let last = new Date();
-            if (m.lastDate) {
-                last = (typeof m.lastDate.toDate === 'function') ? m.lastDate.toDate() : new Date(m.lastDate);
-            }
-            const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
-            const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
-            const baseLimit = (m.level === 0 ? 30 : 122);
-            const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
-
-            let dPlusVal = 0;
-            if (m.regDate) {
-                const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
-                const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
-                dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
-            }
-
-            return { 
-                ...m, 
-                ddayVal: ddayVal,
-                dPlusVal: dPlusVal
-            };
-        });
-
-        // 정렬
-        processedData.sort((a, b) => {
-            if (sort === 'qCount') return (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0);
-            if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
-            if (sort === 'level') return (b.level || 0) - (a.level || 0) || (b.qCount || 0) - (a.qCount || 0);
-            if (sort === 'name') return String(a.name || '').localeCompare(String(b.name || ''), 'ko');
-            if (sort === 'dday') return a.ddayVal - b.ddayVal;
-            return 0;
-        });
-
-        const topNames = [...processedData]
-            .filter(m => !m.isHidden && m.name !== "오즈")
-            .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
-            .slice(0, 3)
-            .map(m => m.name);
-
-        let isFirstVisible = true;
-        let htmlBuilder = ""; 
-
-        processedData.forEach((m) => {
-            if (typeof isAdminLoggedIn !== 'undefined' && !isAdminLoggedIn && m.isHidden) return;
+        let rankT = ""; 
+        let rankC = "";
+        if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
+            const idx = topNames.indexOf(m.name);
             
-            // 🎯 초성/완성형 조합 매칭 체크
-            if (search && !isMatchName(m.name, search)) return;
-
-            let clickTag = "";
-            if (isFirstVisible && !m.isHidden) {
-                clickTag = `<span class="click-neon-adjust">CLICK</span>`;
+            let activeQuarter = 1; 
+            const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+            if (activeBtn) {
+                const btnId = activeBtn.id; 
+                activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+            } else {
+                activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
+                                ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
             }
+            
+            const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+            const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
-            let rankT = ""; 
-            let rankC = "";
-            if (m.name !== "오즈" && (m.qCount || 0) > 0 && !m.isHidden) {
-                const idx = topNames.indexOf(m.name);
-                
-                let activeQuarter = 1; 
-                const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
-                if (activeBtn) {
-                    const btnId = activeBtn.id; 
-                    activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
-                } else {
-                    activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
-                                    ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
-                }
-                
-                const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
-                const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
-
-                if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
-                else if (idx === 1) { rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
-                else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
+            if (idx === 0) { 
+                rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
+                rankC = "rank-1"; 
             }
+            else if (idx === 1) { 
+                rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
+                rankC = "rank-2"; 
+            }
+            else if (idx === 2) { 
+                rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
+                rankC = "rank-3"; 
+            }
+        }
 
-            const style = (typeof getLevelStyle === 'function') ? getLevelStyle(m.level) : { bg: '#fff', border: '#ccc', text: '#000', blink: '' };
-            const badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(m.level) : (m.level || 0);
-            const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
+        const style = getLevelStyle(m.level);
+        const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
-            const rawHeight = m.totalHeight || 0;
-            const displayHeight = rawHeight >= 10000 
-                ? (rawHeight / 1000).toFixed(1) + 'k' 
-                : rawHeight + 'm';
+        const rawHeight = m.totalHeight || 0;
+        const displayHeight = rawHeight >= 10000 
+            ? (rawHeight / 1000).toFixed(1) + 'k' 
+            : rawHeight + 'm';
 
-            htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-            <td style="position: relative;" class="text-xs text-center">
-                ${clickTag}
-                <div class="flex flex-col items-center justify-center">
-                    ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
-                    <span class="font-bold ${nameColor} cursor-pointer hover:underline"
-                          onclick="showMemberMountain('${m.name}', '${m.name}')">
-                        ${m.name}
-                    </span>
+        list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
+        <!-- 1. 회원명 -->
+        <td style="position: relative;" class="text-xs text-center">
+    ${clickTag}
+    <div class="flex flex-col items-center justify-center">
+        ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
+        <span class="font-bold ${nameColor} cursor-pointer hover:underline"
+              onclick="showMemberMountain('${m.name}', '${m.name}')">
+            ${m.name}
+        </span>
+    </div>
+</td>
+        <!-- 2. 레벨 -->
+        <td style="position: relative;">
+            ${clickTag}
+            <div class="badge-level">
+                <div class="badge-icon-box ${style.blink} cursor-pointer"
+                     onclick="showMilkyWay('${m.name}', '${m.name}')"
+                     style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                    <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
                 </div>
-            </td>
-            <td style="position: relative;">
-                ${clickTag}
-                <div class="badge-level">
-                    <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
-                         onclick="showMilkyWay('${m.name}', '${m.name}')"
-                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                        <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
-                    </div>
-                    <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
-                </div>
-            </td>
-            <td style="position: relative;">
-                ${clickTag}
-                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount || 0}점 📈</button>
-            </td>
-            <td style="position: relative;">
-                ${clickTag}
-                <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
-            </td>
-            <td style="position: relative;" class="text-center">
-                ${clickTag}
-                <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level || 0})" 
-                        data-dplus="D+${m.dPlusVal}"
-                        class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
-                    <span class="record-btn-txt">기록보기</span>
-                </button>
-            </td>
-            </tr>`;
+                <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
+            </div>
+        </td>
+        <!-- 3. 활동점수 -->
+        <td style="position: relative;">
+            ${clickTag}
+            <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+        </td>
+        <!-- 4. 누적고도 -->
+        <td style="position: relative;">
+            ${clickTag}
+            <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+        </td>
+        <!-- 5. 개인기록 -->
+        <td style="position: relative;" class="text-center">
+            ${clickTag}
+            <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+                    data-dplus="D+${m.dPlusVal}"
+                    class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
+                <span class="record-btn-txt">기록보기</span>
+            </button>
+        </td>
+        </tr>`;
 
-            if (isFirstVisible && !m.isHidden) {
-                isFirstVisible = false;
+        if (isFirstVisible && !m.isHidden) {
+            isFirstVisible = false;
+        }
+    });
+
+    // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
+    let showDPlus = false;
+    window.recordBtnToggleInterval = setInterval(() => {
+        showDPlus = !showDPlus;
+        const toggleBtns = document.querySelectorAll('.record-auto-toggle-btn');
+        
+        toggleBtns.forEach(btn => {
+            const txtSpan = btn.querySelector('.record-btn-txt');
+            const dplusTxt = btn.dataset.dplus;
+            if (!txtSpan) return;
+
+            if (showDPlus) {
+                txtSpan.innerText = dplusTxt;
+                btn.classList.remove('record-glow-active');
+                btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
+            } else {
+                txtSpan.innerText = "기록보기";
+                btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
+                btn.classList.add('record-glow-active');
             }
         });
-
-        list.innerHTML = htmlBuilder;
-
-        // 3초 간격 텍스트 교체 타이머
-        let showDPlus = false;
-        window.recordBtnToggleInterval = setInterval(() => {
-            showDPlus = !showDPlus;
-            const toggleBtns = document.querySelectorAll('.record-auto-toggle-btn');
-            
-            toggleBtns.forEach(btn => {
-                const txtSpan = btn.querySelector('.record-btn-txt');
-                const dplusTxt = btn.dataset.dplus;
-                if (!txtSpan) return;
-
-                if (showDPlus) {
-                    txtSpan.innerText = dplusTxt;
-                    btn.classList.remove('record-glow-active');
-                    btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
-                } else {
-                    txtSpan.innerText = "기록보기";
-                    btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
-                    btn.classList.add('record-glow-active');
-                }
-            });
-        }, 3000);
-
-    } catch (err) {
-        console.error("renderStatusTable 실행 중 오류 발생:", err);
-    }
-};
-
-
-
-
-
-      
+    }, 3000);
+}; // <- 여기서 깔끔하게 닫힙니다.
+   
         
         
             
