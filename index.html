@@ -2302,53 +2302,51 @@ text-align: center;
 .del-btn-mini { font-size: 0.6rem; background: #ef4444; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
-/* 테이블 기본 스타일 유지 */
-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; background-color: #ffffff; }
-td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
-
-/* 💡 화면이 딱 들어맞게 전체 세로 고정 */
-html, body {
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
+: 0 !important;
+/* 1. 테이블 기본 스타일 */
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  table-layout: fixed; 
 }
 
+th { 
+  color: #94a3b8; 
+  font-size: 0.65rem; 
+  padding-bottom: 12px; 
+  border-bottom: 2px solid #f8fafc; 
+  text-align: center; 
+  font-weight: 900; 
+  background-color: #ffffff;
+}
+
+td { 
+  padding: 12px 0; 
+  text-align: center; 
+  vertical-align: middle; 
+  position: relative; 
+  border-bottom: 1px solid #f8fafc; 
+}
+
+/* 2. 관리자 탭 전환 충돌 방지 및 전체 스크롤 영역 설정 */
 .main-container {
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* 관리자 창 보이기/숨기기 기능을 원활하게 하기 위한 뷰 컨테이너 설정 */
 #viewStatus {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden !important; /* 전체 스크롤을 막고 내부 스크롤로 유도 */
-  padding-bottom: 0 !important;
+  max-height: calc(100vh - 50px); /* 상단 탭 메뉴 높이 제외 */
+  overflow-y: auto !important;   /* 스크롤 생성 */
 }
 
-/* 상단 탭, 검색창, 분기버튼 등은 고정 */
-.year-selector,
-.flex.gap-2.mb-3.h-10,
-#quarterTabs {
-  flex-shrink: 0;
-}
-
-/* 🔴 빨간 줄 아래 회원 리스트(tbody) 영역만 독립 스크롤 */
-.min-h-\[300px\] {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-}
-
-/* 테이블 제목(th)을 스크롤 최상단에 딱 붙이기 */
-thead th {
+/* 3. 🔴 빨간 줄(테이블 제목 th)을 화면 최상단에 고정 */
+#viewStatus table thead th {
   position: sticky;
   top: 0;
-  z-index: 10;
-  background-color: #ffffff;
+  z-index: 20;
+  background-color: #ffffff; /* 스크롤 시 아래 글자가 뒤로 숨도록 처리 */
+  box-shadow: 0 1px 0 0 #f8fafc; /* 경계선 유지 */
 }
 
 
