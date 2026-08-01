@@ -3544,7 +3544,9 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
      
-     // ─── 💡 한글 초성 분리 및 조합 검색 유틸리티 ───
+           
+
+    // ─── 💡 한글 초성 분리 및 조합 검색 유틸리티 ───
 const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
 // 한 글자 또는 문자열 전체를 초성으로 변환 (예: "오즈" -> "ㅇㅈ")
@@ -3592,7 +3594,6 @@ function isMatchName(name, searchKeyword) {
 
     return true;
 }
-      
 
 
 
