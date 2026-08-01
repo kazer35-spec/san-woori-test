@@ -8487,22 +8487,21 @@ document.addEventListener('touchstart', (e) => {
 
     
 
-
-
-
-
 // =========================================================================
-// [scrollModal 전용] 개인 운동 상태 리포트 & 뒤로가기(Hash) 완전 제어
+// [완전 해결] 뒤로가기 버튼 전용 락(Lock) 제어 스크립트
+// 기존 HTML / JS 수정 없이 script 맨 최하단에 붙여넣으세요.
 // =========================================================================
 (function() {
-    // 1. 관리할 모달 ID 목록
     const TARGET_MODALS = [
         'scrollModal', 'milkyWayModal', 'timelineModal', 'levelModal',
         'starGuideModal', 'sgCustomModal', 'vibeModal', 'hallModal',
         'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup'
     ];
 
-    // 2. 모달 열림 상태 체크
+    // 뒤로가기 처리 중 중복 감지 방지용 플래그 Lock
+    let isPopstateHandling = false;
+
+    // 화면에 보이는 상태인지 체크
     function isVisible(el) {
         if (!el) return false;
         if (el.classList.contains('hidden')) return false;
@@ -8510,71 +8509,55 @@ document.addEventListener('touchstart', (e) => {
         return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0;
     }
 
-    // 3. 안전한 닫기 처리 함수
-    window.closeSanWooriModal = function(id) {
-        const el = document.getElementById(id);
+    // 모달 강제 숨김 처리
+    function hideModalElement(el) {
         if (!el) return;
+        el.style.display = 'none';
+        el.classList.add('hidden');
+    }
 
-        if (id === 'scrollModal' || id === 'timelineModal') {
-            el.style.display = 'none';
-            el.classList.add('hidden');
-        } else if (id === 'milkyWayModal' && typeof window.toggleMilkyWayModal === 'function') {
-            window.toggleMilkyWayModal(false);
-        } else if (id === 'levelModal' && typeof window.toggleModal === 'function') {
-            window.toggleModal(false);
-        } else {
-            el.style.display = 'none';
-            el.classList.add('hidden');
+    // 1. 뒤로가기(popstate) 발생 시 최우선 처리 (브라우저 물리 뒤로가기 대응)
+    window.addEventListener('popstate', function(e) {
+        let closedAny = false;
+
+        TARGET_MODALS.forEach(id => {
+            const el = document.getElementById(id);
+            if (isVisible(el)) {
+                hideModalElement(el);
+                closedAny = true;
+            }
+        });
+
+        // 뒤로가기로 모달을 닫았을 때 Observer가 엉뚱한 history를 또 쌓지 못하도록 락 걸기
+        if (closedAny) {
+            isPopstateHandling = true;
+            setTimeout(() => {
+                isPopstateHandling = false;
+            }, 250);
         }
-    };
+    });
 
-    // 4. scrollModal 열기 함수
-    window.showScrollModal = function() {
-        const modal = document.getElementById('scrollModal');
-        if (!modal) return;
-
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex'; // 또는 'block'
-
-        // 페이지네이션 초기화 및 리스트 로드
-        if (!window.scrollPagination) {
-            window.scrollPagination = { currentCategory: 'all', currentPageSize: 20, isEnd: false };
-        } else {
-            window.scrollPagination.currentPageSize = 20;
-            window.scrollPagination.isEnd = false;
-        }
-
-        if (typeof window.loadScrollLogsPage === 'function') {
-            window.loadScrollLogsPage(true);
-        }
-    };
-
-    // 5. DOM 변화 감지하여 모달이 열리면 URL Hash (#scrollModal) 부여
+    // 2. DOM 변화 감지 (모달이 새로 화면에 켜질 때만 pushState 수행)
     const observer = new MutationObserver(() => {
+        // 뒤로가기로 모달을 닫는 중이라면 history push 생략
+        if (isPopstateHandling) return;
+
         TARGET_MODALS.forEach(id => {
             const el = document.getElementById(id);
+            // 모달이 켜졌는데 주소창에 해당 해시가 없으면 1회만 Push
             if (isVisible(el) && location.hash !== '#' + id) {
-                history.pushState(null, null, '#' + id);
+                history.pushState({ modalId: id }, null, '#' + id);
             }
         });
     });
 
-    // 6. 브라우저 뒤로가기(popstate) 발생 시 모달 닫기
-    window.addEventListener('popstate', function() {
-        TARGET_MODALS.forEach(id => {
-            const el = document.getElementById(id);
-            // 모달은 열려있는데 해시가 사라진 경우(=뒤로가기를 누른 경우)
-            if (isVisible(el) && location.hash !== '#' + id) {
-                window.closeSanWooriModal(id);
-            }
-        });
-    });
-
-    // 초기화
     function init() {
         if (document.body) {
             observer.observe(document.body, {
-                attributes: true, childList: true, subtree: true, attributeFilter: ['style', 'class']
+                attributes: true,
+                childList: true,
+                subtree: true,
+                attributeFilter: ['style', 'class']
             });
         }
     }
@@ -8586,73 +8569,10 @@ document.addEventListener('touchstart', (e) => {
     }
 })();
 
-    // =========================================================================
-// [완전 해결] scrollModal 전용 뒤로가기 & 수동 닫기 동기화 스크립트
-// =========================================================================
-(function() {
-    const TARGET_MODALS = [
-        'scrollModal', 'milkyWayModal', 'timelineModal', 'levelModal',
-        'starGuideModal', 'sgCustomModal', 'vibeModal', 'hallModal',
-        'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup'
-    ];
 
-    let isInternalClosing = false;
 
-    // 모달 감지
-    function isVisible(el) {
-        if (!el) return false;
-        if (el.classList.contains('hidden')) return false;
-        const style = window.getComputedStyle(el);
-        return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0;
-    }
 
-    // 🎯 핵심: 버튼/X를 눌러서 닫을 때 실행할 전역 함수
-    window.closeScrollModal = function() {
-        const modal = document.getElementById('scrollModal');
-        if (!modal) return;
 
-        modal.style.display = 'none';
-        modal.classList.add('hidden');
-
-        // 만약 주소창에 #scrollModal이 들어있다면 뒤로가기를 1회 실행해서 히스토리를 깔끔히 청소
-        if (location.hash === '#scrollModal') {
-            isInternalClosing = true;
-            history.back();
-            setTimeout(() => { isInternalClosing = false; }, 100);
-        }
-    };
-
-    // DOM 감시 ➔ 모달이 열리면 주소창에 Hash 부여
-    const observer = new MutationObserver(() => {
-        if (isInternalClosing) return;
-        
-        TARGET_MODALS.forEach(id => {
-            const el = document.getElementById(id);
-            if (isVisible(el) && location.hash !== '#' + id) {
-                history.pushState({ modalId: id }, null, '#' + id);
-            }
-        });
-    });
-
-    // 뒤로가기 버튼(popstate) 누르면 화면에서 닫기
-    window.addEventListener('popstate', function() {
-        if (isInternalClosing) return;
-
-        TARGET_MODALS.forEach(id => {
-            const el = document.getElementById(id);
-            if (isVisible(el) && location.hash !== '#' + id) {
-                el.style.display = 'none';
-                el.classList.add('hidden');
-            }
-        });
-    });
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['style', 'class'] }));
-    } else {
-        observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['style', 'class'] });
-    }
-})();
 
 </script>
 </body>
