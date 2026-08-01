@@ -3494,9 +3494,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
      
-      
-        
-        window.renderStatusTable = () => {
+   window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
     const search = document.getElementById('searchInput').value.trim();
     const sort = document.getElementById('statusSortOrder').value;
@@ -3552,7 +3550,6 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
         let clickTag = "";
         if (isFirstVisible && !m.isHidden) {
-            // 통합된 click-neon-adjust 클래스 적용
             clickTag = `<span class="click-neon-adjust">CLICK</span>`;
         }
 
@@ -3597,7 +3594,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             : rawHeight + 'm';
 
         list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-        <!-- 1. 회원명 (다른 td와 동일 구조로 정렬 맞춤) -->
+        <!-- 1. 회원명 -->
         <td style="position: relative;" class="text-xs text-center">
             ${clickTag}
             <div class="flex flex-col items-center justify-center pt-2">
@@ -3645,7 +3642,6 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             isFirstVisible = false;
         }
     });
-};
 
     // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
     let showDPlus = false;
@@ -3659,19 +3655,21 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             if (!txtSpan) return;
 
             if (showDPlus) {
-                // D+254 일 때: 반짝임 해제 및 차분한 스카이블루 톤
                 txtSpan.innerText = dplusTxt;
                 btn.classList.remove('record-glow-active');
                 btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
             } else {
-                // 기록보기 일 때: 기존 반짝임(Glow) 적용
                 txtSpan.innerText = "기록보기";
                 btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
                 btn.classList.add('record-glow-active');
             }
         });
     }, 3000);
-};
+}; // <- 여기서 깔끔하게 닫힙니다.
+   
+        
+        
+            
 
         
             
