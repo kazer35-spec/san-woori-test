@@ -2302,36 +2302,28 @@ text-align: center;
 .del-btn-mini { font-size: 0.6rem; background: #ef4444; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
-/* 테이블 간격 및 정렬 최적화 */
-/* 테이블 간격 및 정렬 최적화 */
-table { 
-  width: 100%; 
-  border-collapse: collapse; 
-  table-layout: fixed; 
-}
+/* 테이블 기본 스타일 유지 */
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; }
+td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
 
-th { 
-  color: #94a3b8; 
-  font-size: 0.65rem; 
-  padding-bottom: 12px; 
-  border-bottom: 2px solid #f8fafc; 
-  text-align: center; 
-  font-weight: 900; 
-
-  /* 헤더 고정을 위한 CSS 추가 */
+/* 🔴 빨간 줄 위쪽 영역 전체 상단 고정 설정 */
+.tab-menu,
+.year-selector,
+.flex.gap-2.mb-3.h-10,
+#quarterTabs,
+thead th {
   position: sticky;
-  top: 0;
-  background-color: #ffffff; /* 스크롤할 때 글자가 겹쳐 보이지 않게 흰색 배경 적용 */
+  background-color: #ffffff; /* 스크롤 시 뒤의 내용이 겹쳐 보이지 않도록 흰색 배경 처리 */
   z-index: 10;
 }
 
-td { 
-  padding: 12px 0; 
-  text-align: center; 
-  vertical-align: middle; 
-  position: relative; 
-  border-bottom: 1px solid #f8fafc; 
-}
+/* 요소별 고정 위치(top) 계산 */
+.tab-menu { top: 0; z-index: 14; }
+.year-selector { top: 48px; z-index: 13; }          /* 탭 메뉴 높이 고려 */
+.flex.gap-2.mb-3.h-10 { top: 100px; z-index: 12; }  /* 검색창/버튼 영역 */
+#quarterTabs { top: 152px; z-index: 11; }           /* 1~4분기 탭 영역 */
+thead th { top: 195px; z-index: 10; }               /* 테이블 헤더 (빨간 줄 바로 위) */
 
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
