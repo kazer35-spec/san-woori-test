@@ -1540,13 +1540,7 @@ tr td:first-child .click-neon-adjust {
     50% { opacity: 0.5; }
 }
 
-/* 테이블 셀 높이 및 정렬 규격화 */
-table tbody tr td {
-    position: relative;
-    height: 60px; /* 셀 높이를 고정하여 click 텍스트 라인을 맞춤 */
-    vertical-align: middle;
-    padding-top: 12px !important; /* 위쪽 click 텍스트 공간 확보 */
-}
+
 
 /* 하단 정보 바 전체 설정 */
 .mountain-info-bar {
@@ -2303,43 +2297,87 @@ text-align: center;
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
 /* 테이블 간격 및 정렬 최적화 */
-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; }
-td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
+/* 테이블 간격 및 정렬 최적화 */
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  table-layout: fixed; 
+}
+
+/* sticky 고정을 위한 thead 레이아웃 설정 */
+thead {
+  position: sticky;
+  top: 0;
+  background-color: #ffffff; /* 스크롤 시 뒤 내용이 비치지 않도록 흰색 배경 지정 */
+  z-index: 10;
+}
+
+th { 
+  color: #94a3b8; 
+  font-size: 0.65rem; 
+  padding-bottom: 12px; 
+  border-bottom: 2px solid #f8fafc; 
+  text-align: center; 
+  font-weight: 900; 
+}
+
+td { 
+  padding: 12px 0; 
+  text-align: center; 
+  vertical-align: middle; 
+  position: relative; 
+  border-bottom: 1px solid #f8fafc; 
+}
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
-.rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
+.rank-1 { color: #facc15 !important; } 
+.rank-2 { color: #94a3b8 !important; } 
+.rank-3 { color: #a36a00 !important; }
 
 /* CLICK 네온 텍스트: 은은한 회색 숨쉬기 효과 */
 .click-neon {
-font-size: 6px; /* 가독성을 위해 살짝 키움 */
-font-weight: 900;
-color: #cbd5e1; /* 기본 회색 */
-text-transform: uppercase;
-position: absolute;
-top: 4px;
-left: 50%;
-transform: translateX(-50%);
-animation: neon-soft-glow 2s infinite ease-in-out; /* 부드러운 애니메이션 */
-letter-spacing: 1px;
-pointer-events: none;
-white-space: nowrap;
-z-index: 5;
+  font-size: 6px;
+  font-weight: 900;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: neon-soft-glow 2s infinite ease-in-out;
+  letter-spacing: 1px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 5;
 }
 
 @keyframes neon-soft-glow {
-0%, 100% {
-opacity: 1;
-/* 은색과 밝은 회색의 조화 */
-text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
-color: #f8fafc;
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
+    color: #f8fafc;
+  }
+  50% {
+    opacity: 0.4;
+    text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
+    color: #64748b;
+  }
 }
-50% {
-opacity: 0.4;
-text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
-color: #64748b; /* 완전히 꺼지지 않고 은은하게 남음 */
+
+/* 테이블 셀 높이 및 정렬 규격화 */
+table tbody tr td {
+  position: relative;
+  height: 60px;
+  vertical-align: middle;
+  padding-top: 12px !important;
 }
+
+/* 💡 스크롤 영역 지정을 위한 클래스 추가 */
+.table-scroll-container {
+  max-height: calc(100vh - 280px); /* 화면 높이에 맞춰 수직 스크롤 영역 제한 (필요시 높이 조정 가능) */
+  overflow-y: auto;
 }
+
 
 /* 2. 배지 스타일 수정 (은은한 글로우 추가) */
 .badge-level {
@@ -2649,16 +2687,17 @@ overflow: hidden;
 </div>
 </div>
 
-<div class="main-container flex flex-col h-screen">
+
+  <div class="main-container flex flex-col h-screen">
   <div class="tab-menu">
     <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
     <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
   </div>
 
-  <!-- 전체 영역 스크롤 차단 (overflow-hidden) -->
+  <!-- 전체 영역 스크롤(overflow-y-auto)을 제거하여 상부 컨트롤 고정 -->
   <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
     
-    <!-- 1. 타이틀 & 컨트롤 영역 (고정) -->
+    <!-- 상단 고정 헤더 영역 -->
     <div class="year-selector flex justify-between items-center mb-3">
       <h1 class="main-title">
         <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
@@ -2667,7 +2706,6 @@ overflow: hidden;
       </h1>
       <div class="flex items-center gap-2">
         <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-
         <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
           <svg viewBox="0 0 36 36">
             <circle class="bg" cx="18" cy="18" r="16"></circle>
@@ -2701,9 +2739,9 @@ overflow: hidden;
       <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
     </div>
 
-    <!-- 2. 표 헤더 영역 (고정) -->
-    <div>
-      <table class="w-full collapse table-fixed">
+    <!-- 💡 아래 영역부터 독립 스크롤 수행 -->
+    <div class="flex-1 overflow-y-auto">
+      <table>
         <thead>
           <tr>
             <th class="w-[18%]">
@@ -2728,26 +2766,13 @@ overflow: hidden;
             </th>
           </tr>
         </thead>
-      </table>
-    </div>
-
-    <!-- 3. 표 바디 영역 (이 안에서만 독립적으로 스크롤 작동) -->
-    <div class="flex-1 overflow-y-auto">
-      <table class="w-full collapse table-fixed">
-        <colgroup>
-          <col class="w-[18%]">
-          <col class="w-[22%]">
-          <col class="w-[18%]">
-          <col class="w-[22%]">
-          <col class="w-[16%]">
-        </colgroup>
         <tbody id="statusList"></tbody>
       </table>
     </div>
 
   </div>
 </div>
-
+          
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
