@@ -8484,79 +8484,104 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: true });
 
     // ===================================================
-// [자동 모달/팝업 뒤로가기 제어 스크립트]
-// 기존 코드는 수정할 필요 없이 맨 밑에 붙여넣기만 하세요.
+// [최종 완벽판] 모달/팝업 자동 감지 뒤로가기 제어 스크립트
 // ===================================================
-(function() {
-    let modalHistoryStack = [];
-    let isProcessingPopstate = false;
+(function () {
+    const modalHistoryStack = [];
+    let isPopstateTriggered = false;
 
-    // 1. 특정 엘리먼트가 현재 화면에 보이는지 검사하는 함수
-    function isVisible(el) {
+    // 1. 요소가 화면에 "실제로 표시중"인지 판별
+    function isElementVisible(el) {
         if (!el) return false;
         if (el.classList.contains('hidden')) return false;
+        
+        // inline display 검사 및 CSS computedStyle 검사
         const style = window.getComputedStyle(el);
         return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
     }
 
-    // 2. 현재 페이지에 있는 모든 모달/팝업 ID 대상
-    const TARGET_MODAL_IDS = ['mountainViewModal', 'scrollModal', 'grassPopup', 'mwInfoHelpModal'];
+    // 2. 모달 상태 체크 및 히스토리 동기화 핵심 로직
+    function syncModalState() {
+        // 감지할 모달 ID 및 클래스 패턴
+        const selectors = [
+            '#mountainViewModal',
+            '#scrollModal',
+            '#grassPopup',
+            '#mwInfoHelpModal',
+            '.mountain-modal',
+            '.scroll-overlay',
+            '.mw-info-modal'
+        ];
 
-    // 3. 화면을 지켜보면서 모달이 열리고 닫히는 것을 자동 감지 (MutationObserver)
-    const observer = new MutationObserver(() => {
-        TARGET_MODAL_IDS.forEach(id => {
-            const el = document.getElementById(id);
-            if (!el) return;
+        // 페이지 내 존재하는 모든 모달 수집 (중복 제거)
+        const foundModals = Array.from(document.querySelectorAll(selectors.join(',')));
+        
+        foundModals.forEach(el => {
+            const idOrRef = el.id || el;
+            const visible = isElementVisible(el);
+            const stackIndex = modalHistoryStack.indexOf(idOrRef);
 
-            const visible = isVisible(el);
-            const inStack = modalHistoryStack.includes(id);
-
-            // [열림 감지] 화면에 보이는데 스택에 없으면 -> 히스토리 추가
-            if (visible && !inStack) {
-                modalHistoryStack.push(id);
-                history.pushState({ isAutoModal: true, modalId: id }, '');
+            // [Case A] 화면에 새로 열림 -> 히스토리 Push
+            if (visible && stackIndex === -1) {
+                modalHistoryStack.push(idOrRef);
+                history.pushState({ isModalState: true }, '');
             } 
-            // [닫힘 감지] 화면에서 사라졌는데 스택에 있으면 -> 스택에서 제거
-            else if (!visible && inStack) {
-                const idx = modalHistoryStack.indexOf(id);
-                if (idx > -1) modalHistoryStack.splice(idx, 1);
+            // [Case B] X버튼/바깥클릭 등으로 화면에서 닫힘 -> 히스토리 정리
+            else if (!visible && stackIndex !== -1) {
+                modalHistoryStack.splice(stackIndex, 1);
 
-                // 뒤로가기 버튼으로 닫힌 게 아니라 클릭으로 닫힌 거라면 가짜 히스토리 정리
-                if (!isProcessingPopstate && history.state && history.state.isAutoModal) {
+                // 뒤로가기 버튼으로 닫힌 게 아닌, 직접 닫았을 때 쌓인 State 정리
+                if (!isPopstateTriggered && history.state && history.state.isModalState) {
                     history.back();
                 }
             }
         });
-    });
+    }
 
-    // 페이지 전체의 스타일/클래스 변화를 자동 감시 시작
-    window.addEventListener('DOMContentLoaded', () => {
-        observer.observe(document.body, {
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['style', 'class']
-        });
-    });
-
-    // 4. 모바일/브라우저 뒤로가기 버튼 눌렀을 때 실행
+    // 3. 브라우저 뒤로가기(popstate) 눌렀을 때 처리
     window.addEventListener('popstate', (e) => {
         if (modalHistoryStack.length > 0) {
-            isProcessingPopstate = true;
-            
-            // 가장 마지막에 열린 모달/팝업 닫기
-            const lastModalId = modalHistoryStack.pop();
-            const el = document.getElementById(lastModalId);
-            
+            isPopstateTriggered = true;
+
+            // 가장 마지막에 열린 모달부터 닫기
+            const lastModalRef = modalHistoryStack.pop();
+            const el = typeof lastModalRef === 'string' ? document.getElementById(lastModalRef) : lastModalRef;
+
             if (el) {
                 el.style.display = 'none';
                 el.classList.add('hidden');
             }
 
+            // popstate 플래그 해제 (이벤트 연쇄 방지)
             setTimeout(() => {
-                isProcessingPopstate = false;
+                isPopstateTriggered = false;
             }, 100);
         }
     });
+
+    // 4. 실시간 DOM/스타일 변화 자동 감시 (MutationObserver)
+    const startObserver = () => {
+        const observer = new MutationObserver(() => {
+            syncModalState();
+        });
+
+        observer.observe(document.body, {
+            attributes: true,
+            childList: true,
+            subtree: true,
+            attributeFilter: ['style', 'class']
+        });
+
+        // 초기 상태 체크
+        syncModalState();
+    };
+
+    // DOM 로드 타이밍 완벽 대응
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startObserver);
+    } else {
+        startObserver();
+    }
 })();
 
 </script>
