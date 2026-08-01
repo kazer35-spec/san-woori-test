@@ -2304,8 +2304,19 @@ text-align: center;
 
 /* 테이블 간격 및 정렬 최적화 */
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-th { color: #94a3b8; font-size: 0.65rem; padding: 10px 0; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; }
-td { padding: 16px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
+
+/* th의 padding-bottom: 12px를 제거하고 위아래 대칭 padding: 6px 0으로 변경 */
+th { 
+  color: #94a3b8; 
+  font-size: 0.65rem; 
+  padding: 6px 0; /* 위아래 동일한 간격 */
+  border-bottom: 2px solid #f8fafc; 
+  text-align: center; 
+  font-weight: 900; 
+  vertical-align: middle; /* 세로 중앙 정렬 보장 */
+}
+
+td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
 .rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
@@ -2701,48 +2712,48 @@ overflow: hidden;
       <button id="qBtn4" class="q-btn flex-1 py-2" onclick="changeQuarter(4)">4분기</button>
     </div>
 
-    <!-- 4. 리스트 테이블 영역 -->
-    <div class="max-h-[calc(100vh-220px)] overflow-y-auto relative">
-      <table class="w-full table-fixed border-collapse">
-        <thead class="sticky top-0 z-20 bg-white shadow-xs">
-          <tr class="border-b border-gray-100">
-            <th class="w-[18%] py-2 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>회원명</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-              </div>
-            </th>
-            <th class="w-[22%] py-2 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>레벨(Lv)</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-              </div>
-            </th>
-            <th class="w-[18%] py-2 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>활동점수</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-              </div>
-            </th>
-            <th class="w-[22%] py-2 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>누적고도</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-              </div>
-            </th>
-            <th class="w-[16%] py-2 text-center bg-white align-middle">
-              <div class="flex flex-col items-center justify-center">
-                <span>개인기록</span>
-                <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="statusList"></tbody>
-      </table>
-    </div>
+      <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
+  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
+    <table class="w-full table-fixed border-collapse">
+      <thead class="sticky top-0 z-20 bg-white shadow-xs">
+        <tr class="border-b border-gray-200">
+          <!-- py-2 제거 및 leading-tight로 위아래 중앙 유착 -->
+          <th class="w-[18%] text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center leading-tight">
+              <span>회원명</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+            </div>
+          </th>
+          <th class="w-[22%] text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center leading-tight">
+              <span>레벨(Lv)</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+            </div>
+          </th>
+          <th class="w-[18%] text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center leading-tight">
+              <span>활동점수</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+            </div>
+          </th>
+          <th class="w-[22%] text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center leading-tight">
+              <span>누적고도</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+            </div>
+          </th>
+          <th class="w-[16%] text-center bg-white align-middle">
+            <div class="flex flex-col items-center justify-center leading-tight">
+              <span>개인기록</span>
+              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="statusList"></tbody>
+    </table>
   </div>
-</div>
+
 
     
 
