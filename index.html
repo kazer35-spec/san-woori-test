@@ -8483,138 +8483,86 @@ document.addEventListener('touchstart', (e) => {
     }
 }, { passive: true });
 
-    // ==========================================
-// 1. 모달 / 뒤로가기 통합 관리자 (Modal Manager)
-// ==========================================
-const ModalManager = {
-    stack: [],
-    isPopstate: false,
+    
+    // ===================================================
+// [통합] 모든 모달/팝업 뒤로가기 자동 연동 스크립트
+// 기존 코드는 수정하지 말고, 이 코드를 script 맨 밑에 붙여넣으세요.
+// ===================================================
+(function() {
+    // 닫아야 할 대상 모달들의 ID 목록
+    const MODAL_IDS = [
+        'mountainViewModal',
+        'scrollModal',
+        'grassPopup',
+        'mwInfoHelpModal'
+    ];
 
-    // 모달/팝업이 열릴 때 호출
-    open(el) {
-        if (!el) return;
-        
-        // 이미 스택에 없다면 등록 및 뒤로가기 스택 추가
-        if (!this.stack.includes(el)) {
-            this.stack.push(el);
-            history.pushState({ modalOpen: true }, '');
-        }
+    // 현재 열려있는 모달 추적 스택
+    const openModalStack = [];
 
-        // 화면 표시
-        el.classList.remove('hidden');
-        el.style.display = (el.id === 'grassPopup') ? 'block' : 'flex';
-    },
+    // 요소가 실제 화면에 떠있는지 검사하는 함수
+    function isModalVisible(el) {
+        if (!el) return false;
+        if (el.classList.contains('hidden')) return false;
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    }
 
-    // 모달/팝업이 닫힐 때 호출
-    close(el) {
-        if (!el) return;
+    // 화면의 모든 모달 상태 체크 및 히스토리 생성
+    function checkModals() {
+        MODAL_IDS.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
 
-        const index = this.stack.indexOf(el);
-        if (index !== -1) {
-            this.stack.splice(index, 1);
+            const visible = isModalVisible(el);
+            const stackIdx = openModalStack.indexOf(id);
+
+            // 1. 모달이 열렸는데 스택에 없으면 -> 히스토리 push
+            if (visible && stackIdx === -1) {
+                openModalStack.push(id);
+                history.pushState({ modalId: id }, '');
+            } 
+            // 2. 모달이 사용자의 직접 클릭(X버튼, 배경클릭 등)으로 닫혔으면 -> 스택에서 제거
+            else if (!visible && stackIdx !== -1) {
+                openModalStack.splice(stackIdx, 1);
+            }
+        });
+    }
+
+    // 뒤로가기 버튼(popstate) 이벤트 수신기
+    window.addEventListener('popstate', () => {
+        // 열린 모달이 있다면 가장 최근에 열린 모달부터 닫기
+        if (openModalStack.length > 0) {
+            const lastId = openModalStack.pop();
+            const el = document.getElementById(lastId);
             
-            // 사용자가 직접 닫았을 때(X버튼/바깥클릭 등) 가짜 히스토리 하나 제거
-            if (!this.isPopstate) {
-                history.back();
+            if (el) {
+                el.classList.add('hidden');
+                el.style.display = 'none';
             }
         }
+    });
 
-        // 화면 숨김
-        el.classList.add('hidden');
-        el.style.display = 'none';
-    },
-
-    // 뒤로가기 버튼 눌렀을 때 실행
-    pop() {
-        if (this.stack.length > 0) {
-            this.isPopstate = true;
-            const lastModal = this.stack.pop();
-            
-            if (lastModal) {
-                lastModal.classList.add('hidden');
-                lastModal.style.display = 'none';
-            }
-
-            setTimeout(() => {
-                this.isPopstate = false;
-            }, 100);
+    // 화면 내 style, class 변화를 0.1초마다/변화시마다 자동 감지
+    const observer = new MutationObserver(checkModals);
+    
+    function initObserver() {
+        if (document.body) {
+            observer.observe(document.body, {
+                attributes: true,
+                subtree: true,
+                attributeFilter: ['style', 'class']
+            });
+            checkModals();
         }
     }
-};
 
-// 모바일 / 브라우저 뒤로가기 이벤트 수신기
-window.addEventListener('popstate', () => {
-    ModalManager.pop();
-});
-
-
-// ==========================================
-// 2. 수정된 잔디 팝업 (Window.showGrassPopup)
-// ==========================================
-Window.showGrassPopup = (event, date, encodedAct) => {
-    if (event.stopPropagation) event.stopPropagation();
-
-    const popup = document.getElementById('grassPopup');
-    const content = document.getElementById('popupContent');
-    const dateEl = document.getElementById('popupDate');
-
-    if (!encodedAct) {
-        ModalManager.close(popup);
-        return;
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initObserver);
+    } else {
+        initObserver();
     }
-
-    if (popup.parentElement !== document.body) {
-        document.body.appendChild(popup);
-    }
-
-    const act = JSON.parse(atob(encodedAct));
-    dateEl.innerText = date;
-    
-    let items = "";
-    if (act.hike > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; gap:12px;"><span>⛰️ 산행</span><b>${act.hike}회</b></div>`;
-    if (act.run > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#ec4899; gap:12px;"><span>🏃‍♀️ 런닝</span><b>${act.run}회</b></div>`;
-    if (act.trek > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#a855f7; gap:12px;"><span>👨‍🦯 트래킹</span><b>${act.trek}회</b></div>`;
-    if (act.walk > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#f97316; gap:12px;"><span>🚶 산책</span><b>${act.walk}회</b></div>`;
-    if (act.extraHike > 0) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#00B36B; gap:12px;"><span>🏔 개인산행</span><b>${act.extraHike}회</b></div>`;
-    if (act.isRegular) items += `<div style="display:flex; justify-content:space-between; font-size:12px; color:#2ecc71; gap:12px;"><span>🌈 정기산행</span><b>참석</b></div>`;
-    
-    content.innerHTML = items;
-
-    // ⭐ 핵심: 직접 style.display 조작 대신 ModalManager 사용
-    ModalManager.open(popup);
-
-    popup.style.position = 'fixed';
-    popup.style.zIndex = '999999';
-
-    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-
-    let left = clientX + 15;
-    let top = clientY - 85;
-
-    if (left + 160 > window.innerWidth) left = clientX - 170;
-    if (top < 10) top = clientY + 20;
-
-    popup.style.left = `${left}px`;
-    popup.style.top = `${top}px`;
-};
-
-// 화면 외부 클릭 시 닫기
-document.addEventListener('mousedown', (e) => {
-    const popup = document.getElementById('grassPopup');
-    if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
-        ModalManager.close(popup);
-    }
-});
-
-// 모바일 터치 시 닫기
-document.addEventListener('touchstart', (e) => {
-    const popup = document.getElementById('grassPopup');
-    if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
-        ModalManager.close(popup);
-    }
-}, { passive: true });
-
+})();
 
 </script>
 </body>
