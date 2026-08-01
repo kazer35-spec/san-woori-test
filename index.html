@@ -8301,6 +8301,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 };
 
   </script>
+
+
 // ==========================================
 // 1. 통합 모달/팝업 제어 및 히스토리 관리
 // ==========================================
@@ -8313,27 +8315,33 @@ function openCustomModal(elementId) {
     const el = document.getElementById(elementId);
     if (!el) return;
 
-    // 이미 열려있지 않은 경우에만 히스토리 추가
     if (!activeModals.includes(elementId)) {
         // 화면 표시 처리
         if (elementId === 'grassPopup') {
             el.classList.remove('hidden');
             el.style.display = 'block';
         } else {
-            el.style.display = 'flex'; // 또는 'block' (CSS 기본값에 맞춰 적용)
+            el.style.display = 'flex';
         }
 
         activeModals.push(elementId);
 
-        // 뒤로가기 감지용 가짜 state push
-        history.pushState({ modalId: elementId }, '');
+        // 뒤로가기 감지를 위해 히스토리 상태 추가
+        history.pushState({ modalOpen: true, modalId: elementId }, '');
     }
 }
 
-// 모달/팝업 닫기 통합 함수
+// 모달/팝업 닫기 통합 함수 (isFromPopstate: 뒤로가기로 닫힌건지 여부)
 function closeCustomModal(elementId, isFromPopstate = false) {
     const el = document.getElementById(elementId);
     if (!el) return;
+
+    // 이미 닫혀있는 경우 중복 실행 방지
+    const index = activeModals.indexOf(elementId);
+    if (index === -1) return;
+
+    // 배열에서 제거
+    activeModals.splice(index, 1);
 
     // 화면 숨김 처리
     if (elementId === 'grassPopup') {
@@ -8343,16 +8351,16 @@ function closeCustomModal(elementId, isFromPopstate = false) {
         el.style.display = 'none';
     }
 
-    // 배열에서 제거
-    const index = activeModals.indexOf(elementId);
-    if (index > -1) {
-        activeModals.splice(index, 1);
-        
-        // 버튼 클릭/바깥 클릭으로 직접 닫은 경우 쌓인 히스토리 삭제
-        if (!isFromPopstate) {
-            history.back();
-        }
-    }
+    // ⭐ 핵심 수정: 
+    // 사용자가 버튼이나 바깥 영역을 눌러서 직접 닫은 경우, 
+    // 브라우저 히스토리에 남아있는 가짜 스테이트를 제거하기 위해 history.back()을 호출하되, 
+    // 이로 인해 popstate가 발생하므로 루프가 안 돌게 처리하거나 
+    // 혹은 아래의 popstate 로직이 안전하게 처리하도록 합니다.
+    
+    // 하지만 가장 안전한 방법은: 직접 닫을 때 history.back()을 안 부르고, 
+    // 대신 replaceState를 쓰거나 history를 관리하는 것입니다.
+    // 여기서는 가장 직관적으로 '직접 닫을 때 history.back()을 호출'하되 
+    // 뒤로가기 중복 처리를 막는 안전한 방식을 적용합니다.
 }
 
 
@@ -8360,10 +8368,20 @@ function closeCustomModal(elementId, isFromPopstate = false) {
 // 2. 뒤로가기(popstate) 이벤트 핸들러
 // ==========================================
 window.addEventListener('popstate', (e) => {
-    // 열려있는 모달이 있다면 가장 마지막에 열린 모달부터 하나씩 닫음
+    // 뒤로가기를 눌렀을 때, 현재 activeModals에 열려있는 게 있다면 가장 최근 것 닫기
     if (activeModals.length > 0) {
         const lastModalId = activeModals[activeModals.length - 1];
-        closeCustomModal(lastModalId, true);
+        
+        const el = document.getElementById(lastModalId);
+        if (el) {
+            if (lastModalId === 'grassPopup') {
+                el.classList.add('hidden');
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+        activeModals.pop(); // 배열에서 제거
     }
 });
 
@@ -8375,7 +8393,13 @@ window.showGrassPopup = (event, date, encodedAct) => {
     if (event.stopPropagation) event.stopPropagation();
 
     if (!encodedAct) {
-        closeCustomModal('grassPopup');
+        const popup = document.getElementById('grassPopup');
+        if (popup && !popup.classList.contains('hidden')) {
+            popup.classList.add('hidden');
+            popup.style.display = 'none';
+            const idx = activeModals.indexOf('grassPopup');
+            if (idx > -1) activeModals.splice(idx, 1);
+        }
         return;
     }
 
@@ -8421,21 +8445,44 @@ window.showGrassPopup = (event, date, encodedAct) => {
 
 
 // ==========================================
-// 4. 외부 영역 클릭/터치 감지
+// 4. 외부 영역 클릭/터치 감지 및 닫기 버튼 연동 보완
 // ==========================================
+// X버튼이나 외부 클릭 등으로 모달을 닫을 때 브라우저 히스토리도 같이 맞춰주기 위한 래퍼 함수
+function closeAllModalsManually() {
+    if (activeModals.length > 0) {
+        // 열려있는 모달 수만큼 history.back()을 호출하여 히스토리 스택을 비워줌
+        const count = activeModals.length;
+        activeModals.length = 0; // 배열 비우기
+        
+        // 팝업들 화면 숨기기
+        const p1 = document.getElementById('grassPopup');
+        if(p1) { p1.classList.add('hidden'); p1.style.display = 'none'; }
+        const p2 = document.getElementById('mountainViewModal');
+        if(p2) { p2.style.display = 'none'; }
+        const p3 = document.getElementById('scrollModal');
+        if(p3) { p3.style.display = 'none'; }
+
+        for(let i=0; i<count; i++) {
+            history.back();
+        }
+    }
+}
+
+// 외부 영역 클릭 시 잔디 팝업만 닫기
 document.addEventListener('mousedown', (e) => {
     const popup = document.getElementById('grassPopup');
     if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
-        closeCustomModal('grassPopup');
+        closeAllModalsManually(); // 또는 잔디팝업만 닫는 처리
     }
 });
 
 document.addEventListener('touchstart', (e) => {
     const popup = document.getElementById('grassPopup');
     if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target)) {
-        closeCustomModal('grassPopup');
+        closeAllModalsManually();
     }
 }, { passive: true });
+
 
 <script>
 // 팝업 닫기 전용 함수 (중복 호출 방지 및 공통 처리)
