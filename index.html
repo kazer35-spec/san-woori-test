@@ -2294,79 +2294,82 @@ text-align: center;
 .del-btn-mini { font-size: 0.6rem; background: #ef4444; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
-/* 테이블 기본 레이아웃 & 헤더 여백 최소화 (빨간줄 간격 축소) */
+/* 테이블 간격 및 정렬 최적화 */
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; }
+td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
 
-th { 
-    color: #94a3b8; 
-    font-size: 0.65rem; 
-    padding-top: 4px;
-    padding-bottom: 4px; /* 기존 12px -> 4px로 축소하여 빨간줄 유격 제거 */
-    border-bottom: 2px solid #f8fafc; 
-    text-align: center; 
-    font-weight: 900; 
-    line-height: 1.2;
-}
-
-/* 데이터 셀 높이 및 CLICK 유격 최적화 */
-td { 
-    padding: 14px 0 6px 0 !important; /* 상단 CLICK 텍스트 안착 공간 14px 확보 */
-    text-align: center; 
-    vertical-align: middle; 
-    position: relative; 
-    border-bottom: 1px solid #f8fafc; 
-}
-
-/* CLICK 네온 텍스트: 첫 번째 행 `td` 바로 상단(노란줄 위치)에 정밀 밀착 */
-.click-neon {
-    font-size: 6px;
-    font-weight: 900;
-    color: #cbd5e1;
-    text-transform: uppercase;
-    position: absolute;
-    top: 2px; /* 👈 negative(-) 값을 없애고 td 내 상단 edge에 딱 맞춤 */
-    left: 50%;
-    transform: translateX(-50%);
-    animation: neon-soft-glow 2s infinite ease-in-out;
-    letter-spacing: 1px;
-    pointer-events: none;
-    white-space: nowrap;
-    z-index: 5;
-}
-
-@keyframes neon-soft-glow {
-    0%, 100% {
-        opacity: 1;
-        text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
-        color: #f8fafc;
-    }
-    50% {
-        opacity: 0.4;
-        text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
-        color: #64748b;
-    }
-}
-
-/* 랭킹 뱃지 & 레벨 배지 스타일 (원문 CSS 유지) */
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
 .rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
 
-.badge-level { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
-.badge-icon-box {
-    padding: 2px 10px;
-    border-radius: 14px;
-    line-height: 1.2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #94a3b8;
-    min-width: 52px;
-    background: rgba(148, 163, 184, 0.1);
-    box-shadow: 0 0 8px rgba(148, 163, 184, 0.2), inset 0 0 4px rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+/* CLICK 네온 텍스트: 은은한 회색 숨쉬기 효과 */
+.click-neon {
+font-size: 6px; /* 가독성을 위해 살짝 키움 */
+font-weight: 900;
+color: #cbd5e1; /* 기본 회색 */
+text-transform: uppercase;
+position: absolute;
+top: -4px;
+left: 50%;
+transform: translateX(-50%);
+animation: neon-soft-glow 2s infinite ease-in-out; /* 부드러운 애니메이션 */
+letter-spacing: 1px;
+pointer-events: none;
+white-space: nowrap;
+z-index: 5;
 }
-.badge-icon-txt { font-size: 0.75rem; font-weight: 800; color: #f1f5f9; text-shadow: 0 0 3px rgba(255, 255, 255, 0.3); }
-.badge-lv-txt { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; color: #94a3b8; opacity: 0.8; }
+
+@keyframes neon-soft-glow {
+0%, 100% {
+opacity: 1;
+/* 은색과 밝은 회색의 조화 */
+text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
+color: #f8fafc;
+}
+50% {
+opacity: 0.4;
+text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
+color: #64748b; /* 완전히 꺼지지 않고 은은하게 남음 */
+}
+}
+
+/* 2. 배지 스타일 수정 (은은한 글로우 추가) */
+.badge-level {
+display: inline-flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+}
+
+.badge-icon-box {
+padding: 2px 10px;
+border-radius: 14px;
+line-height: 1.2;
+display: flex;
+align-items: center;
+justify-content: center;
+border: 1px solid #94a3b8;
+min-width: 52px;
+background: rgba(148, 163, 184, 0.1); /* 배경에 회색기운 추가 */
+/* 박스 외곽에 은은한 회색 광택 */
+box-shadow: 0 0 8px rgba(148, 163, 184, 0.2), inset 0 0 4px rgba(255, 255, 255, 0.1);
+transition: all 0.3s ease;
+}
+
+.badge-icon-txt {
+font-size: 0.75rem;
+font-weight: 800;
+color: #f1f5f9;
+text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.badge-lv-txt {
+font-size: 0.6rem;
+font-weight: 800;
+letter-spacing: 0.5px;
+color: #94a3b8;
+opacity: 0.8;
+}
 
 /* 박스 크기 규격화: 분기 횟수 & D-Day */
 .dday-box, .qcount-box {
@@ -2644,99 +2647,79 @@ overflow: hidden;
 <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
 </div>
 
+<div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+<div class="year-selector flex justify-between items-center mb-3">
+<h1 class="main-title">
+<img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+<span>산:우리</span>
+<span class="slogan-txt">같이 걷는 즐거움</span>
+</h1>
+<div class="flex items-center gap-2">
+<button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
 
-        
-
-            <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
-  <div class="year-selector flex justify-between items-center mb-3">
-    <h1 class="main-title">
-      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-      <span>산:우리</span>
-      <span class="slogan-txt">같이 걷는 즐거움</span>
-    </h1>
-    <div class="flex items-center gap-2">
-      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-      <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-        <svg viewBox="0 0 36 36">
-          <circle class="bg" cx="18" cy="18" r="16"></circle>
-          <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-        </svg>
-        <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-      </button>
-      <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-        <option value="2026">2026년</option>
-        <option value="2027">2027년</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="flex gap-2 mb-2 h-10 items-center">
-    <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-    <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-    <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-      <option value="qCount">점수순 ▼</option>
-      <option value="level">레벨순 ▼</option>
-      <option value="name">이름순 ▼</option>
-      <option value="totalHeight">높이순 ▼</option>
-      <option value="dday">날짜순 ▼</option>
-    </select>
-  </div>
-
-  <div id="quarterTabs" class="mb-1">
-    <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-    <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-    <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-    <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-  </div>
-
-  <!-- 파란선 상단 고정 테이블 & 높이 정밀 세팅 -->
-  <div class="max-h-[calc(100vh-210px)] overflow-y-auto relative">
-    <table class="w-full table-fixed border-collapse">
-      <thead class="sticky top-0 z-20 bg-white shadow-xs">
-        <tr class="border-b border-gray-200">
-          <!-- py-2 및 flex 정렬로 글자를 셀 정중앙으로 유착 -->
-          <th class="w-[18%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>회원명</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-            </div>
-          </th>
-          <th class="w-[22%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>레벨(Lv)</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-            </div>
-          </th>
-          <th class="w-[18%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>활동점수</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-            </div>
-          </th>
-          <th class="w-[22%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>누적고도</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-            </div>
-          </th>
-          <th class="w-[16%] py-2 text-center bg-white align-middle">
-            <div class="flex flex-col items-center justify-center">
-              <span>개인기록</span>
-              <span class="text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody id="statusList"></tbody>
-    </table>
-  </div>
+<button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+<svg viewBox="0 0 36 36">
+<circle class="bg" cx="18" cy="18" r="16"></circle>
+<circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+</svg>
+<span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+</button>
+<select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+<option value="2026">2026년</option>
+<option value="2027">2027년</option>
+</select>
+</div>
 </div>
 
+<div class="flex gap-2 mb-3 h-10 items-center">
+<input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+<button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+<select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
+<option value="qCount">점수순 ▼</option>
+<option value="level">레벨순 ▼</option>
+<option value="name">이름순 ▼</option>
+<option value="totalHeight">높이순 ▼</option>
+<option value="dday">날짜순 ▼</option>
+</select>
+</div>
 
+<div id="quarterTabs">
+<button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+<button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+<button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+<button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+</div>
 
-
-
-
+<div class="min-h-[300px]">
+  <table>
+    <thead>
+      <tr>
+        <th class="w-[18%]">
+          회원명
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+        </th>
+        <th class="w-[22%]">
+          레벨(Lv)
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+        </th>
+        <th class="w-[18%]">
+          활동점수
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+        </th>
+        <th class="w-[22%]">
+          누적고도
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+        </th>
+        <th class="w-[16%]">
+        개인기록
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="statusList"></tbody>
+  </table>
+</div>
+</div> <!-- 기존 코드의 닫는 div 태그 유지 -->
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
@@ -3508,14 +3491,11 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
      
-                  
-            
-        window.renderStatusTable = () => {
+      window.renderStatusTable = () => {
     const list = document.getElementById('statusList');
-    const search = document.getElementById('searchInput')?.value.trim() || '';
-    const sort = document.getElementById('statusSortOrder')?.value || 'qCount';
-    if (!list) return;
-    
+    const search = document.getElementById('searchInput').value.trim();
+    const sort = document.getElementById('statusSortOrder').value;
+    if(!list) return;
     list.innerHTML = "";
 
     // 💡 기존 타이머 정리
@@ -3527,7 +3507,6 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     const today = new Date();
     const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-    // 1. 데이터 가공
     let processedData = currentData.map(m => {
         const last = m.lastDate ? m.lastDate.toDate() : new Date();
         const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
@@ -3549,102 +3528,118 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
         };
     });
 
-    // 2. 정렬 로직
     processedData.sort((a, b) => {
-        if (sort === 'qCount') return (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0);
-        if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
-        if (sort === 'level') return (b.level || 0) - (a.level || 0) || (b.qCount || 0) - (a.qCount || 0);
+        if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
+        if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
+        if (sort === 'level') return b.level - a.level || b.qCount - a.qCount;
         if (sort === 'name') return a.name.localeCompare(b.name, 'ko');
         if (sort === 'dday') return a.ddayVal - b.ddayVal;
         return 0;
     });
 
-    const topNames = [...processedData]
-        .filter(m => !m.isHidden && m.name !== "오즈")
-        .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
-        .slice(0, 3)
-        .map(m => m.name);
+    const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
 
-    let htmlContent = "";
-    let visibleIndex = 0;
+    let isFirstVisible = true;
 
-    // 3. 렌더링 HTML 생성
     processedData.forEach((m) => {
         if (!isAdminLoggedIn && m.isHidden) return;
         if (search && !m.name.includes(search)) return;
 
-        // 첫번째 노출되는 유저에 네온 효과 지정
-        const clickTag = (visibleIndex === 0 && !m.isHidden) ? `<span class="click-neon">CLICK</span>` : '';
+        let clickTag = "";
+        if (isFirstVisible && !m.isHidden) {
+            clickTag = `<span class="click-neon">CLICK</span>`;
+        }
 
         let rankT = ""; 
         let rankC = "";
-        if (m.name !== "오즈" && (m.qCount || 0) > 0 && !m.isHidden) {
+        if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
             const idx = topNames.indexOf(m.name);
-            const activeQuarter = (typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1;
-            const activeYear = (typeof selectedYear !== 'undefined') ? selectedYear : 2026;
+            
+            let activeQuarter = 1; 
+            const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+            if (activeBtn) {
+                const btnId = activeBtn.id; 
+                activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+            } else {
+                activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
+                                ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
+            }
+            
+            const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
             const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
-            if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
-            else if (idx === 1) { rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
-            else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
+            if (idx === 0) { 
+                rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
+                rankC = "rank-1"; 
+            }
+            else if (idx === 1) { 
+                rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
+                rankC = "rank-2"; 
+            }
+            else if (idx === 2) { 
+                rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
+                rankC = "rank-3"; 
+            }
         }
 
-        const style = getLevelStyle(m.level || 0);
+        const style = getLevelStyle(m.level);
+        const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
+
         const rawHeight = m.totalHeight || 0;
         const displayHeight = rawHeight >= 10000 
             ? (rawHeight / 1000).toFixed(1) + 'k' 
             : rawHeight + 'm';
 
-        htmlContent += `
-        <tr class="border-b border-slate-100 text-center text-xs">
-          <!-- 1. 회원명 -->
-          <td class="py-2.5 relative">
-            ${clickTag}
+        list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
+        <td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
+            <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
+                ${clickTag}
+            </div>
+
             <div class="flex flex-col items-center justify-center">
-              ${rankT ? `<span class="rank-badge ${rankC} text-[9px] px-1 rounded mb-0.5">${rankT}</span>` : ''}
-              <span class="font-bold text-slate-800 text-xs cursor-pointer" onclick="showMemberMountain('${m.name}')">${m.name}</span>
+                ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
+                <span class="font-bold ${nameColor} cursor-pointer hover:underline"
+                      onclick="showMemberMountain('${m.name}', '${m.name}')">
+                    ${m.name}
+                </span>
             </div>
-          </td>
-
-          <!-- 2. 레벨(Lv) -->
-          <td class="py-2.5">
-            <div class="flex items-center justify-center gap-1">
-              <div class="px-1.5 py-0.5 rounded-full border text-[10px] font-extrabold cursor-pointer" onclick="showMilkyWay('${m.name}')" style="background-color: ${style.bg}; border-color: ${style.border}; color: ${style.text}">
-                <span>${getLevelBadge(m.level || 0)}</span>
-              </div>
-              <span class="text-[10px] font-bold" style="color:${style.text}">Lv ${m.level || 0}</span>
+        </td>
+        <td style="position: relative;">
+            ${clickTag}
+            <div class="badge-level">
+                <div class="badge-icon-box ${style.blink} cursor-pointer"
+                     onclick="showMilkyWay('${m.name}', '${m.name}')"
+                     style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                    <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
+                </div>
+                <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
             </div>
-          </td>
+        </td>
+        <td style="position: relative;">
+            ${clickTag}
+            <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+        </td>
+        <td style="position: relative;">
+            ${clickTag}
+            <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+        </td>
+        <td style="position: relative;" class="text-center">
+    ${clickTag}
+    <!-- 🎈 누적고도 탭버튼 크기와 동일하게 수정한 알약 모양 버튼 -->
+    <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})" 
+            data-dplus="D+${m.dPlusVal}"
+            class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
+        <span class="record-btn-txt">기록보기</span>
+    </button>
+</td>
+</tr>`;
 
-          <!-- 3. 활동점수 -->
-          <td class="py-2.5">
-            <button onclick="showMemberTimeline('${m.name}')" class="bg-slate-100 active:bg-slate-200 text-slate-600 px-2 py-1 rounded-lg text-[10px] font-black transition-colors">
-              ${m.qCount || 0}점 📈
-            </button>
-          </td>
-
-          <!-- 4. 누적고도 -->
-          <td class="py-2.5">
-            <button onclick="showMemberMap('${m.name}')" class="bg-emerald-50 active:bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-[10px] font-black transition-colors">
-              🚩 ${displayHeight}
-            </button>
-          </td>
-
-          <!-- 5. 개인기록 -->
-          <td class="py-2.5">
-            <button onclick="showFadingScroll('${m.name}')" class="record-auto-toggle-btn border border-slate-200 text-slate-700 px-2 py-1 rounded-full text-[9px] font-bold active:scale-95 transition-all" data-dplus="D+${m.dPlusVal}">
-              <span class="record-btn-txt">D+${m.dPlusVal}</span>
-            </button>
-          </td>
-        </tr>
-        `;
-
-        visibleIndex++;
+        if (isFirstVisible && !m.isHidden) {
+            isFirstVisible = false;
+        }
     });
 
-    list.innerHTML = htmlContent;
-
-    // 4. 3초 간격 전환 애니메이션 타이머
+    // ─── 🎯 3초 간격 전환 (기록보기 ↔ D+254) ───
     let showDPlus = false;
     window.recordBtnToggleInterval = setInterval(() => {
         showDPlus = !showDPlus;
@@ -3656,10 +3651,12 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
             if (!txtSpan) return;
 
             if (showDPlus) {
+                // D+254 일 때: 반짝임 해제 및 차분한 스카이블루 톤
                 txtSpan.innerText = dplusTxt;
                 btn.classList.remove('record-glow-active');
                 btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
             } else {
+                // 기록보기 일 때: 기존 반짝임(Glow) 적용
                 txtSpan.innerText = "기록보기";
                 btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
                 btn.classList.add('record-glow-active');
@@ -3668,6 +3665,7 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
     }, 3000);
 };
 
+        
             
             
             
