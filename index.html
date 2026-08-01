@@ -2303,6 +2303,7 @@ text-align: center;
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
 /* 테이블 간격 및 정렬 최적화 */
+/* 테이블 간격 및 정렬 최적화 */
 table { 
   width: 100%; 
   border-collapse: collapse; 
@@ -2317,10 +2318,10 @@ th {
   text-align: center; 
   font-weight: 900; 
 
-  /* 상단 고정 관련 핵심 설정 추가 */
+  /* 헤더 고정을 위한 CSS 추가 */
   position: sticky;
   top: 0;
-  background-color: #ffffff; /* 스크롤 시 내용이 뒤로 숨기 위해 배경색 지정 */
+  background-color: #ffffff; /* 스크롤할 때 글자가 겹쳐 보이지 않게 흰색 배경 적용 */
   z-index: 10;
 }
 
@@ -2331,6 +2332,7 @@ td {
   position: relative; 
   border-bottom: 1px solid #f8fafc; 
 }
+
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
 .rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
@@ -2674,15 +2676,14 @@ overflow: hidden;
 </div>
 </div>
 
-<div class="main-container flex flex-col h-screen overflow-hidden">
-  <!-- 1. 고정 영역 (탭, 타이틀, 검색/버튼, 분기 탭) -->
-  <div class="tab-menu shrink-0">
+<div class="main-container flex flex-col">
+  <div class="tab-menu">
     <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
     <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
   </div>
 
-  <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col min-h-0 overflow-hidden">
-    <div class="year-selector flex justify-between items-center mb-3 shrink-0">
+  <div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+    <div class="year-selector flex justify-between items-center mb-3">
       <h1 class="main-title">
         <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
         <span>산:우리</span>
@@ -2704,7 +2705,7 @@ overflow: hidden;
       </div>
     </div>
 
-    <div class="flex gap-2 mb-3 h-10 items-center shrink-0">
+    <div class="flex gap-2 mb-3 h-10 items-center">
       <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
       <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
       <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
@@ -2716,15 +2717,14 @@ overflow: hidden;
       </select>
     </div>
 
-    <div id="quarterTabs" class="shrink-0 mb-3">
+    <div id="quarterTabs">
       <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
       <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
       <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
       <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
     </div>
 
-    <!-- 2. 실제 스크롤되는 테이블 영역 -->
-    <div class="flex-1 overflow-y-auto min-h-0">
+    <div class="min-h-[300px]">
       <table>
         <thead>
           <tr>
@@ -2754,7 +2754,7 @@ overflow: hidden;
       </table>
     </div>
   </div>
-</div>
+
 
 
 <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
