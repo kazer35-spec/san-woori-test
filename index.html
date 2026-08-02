@@ -3029,6 +3029,27 @@ overflow: hidden;
       </p>
     </div>
 
+
+      <!-- 관리자 전용 데이터 변환 섹션 -->
+<div class="bg-slate-900 border border-amber-500/30 p-5 rounded-2xl mb-4">
+    <div class="flex justify-between items-center mb-2">
+        <h4 class="text-amber-400 font-bold text-sm flex items-center gap-2">
+            <span>🛠️</span> bondingForest ID 구조 일괄 개편
+        </h4>
+        <span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">관리자 전용</span>
+    </div>
+    
+    <p class="text-slate-300 text-xs mb-4 leading-relaxed">
+        기존의 랜덤 ID(예: <code class="text-amber-300 font-mono">0fLJ3EErb...</code>)로 저장된 동행 기록 문서들을 <br>
+        <b class="text-white">[산이름_YYYY-MM-DD]</b> 형태의 Custom ID로 복사 후 기존 문서를 삭제합니다.
+    </p>
+
+    <button onclick="runBondingForestMigration()" 
+            class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+        <span>🔄</span> ID 일괄 변환 마이그레이션 실행
+    </button>
+</div>
+
   </div> <!-- viewAdmin 닫힘 -->
 
 </div> <!-- main-container 닫힘 -->
@@ -4183,8 +4204,98 @@ window.renderStatusTable = function() {
     }
 };
        
+       /**
+ * 🌲 신규 bondingForest 기록 저장 함수 예시
+ */
+async function saveBondingForestData(mountainName, dateStr, membersList) {
+    const cleanMountain = mountainName.trim().replace(/\s+/g, "");
+    const cleanDate = dateStr.trim(); // YYYY-MM-DD 형식
+    
+    let docId = `${cleanMountain}_${cleanDate}`;
+    let docRef = doc(db, "bondingForest", docId);
+    
+    // 문서 존재 여부 체크 후 중복 식별자 부여
+    let checkDoc = await getDoc(docRef);
+    let dupIndex = 2;
+    while (checkDoc.exists()) {
+        docId = `${cleanMountain}_${cleanDate}_${dupIndex}`;
+        docRef = doc(db, "bondingForest", docId);
+        checkDoc = await getDoc(docRef);
+        dupIndex++;
+    }
+
+    await setDoc(docRef, {
+        mountain: cleanMountain,
+        date: cleanDate,
+        members: membersList,
+        memberCount: membersList.length,
+        createdAt: serverTimestamp()
+    });
+
+    console.log(`🌲 인연의 숲 저장 완료: ${docId}`);
+}
+
+    
+            /**
+ * 🛠️ [관리자 전용] bondingForest 컬렉션 ID 일괄 변경 마이그레이션
+ * 콘솔창에서 runBondingForestMigration() 을 실행하세요.
+ */
+window.runBondingForestMigration = async () => {
+    if (!confirm("⚠️ bondingForest의 모든 문서 ID를 [산이름_날짜] 형태로 일괄 변경하시겠습니까?\n작업 중 브라우저를 닫지 마세요.")) return;
+
+    try {
+        console.log("🔄 마이그레이션 시작...");
+        const forestRef = collection(db, "bondingForest");
+        const snap = await getDocs(forestRef);
+
+        let successCount = 0;
+        let skippedCount = 0;
+
+        for (const documentSnapshot of snap.docs) {
+            const data = documentSnapshot.data();
+            const oldId = documentSnapshot.id;
+
+            // 이미 [산이름_날짜] 형태인 경우 패스 (중복 실행 방지)
+            if (oldId.includes("_") && oldId.match(/\d{4}-\d{2}-\d{2}/)) {
+                console.log(`⏩ 이미 마이그레이션된 문서 패스: ${oldId}`);
+                skippedCount++;
+                continue;
+            }
+
+            const mountain = (data.mountain || "미지정산").trim().replace(/\s+/g, "");
+            const date = (data.date || "0000-00-00").trim();
             
-                    
+            let newDocId = `${mountain}_${date}`;
+
+            // 동일한 날짜/산 이름의 문서가 이미 존재할 경우 (중복 처리)
+            let targetRef = doc(db, "bondingForest", newDocId);
+            let checkDoc = await getDoc(targetRef);
+            let dupIndex = 2;
+
+            while (checkDoc.exists()) {
+                newDocId = `${mountain}_${date}_${dupIndex}`;
+                targetRef = doc(db, "bondingForest", newDocId);
+                checkDoc = await getDoc(targetRef);
+                dupIndex++;
+            }
+
+            // 1. 새 ID로 문서 생성 (기존 데이터 완벽 유지)
+            await setDoc(targetRef, data);
+
+            // 2. 기존 랜덤 ID 문서 삭제
+            await deleteDoc(doc(db, "bondingForest", oldId));
+
+            console.log(`✅ ID 변경 완료: ${oldId} ➡️ ${newDocId}`);
+            successCount++;
+        }
+
+        alert(`🎉 마이그레이션이 완료되었습니다!\n- 변환 성공: ${successCount}건\n- 건너뜀: ${skippedCount}건`);
+    } catch (error) {
+        console.error("❌ 마이그레이션 중 오류 발생:", error);
+        alert("마이그레이션 중 오류가 발생했습니다. 콘솔 로그를 확인해주세요.");
+    }
+};
+        
             
                  
         
