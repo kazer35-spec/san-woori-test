@@ -327,10 +327,16 @@ tr td:first-child .click-neon-adjust {
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
     z-index: 9999;
-    display: flex;
+    display: none; /* 🎯 기본 상태를 hidden/none으로 안전하게 설정 */
     align-items: center;
     justify-content: center;
 }
+
+/* JS에서 열어줄 때 사용할 class 정의 */
+.scroll-overlay.active {
+    display: flex !important;
+}
+
 .fading-scroll {
     background: #ffffff;
     border-radius: 24px;
@@ -4975,15 +4981,15 @@ if (legendArea) {
     const legends = {
         regular: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
             <span class="inline-block w-2 h-2 rounded-full border border-black/5" style="background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);"></span>
-            <span>정기산행</span>
+            <span>정기</span>
         </div>`,
         hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
             <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
-            <span>일정산행</span>
+            <span>일정</span>
         </div>`,
         extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
             <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
-            <span>개인산행</span>
+            <span>개인</span>
         </div>`,
         trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
             <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
