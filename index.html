@@ -7943,7 +7943,7 @@ function createShootingStar(board, tx, ty) {
 }
 
              
-Window.currentScrollLogs = []; 
+window.currentScrollLogs = []; 
 
 window.scrollPagination = {
     currentCategory: 'all',
@@ -8119,13 +8119,23 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     }
 
     modal.onclick = (e) => { 
-        if (e.target === modal) modal.style.display = 'none'; 
+        if (e.target === modal) {
+            window.closeScrollModal();
+        }
     };
     if(scrollWrap) {
         scrollWrap.onclick = (e) => e.stopPropagation();
     }
 };
 
+    // 🎯 4. 스크롤 모달 전용 통합 닫기 함수 신설
+window.closeScrollModal = function() {
+    const modal = document.getElementById('scrollModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+    
 window.switchScrollTab = (category) => {
     if (window.scrollPagination.currentCategory === category) return;
     
@@ -8417,7 +8427,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
             <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
             <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
-            <span class="modal-close-btn" onclick="document.getElementById('scrollModal').style.display='none'">&times;</span>
+            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
         </div>
 
         <!-- 스크롤 컨텐츠 영역 -->
@@ -8425,7 +8435,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
         <!-- 하단 푸터 영역 -->
         <div class="scroll-footer">
-            <button class="modal-bottom-close-btn" onclick="document.getElementById('scrollModal').style.display='none'"></button>
+            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()"></button>
         </div>
         
     </div>
