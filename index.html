@@ -8660,6 +8660,85 @@ document.addEventListener('touchstart', (e) => {
     }
 })();
 
+    (function() {
+    const TARGET_MODALS = [
+        'scrollModal', 'milkyWayModal', 'timelineModal', 'levelModal',
+        'starGuideModal', 'sgCustomModal', 'vibeModal', 'hallModal',
+        'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup'
+    ];
+
+    let activeModalStack = [];
+
+    function isVisible(el) {
+        if (!el) return false;
+        if (el.classList.contains('hidden')) return false;
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0;
+    }
+
+    // 모달 강제 닫기 및 스택 정리
+    function forceCloseModal(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'none';
+            el.classList.add('hidden');
+        }
+        // 스택에서 완벽히 제거
+        activeModalStack = activeModalStack.filter(m => m !== id);
+    }
+
+    // 뒤로가기 버튼 클릭 처리
+    window.addEventListener('popstate', function(e) {
+        if (activeModalStack.length > 0) {
+            const lastId = activeModalStack.pop();
+            forceCloseModal(lastId);
+            // timelineModal/scrollModal 연동 처리
+            if (lastId === 'scrollModal' || lastId === 'timelineModal') {
+                forceCloseModal('scrollModal');
+                forceCloseModal('timelineModal');
+            }
+        }
+    });
+
+    // MutationObserver: 모달 열림/닫힘 감시
+    const observer = new MutationObserver(() => {
+        TARGET_MODALS.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            const visible = isVisible(el);
+            const inStack = activeModalStack.includes(id);
+
+            // [열림] 화면에 보이는데 스택에 없으면 추가
+            if (visible && !inStack) {
+                activeModalStack.push(id);
+                history.pushState({ modalId: id }, '', location.href);
+            }
+            // [닫힘] 화면에서 사라졌는데 스택에 남아있으면 제거 (X버튼/배경 클릭 등)
+            else if (!visible && inStack) {
+                activeModalStack = activeModalStack.filter(m => m !== id);
+            }
+        });
+    });
+
+    function init() {
+        if (document.body) {
+            observer.observe(document.body, {
+                attributes: true,
+                childList: true,
+                subtree: true,
+                attributeFilter: ['style', 'class']
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
 </script>
 </body>
     </html>
