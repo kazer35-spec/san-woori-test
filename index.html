@@ -4970,8 +4970,13 @@ function setupTimelineTabs() {
     const legendArea = document.getElementById('timelineLegend');
     if (legendArea) {
         // 범례 조각 정의 (w-2 h-2로 도트 크기 축소, text-[10px]로 폰트 축소, 간격 정밀 조정)
-        const legends = {
-
+        
+const legends = {
+    // 🎯 여기에 regular (정기산행) 데이터를 JS 내부에서 직접 정의
+    regular: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+        <span class="inline-block w-2 h-2 rounded-full border border-black/5" style="background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);"></span>
+        <span>정기산행</span>
+    </div>`,
             hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
                 <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
                 <span>일정산행</span>
@@ -4995,9 +5000,12 @@ function setupTimelineTabs() {
         };
 
         // 탭 종류에 따라 알맞은 범례 아이템 배치
-        if (category === 'hiking') {
-            legendArea.innerHTML = [legends.regular, legends.hike, legends.extraHike].join('');
-            legendArea.style.display = 'flex';
+        // ✅ 올바른 수정 코드
+if (category === 'hiking') {
+    legendArea.innerHTML = [legends.hike, legends.extraHike].join(''); // legends.regular 제거
+    legendArea.style.display = 'flex';
+}
+
         } else if (category === 'running') {
             legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
             legendArea.style.display = 'flex';
@@ -5282,10 +5290,9 @@ function renderGrowthChart(data) {
         y: { beginAtZero: true, position: 'left' },
         y1: { beginAtZero: true, position: 'right', display: false }
     }
-}
-
-    });
-}
+    } // 👈 options 닫기
+});   // 👈 new Chart(...) 닫기
+}     //
 
       
 
@@ -5561,29 +5568,6 @@ toggleMarkerStyle();
 const marker = document.getElementById('adminMapMarker');
 marker.style.left = d.x + "%"; marker.style.top = d.y + "%"; marker.classList.remove('hidden');
 }
-};
-
-// [추가] 산 이름을 입력하면 기존에 저장된 바위/숲/계곡 데이터를 불러오는 함수
-window.autoFindMountainStats = async () => {
-    const mName = document.getElementById('mountainName').value.trim();
-    if(!mName) return;
-
-    try {
-        const docSnap = await getDoc(doc(db, "mountains", mName));
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            // 기존 값이 있으면 넣어주고 없으면 0
-            document.getElementById('pRock').value = data.pRock || 0;
-            document.getElementById('pForest').value = data.pForest || 0;
-            document.getElementById('pValley').value = data.pValley || 0;
-            
-            // 만약 높이 입력창(mountainHeight)이 있다면 그것도 자동 세팅
-            if(data.height && document.getElementById('mountainHeight')) {
-                document.getElementById('mountainHeight').value = data.height;
-            }
-            console.log(`${mName} 정보 로드 완료`);
-        }
-    } catch (e) { console.error("데이터 로드 실패:", e); }
 };
 
 // [1] 산 정보를 불러오는 함수 (이름 입력 시 자동 실행)
