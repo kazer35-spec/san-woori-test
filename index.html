@@ -327,10 +327,16 @@ tr td:first-child .click-neon-adjust {
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
     z-index: 9999;
-    display: flex;
+    display: none; /* 🎯 기본 상태를 hidden/none으로 안전하게 설정 */
     align-items: center;
     justify-content: center;
 }
+
+/* JS에서 열어줄 때 사용할 class 정의 */
+.scroll-overlay.active {
+    display: flex !important;
+}
+
 .fading-scroll {
     background: #ffffff;
     border-radius: 24px;
@@ -8512,6 +8518,152 @@ document.addEventListener('touchstart', (e) => {
         popup.style.display = 'none';
     }
 }, { passive: true });
+
+    
+// ===================================================
+// [통합] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
+// 기존 코드 수정 없이 script 맨 최하단에 붙여넣으세요.
+// ===================================================
+(function() {
+    // 닫기 처리를 할 모든 모달 ID 목록 (새로 추가된 모달 포함)
+    const MODAL_IDS = [
+        'starGuideModal',
+        'sgCustomModal',
+        'levelModal',
+        'vibeModal',
+        'hallModal',
+        'mapModal',
+        'milkyWayModal',
+        'timelineModal',
+        'logPopup',
+        'mountainViewModal',
+        'scrollModal',
+        'mwInfoHelpModal',
+        'grassPopup'
+    ];
+
+    // 열려있는 모달을 추적하는 스택
+    const modalStack = [];
+
+    // 모달이 실제 화면에 보이고 있는지 판별하는 함수
+    function isVisible(el) {
+        if (!el) return false;
+        if (el.classList.contains('hidden')) return false;
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    }
+
+    // 각 모달을 안전하게 닫는 통합 함수 (기존 toggle/close/hide 함수 연동)
+    function closeModalById(id) {
+        switch (id) {
+            case 'starGuideModal':
+                if (typeof window.toggleStarGuide === 'function') window.toggleStarGuide(false);
+                else hideEl(id);
+                break;
+            case 'sgCustomModal':
+                if (typeof window.closeSgModal === 'function') window.closeSgModal();
+                else {
+                    const el = document.getElementById(id);
+                    if (el) el.remove();
+                }
+                break;
+            case 'timelineModal':
+                if (typeof window.toggleTimelineModal === 'function') window.toggleTimelineModal(false);
+                else hideEl(id);
+                break;
+            case 'scrollModal':
+                hideEl(id);
+                break;
+            case 'levelModal':
+                if (typeof window.toggleModal === 'function') window.toggleModal(false);
+                else hideEl(id);
+                break;
+            case 'vibeModal':
+                if (typeof window.toggleVibeModal === 'function') window.toggleVibeModal(false);
+                else hideEl(id);
+                break;
+            case 'hallModal':
+                if (typeof window.toggleHallModal === 'function') window.toggleHallModal(false);
+                else hideEl(id);
+                break;
+            case 'mapModal':
+                if (typeof window.toggleMapModal === 'function') window.toggleMapModal(false);
+                else hideEl(id);
+                break;
+            case 'logPopup':
+                if (typeof window.toggleLogPopup === 'function') window.toggleLogPopup(false);
+                else hideEl(id);
+                break;
+            case 'mwInfoHelpModal':
+                if (typeof window.closeMountainInfoModal === 'function') window.closeMountainInfoModal();
+                else hideEl(id);
+                break;
+            default:
+                hideEl(id);
+                break;
+        }
+    }
+
+    // 엘리먼트 수동 숨김 (fallback)
+    function hideEl(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.add('hidden');
+            el.style.display = 'none';
+        }
+    }
+
+    // 화면 내 모달들의 상태 변화 감지 및 브라우저 history 동기화
+    function syncModalHistory() {
+        MODAL_IDS.forEach(id => {
+            const el = document.getElementById(id);
+            const visible = isVisible(el);
+            const stackIndex = modalStack.indexOf(id);
+
+            // 1. 새 모달이 열렸는데 스택에 없으면 -> 뒤로가기 히스토리 추가
+            if (visible && stackIndex === -1) {
+                modalStack.push(id);
+                history.pushState({ isSanWooriModal: true, modalId: id }, '');
+            } 
+            // 2. 사용자가 버튼 클릭이나 배경 터치 등으로 직접 닫았으면 -> 스택에서 제거
+            else if (!visible && stackIndex !== -1) {
+                modalStack.splice(stackIndex, 1);
+            }
+        });
+    }
+
+    // 모바일/브라우저 뒤로가기 버튼(popstate) 처리
+    window.addEventListener('popstate', (e) => {
+        if (modalStack.length > 0) {
+            // 가장 마지막에 열린 모달부터 차례대로 닫기
+            const lastModalId = modalStack.pop();
+            closeModalById(lastModalId);
+        }
+    });
+
+    // DOM 변화(style, class 등)를 실시간 감지하여 모달 열림/닫힘 자동 추적
+    const observer = new MutationObserver(() => {
+        syncModalHistory();
+    });
+
+    function initModalObserver() {
+        if (document.body) {
+            observer.observe(document.body, {
+                attributes: true,
+                childList: true,
+                subtree: true,
+                attributeFilter: ['style', 'class']
+            });
+            syncModalHistory();
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initModalObserver);
+    } else {
+        initModalObserver();
+    }
+})();
 
 </script>
 </body>
