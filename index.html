@@ -4123,8 +4123,8 @@ window.renderStatusTable = function() {
             <div id="forestModal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 backdrop-blur-md" onclick="this.remove()">
                 <div class="bg-[#0f172a] border border-emerald-500/30 p-6 rounded-[2.5rem] w-[320px] text-center shadow-2xl" onclick="event.stopPropagation()">
                     <div class="text-emerald-400 text-[10px] font-black mb-2 tracking-[0.4em]">BONDING FOREST</div>
-                    <div class="text-6xl mb-1">🌲</div>
-                    <h3 class="text-white text-xl font-bold mb-1">${mName}님의 인연</h3>
+                    <div class="text-6xl mb-1"></div>
+                    <h3 class="text-white text-xl font-bold mb-1">🌲${mName}님의 인연</h3>
                     <p class="text-[11px] text-slate-500 mb-4 leading-relaxed"></p>
                     
                     <div class="space-y-2 text-left">
@@ -4194,36 +4194,48 @@ window.renderStatusTable = function() {
     }
 };
        
-       /**
- * 🌲 신규 bondingForest 기록 저장 함수 예시
- */
-async function saveBondingForestData(mountainName, dateStr, membersList) {
-    const cleanMountain = mountainName.trim().replace(/\s+/g, "");
-    const cleanDate = dateStr.trim(); // YYYY-MM-DD 형식
-    
-    let docId = `${cleanMountain}_${cleanDate}`;
-    let docRef = doc(db, "bondingForest", docId);
-    
-    // 문서 존재 여부 체크 후 중복 식별자 부여
-    let checkDoc = await getDoc(docRef);
-    let dupIndex = 2;
-    while (checkDoc.exists()) {
-        docId = `${cleanMountain}_${cleanDate}_${dupIndex}`;
-        docRef = doc(db, "bondingForest", docId);
-        checkDoc = await getDoc(docRef);
-        dupIndex++;
+       
+window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
+    try {
+        if (!mountainName || !dateStr) {
+            alert("산 이름과 날짜는 필수 정보입니다.");
+            return;
+        }
+
+        // 1. 공백 제거 및 문서 ID 포맷팅 (예: 관악산_2026-08-03)
+        const cleanMountain = mountainName.trim().replace(/\s+/g, "");
+        const cleanDate = dateStr.trim();
+        let customDocId = `${cleanMountain}_${cleanDate}`;
+
+        // 2. 혹시 같은 날, 같은 산을 2번 이상 저장할 경우를 대비한 중복 방어
+        let docRef = doc(db, "bondingForest", customDocId);
+        let checkDoc = await getDoc(docRef);
+        let dupIndex = 2;
+
+        while (checkDoc.exists()) {
+            customDocId = `${cleanMountain}_${cleanDate}_${dupIndex}`;
+            docRef = doc(db, "bondingForest", customDocId);
+            checkDoc = await getDoc(docRef);
+            dupIndex++;
+        }
+
+        // 3. addDoc 대신 setDoc을 사용하여 내가 지정한 ID(customDocId)로 저장!
+        await setDoc(docRef, {
+            mountain: cleanMountain,
+            date: cleanDate,
+            members: membersList || [],
+            memberCount: (membersList || []).length,
+            createdAt: serverTimestamp()
+        });
+
+        console.log(`✅ [bondingForest] 지정한 ID로 저장 완료: ${customDocId}`);
+        return customDocId;
+
+    } catch (error) {
+        console.error("❌ 저장 실패:", error);
+        alert("산행 기록 저장 중 오류가 발생했습니다.");
     }
-
-    await setDoc(docRef, {
-        mountain: cleanMountain,
-        date: cleanDate,
-        members: membersList,
-        memberCount: membersList.length,
-        createdAt: serverTimestamp()
-    });
-
-    console.log(`🌲 인연의 숲 저장 완료: ${docId}`);
-}
+};
 
             
                        
@@ -6117,9 +6129,29 @@ window.addMultiActivity = async () => {
             }
         } 
 
+        // 🎯 [수정된 부분] bondingForest에 addDoc 대신 setDoc을 사용하여 [산이름_날짜] ID로 직접 저장!
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
-            await addDoc(collection(db, "bondingForest"), {
-                mountain: mName, members: selectedNames, memberCount: selectedNames.length, date: dateVal, createdAt: new Date()
+            const cleanMountain = (mName || "산행").trim().replace(/\s+/g, "");
+            const cleanDate = dateVal.trim();
+            let bondingDocId = `${cleanMountain}_${cleanDate}`;
+
+            // 동일 날짜, 동일 산 중복 저장 시 식별자 부여 (_2, _3...)
+            let bondingRef = doc(db, "bondingForest", bondingDocId);
+            let checkSnap = await getDoc(bondingRef);
+            let dupSeq = 2;
+            while (checkSnap.exists()) {
+                bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
+                bondingRef = doc(db, "bondingForest", bondingDocId);
+                checkSnap = await getDoc(bondingRef);
+                dupSeq++;
+            }
+
+            await setDoc(bondingRef, {
+                mountain: cleanMountain, 
+                members: selectedNames, 
+                memberCount: selectedNames.length, 
+                date: cleanDate, 
+                createdAt: new Date()
             });
         }
 
@@ -6163,10 +6195,7 @@ window.addMultiActivity = async () => {
     }
 };
 
-     
-        
-                        
-   // 📌 [신규 회원 등록 함수] - 수정본
+// 📌 [신규 회원 등록 함수]
 window.addMember = async () => {
     const nameInput = document.getElementById('newName');
     const genderInput = document.querySelector('input[name="newGender"]:checked');
@@ -6176,10 +6205,9 @@ window.addMember = async () => {
         return alert("회원 이름을 입력해주세요.");
     }
 
-    const cleanName = nameInput.value.trim(); // 한글 이름 공백 제거
+    const cleanName = nameInput.value.trim();
     const gender = genderInput ? genderInput.value : "여";
     
-    // 날짜 선택이 안 되어있으면 오늘 날짜 적용
     const regDateVal = dateInput && dateInput.value ? new Date(dateInput.value) : new Date();
     const ts = (typeof Timestamp !== 'undefined') ? Timestamp.fromDate(regDateVal) : regDateVal;
 
@@ -6196,17 +6224,15 @@ window.addMember = async () => {
             friendshipPoint: 0,
             qCount: 0,
             isHidden: false,
-            regDate: ts,    // 👈 🎯 핵심! 이 필드가 추가되어야 가입일 조회가 정상 작동합니다.
-            createdAt: ts,  // 기존 createdAt도 유지
+            regDate: ts,
+            createdAt: ts,
             lastDate: ts
         }, { merge: true });
 
         alert(`신규 회원 [${cleanName}] 님이 정상 등록되었습니다! 🎉`);
 
-        // 입력 폼 초기화
         nameInput.value = "";
         
-        // 데이터 실시간 동기화 함수가 있다면 재실행
         if (typeof startRealtimeSync === 'function') {
             startRealtimeSync();
         }
@@ -6216,6 +6242,9 @@ window.addMember = async () => {
     }
 };
 
+            
+
+            
 // 📌 회원 이름 변경 및 데이터 완벽 이전 함수
 window.updateMemberName = async () => {
     const selectEl = document.getElementById('memberSelectEdit');
@@ -8704,7 +8733,7 @@ document.addEventListener('touchstart', (e) => {
     const TARGET_MODALS = [
         'scrollModal', 'milkyWayModal', 'timelineModal', 'levelModal',
         'starGuideModal', 'sgCustomModal', 'vibeModal', 'hallModal',
-        'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup'
+        'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup', 'forestModal'
     ];
 
     let activeModalStack = [];
