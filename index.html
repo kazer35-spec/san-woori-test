@@ -8383,11 +8383,10 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
         <!-- 헤더 영역 -->
         <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center;">
+            <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
             <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
             <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
-            
-            <!-- 🎯 여기 onclick 수정: closeScrollModal() 호출 -->
-            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
+            <span class="modal-close-btn" onclick="document.getElementById('scrollModal').style.display='none'">&times;</span>
         </div>
 
         <!-- 스크롤 컨텐츠 영역 -->
@@ -8395,8 +8394,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
         <!-- 하단 푸터 영역 -->
         <div class="scroll-footer">
-            <!-- 🎯 여기 onclick 수정: closeScrollModal() 호출 -->
-            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()"></button>
+            <button class="modal-bottom-close-btn" onclick="document.getElementById('scrollModal').style.display='none'"></button>
         </div>
         
     </div>
@@ -8484,106 +8482,6 @@ document.addEventListener('touchstart', (e) => {
         popup.style.display = 'none';
     }
 }, { passive: true });
-
-    
-
-// =========================================================================
-// [완전 해결] history.state 직접 제어형 뒤로가기 스크립트
-// =========================================================================
-(function() {
-    // 제어할 모달 ID 목록
-    const TARGET_MODALS = [
-        'scrollModal', 'milkyWayModal', 'timelineModal', 'levelModal',
-        'starGuideModal', 'sgCustomModal', 'vibeModal', 'hallModal',
-        'mapModal', 'logPopup', 'mwInfoHelpModal', 'grassPopup'
-    ];
-
-    // 모달 닫기 실행 함수
-    function closeModalElement(el) {
-        if (!el) return;
-        
-        // 1. 특수 토글 함수가 있는 모달 우선 처리
-        if (el.id === 'milkyWayModal' && typeof window.toggleMilkyWayModal === 'function') {
-            window.toggleMilkyWayModal(false);
-            return;
-        }
-        if (el.id === 'starGuideModal' && typeof window.toggleStarGuide === 'function') {
-            window.toggleStarGuide(false);
-            return;
-        }
-        if (el.id === 'timelineModal' && typeof window.toggleTimelineModal === 'function') {
-            window.toggleTimelineModal(false);
-            return;
-        }
-
-        // 2. 일반 모달 닫기
-        el.style.display = 'none';
-        el.classList.add('hidden');
-    }
-
-    // 화면에 모달이 실제 보이는지 체크
-    function isModalVisible(el) {
-        if (!el) return false;
-        if (el.classList.contains('hidden')) return false;
-        const style = window.getComputedStyle(el);
-        return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0;
-    }
-
-    // 🎯 1. 모달을 켤 때 호출하거나 클릭 시 히스토리 적재하는 안전 함수
-    window.openModalWithHistory = function(modalId) {
-        const el = document.getElementById(modalId);
-        if (!el) return;
-
-        // 이미 히스토리가 쌓여있는 상태가 아닐 때만 pushState 실행
-        if (!history.state || history.state.openModalId !== modalId) {
-            history.pushState({ openModalId: modalId }, '');
-        }
-    };
-
-    // 🎯 2. 스마트폰/브라우저 물리 뒤로가기(popstate) 발생 시
-    window.addEventListener('popstate', function(e) {
-        // 현재 화면에 켜져 있는 모달이 있는지 확인 후 해당 모달만 닫음
-        let hasClosedModal = false;
-        TARGET_MODALS.forEach(id => {
-            const el = document.getElementById(id);
-            if (isModalVisible(el)) {
-                closeModalElement(el);
-                hasClosedModal = true;
-            }
-        });
-    });
-
-    // 🎯 3. 모달이 열리는 순간을 실시간 감지하여 히스토리(State) 1개만 딱 주입
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach(mutation => {
-            const target = mutation.target;
-            if (target && target.id && TARGET_MODALS.includes(target.id)) {
-                if (isModalVisible(target)) {
-                    // 모달이 켜졌는데 현재 state가 이 모달의 state가 아니면 pushState
-                    if (!history.state || history.state.openModalId !== target.id) {
-                        history.pushState({ openModalId: target.id }, '');
-                    }
-                }
-            }
-        });
-    });
-
-    function init() {
-        if (document.body) {
-            observer.observe(document.body, {
-                attributes: true,
-                subtree: true,
-                attributeFilter: ['style', 'class']
-            });
-        }
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
 
 </script>
 </body>
