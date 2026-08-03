@@ -3176,52 +3176,48 @@ overflow: hidden;
 <div id="mapModal" class="modal-overlay" onclick="toggleMapModal(false)">
   <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-hidden" onclick="event.stopPropagation()">
     
-    <!-- Header Zone -->
-    <div class="flex justify-between items-center mb-4 gap-2">
+    <!-- Header Zone + 에베레스트 정복 창 -->
+    <div class="flex justify-between items-center mb-4 gap-3">
       <div class="flex-shrink-0">
-        <h2 class="text-lg font-black text-emerald-600 tracking-tight"><span id="mapMemberName">오즈</span> <span class="text-slate-800 font-bold">님</span></h2>
-        <p class="text-[10px] font-bold text-slate-400 tracking-wide">Conquest Map</p>
+        <h2 class="text-lg font-black text-slate-900"><span id="mapMemberName" class="text-emerald-600"></span> 님</h2>
+        <p class="text-[10px] font-bold text-slate-400">Conquest Map</p>
       </div>
 
-      <!-- 에베레스트 정복 카드 -->
-      <div class="flex-1 bg-sky-50/60 border border-sky-100 px-3 py-2 rounded-full">
-        <div class="text-[10px] font-bold text-sky-900 text-center mb-1 flex items-center justify-center gap-1">
-          <span>우리는</span>
-          <span class="text-xs">🏔️</span>
-          <span>에베레스트를 <strong id="everestCount" class="text-sky-600 font-black">0.0</strong>회 정복하였습니다</span>
+      <!-- 🏔️ 에베레스트 정복 미니 카드 -->
+      <div class="everest-card-mini flex-1 bg-sky-50/80 p-2.5 rounded-2xl border border-sky-100/80">
+        <div id="everestTextLine" class="everest-count-mini text-[10px] font-bold text-sky-900 text-center mb-1.5">
+          우리는 🏔️ 에베레스트를 <span id="everestCount" class="text-sky-600 font-extrabold">0.0</span>회 정복하였습니다
         </div>
-        <div class="w-full bg-sky-100/80 rounded-full h-1.5 overflow-hidden">
-          <div id="everestProgressBar" class="bg-sky-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+        <div class="everest-progress-bg-mini w-full bg-sky-200/50 rounded-full h-1.5 overflow-hidden">
+          <div id="everestProgressBar" class="everest-progress-bar-mini bg-sky-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
         </div>
       </div>
     </div>
 
-    <!-- 1. 메인 지도 뷰 -->
-    <div id="mapViewMain" style="display: block;">
-      <div class="map-container relative rounded-2xl overflow-hidden border border-slate-100 shadow-sm mb-3">
+    <!-- Main Map View -->
+    <div id="mapViewMain">
+      <!-- 지도 컨테이너 -->
+      <div class="map-container relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm mb-3">
         <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block">
         
-        <!-- 100대 명산 배지 -->
-        <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-200 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
+        <!-- 🌲 지도 우측 상단 미니 배지 (좌표 존재하는 100대 명산만 집계) -->
+        <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
           <span class="text-[10px]">🌲</span>
           <span id="miniTop100Badge" class="tracking-tight">0/100</span>
         </div>
 
         <div id="conquerMapPoints"></div>
-
-        <!-- 출처 문구 원래 위치 -->
-        <div class="absolute bottom-2 right-3 text-[9px] text-slate-500 font-medium z-10 select-none">
-          출처: 산림청
-        </div>
+        <div class="map-source-txt absolute bottom-2 right-2 text-[8px] bg-slate-800/70 text-white px-1.5 py-0.5 rounded backdrop-blur-sm">출처: 산림청</div>
       </div>
 
-      <!-- 📌 [누락 해결] 통계 창으로 진입하는 메인 버튼 -->
-      <button type="button" onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/70 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/80 transition-all flex justify-between items-center shadow-xs cursor-pointer">
-        <span class="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
-          <span>🏅</span> 지역 점유율 및 정복 통계
+      <!-- 상세 통계 전환 버튼 -->
+      <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
+        <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
+          <span>🎖️</span> 정복 통계 및 100대 명산 목록
         </span>
-        <span class="text-xs font-bold text-emerald-600 flex items-center gap-0.5">
-          상세보기 &gt;
+        <span class="text-xs font-bold text-sky-600 flex items-center gap-0.5">
+          상세보기
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </span>
       </button>
 
@@ -3231,57 +3227,34 @@ overflow: hidden;
       </div>
     </div>
 
-    <!-- 2. 통계 및 목록 상세 뷰 -->
-    <div id="mapViewStats" style="display: none;">
-      <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 min-h-[360px]">
+    <!-- Detailed Stats View (통계 + 100대 명산 탭) -->
+    <div id="mapViewStats" class="hidden-view">
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 min-h-[350px]">
         
-        <!-- 3개 탭 헤더 -->
-        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200/60">
-          <div class="flex gap-1">
-            <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
-              점유율
+        <!-- Header & Tab Navigation -->
+        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
+          <div class="flex gap-1.5">
+            <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2.5 rounded-lg text-xs font-bold bg-sky-500 text-white shadow-sm">
+              지역별 점유율
             </button>
-            <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">
-              산림청 100
-            </button>
-            <button id="tabBtnVisited" onclick="switchStatsTab('visited')" class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">
-              정복한 산
+            <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2.5 rounded-lg text-xs font-bold bg-white text-slate-500 border border-slate-200">
+              100대 명산 목록
             </button>
           </div>
-          <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg font-bold shadow-xs">
+          <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2 py-1 rounded-lg font-bold shadow-sm hover:bg-slate-50">
             ← 지도
           </button>
         </div>
 
-        <!-- 탭 1: 지역별 점유율 -->
+        <!-- Tab 1: 지역별 점유율 -->
         <div id="regionStatsBox">
           <div id="conquerRegionGrid" class="max-h-[280px] overflow-y-auto pr-1"></div>
         </div>
 
-        <!-- 탭 2: 산림청 100 -->
+        <!-- Tab 2: 100대 명산 정복 목록 (ㄱㄴㄷ순 + 20개씩 더보기) -->
         <div id="top100ListBox" class="hidden">
-          <div id="top100MountainGrid" class="max-h-[240px] overflow-y-auto pr-1"></div>
-          <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 hidden">
-            더보기
-          </button>
-        </div>
-
-        <!-- 탭 3: 정복한 산 (서브 필터 적용) -->
-        <div id="visitedMountainBox" class="hidden">
-          <div class="flex gap-1 mb-2.5 p-1 bg-slate-100 rounded-lg">
-            <button id="subTabVisitedAll" onclick="filterVisitedMountains('all')" class="px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-600 text-white">
-              전체
-            </button>
-            <button id="subTabVisitedOfficial" onclick="filterVisitedMountains('official')" class="px-2 py-1 rounded-md text-[10px] font-bold bg-slate-200 text-slate-600">
-              정기 및 일정산행
-            </button>
-            <button id="subTabVisitedPersonal" onclick="filterVisitedMountains('personal')" class="px-2 py-1 rounded-md text-[10px] font-bold bg-slate-200 text-slate-600">
-              개인산행
-            </button>
-          </div>
-
-          <div id="visitedMountainGrid" class="max-h-[220px] overflow-y-auto pr-1"></div>
-          <button id="visitedMoreBtn" onclick="loadNext20Visited()" class="w-full mt-2 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 hidden">
+          <div id="top100MountainGrid" class="max-h-[240px] overflow-y-auto pr-1 space-y-1.5"></div>
+          <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 hidden">
             더보기
           </button>
         </div>
@@ -3289,15 +3262,32 @@ overflow: hidden;
       </div>
     </div>
 
-    <!-- 닫기 버튼 -->
-    <button onclick="toggleMapModal(false)" class="w-full py-3.5 mt-3 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs border border-slate-200 transition-all">
+    <button onclick="toggleMapModal(false)" class="w-full py-3.5 mt-3 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
       닫기
     </button>
   </div>
 </div>
 
+<div id="mapModal" class="modal-overlay" onclick="toggleMapModal(false)">
+  <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-hidden" onclick="event.stopPropagation()">
     
+    <!-- Header Zone + 에베레스트 정복 창 -->
+    <div class="flex justify-between items-center mb-4 gap-3">
+      <div class="flex-shrink-0">
+        <h2 class="text-lg font-black text-slate-900"><span id="mapMemberName" class="text-emerald-600"></span> 님</h2>
+        <p class="text-[10px] font-bold text-slate-400">Conquest Map</p>
+      </div>
 
+      <!-- 🏔️ 에베레스트 정복 미니 카드 -->
+      <div class="everest-card-mini flex-1 bg-sky-50/80 p-2.5 rounded-2xl border border-sky-100/80">
+        <div id="everestTextLine" class="everest-count-mini text-[10px] font-bold text-sky-900 text-center mb-1.5">
+          우리는 🏔️ 에베레스트를 <span id="everestCount" class="text-sky-600 font-extrabold">0.0</span>회 정복하였습니다
+        </div>
+        <div class="everest-progress-bg-mini w-full bg-sky-200/50 rounded-full h-1.5 overflow-hidden">
+          <div id="everestProgressBar" class="everest-progress-bar-mini bg-sky-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
 
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
@@ -5576,18 +5566,15 @@ window.openMountainInfoModal = function(type, event) {
 };
 
 
+
 // 캐시 유효 시간 (5분)
 const MAP_CACHE_EXPIRY = 5 * 60 * 1000;
 
-// 글로벌 상태 변수
+// 100대 명산 더보기 관련 글로벌 변수
 let top100FullList = [];
 let top100DisplayCount = 20;
 
-let visitedMountainsFullList = [];
-let visitedMountainsFilter = 'all'; // all | official | personal
-let visitedMountainsDisplayCount = 20;
-
-// [1] 모달 뷰 전환 함수
+// [1] 모달 뷰 전환 및 탭 전환 함수
 window.toggleMapView = (viewType) => {
     const main = document.getElementById('mapViewMain');
     const stats = document.getElementById('mapViewStats');
@@ -5602,45 +5589,29 @@ window.toggleMapView = (viewType) => {
     }
 };
 
-// [2] 3개 탭 전환 (점유율 / 산림청 100 / 정복한 산)
 window.switchStatsTab = (tabName) => {
     const regionBox = document.getElementById('regionStatsBox');
     const top100Box = document.getElementById('top100ListBox');
-    const visitedBox = document.getElementById('visitedMountainBox');
-
     const tabRegion = document.getElementById('tabBtnRegion');
     const tabTop100 = document.getElementById('tabBtnTop100');
-    const tabVisited = document.getElementById('tabBtnVisited');
-
-    const activeStyle = "py-1.5 px-2.5 rounded-lg text-xs font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30";
-    const inactiveStyle = "py-1.5 px-2.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-400";
-
-    if (regionBox) regionBox.classList.add('hidden');
-    if (top100Box) top100Box.classList.add('hidden');
-    if (visitedBox) visitedBox.classList.add('hidden');
-
-    if (tabRegion) tabRegion.className = inactiveStyle;
-    if (tabTop100) tabTop100.className = inactiveStyle;
-    if (tabVisited) tabVisited.className = inactiveStyle;
 
     if (tabName === 'top100') {
-        if (top100Box) top100Box.classList.remove('hidden');
-        if (tabTop100) tabTop100.className = activeStyle;
-    } else if (tabName === 'visited') {
-        if (visitedBox) visitedBox.classList.remove('hidden');
-        if (tabVisited) tabVisited.className = activeStyle;
-        filterVisitedMountains('all');
+        regionBox.classList.add('hidden');
+        top100Box.classList.remove('hidden');
+        tabRegion.className = "py-1 px-2.5 rounded-lg text-xs font-bold bg-white text-slate-500 border border-slate-200";
+        tabTop100.className = "py-1 px-2.5 rounded-lg text-xs font-bold bg-sky-500 text-white shadow-sm";
     } else {
-        if (regionBox) regionBox.classList.remove('hidden');
-        if (tabRegion) tabRegion.className = activeStyle;
+        regionBox.classList.remove('hidden');
+        top100Box.classList.add('hidden');
+        tabRegion.className = "py-1 px-2.5 rounded-lg text-xs font-bold bg-sky-500 text-white shadow-sm";
+        tabTop100.className = "py-1 px-2.5 rounded-lg text-xs font-bold bg-white text-slate-500 border border-slate-200";
     }
 };
 
-// [3] 100대 명산 20개씩 더보기 렌더링
+// [2] 100대 명산 20개씩 더보기 렌더링 (화이트 스타일 적용)
 window.renderMoreTop100 = () => {
     const listBoard = document.getElementById('top100MountainGrid');
     const moreBtn = document.getElementById('top100MoreBtn');
-    if (!listBoard) return;
     
     const targetSlice = top100FullList.slice(0, top100DisplayCount);
     
@@ -5651,19 +5622,19 @@ window.renderMoreTop100 = () => {
     }
 
     listBoard.innerHTML = targetSlice.map((item, idx) => `
-        <div class="flex justify-between items-center p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/50 mb-1.5">
+        <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
             <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-sky-400 bg-sky-950/80 px-1.5 py-0.5 rounded border border-sky-500/30">${idx + 1}</span>
-                <span class="text-xs font-bold text-slate-200">${item.name}</span>
+                <span class="text-[10px] font-black text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">${idx + 1}</span>
+                <span class="text-xs font-bold text-slate-800">${item.name}</span>
             </div>
             <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
         </div>
     `).join('');
 
-    if (moreBtn) {
-        if (top100DisplayCount >= top100FullList.length) {
-            moreBtn.classList.add('hidden');
-        } else {
+    if (top100DisplayCount >= top100FullList.length) {
+        if(moreBtn) moreBtn.classList.add('hidden');
+    } else {
+        if(moreBtn) {
             moreBtn.classList.remove('hidden');
             moreBtn.innerText = `더보기 (${top100DisplayCount}/${top100FullList.length})`;
         }
@@ -5675,270 +5646,114 @@ window.loadNext20Top100 = () => {
     renderMoreTop100();
 };
 
-// [4] 정복한 산 필터링 & 렌더링
-window.filterVisitedMountains = (filterType) => {
-    visitedMountainsFilter = filterType;
-    visitedMountainsDisplayCount = 20;
+// [3] 메인 지도 불러오기 (화이트 스타일 동적 생성 적용)
+window.showMemberMap = async (mId, mName) => {
+    toggleMapModal(true);
+    document.getElementById('mapModalContent').scrollTop = 0;
+    toggleMapView('main');
+    switchStatsTab('region');
+    document.getElementById('mapMemberName').innerText = mName;
 
-    const btnAll = document.getElementById('subTabVisitedAll');
-    const btnOfficial = document.getElementById('subTabVisitedOfficial');
-    const btnPersonal = document.getElementById('subTabVisitedPersonal');
+    const pointsBoard = document.getElementById('conquerMapPoints');
+    const regionBoard = document.getElementById('conquerRegionGrid');
+    pointsBoard.innerHTML = regionBoard.innerHTML = "";
 
-    const subActive = "px-2 py-1 rounded-md text-[10px] font-bold bg-sky-500 text-white";
-    const subInactive = "px-2 py-1 rounded-md text-[10px] font-bold bg-slate-800 text-slate-400";
+    // ⚡ 캐시 확인 (Local Storage)
+    const cacheKey = `sanwoori_map_cache_${mId}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    const nowTime = Date.now();
+    let logsData = [];
 
-    if (btnAll) btnAll.className = filterType === 'all' ? subActive : subInactive;
-    if (btnOfficial) btnOfficial.className = filterType === 'official' ? subActive : subInactive;
-    if (btnPersonal) btnPersonal.className = filterType === 'personal' ? subActive : subInactive;
-
-    renderVisitedMountains();
-};
-
-window.renderVisitedMountains = () => {
-    const listBoard = document.getElementById('visitedMountainGrid');
-    const moreBtn = document.getElementById('visitedMoreBtn');
-    if (!listBoard) return;
-
-    let filteredList = visitedMountainsFullList.filter(item => {
-        if (visitedMountainsFilter === 'official') {
-            return item.type === 'regular' || item.type === 'schedule' || item.isOfficial;
-        } else if (visitedMountainsFilter === 'personal') {
-            return item.type === 'personal' || (!item.isOfficial && item.type !== 'regular' && item.type !== 'schedule');
+    if (cachedData) {
+        const parsed = JSON.parse(cachedData);
+        if (nowTime - parsed.timestamp < MAP_CACHE_EXPIRY) {
+            logsData = parsed.logs;
+            console.log("⚡ [캐시 로드] 데이터 트래픽 절약 완료");
         }
-        return true;
+    }
+
+    if (logsData.length === 0) {
+        const snapAll = await getDocs(collection(db, `sanwoori/${mId}/logs`));
+        snapAll.forEach(doc => logsData.push(doc.data()));
+        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: nowTime, logs: logsData }));
+        console.log("🔥 [DB 로드] 신규 데이터 저장 완료");
+    }
+
+    let totalH = 0;
+    let mapHtml = "";
+    let regionCounts = {};
+    let validLogsCount = 0;
+    
+    // 100대 명산 집계 (산이름 -> { count, height })
+    const top100Map = {};
+
+    logsData.forEach(log => {
+        totalH += (log.height || 0);
+
+        // 🎯 [핵심] 좌표(coords)가 존재하는 기록만 지도 점 찍기 및 100대 명산 집계에 포함
+        if (log.coords) {
+            validLogsCount++;
+            mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
+            
+            const rName = log.region || getRegionFromCoord(log.coords);
+            regionCounts[rName] = (regionCounts[rName] || 0) + 1;
+
+            if (log.isTop100 && log.mountain) {
+                if (!top100Map[log.mountain]) {
+                    top100Map[log.mountain] = { count: 0, height: log.height || 0 };
+                }
+                top100Map[log.mountain].count += 1;
+            }
+        }
     });
 
-    const targetSlice = filteredList.slice(0, visitedMountainsDisplayCount);
+    // ㄱㄴㄷ 순 정렬 처리
+    top100FullList = Object.keys(top100Map)
+        .sort((a, b) => a.localeCompare(b, 'ko'))
+        .map(mName => ({
+            name: mName,
+            count: top100Map[mName].count,
+            height: top100Map[mName].height
+        }));
 
-    if (targetSlice.length === 0) {
-        listBoard.innerHTML = "<p class='text-center text-xs py-8 text-slate-400'>해당 산행 기록이 없습니다.</p>";
-        if(moreBtn) moreBtn.classList.add('hidden');
-        return;
-    }
+    top100DisplayCount = 20;
+    renderMoreTop100();
 
-    listBoard.innerHTML = targetSlice.map((item) => {
-        const isRegular = item.type === 'regular';
-        const isOfficialGroup = isRegular || item.type === 'schedule' || item.isOfficial;
+    // 지도 상단 미니 배지 수치 업데이트
+    const top100Count = top100FullList.length;
+    document.getElementById('miniTop100Badge').innerText = `${top100Count}/100`;
 
-        let badgeStyle = "bg-slate-700 text-slate-300 border-slate-600";
-        let badgeText = "개인";
+    document.getElementById('mapTotalHeight').innerText = totalH.toLocaleString();
+    pointsBoard.innerHTML = mapHtml;
 
-        if (isRegular) {
-            badgeStyle = "bg-emerald-950 text-emerald-400 border-emerald-500/50 font-extrabold";
-            badgeText = "정기";
-        } else if (isOfficialGroup) {
-            badgeStyle = "bg-sky-950 text-sky-400 border-sky-500/50";
-            badgeText = "일정";
-        }
-
-        return `
-        <div class="flex justify-between items-center p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/50 mb-1.5">
-            <div class="flex items-center gap-2">
-                <span class="text-[9px] px-1.5 py-0.5 rounded border ${badgeStyle}">${badgeText}</span>
-                <div>
-                    <div class="text-xs font-bold text-slate-200">${item.mountain}</div>
-                    <div class="text-[9px] text-slate-400">${item.date || ''} ${item.region ? '· ' + item.region : ''}</div>
+    // 지역별 점유율 리스트 업데이트 (화이트 카드 테마)
+    const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
+    if (sortedRegions.length === 0) {
+        regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
+    } else {
+        regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
+            const percent = ((count / validLogsCount) * 100).toFixed(1);
+            return `
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 mb-2 shadow-sm">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-slate-800">${name} <span class="text-[10px] text-sky-600 font-normal ml-1">(${count}회)</span></span>
+                    <span class="text-xs font-black text-sky-600">${percent}%</span>
                 </div>
-            </div>
-            <span class="text-[10px] font-bold text-sky-400">${item.height ? item.height + 'm' : ''}</span>
-        </div>
-        `;
-    }).join('');
-
-    if (moreBtn) {
-        if (visitedMountainsDisplayCount >= filteredList.length) {
-            moreBtn.classList.add('hidden');
-        } else {
-            moreBtn.classList.remove('hidden');
-            moreBtn.innerText = `더보기 (${visitedMountainsDisplayCount}/${filteredList.length})`;
-        }
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-gradient-to-r from-sky-400 to-emerald-400 h-1.5 rounded-full" style="width:${percent}%"></div>
+                </div>
+            </div>`;
+        }).join('');
     }
+
+    // 에베레스트 글로벌 통계
+    const globalTotalH = currentData.reduce((acc, m) => acc + (m.totalHeight || 0), 0);
+    document.getElementById('mapGlobalTotalHeight').innerText = globalTotalH.toLocaleString();
+    const conquestCount = (globalTotalH / 8848).toFixed(1);
+    document.getElementById('everestCount').innerText = conquestCount;
+    document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
 };
-
-window.loadNext20Visited = () => {
-    visitedMountainsDisplayCount += 20;
-    renderVisitedMountains();
-};
-
-// [5] 메인 지도 불러오기
-window.showMemberMap = async (mId, mName) => {
-    console.log("🗺️ showMemberMap 실행 시작 - Member ID:", mId, "Name:", mName);
-
-    try {
-        // 모달 열기 처리
-        if (typeof window.toggleMapModal === 'function') {
-            window.toggleMapModal(true);
-        } else {
-            const modal = document.getElementById('mapModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        const modalContent = document.getElementById('mapModalContent');
-        if (modalContent) modalContent.scrollTop = 0;
-
-        toggleMapView('main');
-        switchStatsTab('region');
         
-        const nameElem = document.getElementById('mapMemberName');
-        if (nameElem) nameElem.innerText = mName;
-
-        const pointsBoard = document.getElementById('conquerMapPoints');
-        const regionBoard = document.getElementById('conquerRegionGrid');
-        if (pointsBoard) pointsBoard.innerHTML = "";
-        if (regionBoard) regionBoard.innerHTML = "";
-
-        // 캐시 확인
-        const cacheKey = `sanwoori_map_cache_${mId}`;
-        const cachedData = localStorage.getItem(cacheKey);
-        const nowTime = Date.now();
-        let logsData = [];
-
-        if (cachedData) {
-            try {
-                const parsed = JSON.parse(cachedData);
-                if (nowTime - parsed.timestamp < MAP_CACHE_EXPIRY) {
-                    logsData = parsed.logs || [];
-                    console.log("⚡ [캐시 로드] 데이터 트래픽 절약 완료, 개수:", logsData.length);
-                }
-            } catch(e) { logsData = []; }
-        }
-
-        if (logsData.length === 0) {
-            console.log("🔥 [DB 로드] Firestore 수집 시작...");
-            
-            // Firebase DB 객체 검증
-            if (typeof db === 'undefined' || typeof getDocs === 'undefined' || typeof collection === 'undefined') {
-                console.error("❌ Firebase `db`, `getDocs`, `collection`이 정의되어 있지 않습니다.");
-                alert("데이터베이스 연결 오류가 발생했습니다. 콘솔을 확인해주세요.");
-                return;
-            }
-
-            const snapAll = await getDocs(collection(db, `sanwoori/${mId}/logs`));
-            snapAll.forEach(doc => logsData.push(doc.data()));
-            localStorage.setItem(cacheKey, JSON.stringify({ timestamp: nowTime, logs: logsData }));
-            console.log("🔥 [DB 로드 완료] 읽어온 기록 수:", logsData.length);
-        }
-
-        let totalH = 0;
-        let mapHtml = "";
-        let regionCounts = {};
-        let validLogsCount = 0;
-        
-        const top100Map = {};
-        const rawVisitedList = [];
-
-        logsData.forEach(log => {
-            totalH += Number(log.height || 0);
-
-            // 좌표가 있는 기록
-            if (log.coords) {
-                validLogsCount++;
-                mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
-                
-                const rName = log.region || (typeof getRegionFromCoord === 'function' ? getRegionFromCoord(log.coords) : '기타');
-                regionCounts[rName] = (regionCounts[rName] || 0) + 1;
-            }
-
-            // 산 이름이 있는 모든 기록 (정복한 산/100대 명산 집계)
-            if (log.mountain) {
-                if (log.isTop100) {
-                    if (!top100Map[log.mountain]) {
-                        top100Map[log.mountain] = { count: 0, height: log.height || 0 };
-                    }
-                    top100Map[log.mountain].count += 1;
-                }
-
-                rawVisitedList.push({
-                    mountain: log.mountain,
-                    height: log.height || 0,
-                    region: log.region || '기타',
-                    type: log.type || (log.isOfficial ? 'schedule' : 'personal'),
-                    isOfficial: !!log.isOfficial,
-                    date: log.date || ''
-                });
-            }
-        });
-
-        // 100대 명산 ㄱㄴㄷ 정렬
-        top100FullList = Object.keys(top100Map)
-            .sort((a, b) => a.localeCompare(b, 'ko'))
-            .map(mName => ({
-                name: mName,
-                count: top100Map[mName].count,
-                height: top100Map[mName].height
-            }));
-
-        top100DisplayCount = 20;
-        renderMoreTop100();
-
-        // 정복한 산 목록 정렬 (정기산행 > 일정산행 > 개인산행)
-        visitedMountainsFullList = rawVisitedList.sort((a, b) => {
-            const priority = (item) => {
-                if (item.type === 'regular') return 1;
-                if (item.type === 'schedule' || item.isOfficial) return 2;
-                return 3;
-            };
-            const pA = priority(a);
-            const pB = priority(b);
-
-            if (pA !== pB) return pA - pB;
-            return (b.date || '').localeCompare(a.date || '') || a.mountain.localeCompare(b.mountain, 'ko');
-        });
-
-        // 미니 배지 수치
-        const miniBadge = document.getElementById('miniTop100Badge');
-        if (miniBadge) miniBadge.innerText = `${top100FullList.length}/100`;
-
-        const heightElem = document.getElementById('mapTotalHeight');
-        if (heightElem) heightElem.innerText = totalH.toLocaleString();
-        if (pointsBoard) pointsBoard.innerHTML = mapHtml;
-
-        // 지역별 점유율 리스트
-        const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
-        if (regionBoard) {
-            if (sortedRegions.length === 0) {
-                regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
-            } else {
-                regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
-                    const percent = validLogsCount > 0 ? ((count / validLogsCount) * 100).toFixed(1) : "0.0";
-                    return `
-                    <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/50 mb-2">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-slate-200">${name} <span class="text-[10px] text-sky-400 font-normal ml-1">(${count}회)</span></span>
-                            <span class="text-xs font-black text-sky-400">${percent}%</span>
-                        </div>
-                        <div class="w-full bg-slate-700/60 rounded-full h-1.5 overflow-hidden">
-                            <div class="bg-gradient-to-r from-sky-500 to-blue-500 h-1.5 rounded-full" style="width:${percent}%"></div>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
-        }
-
-        // 에베레스트 통계
-        let globalTotalH = 0;
-        if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-            globalTotalH = currentData.reduce((acc, m) => acc + Number(m.totalHeight || 0), 0);
-        } else {
-            globalTotalH = totalH;
-        }
-
-        const globalHElem = document.getElementById('mapGlobalTotalHeight');
-        if (globalHElem) globalHElem.innerText = globalTotalH.toLocaleString();
-
-        const conquestCount = (globalTotalH / 8848).toFixed(1);
-        const everestCountElem = document.getElementById('everestCount');
-        const everestBarElem = document.getElementById('everestProgressBar');
-        if (everestCountElem) everestCountElem.innerText = conquestCount;
-        if (everestBarElem) everestBarElem.style.width = `${(conquestCount % 1) * 100}%`;
-
-        console.log("✅ showMemberMap 실행 완료!");
-
-    } catch (error) {
-        console.error("❌ Map load error 발생:", error);
-    }
-};
-
                 
         
     
