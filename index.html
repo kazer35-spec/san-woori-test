@@ -3208,8 +3208,8 @@ overflow: hidden;
         </div>
 
         <div id="conquerMapPoints"></div>
-        <!-- 💡 출처 텍스트: 좌측 이동 + 아래로 배치 -->
-        <div class="map-source-txt absolute -bottom-1 left-2 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
+        <!-- 💡 출처 텍스트: 범례 아래 우측 위치 (요청하신 빨간선 위치) -->
+        <div class="map-source-txt absolute bottom-2.5 right-3 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
       </div>
 
       <!-- 상세 통계 전환 버튼 -->
@@ -3231,7 +3231,8 @@ overflow: hidden;
 
     <!-- Detailed Stats View (통계 3종 탭) -->
     <div id="mapViewStats" class="hidden-view">
-      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 min-h-[350px]">
+      <!-- 💡 창 크기 확장: min-h-[400px] -->
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 min-h-[400px]">
         
         <!-- Header & Tab Navigation -->
         <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1">
@@ -3242,8 +3243,9 @@ overflow: hidden;
             <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
               산림청 100대
             </button>
-            <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
-              정복한 산
+            <!-- 💡 정복한 산 탭 이름 바로 앞에 🔴 빨간점 추가 -->
+            <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 정복한 산
             </button>
           </div>
           <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2 py-1 rounded-lg font-bold shadow-sm hover:bg-slate-50 flex-shrink-0">
@@ -3251,17 +3253,14 @@ overflow: hidden;
           </button>
         </div>
 
-        <!-- Tab 1: 지역별 점유율 (기본 6개 출력 + 더보기) -->
+        <!-- Tab 1: 지역별 점유율 (높이 290px로 확장) -->
         <div id="regionStatsBox">
-          <div id="conquerRegionGrid" class="max-h-[240px] overflow-y-auto pr-1"></div>
-          <button id="regionMoreBtn" onclick="loadNextRegions()" class="w-full mt-2 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl border border-slate-200 hidden">
-            더보기
-          </button>
+          <div id="conquerRegionGrid" class="max-h-[290px] overflow-y-auto pr-1"></div>
         </div>
 
         <!-- Tab 2: 산림청 100대 명산 정복 목록 -->
         <div id="top100ListBox" class="hidden">
-          <div id="top100MountainGrid" class="max-h-[240px] overflow-y-auto pr-1 space-y-1.5"></div>
+          <div id="top100MountainGrid" class="max-h-[290px] overflow-y-auto pr-1 space-y-1.5"></div>
           <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 hidden">
             더보기
           </button>
@@ -3269,7 +3268,7 @@ overflow: hidden;
 
         <!-- Tab 3: 일반 정복한 산 목록 -->
         <div id="normalListBox" class="hidden">
-          <div id="normalMountainGrid" class="max-h-[240px] overflow-y-auto pr-1 space-y-1.5"></div>
+          <div id="normalMountainGrid" class="max-h-[290px] overflow-y-auto pr-1 space-y-1.5"></div>
           <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 hidden">
             더보기
           </button>
@@ -3283,6 +3282,7 @@ overflow: hidden;
     </button>
   </div>
 </div>
+
 
 
           
@@ -5568,9 +5568,6 @@ window.openMountainInfoModal = function(type, event) {
 const MAP_CACHE_EXPIRY = 5 * 60 * 1000;
 
 // 글로벌 상태 변수
-let regionFullList = [];
-let regionDisplayCount = 6; // 💡 점유율 처음 노출 개수 6개로 지정
-
 let top100FullList = [];
 let top100DisplayCount = 20;
 
@@ -5605,68 +5602,26 @@ window.switchStatsTab = (tabName) => {
     top100Box.classList.add('hidden');
     normalBox.classList.add('hidden');
 
-    const activeStyle = "py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap";
-    const inactiveStyle = "py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap";
+    const activeBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap";
+    const inactiveBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap";
 
-    tabRegion.className = inactiveStyle;
-    tabTop100.className = inactiveStyle;
-    tabNormal.className = inactiveStyle;
+    tabRegion.className = inactiveBase;
+    tabTop100.className = inactiveBase;
+    tabNormal.className = inactiveBase + " flex items-center gap-1";
 
     if (tabName === 'top100') {
         top100Box.classList.remove('hidden');
-        tabTop100.className = activeStyle;
+        tabTop100.className = activeBase;
     } else if (tabName === 'normal') {
         normalBox.classList.remove('hidden');
-        tabNormal.className = activeStyle;
+        tabNormal.className = activeBase + " flex items-center gap-1";
     } else {
         regionBox.classList.remove('hidden');
-        tabRegion.className = activeStyle;
+        tabRegion.className = activeBase;
     }
 };
 
-// [2-1] 지역 점유율 렌더링 (초기 6개 노출)
-window.renderMoreRegions = (validLogsCount) => {
-    const listBoard = document.getElementById('conquerRegionGrid');
-    const moreBtn = document.getElementById('regionMoreBtn');
-
-    if (regionFullList.length === 0) {
-        listBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
-        if(moreBtn) moreBtn.classList.add('hidden');
-        return;
-    }
-
-    const targetSlice = regionFullList.slice(0, regionDisplayCount);
-
-    listBoard.innerHTML = targetSlice.map(([name, count]) => {
-        const percent = ((count / validLogsCount) * 100).toFixed(1);
-        return `
-        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 mb-2 shadow-sm">
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs font-bold text-slate-800">${name} <span class="text-[10px] text-sky-600 font-normal ml-1">(${count}회)</span></span>
-                <span class="text-xs font-black text-sky-600">${percent}%</span>
-            </div>
-            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                <div class="bg-gradient-to-r from-sky-400 to-emerald-400 h-1.5 rounded-full" style="width:${percent}%"></div>
-            </div>
-        </div>`;
-    }).join('');
-
-    if (regionDisplayCount >= regionFullList.length) {
-        if(moreBtn) moreBtn.classList.add('hidden');
-    } else {
-        if(moreBtn) {
-            moreBtn.classList.remove('hidden');
-            moreBtn.innerText = `더보기 (${regionDisplayCount}/${regionFullList.length})`;
-        }
-    }
-};
-
-window.loadNextRegions = () => {
-    regionDisplayCount += 6;
-    renderMoreRegions(window.currentValidLogsCount || 1);
-};
-
-// [2-2] 100대 명산 20개씩 더보기 렌더링
+// [2-1] 100대 명산 20개씩 더보기 렌더링
 window.renderMoreTop100 = () => {
     const listBoard = document.getElementById('top100MountainGrid');
     const moreBtn = document.getElementById('top100MoreBtn');
@@ -5704,7 +5659,7 @@ window.loadNext20Top100 = () => {
     renderMoreTop100();
 };
 
-// [2-3] 정복한 산 (일반 산) 🔴 빨간점 추가 + 20개씩 더보기 렌더링
+// [2-2] 정복한 산 (일반 산) 20개씩 더보기 렌더링
 window.renderMoreNormal = () => {
     const listBoard = document.getElementById('normalMountainGrid');
     const moreBtn = document.getElementById('normalMoreBtn');
@@ -5720,9 +5675,7 @@ window.renderMoreNormal = () => {
     listBoard.innerHTML = targetSlice.map((item, idx) => `
         <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
             <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 flex items-center gap-1">
-                  <span class="inline-block w-1.5 h-1.5 rounded-full bg-rose-500"></span> ${idx + 1}
-                </span>
+                <span class="text-[10px] font-black text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${idx + 1}</span>
                 <span class="text-xs font-bold text-slate-800">${item.name}</span>
             </div>
             <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
@@ -5811,14 +5764,27 @@ window.showMemberMap = async (mId, mName) => {
         }
     });
 
-    window.currentValidLogsCount = validLogsCount;
+    // 지역 점유율 전체 렌더링
+    const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
+    if (sortedRegions.length === 0) {
+        regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
+    } else {
+        regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
+            const percent = ((count / validLogsCount) * 100).toFixed(1);
+            return `
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 mb-2 shadow-sm">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-slate-800">${name} <span class="text-[10px] text-sky-600 font-normal ml-1">(${count}회)</span></span>
+                    <span class="text-xs font-black text-sky-600">${percent}%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-gradient-to-r from-sky-400 to-emerald-400 h-1.5 rounded-full" style="width:${percent}%"></div>
+                </div>
+            </div>`;
+        }).join('');
+    }
 
-    // 지역 점유율 리스트 정렬
-    regionFullList = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
-    regionDisplayCount = 6; // 6개로 리셋
-    renderMoreRegions(validLogsCount);
-
-    // ㄱㄴㄷ 순 정렬 처리 - 100대 명산
+    // ㄱㄴㄷ 순 정렬 - 100대 명산
     top100FullList = Object.keys(top100Map)
         .sort((a, b) => a.localeCompare(b, 'ko'))
         .map(mName => ({
@@ -5827,7 +5793,7 @@ window.showMemberMap = async (mId, mName) => {
             height: top100Map[mName].height
         }));
 
-    // ㄱㄴㄷ 순 정렬 처리 - 일반 정복한 산
+    // ㄱㄴㄷ 순 정렬 - 정복한 산
     normalFullList = Object.keys(normalMap)
         .sort((a, b) => a.localeCompare(b, 'ko'))
         .map(mName => ({
@@ -5860,7 +5826,6 @@ window.showMemberMap = async (mId, mName) => {
 window.toggleTimelineModal = (show) => {
     const modal = document.getElementById('timelineModal');
     if (!modal) return;
-    
     modal.style.display = show ? 'flex' : 'none';
 
     if (!show && typeof growthChartInstance !== 'undefined' && growthChartInstance) {
@@ -5872,7 +5837,6 @@ window.toggleTimelineModal = (show) => {
 window.toggleMapModal = (show) => {
     const modal = document.getElementById('mapModal');
     if (!modal) return;
-    
     modal.style.display = show ? 'flex' : 'none';
     
     if (!show) {
@@ -5888,7 +5852,6 @@ window.toggleMapModal = (show) => {
 window.toggleLogPopup = (show) => {
     const popup = document.getElementById('logPopup');
     const scrollContainer = document.getElementById('timelineScrollContainer');
-    
     if (!popup) return;
 
     if (show) {
@@ -5913,9 +5876,6 @@ window.setAdminCoordinate = (event) => {
     document.getElementById('adminManualRegionSelect').value = detectedRegion;
     document.getElementById('coordDisplay').innerText = `좌표: X ${tempCoord.x} / Y ${tempCoord.y} (${detectedRegion})`;
 };
-
-
-
 
     
 
