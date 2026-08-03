@@ -3174,7 +3174,8 @@ overflow: hidden;
 
 
 
-    <div id="mapModal" class="modal-overlay" onclick="toggleMapModal(false)">
+
+          <div id="mapModal" class="modal-overlay" onclick="toggleMapModal(false)">
   <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-hidden" onclick="event.stopPropagation()">
     
     <!-- Header Zone + 에베레스트 정복 창 -->
@@ -3287,7 +3288,6 @@ overflow: hidden;
     </button>
   </div>
 </div>
-
 
         
       
@@ -5884,8 +5884,6 @@ window.showMemberMap = async (mId, mName) => {
     document.getElementById('everestCount').innerText = conquestCount;
     document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
 };
-
-
 
 
          
