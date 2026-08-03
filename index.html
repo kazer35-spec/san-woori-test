@@ -5675,7 +5675,7 @@ window.loadNext20Top100 = () => {
     renderMoreTop100();
 };
 
-// [4] 정복한 산 필터링 & 렌더링 (전체 / 정기·일정 / 개인산행 + 정기산행 상위 노출)
+// [4] 정복한 산 필터링 & 렌더링
 window.filterVisitedMountains = (filterType) => {
     visitedMountainsFilter = filterType;
     visitedMountainsDisplayCount = 20;
@@ -5760,10 +5760,19 @@ window.loadNext20Visited = () => {
     renderVisitedMountains();
 };
 
-// [5] 메인 지도 불러오기 (기존 정상 작동 원본 복구 + 정복한 산 집계)
+// [5] 메인 지도 불러오기
 window.showMemberMap = async (mId, mName) => {
+    console.log("🗺️ showMemberMap 실행 시작 - Member ID:", mId, "Name:", mName);
+
     try {
-        if (typeof toggleMapModal === 'function') toggleMapModal(true);
+        // 모달 열기 처리
+        if (typeof window.toggleMapModal === 'function') {
+            window.toggleMapModal(true);
+        } else {
+            const modal = document.getElementById('mapModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
         const modalContent = document.getElementById('mapModalContent');
         if (modalContent) modalContent.scrollTop = 0;
 
@@ -5778,7 +5787,7 @@ window.showMemberMap = async (mId, mName) => {
         if (pointsBoard) pointsBoard.innerHTML = "";
         if (regionBoard) regionBoard.innerHTML = "";
 
-        // ⚡ 캐시 확인 (Local Storage)
+        // 캐시 확인
         const cacheKey = `sanwoori_map_cache_${mId}`;
         const cachedData = localStorage.getItem(cacheKey);
         const nowTime = Date.now();
@@ -5789,16 +5798,25 @@ window.showMemberMap = async (mId, mName) => {
                 const parsed = JSON.parse(cachedData);
                 if (nowTime - parsed.timestamp < MAP_CACHE_EXPIRY) {
                     logsData = parsed.logs || [];
-                    console.log("⚡ [캐시 로드] 데이터 트래픽 절약 완료");
+                    console.log("⚡ [캐시 로드] 데이터 트래픽 절약 완료, 개수:", logsData.length);
                 }
             } catch(e) { logsData = []; }
         }
 
         if (logsData.length === 0) {
+            console.log("🔥 [DB 로드] Firestore 수집 시작...");
+            
+            // Firebase DB 객체 검증
+            if (typeof db === 'undefined' || typeof getDocs === 'undefined' || typeof collection === 'undefined') {
+                console.error("❌ Firebase `db`, `getDocs`, `collection`이 정의되어 있지 않습니다.");
+                alert("데이터베이스 연결 오류가 발생했습니다. 콘솔을 확인해주세요.");
+                return;
+            }
+
             const snapAll = await getDocs(collection(db, `sanwoori/${mId}/logs`));
             snapAll.forEach(doc => logsData.push(doc.data()));
             localStorage.setItem(cacheKey, JSON.stringify({ timestamp: nowTime, logs: logsData }));
-            console.log("🔥 [DB 로드] 신규 데이터 저장 완료");
+            console.log("🔥 [DB 로드 완료] 읽어온 기록 수:", logsData.length);
         }
 
         let totalH = 0;
@@ -5810,37 +5828,38 @@ window.showMemberMap = async (mId, mName) => {
         const rawVisitedList = [];
 
         logsData.forEach(log => {
-            totalH += (log.height || 0);
+            totalH += Number(log.height || 0);
 
-            // 🎯 좌표(coords)가 존재하는 기록만 지도 점 찍기 및 집계
+            // 좌표가 있는 기록
             if (log.coords) {
                 validLogsCount++;
                 mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
                 
                 const rName = log.region || (typeof getRegionFromCoord === 'function' ? getRegionFromCoord(log.coords) : '기타');
                 regionCounts[rName] = (regionCounts[rName] || 0) + 1;
+            }
 
-                if (log.mountain) {
-                    if (log.isTop100) {
-                        if (!top100Map[log.mountain]) {
-                            top100Map[log.mountain] = { count: 0, height: log.height || 0 };
-                        }
-                        top100Map[log.mountain].count += 1;
+            // 산 이름이 있는 모든 기록 (정복한 산/100대 명산 집계)
+            if (log.mountain) {
+                if (log.isTop100) {
+                    if (!top100Map[log.mountain]) {
+                        top100Map[log.mountain] = { count: 0, height: log.height || 0 };
                     }
-
-                    rawVisitedList.push({
-                        mountain: log.mountain,
-                        height: log.height || 0,
-                        region: rName,
-                        type: log.type || (log.isOfficial ? 'schedule' : 'personal'),
-                        isOfficial: !!log.isOfficial,
-                        date: log.date || ''
-                    });
+                    top100Map[log.mountain].count += 1;
                 }
+
+                rawVisitedList.push({
+                    mountain: log.mountain,
+                    height: log.height || 0,
+                    region: log.region || '기타',
+                    type: log.type || (log.isOfficial ? 'schedule' : 'personal'),
+                    isOfficial: !!log.isOfficial,
+                    date: log.date || ''
+                });
             }
         });
 
-        // 100대 명산 ㄱㄴㄷ 순 정렬
+        // 100대 명산 ㄱㄴㄷ 정렬
         top100FullList = Object.keys(top100Map)
             .sort((a, b) => a.localeCompare(b, 'ko'))
             .map(mName => ({
@@ -5852,12 +5871,12 @@ window.showMemberMap = async (mId, mName) => {
         top100DisplayCount = 20;
         renderMoreTop100();
 
-        // 정복한 산 목록 정렬 (정기산행 상위 노출 우선순위)
+        // 정복한 산 목록 정렬 (정기산행 > 일정산행 > 개인산행)
         visitedMountainsFullList = rawVisitedList.sort((a, b) => {
             const priority = (item) => {
-                if (item.type === 'regular') return 1;                  // 1순위: 정기산행
-                if (item.type === 'schedule' || item.isOfficial) return 2; // 2순위: 일정산행
-                return 3;                                               // 3순위: 개인산행
+                if (item.type === 'regular') return 1;
+                if (item.type === 'schedule' || item.isOfficial) return 2;
+                return 3;
             };
             const pA = priority(a);
             const pB = priority(b);
@@ -5866,7 +5885,7 @@ window.showMemberMap = async (mId, mName) => {
             return (b.date || '').localeCompare(a.date || '') || a.mountain.localeCompare(b.mountain, 'ko');
         });
 
-        // 지도 상단 미니 배지 수치
+        // 미니 배지 수치
         const miniBadge = document.getElementById('miniTop100Badge');
         if (miniBadge) miniBadge.innerText = `${top100FullList.length}/100`;
 
@@ -5874,14 +5893,14 @@ window.showMemberMap = async (mId, mName) => {
         if (heightElem) heightElem.innerText = totalH.toLocaleString();
         if (pointsBoard) pointsBoard.innerHTML = mapHtml;
 
-        // 지역별 점유율 리스트 업데이트
+        // 지역별 점유율 리스트
         const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
         if (regionBoard) {
             if (sortedRegions.length === 0) {
                 regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
             } else {
                 regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
-                    const percent = ((count / validLogsCount) * 100).toFixed(1);
+                    const percent = validLogsCount > 0 ? ((count / validLogsCount) * 100).toFixed(1) : "0.0";
                     return `
                     <div class="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/50 mb-2">
                         <div class="flex justify-between items-center mb-1">
@@ -5896,10 +5915,10 @@ window.showMemberMap = async (mId, mName) => {
             }
         }
 
-        // 에베레스트 글로벌 통계
+        // 에베레스트 통계
         let globalTotalH = 0;
         if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-            globalTotalH = currentData.reduce((acc, m) => acc + (m.totalHeight || 0), 0);
+            globalTotalH = currentData.reduce((acc, m) => acc + Number(m.totalHeight || 0), 0);
         } else {
             globalTotalH = totalH;
         }
@@ -5913,18 +5932,15 @@ window.showMemberMap = async (mId, mName) => {
         if (everestCountElem) everestCountElem.innerText = conquestCount;
         if (everestBarElem) everestBarElem.style.width = `${(conquestCount % 1) * 100}%`;
 
+        console.log("✅ showMemberMap 실행 완료!");
+
     } catch (error) {
-        console.error("Map load error:", error);
+        console.error("❌ Map load error 발생:", error);
     }
 };
 
-
                 
         
-    
-
-
-
     
 
 
