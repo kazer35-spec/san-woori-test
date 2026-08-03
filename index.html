@@ -8583,48 +8583,69 @@ document.addEventListener('touchstart', (e) => {
     }
 }, { passive: true });
 
-// ===================================================
-// [최종 수정본] San:Woori 모달 뒤로가기 연동 완벽 동기화 스크립트
+
+
+    // ===================================================
+// [최종 수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
 // ===================================================
 (function() {
     const MODAL_IDS = [
-        'starGuideModal', 'sgCustomModal', 'levelModal', 'vibeModal',
-        'hallModal', 'mapModal', 'milkyWayModal', 'timelineModal',
-        'logPopup', 'mountainViewModal', 'scrollModal', 'mwInfoHelpModal',
-        'grassPopup', 'forestModal'
+        'milkyWayModal',
+        'starGuideModal',
+        'sgCustomModal',
+        'scrollModal',
+        'timelineModal',
+        'levelModal',
+        'vibeModal',
+        'hallModal',
+        'mapModal',
+        'logPopup',
+        'mountainViewModal',
+        'mwInfoHelpModal',
+        'grassPopup'
     ];
 
-    const modalStack = [];
-    let isNavigating = false; // 뒤로가기/전진 중 플래그
+    // 스택 관리: [{ id: 'modalId', pushed: true/false }]
+    let activeModalStack = [];
 
-    function isVisible(el) {
+    // 모달 감지 기준 완화 (opacity 및 flex/block 모두 감지)
+    function isModalOpen(id) {
+        const el = document.getElementById(id);
         if (!el) return false;
         if (el.classList.contains('hidden')) return false;
+        
         const style = window.getComputedStyle(el);
-        return style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity || '1') > 0;
+        const isDisplayed = style.display !== 'none' && style.visibility !== 'hidden';
+        const isOpaque = parseFloat(style.opacity || '1') > 0;
+        
+        return isDisplayed && isOpaque;
     }
 
-    function hideEl(id) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.classList.add('hidden');
-            el.style.display = 'none';
-        }
-    }
-
-    function closeModalById(id) {
+    // 모달별 안전한 닫기 처리
+    function forceCloseModal(id) {
         switch (id) {
+            case 'milkyWayModal':
+                if (typeof window.toggleMilkyWayModal === 'function') window.toggleMilkyWayModal(false);
+                else if (typeof window.closeMilkyWayModal === 'function') window.closeMilkyWayModal();
+                else hideEl(id);
+                break;
             case 'starGuideModal':
                 if (typeof window.toggleStarGuide === 'function') window.toggleStarGuide(false);
                 else hideEl(id);
                 break;
             case 'sgCustomModal':
                 if (typeof window.closeSgModal === 'function') window.closeSgModal();
-                else hideEl(id);
+                else {
+                    const el = document.getElementById(id);
+                    if (el) el.remove();
+                }
                 break;
             case 'timelineModal':
                 if (typeof window.toggleTimelineModal === 'function') window.toggleTimelineModal(false);
                 else hideEl(id);
+                break;
+            case 'scrollModal':
+                hideEl(id);
                 break;
             case 'levelModal':
                 if (typeof window.toggleModal === 'function') window.toggleModal(false);
@@ -8654,56 +8675,52 @@ document.addEventListener('touchstart', (e) => {
                 hideEl(id);
                 break;
         }
+    }
 
-        if (id === 'scrollModal' || id === 'timelineModal') {
-            hideEl('scrollModal');
-            hideEl('timelineModal');
+    function hideEl(id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'none';
+            el.classList.add('hidden');
         }
     }
 
-    function syncModalHistory() {
-        if (isNavigating) return;
-
+    // 상태 동기화 및 history.pushState 관리
+    function syncModalState() {
         MODAL_IDS.forEach(id => {
-            const el = document.getElementById(id);
-            const visible = isVisible(el);
-            const stackIndex = modalStack.indexOf(id);
+            const open = isModalOpen(id);
+            const inStack = activeModalStack.includes(id);
 
-            // 1. 모달이 새로 열림 -> 히스토리 push
-            if (visible && stackIndex === -1) {
-                modalStack.push(id);
-                history.pushState({ isSanWooriModal: true, modalId: id }, '');
+            // 1. 모달이 열렸는데 스택에 없으면 추가 & History Push
+            if (open && !inStack) {
+                activeModalStack.push(id);
+                history.pushState({ modalId: id }, '', location.href);
             } 
-            // 2. 버튼 클릭 등으로 사용자가 직접 모달을 닫음 -> 쌓여있던 히스토리 강제 제거(history.back)
-            else if (!visible && stackIndex !== -1) {
-                modalStack.splice(stackIndex, 1);
-                isNavigating = true;
-                history.back(); // 브라우저 히스토리 찌꺼기 제거
-                setTimeout(() => { isNavigating = false; }, 100);
+            // 2. 사용자가 X버튼이나 배경 클릭으로 직접 닫은 경우
+            else if (!open && inStack) {
+                activeModalStack = activeModalStack.filter(item => item !== id);
+                // 브라우저 뒤로가기 상태와 갯수 동기화 (히스토리 정리)
+                if (history.state && history.state.modalId === id) {
+                    history.back();
+                }
             }
         });
     }
 
-    // 뒤로가기(popstate) 이벤트 발생 시
+    // 뒤로가기 버턴(popstate) 눌렀을 때의 동작
     window.addEventListener('popstate', (e) => {
-        if (isNavigating) return;
-
-        if (modalStack.length > 0) {
-            isNavigating = true;
-            const lastModalId = modalStack.pop();
-            closeModalById(lastModalId);
-
-            setTimeout(() => {
-                isNavigating = false;
-            }, 100);
+        if (activeModalStack.length > 0) {
+            const lastModalId = activeModalStack.pop();
+            forceCloseModal(lastModalId);
         }
     });
 
+    // 실시간 DOM 감지
     const observer = new MutationObserver(() => {
-        syncModalHistory();
+        syncModalState();
     });
 
-    function initModalObserver() {
+    function initObserver() {
         if (document.body) {
             observer.observe(document.body, {
                 attributes: true,
@@ -8711,16 +8728,17 @@ document.addEventListener('touchstart', (e) => {
                 subtree: true,
                 attributeFilter: ['style', 'class']
             });
-            syncModalHistory();
+            syncModalState();
         }
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initModalObserver);
+        document.addEventListener('DOMContentLoaded', initObserver);
     } else {
-        initModalObserver();
+        initObserver();
     }
 })();
+
 
 
 </script>
