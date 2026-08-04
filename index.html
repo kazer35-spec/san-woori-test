@@ -7813,21 +7813,38 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
     svg.appendChild(coreShape);
 
-    // [6] 나이테 및 위성 별 생성
+    // [6] 나이테 및 위성 별 생성 (로그 스케일 & 밀도 감쇄 적용)
     const rings = [];
     const satellites = [];
     const seed = memberName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
+    // 🎯 중앙 코어(14px)와 최외각 마진(102px) 안전지대 설정
+    const minRadius = 14;  
+    const maxRadius = 102; 
+
+    // 🎯 경과 월수에 따른 파동(Wave) 크기 및 위성별 크기 동적 조절
+    const waveAmp = Math.max(0.6, 2.5 - (diffMonths * 0.03)); 
+    const starRadius = diffMonths > 36 ? "1.3" : "1.8";
+
     for (let i = 0; i < diffMonths; i++) {
-        const radius = 10 + ((i + 1) * (95 / diffMonths));
         const path = document.createElementNS(svgNS, "path");
         path.setAttribute("class", "tree-ring-path");
+
+        // 🎯 1. 로그 스케일 반지름 산출 (오래된 나이테일수록 자연스럽게 촘촘해짐)
+        const progress = Math.log10(1 + (i + 1)) / Math.log10(1 + diffMonths);
+        const radius = minRadius + progress * (maxRadius - minRadius);
+
+        // 🎯 2. 개수가 많아지면 선 두께 축소 (뭉침 방지)
+        const baseStrokeWidth = diffMonths > 48 ? "0.2" : (diffMonths > 24 ? "0.28" : "0.35");
+        const isYearRing = (i + 1) % 12 === 0;
+        const strokeWidth = isYearRing ? "1.0" : baseStrokeWidth;
 
         let d = "";
         let points = [];
         for (let a = 0; a <= 360; a += 6) {
             const angle = (a * Math.PI) / 180;
-            const wave = Math.sin(angle * (seed % 4 + 3) + (i + 1)) * 2.5;
+            // 🎯 3. 감쇄된 waveAmp 적용
+            const wave = Math.sin(angle * (seed % 4 + 3) + (i + 1)) * waveAmp;
             const r = radius + wave;
             const x = 120 + r * Math.cos(angle);
             const y = 120 + r * Math.sin(angle);
@@ -7839,13 +7856,14 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         path.setAttribute("d", d);
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", ringColor);
-        path.setAttribute("stroke-width", (i + 1) % 12 === 0 ? "1.2" : "0.35"); 
+        path.setAttribute("stroke-width", strokeWidth); 
         path.setAttribute("stroke-opacity", "0");
         path.style.transition = "stroke-opacity 0.5s ease-in, stroke-width 0.5s ease";
 
         svg.appendChild(path);
         rings.push(path);
 
+        // 🎯 4. 위성 별 생성 (별 크기 동적 반영)
         if (regularHikesByMonth[i]) {
             regularHikesByMonth[i].forEach(starType => {
                 const colorIdx = parseInt(starType.split('_')[1]) - 1;
@@ -7856,7 +7874,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
                 const satellite = document.createElementNS(svgNS, "circle");
                 satellite.setAttribute("cx", pos.x);
                 satellite.setAttribute("cy", pos.y);
-                satellite.setAttribute("r", "1.8");
+                satellite.setAttribute("r", starRadius); // 동적 별 크기
                 satellite.setAttribute("fill", starColor);
                 satellite.setAttribute("opacity", "0");
                 satellite.style.filter = `drop-shadow(0 0 3px ${starColor}) brightness(1.2)`;
@@ -7872,7 +7890,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
             });
         }
     }
-    container.appendChild(svg);
+
 
     // [7] 애니메이션 실행
     const totalAnimTime = 1200; 
