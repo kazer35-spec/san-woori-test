@@ -5849,12 +5849,19 @@ window.toggleTimelineModal = (show) => {
     }
 };
 
+// 🟢 수정 후 toggleMapModal
 window.toggleMapModal = (show) => {
     const modal = document.getElementById('mapModal');
     if (!modal) return;
-    modal.style.display = show ? 'flex' : 'none';
     
-    if (!show) {
+    if (show) {
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+    } else {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+        
+        // 닫힐 때 내부 뷰 초기화 (DOM 감지 방해 안 받게 단순 처리)
         const statsView = document.getElementById('mapViewStats');
         const mainView = document.getElementById('mapViewMain');
         if (statsView && mainView) {
@@ -5863,6 +5870,7 @@ window.toggleMapModal = (show) => {
         }
     }
 };
+
 
 window.toggleLogPopup = (show) => {
     const popup = document.getElementById('logPopup');
