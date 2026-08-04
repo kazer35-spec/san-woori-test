@@ -3182,12 +3182,10 @@ overflow: hidden;
 </div>
 
 
-
-
-
-    <div id="mapModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto" onclick="toggleMapModal(false)">
-  <!-- 💡 [수정] max-h-[90vh] 및 overflow-y-auto 추가 / overflow-hidden 제거 -->
-  <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto my-auto" onclick="event.stopPropagation()">
+  <!-- 💡 [수정] hidden 클래스 추가 + 스크롤/상단짤림 방지 옵션 유지 -->
+<div id="mapModal" class="modal-overlay hidden fixed inset-0 z-50 flex items-start justify-center p-4 py-6 bg-black/50 backdrop-blur-sm overflow-y-auto" onclick="toggleMapModal(false)">
+  
+  <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 max-h-[85vh] overflow-y-auto m-auto" onclick="event.stopPropagation()">
     
     <!-- Header Zone + 에베레스트 정복 창 -->
     <div class="flex justify-between items-center mb-4 gap-3">
@@ -3220,7 +3218,7 @@ overflow: hidden;
         </div>
 
         <div id="conquerMapPoints"></div>
-        <!-- 💡 출처 텍스트: 범례 아래 우측 위치 -->
+        <!-- 💡 출처 텍스트 -->
         <div class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
       </div>
 
@@ -3243,7 +3241,6 @@ overflow: hidden;
 
     <!-- Detailed Stats View (통계 3종 탭) -->
     <div id="mapViewStats" class="hidden-view">
-      <!-- 💡 [보완] 모바일 세로 높이 부담을 줄이기 위해 min-h-[400px] 제거 및 max-h 반응형 조정 -->
       <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
         
         <!-- Header & Tab Navigation -->
@@ -3266,12 +3263,12 @@ overflow: hidden;
 
         <!-- Tab 1: 지역별 점유율 -->
         <div id="regionStatsBox">
-          <div id="conquerRegionGrid" class="max-h-[250px] sm:max-h-[330px] overflow-y-auto pr-1"></div>
+          <div id="conquerRegionGrid" class="max-h-[220px] sm:max-h-[300px] overflow-y-auto pr-1"></div>
         </div>
 
         <!-- Tab 2: 산림청 100대 명산 정복 목록 -->
         <div id="top100ListBox" class="hidden">
-          <div id="top100MountainGrid" class="max-h-[220px] sm:max-h-[280px] overflow-y-auto pr-1 space-y-1.5"></div>
+          <div id="top100MountainGrid" class="max-h-[200px] sm:max-h-[260px] overflow-y-auto pr-1 space-y-1.5"></div>
           <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 hidden">
             더보기
           </button>
@@ -3279,7 +3276,7 @@ overflow: hidden;
 
         <!-- Tab 3: 일반 정복한 산 목록 -->
         <div id="normalListBox" class="hidden">
-          <div id="normalMountainGrid" class="max-h-[220px] sm:max-h-[280px] overflow-y-auto pr-1 space-y-1.5"></div>
+          <div id="normalMountainGrid" class="max-h-[200px] sm:max-h-[260px] overflow-y-auto pr-1 space-y-1.5"></div>
           <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 hidden">
             더보기
           </button>
@@ -3295,12 +3292,6 @@ overflow: hidden;
   </div>
 </div>
 
-
-
-
-
-
-          
       
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
