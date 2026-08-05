@@ -6220,7 +6220,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 2. 기록 저장 핵심 로직    
-window.addMultiActivity = async () => {
+ window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -6266,14 +6266,21 @@ window.addMultiActivity = async () => {
     const pValley = parseInt(document.getElementById('pValley')?.value) || 0;
     
     const isExtraHike = isRunning && isTracking; 
-    const isSpecial = isRunning || isTracking || isWalking || isOnlyLog || isExtraHike;
-    const isRealHike = !isSpecial; 
+    
+    // 🌟 [핵심 변경 1] 트레킹 + 산책 동시 체크 시 순수산행과 동일한 인정 조건 부여
+    const isSpecialTracking = isTracking && isWalking;
+
+    // isSpecial Tracking(트레킹+산책)인 경우는 Special 예외 처리에서 제외시킴
+    const isSpecial = (isRunning || isOnlyLog || isExtraHike || (isTracking && !isSpecialTracking) || (isWalking && !isSpecialTracking));
+    
+    // 순수 산행이거나 [트레킹 + 산책] 동시 선택 시 순수산행 인정!
+    const isRealHike = !isSpecial || isSpecialTracking; 
 
     // 🔥 정기산행 방어 logic
     const isRegular = isRegularRaw && isRealHike; 
 
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
-    const isDdayTargetActivity = (isRunning || isTracking || isWalking) && !isExtraHike;
+    const isDdayTargetActivity = (isRunning || isTracking || isWalking) && !isExtraHike && !isSpecialTracking;
 
     if(!selectedMemberIds || selectedMemberIds.size === 0 || !dateVal) return alert("대상과 날짜를 확인해주세요.");
 
@@ -6317,6 +6324,7 @@ window.addMultiActivity = async () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
+            // 🌟 [핵심 변경 2] isRealHike 또는 isSpecialTracking 일 때 레벨업 적용
             const realUpAmount = (isRealHike && !isExtraHike) ? up : 0;
             const oldLevel = member.level || 0;
             const newLevel = oldLevel + realUpAmount; 
@@ -6326,7 +6334,7 @@ window.addMultiActivity = async () => {
             if (realUpAmount > 0) checkLevelUpgrade(member.name, oldLevel, newLevel);
             selectedNames.push(member.name);
 
-            // ─── 🅰️ 오직 '정식 순수산행'일 때만 count 상승 ───
+            // ─── 🅰️ 순수산행 OR (트레킹+산책) 지정 산행일 때 count 및 스탯 상승 ───
             if (isRealHike && !isExtraHike) {
                 updateData.count = _increment(1); 
                 updateData.lastDate = ts; 
@@ -6354,7 +6362,7 @@ window.addMultiActivity = async () => {
                     updateData[`fp_bins.${qKey}`] = _increment(pointToAdd);
                 }
 
-            // ─── 🅱️ 번외산행 / 러닝 / 트레킹 / 산책 묶음일 때 (Count 고정) ───
+            // ─── 🅱️ 일반 번외산행 / 단일 러닝 / 단일 트레킹 / 단일 산책 일 때 (Count 고정) ───
             } else {
                 updateData[`quarterlyStats.${qKey}.total`] = _increment(1);
                 updateData[`quarterlyStats.${qKey}.hike`] = _increment(0); 
@@ -6384,7 +6392,7 @@ window.addMultiActivity = async () => {
             const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
 
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
-            const baseDocId = rawMountainName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동")));
+            const baseDocId = rawMountainName || (isSpecialTracking ? "인정 트레킹" : (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))));
 
             const existingLogsRef = collection(db, `sanwoori/${id}/logs`);
             const existingSnap = await getDocs(existingLogsRef);
@@ -6410,7 +6418,7 @@ window.addMultiActivity = async () => {
                     isSchedule,  
                     isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
-                    isSpecial: isSpecial,
+                    isSpecial: isSpecialTracking ? false : isSpecial, // 인정 트레킹은 Special 제외 처리
                     pRock, pForest, pValley
                 };
 
@@ -6427,13 +6435,13 @@ window.addMultiActivity = async () => {
             }
         } 
 
-        // 🎯 [수정된 부분] bondingForest에 addDoc 대신 setDoc을 사용하여 [산이름_날짜] ID로 직접 저장!
+        // 🌟 [핵심 변경 3] 순수산행 및 (트레킹+산책) 조합에 대해 2인 이상 동행 시 bondingForest에 저장
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
-            const cleanMountain = (mName || "산행").trim().replace(/\s+/g, "");
+            const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
             const cleanDate = dateVal.trim();
             let bondingDocId = `${cleanMountain}_${cleanDate}`;
 
-            // 동일 날짜, 동일 산 중복 저장 시 식별자 부여 (_2, _3...)
+            // 동일 날짜, 동일 산/명칭 중복 저장 시 식별자 부여 (_2, _3...)
             let bondingRef = doc(db, "bondingForest", bondingDocId);
             let checkSnap = await getDoc(bondingRef);
             let dupSeq = 2;
@@ -6449,13 +6457,14 @@ window.addMultiActivity = async () => {
                 members: selectedNames, 
                 memberCount: selectedNames.length, 
                 date: cleanDate, 
+                type: "정식", // 인연의 숲 필터링 통과를 위한 타입 설정
                 createdAt: new Date()
             });
         }
 
         if (pendingLevelUpCards.length > 0) showCombinedLevelUpAlert();
         
-        alert((isRealHike && !isExtraHike) ? "순수산행 기록 완료! ✅" : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
+        alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
         // 입력 폼 초기화
         selectedMemberIds.clear();
@@ -6492,6 +6501,8 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
+
+                    
 
 // 📌 [신규 회원 등록 함수]
 window.addMember = async () => {
