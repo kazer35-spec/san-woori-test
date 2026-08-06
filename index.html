@@ -3208,47 +3208,47 @@ overflow: hidden;
     </div>
 
     <!-- Main Map View -->
-<div id="mapViewMain">
-  <!-- 지도 컨테이너 -->
-  <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3">
-    <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl">
-    
-    <!-- 🌲 지도 우측 상단 미니 배지 -->
-    <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
-      <span class="text-[10px]">🌲</span>
-      <span id="miniTop100Badge" class="tracking-tight">0/100</span>
+    <div id="mapViewMain">
+      <!-- 지도 컨테이너 -->
+      <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3">
+        <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl">
+        
+        <!-- 🌲 지도 우측 상단 미니 배지 -->
+        <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
+          <span class="text-[10px]">🌲</span>
+          <span id="miniTop100Badge" class="tracking-tight">0/100</span>
+        </div>
+
+        <div id="conquerMapPoints"></div>
+        <!-- 💡 출처 텍스트: 범례 아래 우측 위치 -->
+        <div class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
+      </div>
+
+      <!-- 상세 통계 전환 버튼 -->
+      <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
+        <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
+          <span>🎖️</span> 정복 통계 및 산림청 100대 목록
+        </span>
+        <span class="text-xs font-bold text-sky-600 flex items-center gap-0.5">
+          상세보기
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </span>
+      </button>
+
+      <div class="hidden">
+        <span id="mapTotalHeight">0</span>
+        <span id="mapGlobalTotalHeight">0</span>
+      </div>
     </div>
 
-    <div id="conquerMapPoints"></div>
-    <!-- 💡 출처 텍스트: 범례 아래 우측 위치 -->
-    <div class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
-  </div>
-
-  <!-- 상세 통계 전환 버튼 -->
-  <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
-    <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
-      <span>🎖️</span> 정복 통계 및 명산 목록
-    </span>
-    <span class="text-xs font-bold text-sky-600 flex items-center gap-0.5">
-      상세보기
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-    </span>
-  </button>
-
-  <div class="hidden">
-    <span id="mapTotalHeight">0</span>
-    <span id="mapGlobalTotalHeight">0</span>
-  </div>
-</div>
-
-<!-- Detailed Stats View (통계 3종 탭) -->
+    <!-- Detailed Stats View (통계 3종 탭) -->
 <div id="mapViewStats" class="hidden-view">
-  <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col">
+  <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 min-h-[400px] flex flex-col justify-between">
     
     <!-- Header & Tab Navigation -->
     <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
       <div class="flex gap-1 overflow-x-auto no-scrollbar">
-        <!-- 🔵 100대 명산 탭 -->
+        <!-- 🔵 100대 명산 탭 (초기 파란 배경 + 흰 점) -->
         <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
           <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
         </button>
@@ -3266,48 +3266,49 @@ overflow: hidden;
       </button>
     </div>
 
-    <!-- Tab Contents (높이를 h-[285px]로 지정하여 리스트 6개가 딱 맞게 보이도록 고정) -->
+    <!-- Tab Contents (높이를 flex-1로 꽉 채우도록 설정) -->
     <div class="flex-1 flex flex-col min-h-0">
-      
       <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
-      <div id="top100ListBox" class="flex flex-col h-[285px]">
-        <div class="flex-1 overflow-y-auto pr-1">
+      <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
+        <div class="flex-1 max-h-[350px] overflow-y-auto pr-1 flex flex-col justify-between">
           <div id="top100MountainGrid" class="space-y-1.5"></div>
+          <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
+            더보기
+          </button>
         </div>
-        <!-- 더보기 버튼 (스크롤 하단에 고정) -->
-        <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
-          더보기
-        </button>
       </div>
 
       <!-- Tab 2: 일반 정복한 산 목록 -->
-      <div id="normalListBox" class="flex flex-col h-[285px] hidden">
-        <div class="flex-1 overflow-y-auto pr-1">
+      <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
+        <div class="flex-1 max-h-[350px] overflow-y-auto pr-1 flex flex-col justify-between">
           <div id="normalMountainGrid" class="space-y-1.5"></div>
+          <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
+            더보기
+          </button>
         </div>
-        <!-- 더보기 버튼 (스크롤 하단에 고정) -->
-        <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
-          더보기
-        </button>
       </div>
 
       <!-- Tab 3: 지역별 점유율 -->
-      <div id="regionStatsBox" class="h-[285px] hidden">
-        <div id="conquerRegionGrid" class="h-full overflow-y-auto pr-1 space-y-1.5"></div>
+      <div id="regionStatsBox" class="flex-1 min-h-0 hidden">
+        <div id="conquerRegionGrid" class="max-h-[350px] overflow-y-auto pr-1"></div>
       </div>
-
     </div>
 
   </div>
 </div>
 
-<!-- 하단 닫기 버튼 -->
-<div class="flex-shrink-0 pt-3">
-  <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
-    닫기
-  </button>
+
+    <!-- 하단 닫기 버튼 (항상 노출 및 고정 위치 감싸기) -->
+    <div class="flex-shrink-0 pt-3">
+      <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
+        닫기
+      </button>
+    </div>
+
+  </div>
 </div>
-     
+
+      
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
 <div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
