@@ -3243,7 +3243,7 @@ overflow: hidden;
 
 <!-- Detailed Stats View (통계 3종 탭) -->
 <div id="mapViewStats" class="hidden-view">
-  <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col justify-between">
+  <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col">
     
     <!-- Header & Tab Navigation -->
     <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
@@ -3266,32 +3266,36 @@ overflow: hidden;
       </button>
     </div>
 
-    <!-- Tab Contents (높이를 최소 350px로 고정) -->
-    <div class="flex-1 flex flex-col min-h-[350px] h-[350px]">
+    <!-- Tab Contents (높이를 h-[285px]로 지정하여 리스트 6개가 딱 맞게 보이도록 고정) -->
+    <div class="flex-1 flex flex-col min-h-0">
+      
       <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
-      <div id="top100ListBox" class="flex-1 flex flex-col h-full min-h-[350px]">
-        <div class="flex-1 overflow-y-auto pr-1 flex flex-col justify-between h-full">
+      <div id="top100ListBox" class="flex flex-col h-[285px]">
+        <div class="flex-1 overflow-y-auto pr-1">
           <div id="top100MountainGrid" class="space-y-1.5"></div>
-          <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
-            더보기
-          </button>
         </div>
+        <!-- 더보기 버튼 (스크롤 하단에 고정) -->
+        <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
+          더보기
+        </button>
       </div>
 
       <!-- Tab 2: 일반 정복한 산 목록 -->
-      <div id="normalListBox" class="flex-1 flex flex-col h-full min-h-[350px] hidden">
-        <div class="flex-1 overflow-y-auto pr-1 flex flex-col justify-between h-full">
+      <div id="normalListBox" class="flex flex-col h-[285px] hidden">
+        <div class="flex-1 overflow-y-auto pr-1">
           <div id="normalMountainGrid" class="space-y-1.5"></div>
-          <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
-            더보기
-          </button>
         </div>
+        <!-- 더보기 버튼 (스크롤 하단에 고정) -->
+        <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
+          더보기
+        </button>
       </div>
 
       <!-- Tab 3: 지역별 점유율 -->
-      <div id="regionStatsBox" class="flex-1 h-full min-h-[350px] hidden">
-        <div id="conquerRegionGrid" class="h-full overflow-y-auto pr-1"></div>
+      <div id="regionStatsBox" class="h-[285px] hidden">
+        <div id="conquerRegionGrid" class="h-full overflow-y-auto pr-1 space-y-1.5"></div>
       </div>
+
     </div>
 
   </div>
