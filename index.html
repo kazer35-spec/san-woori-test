@@ -3241,9 +3241,8 @@ overflow: hidden;
   </div>
 </div>
 
-<!-- Detailed Stats View (통계 3종 탭) -->
+      <!-- Detailed Stats View (통계 3종 탭) -->
 <div id="mapViewStats" class="hidden-view">
-  <!-- 💡 min-h-[350px] 제거 및 불필요한 justify-between 제거로 여백 최소화 -->
   <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
     
     <!-- Header & Tab Navigation -->
@@ -3267,10 +3266,10 @@ overflow: hidden;
       </button>
     </div>
 
-    <!-- Tab Contents (여백 없이 내용물만큼만 박스 높이 생성) -->
+    <!-- Tab Contents -->
     <div>
       <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
-      <div id="top100ListBox">
+      <div id="top100ListBox" style="display: block;">
         <div class="max-h-[280px] overflow-y-auto pr-1">
           <div id="top100MountainGrid" class="space-y-1.5"></div>
           <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 hidden">
@@ -3280,7 +3279,7 @@ overflow: hidden;
       </div>
 
       <!-- Tab 2: 일반 정복한 산 목록 -->
-      <div id="normalListBox" class="hidden">
+      <div id="normalListBox" style="display: none;">
         <div class="max-h-[280px] overflow-y-auto pr-1">
           <div id="normalMountainGrid" class="space-y-1.5"></div>
           <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 hidden">
@@ -3290,13 +3289,14 @@ overflow: hidden;
       </div>
 
       <!-- Tab 3: 지역별 점유율 -->
-      <div id="regionStatsBox" class="hidden">
+      <div id="regionStatsBox" style="display: none;">
         <div id="conquerRegionGrid" class="max-h-[280px] overflow-y-auto pr-1"></div>
       </div>
     </div>
 
   </div>
 </div>
+
 
 
 <!-- 하단 닫기 버튼 -->
