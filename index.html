@@ -3248,10 +3248,10 @@ overflow: hidden;
     <!-- Header & Tab Navigation -->
     <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
       <div class="flex gap-1 overflow-x-auto no-scrollbar">
-        <!-- 🔵 100대 명산 탭 (id="dotTop100" 명시) -->
-<button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
-  <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
-</button>
+        <!-- 🔵 100대 명산 탭 (초기 파란 배경 + 흰 점) -->
+        <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
+          <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
+        </button>
         <!-- 🔴 기타 명산 탭 -->
         <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
           <span id="dotNormal" class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 기타 명산
@@ -5616,7 +5616,6 @@ window.toggleMapView = (viewType) => {
 };
 
 window.switchStatsTab = (tabName) => {
-window.switchStatsTab = (tabName) => {
     const regionBox = document.getElementById('regionStatsBox');
     const top100Box = document.getElementById('top100ListBox');
     const normalBox = document.getElementById('normalListBox');
@@ -5630,7 +5629,6 @@ window.switchStatsTab = (tabName) => {
 
     if(!regionBox || !top100Box || !normalBox) return;
 
-    // 모든 박스 숨기기
     regionBox.classList.add('hidden');
     top100Box.classList.add('hidden');
     normalBox.classList.add('hidden');
@@ -5638,24 +5636,25 @@ window.switchStatsTab = (tabName) => {
     const activeBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap";
     const inactiveBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap";
 
-    // 1. 모든 버튼을 기본(비활성화 - 흰색 배경) 스타일로 초기화
+    // 초기화 (기본 상태: 흰색 배경)
     if(tabRegion) tabRegion.className = inactiveBase;
     if(tabTop100) tabTop100.className = inactiveBase + " flex items-center gap-1";
     if(tabNormal) tabNormal.className = inactiveBase + " flex items-center gap-1";
 
-    // 2. 점 색상 기본값 세팅 (비활성화 상태: 100대=파란점, 기타=빨간점)
+    // 점 색상 기본값 (비활성화 상태일 때는 원래 제 색상)
     if(dotTop100) dotTop100.className = "w-1.5 h-1.5 rounded-full bg-sky-500 inline-block";
     if(dotNormal) dotNormal.className = "w-1.5 h-1.5 rounded-full bg-rose-500 inline-block";
 
-    // 3. 선택된 탭 활성화 처리 (선택된 버튼은 파란 배경 + 흰 점)
     if (tabName === 'top100') {
         top100Box.classList.remove('hidden');
         if(tabTop100) tabTop100.className = activeBase + " flex items-center gap-1";
-        if(dotTop100) dotTop100.className = "w-1.5 h-1.5 rounded-full bg-white inline-block"; // 선택 시 흰 점
+        // 🟢 활성화되었을 때만 점을 흰색으로 변경
+        if(dotTop100) dotTop100.className = "w-1.5 h-1.5 rounded-full bg-white inline-block";
     } else if (tabName === 'normal') {
         normalBox.classList.remove('hidden');
         if(tabNormal) tabNormal.className = activeBase + " flex items-center gap-1";
-        if(dotNormal) dotNormal.className = "w-1.5 h-1.5 rounded-full bg-white inline-block"; // 선택 시 흰 점
+        // 🟢 활성화되었을 때만 점을 흰색으로 변경
+        if(dotNormal) dotNormal.className = "w-1.5 h-1.5 rounded-full bg-white inline-block";
     } else {
         regionBox.classList.remove('hidden');
         if(tabRegion) tabRegion.className = activeBase;
