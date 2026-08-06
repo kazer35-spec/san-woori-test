@@ -3182,9 +3182,7 @@ overflow: hidden;
 </div>
 
 
-  
-      
-<!-- 🟢 변경 후 (hidden 추가) -->
+  <!-- 🟢 변경 후 (hidden 추가) -->
 <div id="mapModal" class="modal-overlay fixed inset-0 z-50 p-4 hidden items-center justify-center overflow-y-auto bg-black/50" onclick="toggleMapModal(false)">
 
   <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-y-auto max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
@@ -3242,61 +3240,64 @@ overflow: hidden;
     </div>
 
     <!-- Detailed Stats View (통계 3종 탭) -->
-<div id="mapViewStats" class="hidden-view">
-  <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 min-h-[400px] flex flex-col justify-between">
-    
-    <!-- Header & Tab Navigation -->
-    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
-      <div class="flex gap-1 overflow-x-auto no-scrollbar">
-        <!-- 🔵 100대 명산 탭 (초기 파란 배경 + 흰 점) -->
-        <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
-          <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
-        </button>
-        <!-- 🔴 기타 명산 탭 -->
-        <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
-          <span id="dotNormal" class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 기타 명산
-        </button>
-        <!-- 지역 점유율 탭 -->
-        <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
-          지역 점유율
-        </button>
-      </div>
-      <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2 py-1 rounded-lg font-bold shadow-sm hover:bg-slate-50 flex-shrink-0">
-        ← 지도
-      </button>
-    </div>
-
-    <!-- Tab Contents (높이를 flex-1로 꽉 채우도록 설정) -->
-    <div class="flex-1 flex flex-col min-h-0">
-      <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
-      <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
-        <div class="flex-1 max-h-[350px] overflow-y-auto pr-1 flex flex-col justify-between">
-          <div id="top100MountainGrid" class="space-y-1.5"></div>
-          <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
-            더보기
+    <div id="mapViewStats" class="hidden-view">
+      <!-- 🔧 수정 부분 1: 전체 통계 박스의 최소 높이를 min-h-0으로 줄임 -->
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col justify-between">
+        
+        <!-- Header & Tab Navigation -->
+        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
+          <div class="flex gap-1 overflow-x-auto no-scrollbar">
+            <!-- 🔵 100대 명산 탭 (초기 파란 배경 + 흰 점) -->
+            <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
+              <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
+            </button>
+            <!-- 🔴 기타 명산 탭 -->
+            <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
+              <span id="dotNormal" class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 기타 명산
+            </button>
+            <!-- 지역 점유율 탭 -->
+            <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
+              지역 점유율
+            </button>
+          </div>
+          <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2 py-1 rounded-lg font-bold shadow-sm hover:bg-slate-50 flex-shrink-0">
+            ← 지도
           </button>
         </div>
-      </div>
 
-      <!-- Tab 2: 일반 정복한 산 목록 -->
-      <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
-        <div class="flex-1 max-h-[350px] overflow-y-auto pr-1 flex flex-col justify-between">
-          <div id="normalMountainGrid" class="space-y-1.5"></div>
-          <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
-            더보기
-          </button>
+        <!-- Tab Contents -->
+        <div class="flex-1 flex flex-col min-h-0">
+          <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
+          <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
+            <!-- 🔧 수정 부분 2: 높이를 h-[260px] 고정으로 줄임 -->
+            <div class="h-[260px] overflow-y-auto pr-1 flex flex-col justify-between">
+              <div id="top100MountainGrid" class="space-y-1.5"></div>
+              <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
+                더보기
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab 2: 일반 정복한 산 목록 -->
+          <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
+            <!-- 🔧 수정 부분 3: 높이를 h-[260px] 고정으로 줄임 -->
+            <div class="h-[260px] overflow-y-auto pr-1 flex flex-col justify-between">
+              <div id="normalMountainGrid" class="space-y-1.5"></div>
+              <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
+                더보기
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab 3: 지역별 점유율 -->
+          <div id="regionStatsBox" class="flex-1 min-h-0 hidden">
+            <!-- 🔧 수정 부분 4: 높이를 h-[260px] 고정으로 줄임 -->
+            <div id="conquerRegionGrid" class="h-[260px] overflow-y-auto pr-1"></div>
+          </div>
         </div>
-      </div>
 
-      <!-- Tab 3: 지역별 점유율 -->
-      <div id="regionStatsBox" class="flex-1 min-h-0 hidden">
-        <div id="conquerRegionGrid" class="max-h-[350px] overflow-y-auto pr-1"></div>
       </div>
     </div>
-
-  </div>
-</div>
-
 
     <!-- 하단 닫기 버튼 (항상 노출 및 고정 위치 감싸기) -->
     <div class="flex-shrink-0 pt-3">
@@ -3308,6 +3309,9 @@ overflow: hidden;
   </div>
 </div>
 
+      
+
+          
       
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
