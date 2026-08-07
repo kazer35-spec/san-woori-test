@@ -31,22 +31,33 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     text-align: center !important;
 }
 
+/* ==========================================
+   부제목 ↔ 탭 바 간격 강제 적용
+   ========================================== */
+
+/* 1. 부제목 기본 마진 초기화 (상쇄 방지) */
 #hallModal .modal-subtitle,
-#hallModal p.hall-subtitle {
+#hallModal p,
+.hall-subtitle {
     margin-top: 0 !important;
-    margin-bottom: 2px !important; /* 부제목 ↔ 탭버튼 사이 간격 */
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
     text-align: center !important;
 }
 
-/* 3. 탭 바 전체 너비 및 좌우 여백 대칭 */
+/* 2. 탭 바 위쪽(margin-top)에 간격을 직접 부여 */
 #hallTabWrapper {
     width: 100% !important;
-    margin: 0 0 12px 0 !important;
+    margin-top: 6px !important;    /* ← 이 숫자로 부제목과의 간격을 조절하세요! */
+    margin-bottom: 12px !important; /* 탭 바 아래쪽(내용물)과의 간격 */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     padding: 3px !important;
     display: flex !important;
     justify-content: space-between !important;
     box-sizing: border-box !important;
 }
+
 
 /* 4. [우정/등산/벙의달인] 탭 버튼 4개 크기 균등 분배 (글자 잘림 방지) */
 #hallTabWrapper button,
