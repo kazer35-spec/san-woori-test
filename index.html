@@ -13,6 +13,25 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+/* 탭 바와 콘텐츠 사이 불필요한 여백 강제 제거 */
+#hallTabWrapper {
+    margin-top: 6px !important;
+    margin-bottom: 0px !important;
+}
+
+#hallListArea {
+    margin-top: 0px !important;
+    padding-top: 0px !important;
+}
+
+/* 탭 바와 리스트 사이에 숨어있는 빈 태그들 강제 숨김 */
+#hallTabWrapper + p,
+#hallTabWrapper + div:not(#hallListArea),
+#hallTabWrapper + br {
+    display: none !important;
+}
+
+    
     /* 첫 번째 컬럼(회원명)의 CLICK 텍스트 위치 미세 보정 */
 tr td:first-child .click-neon-adjust {
     top: 0px !important; /* 원래 top 값보다 3~4px 정도 위로 올림 */
@@ -4391,7 +4410,7 @@ function renderHallModalStructure() {
     const modalContent = modal.querySelector('.modal-content') || modal.firstElementChild;
 
     if (modalContent) {
-        modalContent.style.position = 'relative'; // X 버튼 기준점
+        modalContent.style.position = 'relative';
         
         // 하단 닫기 버튼 강제 숨김
         const bottomCloseBtns = modalContent.querySelectorAll('button, .modal-footer, .close-btn');
@@ -4425,28 +4444,32 @@ function renderHallModalStructure() {
         }
     }
 
-    // 서브타이틀 아래 마진 및 패딩 완전 제거
+    // 서브타이틀 마진 제거
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     if (originalSubtitle) {
         originalSubtitle.style.setProperty('margin-bottom', '0px', 'important');
         originalSubtitle.style.setProperty('padding-bottom', '0px', 'important');
     }
 
-    // 탭 컨테이너 위치 잡기
+    // [핵심] listArea 바로 위에 탭 바를 배치하여 사이에 아무것도 들어오지 못하게 만듭니다.
+    const listArea = document.getElementById('hallListArea');
     let tabWrapper = document.getElementById('hallTabWrapper');
+    
     if (!tabWrapper) {
         tabWrapper = document.createElement('div');
         tabWrapper.id = 'hallTabWrapper';
         tabWrapper.className = 'hall-tab-container-95';
         
-        if (originalSubtitle && originalSubtitle.parentNode) {
+        if (listArea && listArea.parentNode) {
+            listArea.parentNode.insertBefore(tabWrapper, listArea);
+        } else if (originalSubtitle && originalSubtitle.parentNode) {
             originalSubtitle.parentNode.insertBefore(tabWrapper, originalSubtitle.nextSibling);
         }
     }
 
-    // [핵심 수정] 탭 바 아래쪽 마진을 0으로 꽉 차게 조절
+    // 탭 바 여백 0 처리
     tabWrapper.setAttribute('style', `
-        margin: 4px auto 0px auto !important; 
+        margin: 6px auto 0px auto !important; 
         width: 100% !important; 
         padding: 3px !important; 
         box-sizing: border-box; 
@@ -4460,7 +4483,6 @@ function renderHallModalStructure() {
 
     const currentTab = window.currentHallTab || 'live';
 
-    // 탭 버튼 스타일
     const getBtnStyle = (tabKey) => {
         const isActive = currentTab === tabKey;
         return `
