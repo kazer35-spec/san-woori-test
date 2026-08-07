@@ -4353,8 +4353,7 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
 
-
-  // 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
+// 타이머 인터벌을 관리할 전역 변수
 window.hallTimerInterval = null;
 
 window.toggleHallModal = async (show) => {
@@ -4378,43 +4377,58 @@ window.toggleHallModal = async (show) => {
 };
 
 /* ==========================================
-   3. 탭 UI 구조 생성 (이미지 맞춤형 한 줄 정렬 버전)
+   3. 탭 UI 구조 생성 및 기존 닫기 버튼 강제 제거
    ========================================== */
 function renderHallModalStructure() {
     const modal = document.getElementById('hallModal');
-    let tabWrapper = document.getElementById('hallTabWrapper');
     
-    // 우측 상단 X 닫기 버튼 추가 (없을 경우 생성)
+    // --------------------------------------------------------
+    // [추가] 기존 HTML 하단에 존재하는 닫기 버튼/안내문구 강제 제거
+    // --------------------------------------------------------
+    const existingCloseBtns = modal.querySelectorAll('button:not(.hall-tab-btn):not(.hall-modal-close-x), .modal-close, [onclick*="toggleHallModal(false)"]');
+    existingCloseBtns.forEach(btn => {
+        if (!btn.classList.contains('hall-modal-close-x')) {
+            btn.style.display = 'none'; // 하단 닫기 버튼 숨김
+        }
+    });
+
+    const ruleNotices = modal.querySelectorAll('.hall-rule-notice');
+    ruleNotices.forEach(notice => notice.remove()); // 동률 관련 안내 문구 삭제
+
+    // --------------------------------------------------------
+    // 우측 상단 X 닫기 버튼 신규 생성 (없을 경우에만 추가)
+    // --------------------------------------------------------
     let closeBtn = modal.querySelector('.hall-modal-close-x');
     if (!closeBtn) {
         closeBtn = document.createElement('button');
         closeBtn.className = 'hall-modal-close-x';
-        closeBtn.innerHTML = '&#10005;'; // X 표시
+        closeBtn.innerHTML = '&#10005;'; // X 아이콘
         closeBtn.setAttribute('style', `
-            position: absolute;
-            top: 14px;
-            right: 16px;
-            background: none;
-            border: none;
-            font-size: 18px;
-            font-weight: bold;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 4px;
-            line-height: 1;
-            z-index: 10;
+            position: absolute !important;
+            top: 14px !important;
+            right: 16px !important;
+            background: transparent !important;
+            border: none !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            color: #94a3b8 !important;
+            cursor: pointer !important;
+            padding: 4px !important;
+            line-height: 1 !important;
+            z-index: 100 !important;
             transition: color 0.2s;
         `);
         closeBtn.onmouseover = () => closeBtn.style.color = '#334155';
         closeBtn.onmouseout = () => closeBtn.style.color = '#94a3b8';
         closeBtn.onclick = () => window.toggleHallModal(false);
         
-        // 모달 컨테이너에 relative 스타일 보장 후 버튼 삽입
         const modalContent = modal.querySelector('.modal-content') || modal.firstElementChild || modal;
         modalContent.style.position = 'relative';
         modalContent.appendChild(closeBtn);
     }
 
+    // 탭 컨테이너 설정
+    let tabWrapper = document.getElementById('hallTabWrapper');
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     
     if (!tabWrapper) {
@@ -4427,7 +4441,6 @@ function renderHallModalStructure() {
         }
     }
 
-    // 탭 컨테이너
     tabWrapper.setAttribute('style', 'margin: 12px auto 16px auto !important; width: 100% !important; padding: 4px !important; box-sizing: border-box; display: flex; gap: 2px; background-color: #f1f5f9; border-radius: 30px;');
 
     const btnStyle = `
@@ -4482,7 +4495,7 @@ function renderHallList() {
     const listArea = document.getElementById('hallListArea');
     if (!listArea) return;
     
-    // 높이를 380px로 고정하여 모든 탭의 스크롤 및 세로 크기 통일
+    // 높이 규격 통일 (380px)
     listArea.setAttribute('style', `
         padding-top: 0px !important; 
         margin-top: 0px !important; 
@@ -4521,7 +4534,7 @@ function renderHallList() {
     const glowClasses = ["glow-gold", "glow-silver", "glow-bronze"];
 
     // -------------------------------------------------------------
-    // [CASE 1] 실황정보 탭 클릭 시
+    // [CASE 1] 실황정보 탭
     // -------------------------------------------------------------
     if (window.currentHallTab === 'live') {
         let liveWith = [];
@@ -4670,7 +4683,7 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 개별 시즌 아카이브 탭 클릭 시 (실황정보와 세로 높이 규격 통일)
+    // [CASE 2] 개별 시즌 아카이브 탭
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
@@ -4734,7 +4747,6 @@ function renderHallList() {
             if (top3.length > 0) {
                 const cardMarginStyle = isCurrent ? 'margin-top: 0px !important;' : 'margin-top: 10px !important;';
                 
-                // 카드 내부 패딩 및 스타일을 실황 카드 규격에 맞춰 통일
                 combinedHtml += `
                 <div class="hall-card ${isCurrent ? 'border-blue-100 bg-blue-50/30' : ''}" style="${cardMarginStyle} padding: 10px 10px !important; border-radius: 18px;">
                     <div class="hall-season-title" style="margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center;">
@@ -4765,9 +4777,8 @@ function renderHallList() {
     listArea.innerHTML = combinedHtml;
 }
 
-    
 
-        
+                
         
             
         
