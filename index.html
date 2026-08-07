@@ -4351,22 +4351,39 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
             
-                       
-
-                 /* ==========================================
-   1. 명예의 전당 전역 상태 및 탭 전환 함수
-   ========================================== */
+    // 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
+window.hallTimerInterval = null;
 window.currentHallTab = window.currentHallTab || 'live';
 
-// 탭 버튼 클릭 이벤트 (전역 등록)
+// [핵심] switchHallTab 함수를 window 전역에 정확히 등록 (탭 클릭 안 됨 해결)
 window.switchHallTab = function(tabName) {
     window.currentHallTab = tabName;
-    renderHallModalStructure(); // 탭 버튼 활성화 UI 갱신
-    renderHallList();           // 해당 탭의 데이터 목록 갱신
+    renderHallModalStructure(); // 탭 버튼 활성화 상태 갱신
+    renderHallList();           // 해당 탭 데이터 목록 갱신
+};
+
+window.toggleHallModal = async (show) => {
+    const modal = document.getElementById('hallModal');
+    if (!modal) return;
+    
+    modal.style.display = show ? 'flex' : 'none';
+    
+    if (show) {
+        if (!window.currentHallTab) {
+            window.currentHallTab = 'live'; 
+        }
+        renderHallModalStructure();
+        renderHallList();
+    } else {
+        if (window.hallTimerInterval) {
+            clearInterval(window.hallTimerInterval);
+            window.hallTimerInterval = null;
+        }
+    }
 };
 
 /* ==========================================
-   2. 탭 UI 구조 및 모달 헤더 생성
+   3. 탭 UI 구조 및 모달 헤더 생성
    ========================================== */
 function renderHallModalStructure() {
     const modal = document.getElementById('hallModal');
@@ -4375,9 +4392,9 @@ function renderHallModalStructure() {
     const modalContent = modal.querySelector('.modal-content') || modal.firstElementChild;
 
     if (modalContent) {
-        modalContent.style.position = 'relative';
-
-        // 하단 static '닫기' 버튼 자동 숨김
+        modalContent.style.position = 'relative'; // X 버튼 기준점
+        
+        // 하단 닫기 버튼 숨김
         const bottomCloseBtns = modalContent.querySelectorAll('button');
         bottomCloseBtns.forEach(btn => {
             if (btn.innerText.trim() === '닫기' && btn.id !== 'hallModalCloseBtn') {
@@ -4385,18 +4402,18 @@ function renderHallModalStructure() {
             }
         });
 
-        // 우측 상단 X 버튼 추가
+        // 우측 상단 X 버튼
         if (!document.getElementById('hallModalCloseBtn')) {
             const closeBtn = document.createElement('button');
             closeBtn.id = 'hallModalCloseBtn';
             closeBtn.innerHTML = '✕';
             closeBtn.setAttribute('style', `
                 position: absolute;
-                top: 14px;
-                right: 18px;
+                top: 18px;
+                right: 20px;
                 background: none;
                 border: none;
-                font-size: 20px;
+                font-size: 22px;
                 font-weight: bold;
                 color: #94a3b8;
                 cursor: pointer;
@@ -4404,22 +4421,19 @@ function renderHallModalStructure() {
                 line-height: 1;
                 z-index: 100;
             `);
-            closeBtn.onclick = () => {
-                if (typeof toggleHallModal === 'function') toggleHallModal(false);
-                else modal.style.display = 'none';
-            };
+            closeBtn.onclick = () => toggleHallModal(false);
             modalContent.appendChild(closeBtn);
         }
     }
 
-    // 서브타이틀 여백 강제 축소 (상단 여백 문제 해결)
+    // [여백 축소 1] 서브타이틀 아래 마진을 2px로 축소
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     if (originalSubtitle) {
-        originalSubtitle.style.setProperty('margin-bottom', '4px', 'important');
+        originalSubtitle.style.setProperty('margin-bottom', '2px', 'important');
         originalSubtitle.style.setProperty('padding-bottom', '0px', 'important');
     }
 
-    // 탭 Wrapper 설정
+    // 탭 컨테이너 위치 잡기
     let tabWrapper = document.getElementById('hallTabWrapper');
     if (!tabWrapper) {
         tabWrapper = document.createElement('div');
@@ -4431,15 +4445,15 @@ function renderHallModalStructure() {
         }
     }
 
-    // 탭 Wrapper 여백 최소화 및 클릭 z-index 부여
+    // [여백 축소 2] 탭 컨테이너 자체 마진 축소 (상단 4px, 하단 2px) + z-index 20 부여
     tabWrapper.setAttribute('style', `
-        margin: 4px auto 8px auto !important;
-        width: 100% !important;
-        padding: 3px !important;
-        box-sizing: border-box;
-        display: flex;
-        gap: 2px;
-        background-color: #f1f5f9;
+        margin: 4px auto 2px auto !important; 
+        width: 100% !important; 
+        padding: 3px !important; 
+        box-sizing: border-box; 
+        display: flex; 
+        gap: 2px; 
+        background-color: #f1f5f9; 
         border-radius: 30px;
         position: relative;
         z-index: 20;
@@ -4447,22 +4461,22 @@ function renderHallModalStructure() {
 
     const currentTab = window.currentHallTab || 'live';
 
-    // 탭 버튼 동적 스타일 지정
+    // 탭 버튼 스타일 동적 계산
     const getBtnStyle = (tabKey) => {
         const isActive = currentTab === tabKey;
         return `
-            flex: 1;
+            flex: 1; 
             min-width: 0;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: center; 
             gap: 3px;
-            padding: 8px 0;
-            font-size: 11.5px;
-            font-weight: 700;
-            line-height: 1;
-            margin: 0;
+            padding: 8px 0; 
+            font-size: 11.5px; 
+            font-weight: 700; 
+            line-height: 1; 
+            margin: 0; 
             white-space: nowrap;
             transition: all 0.2s ease;
             border-radius: 24px;
@@ -4475,6 +4489,7 @@ function renderHallModalStructure() {
         `;
     };
 
+    // [클릭 문제 해결] onclick에 window.switchHallTab 지정
     tabWrapper.innerHTML = `
         <button type="button" class="hall-tab-btn" style="${getBtnStyle('live')}" onclick="window.switchHallTab('live')">⚡️ 실황정보</button>
         <button type="button" class="hall-tab-btn" style="${getBtnStyle('with')}" onclick="window.switchHallTab('with')">👑 우정대장</button>
@@ -4484,15 +4499,16 @@ function renderHallModalStructure() {
 }
 
 /* ==========================================
-   3. 명단 및 탭 내용 렌더링
+   4. 명단 리스트 렌더링
    ========================================== */
 function renderHallList() {
     const listArea = document.getElementById('hallListArea');
     if (!listArea) return;
     
+    // [여백 축소 3] 리스트 영역 상단 padding, margin 바짝 밀착
     listArea.setAttribute('style', `
-        padding-top: 4px !important; 
-        margin-top: 0px !important; 
+        padding-top: 0px !important; 
+        margin-top: 2px !important; 
         max-height: 480px !important; 
         overflow-y: auto !important; 
         width: 100%; 
@@ -4570,9 +4586,9 @@ function renderHallList() {
             </div>`;
         };
 
-        // 타이머 UI
+        // [여백 축소 4] 타이머 상단 margin-top: 0px 밀착
         combinedHtml += `
-        <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 12px; margin-top: 2px !important; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+        <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 12px; margin-top: 0px !important; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
             <span style="font-size: 10.5px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 5px;">
                 ✨️ ${currentQuarter}분기 전설의 시작까지
             </span>
@@ -4586,7 +4602,7 @@ function renderHallList() {
         </div>
         <style>@keyframes hallPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(1.4); } }</style>`;
 
-        // 1-1. 우정대장 현황
+        // 1-1. 실황 - 우정대장
         if (liveWith.length > 0) {
             combinedHtml += `
             <div class="hall-card" style="margin-top: 0px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ffedd5; background: linear-gradient(180deg, #fffbee 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(251, 146, 60, 0.04);">
@@ -4605,10 +4621,10 @@ function renderHallList() {
             </div>`;
         }
 
-        // 1-2. 등산의신 현황
+        // 1-2. 실황 - 등산의신
         if (liveMountain.length > 0) {
             combinedHtml += `
-            <div class="hall-card" style="margin-top: 8px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ccfbf1; background: linear-gradient(180deg, #f0fdfa 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(26, 188, 156, 0.04);">
+            <div class="hall-card" style="margin-top: 6px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ccfbf1; background: linear-gradient(180deg, #f0fdfa 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(26, 188, 156, 0.04);">
                 <div class="hall-season-title" style="margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 12.5px; font-weight:800; color: #0f766e; display: flex; align-items: center; gap: 5px;">
                         <span style="display: inline-block; width: 3.5px; height: 12px; background-color: #1abc9c; border-radius: 2px;"></span>
@@ -4624,10 +4640,10 @@ function renderHallList() {
             </div>`;
         }
 
-        // 1-3. 벙의달인 현황
+        // 1-3. 실황 - 벙의달인
         if (liveHost.length > 0) {
             combinedHtml += `
-            <div class="hall-card" style="margin-top: 8px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #e0f2fe; background: linear-gradient(180deg, #f0f9ff 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(0, 191, 255, 0.04);">
+            <div class="hall-card" style="margin-top: 6px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #e0f2fe; background: linear-gradient(180deg, #f0f9ff 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(0, 191, 255, 0.04);">
                 <div class="hall-season-title" style="margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 12.5px; font-weight:800; color: #1d4ed8; display: flex; align-items: center; gap: 5px;">
                         <span style="display: inline-block; width: 3.5px; height: 12px; background-color: #00ced1; border-radius: 2px;"></span>
@@ -4643,7 +4659,6 @@ function renderHallList() {
             </div>`;
         }
 
-        // 카운트다운 타이머 인터벌
         if (window.hallTimerInterval) clearInterval(window.hallTimerInterval);
         const updateCountdown = () => {
             const timerEl = document.getElementById('hallLiveCountdown');
@@ -4679,7 +4694,7 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 아카이브 탭 (우정대장 / 등산의신 / 벙의달인)
+    // [CASE 2] 아카이브 탭 (우정대장/등산의신/벙의달인)
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
@@ -4726,7 +4741,7 @@ function renderHallList() {
             }
 
             if (top3.length > 0) {
-                const cardMarginStyle = isCurrent ? 'margin-top: 0px !important;' : 'margin-top: 8px !important;';
+                const cardMarginStyle = isCurrent ? 'margin-top: 0px !important;' : 'margin-top: 6px !important;';
                 combinedHtml += `
                 <div class="hall-card ${isCurrent ? 'border-blue-100 bg-blue-50/30' : ''}" style="${cardMarginStyle} padding: 10px 10px !important; border-radius: 18px;">
                     <div class="hall-season-title" style="margin-bottom: 8px !important;">
@@ -4756,6 +4771,10 @@ function renderHallList() {
 
     listArea.innerHTML = combinedHtml;
 }
+                   
+
+                 
+                                
 
     
 window.toggleVibeModal = (show) => { document.getElementById('vibeModal').style.display = show ? 'flex' : 'none'; };
