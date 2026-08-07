@@ -5599,7 +5599,7 @@ let top100DisplayCount = 20;
 let normalFullList = [];
 let normalDisplayCount = 20;
 
-// [1] 모달 뷰 전환 및 탭 전환 함수
+ // [1] 모달 뷰 전환 및 탭 전환 함수
 window.toggleMapView = (viewType) => {
     const main = document.getElementById('mapViewMain');
     const stats = document.getElementById('mapViewStats');
@@ -5629,6 +5629,14 @@ window.switchStatsTab = (tabName) => {
     const dotNormal = document.getElementById('dotNormal');
 
     if(!regionBox || !top100Box || !normalBox) return;
+
+    // 🟢 [추가] 탭 전환 시 각 목록의 스크롤 위치를 맨 위로 초기화
+    const top100Scroll = top100Box.querySelector('div.overflow-y-auto');
+    const normalScroll = normalBox.querySelector('div.overflow-y-auto');
+    const regionScroll = regionBox.querySelector('div.overflow-y-auto');
+    if (top100Scroll) top100Scroll.scrollTop = 0;
+    if (normalScroll) normalScroll.scrollTop = 0;
+    if (regionScroll) regionScroll.scrollTop = 0;
 
     regionBox.classList.add('hidden');
     top100Box.classList.add('hidden');
@@ -5661,6 +5669,8 @@ window.switchStatsTab = (tabName) => {
         if(tabRegion) tabRegion.className = activeBase;
     }
 };
+
+
 
 
 
@@ -5878,6 +5888,7 @@ window.toggleTimelineModal = (show) => {
 };
 
 // 🟢 수정 후 toggleMapModal
+// 🟢 수정 후 toggleMapModal
 window.toggleMapModal = (show) => {
     const modal = document.getElementById('mapModal');
     if (!modal) return;
@@ -5896,6 +5907,13 @@ window.toggleMapModal = (show) => {
             statsView.classList.add('hidden-view');
             mainView.classList.remove('hidden-view');
         }
+
+        // 🟢 [추가] 모달이 닫힐 때 명산/지역 스크롤 컨테이너들을 모두 맨 위로 reset
+        const scrollContainers = document.querySelectorAll('#mapModalContent .overflow-y-auto');
+        scrollContainers.forEach(container => {
+            container.scrollTop = 0;
+        });
+
         switchStatsTab('top100'); // 🟢 [추가] 닫힐 때 100대 명산 탭으로 원복
     }
 };
