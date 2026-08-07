@@ -5751,9 +5751,14 @@ window.renderMoreNormal = () => {
 window.showMemberMap = async (mId, mName) => {
     toggleMapModal(true);
 
-    // 🟢 [추가] 다른 사용자로 전환될 때 모달 전체 및 내부 모든 스크롤 요소를 맨 위로 reset
-    const innerScrolls = document.querySelectorAll('#mapModalContent .overflow-y-auto');
-    innerScrolls.forEach(el => el.scrollTop = 0);
+    // 🟢 [수정] 각 탭별 스크롤 박스를 직접 찾아서 전부 맨 위(0)로 초기화
+    const top100Scroll = document.querySelector('#top100ListBox > div');
+    const normalScroll = document.querySelector('#normalListBox > div');
+    const regionScroll = document.getElementById('conquerRegionGrid');
+    
+    if (top100Scroll) top100Scroll.scrollTop = 0;
+    if (normalScroll) normalScroll.scrollTop = 0;
+    if (regionScroll) regionScroll.scrollTop = 0;
 
     toggleMapView('main');
     switchStatsTab('top100');
@@ -5838,9 +5843,6 @@ window.showMemberMap = async (mId, mName) => {
         }).join('');
     }
 
-    // 🟢 [추가] 지역 점유율 스크롤 초기화
-    if (regionBoard) regionBoard.scrollTop = 0;
-
     // ㄱㄴㄷ 순 정렬 - 100대 명산
     top100FullList = Object.keys(top100Map)
         .sort((a, b) => a.localeCompare(b, 'ko'))
@@ -5879,7 +5881,6 @@ window.showMemberMap = async (mId, mName) => {
     document.getElementById('everestCount').innerText = conquestCount;
     document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
 };
-
 
 
 
