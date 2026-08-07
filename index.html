@@ -5878,26 +5878,11 @@ window.toggleTimelineModal = (show) => {
 };
 
 // 🟢 수정 후 toggleMapModal
-// 🟢 수정 후 toggleMapModal
 window.toggleMapModal = (show) => {
     const modal = document.getElementById('mapModal');
     if (!modal) return;
     
-    // 🟢 [추가] 스크롤 위치를 맨 위로 리셋하는 함수
-    const resetScroll = () => {
-        const scrollContainers = [
-            document.getElementById('mapModalContent'),
-            document.querySelector('#top100ListBox > div'),
-            document.querySelector('#normalListBox > div'),
-            document.getElementById('conquerRegionGrid')
-        ];
-        scrollContainers.forEach(el => {
-            if (el) el.scrollTop = 0;
-        });
-    };
-    
     if (show) {
-        resetScroll(); // 🟢 열릴 때 스크롤 맨 위로!
         modal.style.display = 'flex';
         modal.classList.remove('hidden');
     } else {
@@ -5912,7 +5897,6 @@ window.toggleMapModal = (show) => {
             mainView.classList.remove('hidden-view');
         }
         switchStatsTab('top100'); // 🟢 [추가] 닫힐 때 100대 명산 탭으로 원복
-        resetScroll(); // 🟢 닫힐 때도 스크롤 위치 초기화
     }
 };
 
