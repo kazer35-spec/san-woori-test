@@ -5589,7 +5589,8 @@ window.openMountainInfoModal = function(type, event) {
 
 
     
-// 캐시 유효 시간 (5분)
+
+         // 캐시 유효 시간 (5분)
 const MAP_CACHE_EXPIRY = 5 * 60 * 1000;
 
 // 글로벌 상태 변수 (100대 명산 / 일반 산)
@@ -5599,7 +5600,20 @@ let top100DisplayCount = 20;
 let normalFullList = [];
 let normalDisplayCount = 20;
 
- // [1] 모달 뷰 전환 및 탭 전환 함수
+// 🟢 [안전한 스크롤 초기화 함수] 다른 팝업에 영향을 주지 않도록 내부 스크롤 요소만 지정
+const resetMapScrolls = () => {
+    setTimeout(() => {
+        const top100Scroll = document.querySelector('#top100ListBox > div');
+        const normalScroll = document.querySelector('#normalListBox > div');
+        const regionScroll = document.getElementById('conquerRegionGrid');
+
+        if (top100Scroll) top100Scroll.scrollTop = 0;
+        if (normalScroll) normalScroll.scrollTop = 0;
+        if (regionScroll) regionScroll.scrollTop = 0;
+    }, 10);
+};
+
+// [1] 모달 뷰 전환 및 탭 전환 함수
 window.toggleMapView = (viewType) => {
     const main = document.getElementById('mapViewMain');
     const stats = document.getElementById('mapViewStats');
@@ -5629,14 +5643,6 @@ window.switchStatsTab = (tabName) => {
     const dotNormal = document.getElementById('dotNormal');
 
     if(!regionBox || !top100Box || !normalBox) return;
-
-    // 🟢 [추가] 탭 전환 시 각 목록의 스크롤 위치를 맨 위로 초기화
-    const top100Scroll = top100Box.querySelector('div.overflow-y-auto');
-    const normalScroll = normalBox.querySelector('div.overflow-y-auto');
-    const regionScroll = regionBox.querySelector('div.overflow-y-auto');
-    if (top100Scroll) top100Scroll.scrollTop = 0;
-    if (normalScroll) normalScroll.scrollTop = 0;
-    if (regionScroll) regionScroll.scrollTop = 0;
 
     regionBox.classList.add('hidden');
     top100Box.classList.add('hidden');
@@ -5668,19 +5674,16 @@ window.switchStatsTab = (tabName) => {
         regionBox.classList.remove('hidden');
         if(tabRegion) tabRegion.className = activeBase;
     }
-};
 
+    // 🟢 탭 전환 시 스크롤 안전 초기화
+    resetMapScrolls();
+};
 
 // [2-1] 100대 명산 20개씩 더보기 렌더링
 window.renderMoreTop100 = () => {
     const listBoard = document.getElementById('top100MountainGrid');
     const moreBtn = document.getElementById('top100MoreBtn');
     
-    // 🟢 [추가] 처음 20개를 불러올 때는 목록 스크롤 박스를 맨 위로 초기화
-    if (top100DisplayCount === 20 && listBoard && listBoard.parentElement) {
-        listBoard.parentElement.scrollTop = 0;
-    }
-
     const targetSlice = top100FullList.slice(0, top100DisplayCount);
     
     if (targetSlice.length === 0) {
@@ -5709,16 +5712,16 @@ window.renderMoreTop100 = () => {
     }
 };
 
+window.loadNext20Top100 = () => {
+    top100DisplayCount += 20;
+    renderMoreTop100();
+};
+
 // [2-2] 정복한 산 (일반 산) 20개씩 더보기 렌더링
 window.renderMoreNormal = () => {
     const listBoard = document.getElementById('normalMountainGrid');
     const moreBtn = document.getElementById('normalMoreBtn');
     
-    // 🟢 [추가] 처음 20개를 불러올 때는 목록 스크롤 박스를 맨 위로 초기화
-    if (normalDisplayCount === 20 && listBoard && listBoard.parentElement) {
-        listBoard.parentElement.scrollTop = 0;
-    }
-
     const targetSlice = normalFullList.slice(0, normalDisplayCount);
     
     if (targetSlice.length === 0) {
@@ -5747,21 +5750,21 @@ window.renderMoreNormal = () => {
     }
 };
 
+window.loadNext20Normal = () => {
+    normalDisplayCount += 20;
+    renderMoreNormal();
+};
+
 // [3] 메인 지도 및 데이터 로드
 window.showMemberMap = async (mId, mName) => {
+    // 🟢 1. 무조건 보여줄 개수를 20개로 초기화
+    top100DisplayCount = 20;
+    normalDisplayCount = 20;
+
     toggleMapModal(true);
-
-    // 🟢 [수정] 각 탭별 스크롤 박스를 직접 찾아서 전부 맨 위(0)로 초기화
-    const top100Scroll = document.querySelector('#top100ListBox > div');
-    const normalScroll = document.querySelector('#normalListBox > div');
-    const regionScroll = document.getElementById('conquerRegionGrid');
-    
-    if (top100Scroll) top100Scroll.scrollTop = 0;
-    if (normalScroll) normalScroll.scrollTop = 0;
-    if (regionScroll) regionScroll.scrollTop = 0;
-
+    document.getElementById('mapModalContent').scrollTop = 0;
     toggleMapView('main');
-    switchStatsTab('top100');
+    switchStatsTab('top100'); // 기본 탭을 100대 명산으로 설정
     document.getElementById('mapMemberName').innerText = mName;
 
     const pointsBoard = document.getElementById('conquerMapPoints');
@@ -5861,11 +5864,11 @@ window.showMemberMap = async (mId, mName) => {
             height: normalMap[mName].height
         }));
 
-    top100DisplayCount = 20;
     renderMoreTop100();
-
-    normalDisplayCount = 20;
     renderMoreNormal();
+
+    // 🟢 2. 데이터 세팅 완료 후 스크롤 리셋
+    resetMapScrolls();
 
     // 지도 상단 미니 배지 수치 업데이트
     const top100Count = top100FullList.length;
@@ -5882,11 +5885,6 @@ window.showMemberMap = async (mId, mName) => {
     document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
 };
 
-
-
-
-            
-
 window.toggleTimelineModal = (show) => {
     const modal = document.getElementById('timelineModal');
     if (!modal) return;
@@ -5898,7 +5896,6 @@ window.toggleTimelineModal = (show) => {
     }
 };
 
-// 🟢 수정 후 toggleMapModal
 // 🟢 수정 후 toggleMapModal
 window.toggleMapModal = (show) => {
     const modal = document.getElementById('mapModal');
@@ -5919,16 +5916,13 @@ window.toggleMapModal = (show) => {
             mainView.classList.remove('hidden-view');
         }
 
-        // 🟢 [추가] 모달이 닫힐 때 명산/지역 스크롤 컨테이너들을 모두 맨 위로 reset
-        const scrollContainers = document.querySelectorAll('#mapModalContent .overflow-y-auto');
-        scrollContainers.forEach(container => {
-            container.scrollTop = 0;
-        });
-
-        switchStatsTab('top100'); // 🟢 [추가] 닫힐 때 100대 명산 탭으로 원복
+        // 🟢 3. 닫힐 때 노출 개수와 스크롤 위치 완벽 리셋
+        top100DisplayCount = 20;
+        normalDisplayCount = 20;
+        switchStatsTab('top100');
+        resetMapScrolls();
     }
 };
-
 
 window.toggleLogPopup = (show) => {
     const popup = document.getElementById('logPopup');
@@ -5958,7 +5952,6 @@ window.setAdminCoordinate = (event) => {
     document.getElementById('coordDisplay').innerText = `좌표: X ${tempCoord.x} / Y ${tempCoord.y} (${detectedRegion})`;
 };
 
-    
         
 
 
