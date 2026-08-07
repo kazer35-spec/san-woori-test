@@ -13,6 +13,44 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+/* ================= 은하수 등급별 모달 테두리 & 글로우 스타일 ================= */
+#milkyWayModal .relative {
+    transition: all 0.4s ease;
+}
+
+/* 🔥 1번 효과: 슈퍼별 보유자 (태양/불꽃 글로우) */
+#milkyWayModal.is-super .relative {
+    border: 1.5px solid rgba(255, 120, 0, 0.6) !important;
+    box-shadow: 0 0 35px rgba(255, 80, 0, 0.35), inset 0 0 20px rgba(255, 140, 0, 0.15) !important;
+}
+#milkyWayModal.is-super h3 {
+    color: #ffaa00 !important;
+    text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
+}
+
+/* ✨ 2번 효과: 스페셜별 보유자 (퍼플 오로라 글로우 - 배지 제외) */
+#milkyWayModal.is-special .relative {
+    border: 1.5px solid rgba(168, 85, 247, 0.6) !important;
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.35), inset 0 0 20px rgba(168, 85, 247, 0.15) !important;
+}
+#milkyWayModal.is-special h3 {
+    color: #c084fc !important;
+    text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
+}
+
+/* 🌟 스타 가이드: 최신 획득자 강조 태그 스타일 */
+.latest-holder-tag {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(168, 85, 247, 0.25)) !important;
+    border: 1px solid rgba(56, 189, 248, 0.6) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    animation: holderPulse 2s infinite alternate ease-in-out;
+}
+
+@keyframes holderPulse {
+    0% { transform: scale(1); box-shadow: 0 0 5px rgba(56, 189, 248, 0.3); }
+    100% { transform: scale(1.05); box-shadow: 0 0 10px rgba(168, 85, 247, 0.6); }
+}
 
     
     /* 첫 번째 컬럼(회원명)의 CLICK 텍스트 위치 미세 보정 */
@@ -8067,23 +8105,45 @@ container.appendChild(svg);
                 
   // ======================= [별 가이드 & 은하수 모듈 통합 - 연도 자동 저장 & 모달 최신화] =======================
 
-// 1. 회원 DB 문서(sanwoori/{memberId})에 레전드 별 획득 기록 저장하는 함수 (최초 1회만 등록)
+// 0. 최신 획득자(최신 왕좌) 판별 보조 함수
+function getLatestLegendHolderId(starType) {
+    if (typeof currentData === 'undefined' || !Array.isArray(currentData)) return null;
+
+    let latestHolderId = null;
+    let maxTimestamp = -1;
+
+    currentData.forEach(member => {
+        if (member.specialStars && Array.isArray(member.specialStars)) {
+            member.specialStars.forEach(item => {
+                if (item.starType === starType) {
+                    const ts = item.timestamp || 0;
+                    if (ts > maxTimestamp) {
+                        maxTimestamp = ts;
+                        latestHolderId = member.id;
+                    }
+                }
+            });
+        }
+    });
+
+    return latestHolderId;
+}
+
+// 1. 회원 DB 문서(sanwoori/{memberId})에 레전드 별 획득 기록 저장 함수
 async function saveSpecialStarToMember(memberId, starType, quarterText, memberInfo) {
     if (starType === "super" || starType === "special") {
         try {
-            // 이미 획득 기록(specialStars)이 존재하는지 확인 (중복 등록 및 수정값 덮어쓰기 방지)
             const currentSpecialStars = memberInfo?.specialStars || [];
             const isAlreadySaved = currentSpecialStars.some(item => item.starType === starType);
 
-            // 최초 등록이 아닐 경우(이미 저장된 기록이 있으면) 자동 저장 로직 실행 안 함
             if (isAlreadySaved) return;
 
-            const currentYear = new Date().getFullYear(); // 🎯 획득 연도 자동 추출
+            const currentYear = new Date().getFullYear();
 
             const newRecord = {
                 starType: starType,
                 quarter: quarterText || "1Q",
-                year: currentYear, // 🎯 연도(year) 필드 추가 자동 저장
+                year: currentYear,
                 timestamp: Date.now()
             };
 
@@ -8092,7 +8152,6 @@ async function saveSpecialStarToMember(memberId, starType, quarterText, memberIn
                 specialStars: arrayUnion(newRecord)
             });
             
-            // 로컬 메모리(currentData & memberInfo)에도 즉시 반영하여 UI 최신화
             if (!memberInfo.specialStars) memberInfo.specialStars = [];
             memberInfo.specialStars.push(newRecord);
 
@@ -8114,8 +8173,29 @@ window.showMilkyWay = async (mId, mName) => {
     const modal = document.getElementById('milkyWayModal');
     const board = document.getElementById('constellationBoard');
     const nameLabel = document.getElementById('mwMemberName');
+    const quoteLabel = modal ? modal.querySelector('p.mt-6') : null;
 
     if (!modal || !board) return;
+
+    // --- [ 1·2·3번 연출 초기화 및 최신 획득자 권한 검증 ] ---
+    modal.classList.remove('is-super', 'is-special');
+
+    const latestSuperHolderId = getLatestLegendHolderId('super');
+    const latestSpecialHolderId = getLatestLegendHolderId('special');
+
+    let isCurrentSuperKing = (mId === latestSuperHolderId);
+    let isCurrentSpecialKing = (mId === latestSpecialHolderId);
+
+    // 3번 효과: 등급별 감성 문구 및 모달 테두리 클래스 동적 부여
+    if (isCurrentSuperKing) {
+        modal.classList.add('is-super'); // 1번 효과
+        if (quoteLabel) quoteLabel.innerHTML = "타오르는 태양의 궤적이 밤하늘에서 가장 찬란한 전설이 됩니다."; // 3번 효과
+    } else if (isCurrentSpecialKing) {
+        modal.classList.add('is-special'); // 2번 효과 (배지 제외)
+        if (quoteLabel) quoteLabel.innerHTML = "신비로운 오로라의 빛이 은하수 깊은 곳을 에픽하게 수놓습니다."; // 3번 효과
+    } else {
+        if (quoteLabel) quoteLabel.innerHTML = "걸어온 궤적은 선이 되고, 마침내 밤하늘의 길이 됩니다."; // 일반 문구
+    }
 
     // --- [ 가이드 UI 주입 ] ---
     if (!document.getElementById('starGuideBtn')) {
@@ -8214,7 +8294,6 @@ window.showMilkyWay = async (mId, mName) => {
             if (log.starType) {
                 shouldTwinkle = true;
                 
-                // ⭐ [수정 핵심]: 레전드 별 발견 시 최초 1회만 자동 저장 (이미 존재하면 자동 저장 건너뜀)
                 if (log.starType === "super" || log.starType === "special") {
                     const defaultQuarter = log.quarter || (log.date ? `${Math.floor(log.date.toDate().getMonth() / 3) + 1}Q` : "1Q");
                     saveSpecialStarToMember(mId, log.starType, defaultQuarter, memberInfo);
@@ -8286,7 +8365,7 @@ window.toggleStarGuide = async (show) => {
     }
 };
 
-// 4. 로컬 currentData 메모리 기반 수집 함수 (Firestore Read: 0건)
+// 4. 로컬 currentData 메모리 기반 수집 함수
 function getLegendStarHistoryFromLocal() {
     const legendHistory = { "super": [], "special": [] };
 
@@ -8298,13 +8377,12 @@ function getLegendStarHistoryFromLocal() {
                         legendHistory[item.starType].push({
                             name: member.name || "익명",
                             quarter: item.quarter || "1Q",
-                            year: item.year || (item.timestamp ? new Date(item.timestamp).getFullYear() : member.specialStarYear) || new Date().getFullYear(), // 🎯 year 우선 추출
+                            year: item.year || (item.timestamp ? new Date(item.timestamp).getFullYear() : member.specialStarYear) || new Date().getFullYear(),
                             timestamp: item.timestamp || 0
                         });
                     }
                 });
             }
-            // 레거시 필드 호환 대응
             if (member.hasSuperStar && !member.specialStars) {
                 legendHistory.super.push({ name: member.name, quarter: member.superStarQuarter || "1Q", year: member.superStarYear || new Date().getFullYear(), timestamp: 0 });
             }
@@ -8320,13 +8398,13 @@ function getLegendStarHistoryFromLocal() {
     return legendHistory;
 }
 
-// 5. 🌌 스타 갤러리 커스텀 모달 닫기 함수 (닫기 동작 보장)
+// 5. 스타 갤러리 커스텀 모달 닫기
 window.closeSgModal = function(e) {
     const modal = document.getElementById('sgCustomModal');
     if (modal) modal.remove();
 };
 
-// 6. 🌌 스타 갤러리 커스텀 모달 열기 함수 (X 버튼 제거 및 우측 연도 배치)
+// 6. 스타 갤러리 커스텀 모달 열기
 function showStarGalleryModal(type, titleText, items) {
     const oldModal = document.getElementById('sgCustomModal');
     if (oldModal) oldModal.remove();
@@ -8335,7 +8413,6 @@ function showStarGalleryModal(type, titleText, items) {
     const icon = isSuper ? "🌟" : "✨";
     const themeClass = isSuper ? "super" : "special";
 
-    // 이름 + 우측 연도 레이아웃
     const listHtml = items.map(item => `
         <div class="sg-owner-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,0.05);">
             <span style="font-weight: 600;">[${item.quarter}] ${item.name}</span>
@@ -8362,7 +8439,7 @@ function showStarGalleryModal(type, titleText, items) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-// 7. 🎯 전체 획득자 더보기 버튼 연동 함수
+// 7. 전체 획득자 더보기 연동
 window.showAllHolders = (starName, holdersJson) => {
     const list = JSON.parse(decodeURIComponent(holdersJson));
     
@@ -8379,7 +8456,7 @@ window.showAllHolders = (starName, holdersJson) => {
     showStarGalleryModal(starType, modalTitle, formattedItems);
 };
 
-// 8. 가이드 항목 랜더링 함수
+// 8. 가이드 항목 랜더링 함수 (1번 최신 획득자 태그 강화 반영)
 async function renderStarGuideItems() {
     const grid = document.getElementById('guideGrid');
     if (!grid) return;
@@ -8416,7 +8493,7 @@ async function renderStarGuideItems() {
         { id: "regular_1", name: "정기 1호", prob: "22.5%", desc: "청명한 시안 블루", style: "background: #00FFFF; box-shadow: 0 0 8px #00FFFF;", twinkle: true },
         { id: "regular_2", name: "정기 2호", prob: "22.5%", desc: "정열의 오렌지", style: "background: #D35400; box-shadow: 0 0 8px #D35400;", twinkle: true },
         { id: "regular_3", name: "정기 3호", prob: "22.5%", desc: "위엄있는 다크레드", style: "background: #D32F2F; box-shadow: 0 0 8px #D32F2F;", twinkle: true },
-        { id: "regular_4", name: "정기 4호", prob: "22.5%", desc: "진하고 우아한 퍼플", style: "background: #7C4DFF; box-shadow: 0 0 8px #7C4DFF;", twinkle: true },
+        { id: "regular_4", name: "정기 4호", prob: "22.5%", desc: "진하고 우아한 퍼플", style: "background: #7C4DFF; box-shadow: 0 0 8px #7C4DFF;", twinkle: false },
         { id: "top100", name: "산림청100대", prob: "인증", desc: "영광의 샴페인 골드", style: "background: #F7E7CE; box-shadow: 0 0 8px #F7E7CE;", twinkle: false },
         { id: "normal", name: "일반 산행", prob: "상시", desc: "소중한 일상의 기록", style: "background: #FFFFFF; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);", twinkle: false }
     ];
@@ -8441,9 +8518,10 @@ async function renderStarGuideItems() {
 
             if (list.length > 0) {
                 const latest = list[0]; 
+                // 🌟 1번 요구사항 반영: 최신 획득자 태그 스타일 강화 (latest-holder-tag 클래스 적용)
                 holdersHTML = `
-                    <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #f8fafc; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">
-                        <span style="color: #38bdf8; font-weight: 900; font-size: 7.5px;">${latest.quarter}</span> ${latest.name}
+                    <span class="latest-holder-tag" style="font-size: 8px; font-weight: 800; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">
+                        <span style="color: #38bdf8; font-weight: 900; font-size: 7.5px;">[${latest.quarter}]</span> ${latest.name} 🔥
                     </span>
                 `;
 
@@ -8451,7 +8529,7 @@ async function renderStarGuideItems() {
                     const extraCount = list.length - 1;
                     const encodedList = encodeURIComponent(JSON.stringify(list));
                     holdersHTML += `
-                        <button onclick="showAllHolders('${s.name}', '${encodedList}')" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 7.5px; font-weight: 800; padding: 1px 5px; border-radius: 4px; cursor: pointer;">
+                        <button onclick="showAllHolders('${s.name}', '${encodedList}')" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 7.5px; font-weight: 800; padding: 2px 6px; border-radius: 6px; cursor: pointer;">
                             +${extraCount}명 보기
                         </button>
                     `;
@@ -8461,8 +8539,8 @@ async function renderStarGuideItems() {
             }
 
             legendHoldersSection = `
-                <div style="display: flex; justify-content: center; align-items: center; gap: 4px; padding-top: 5px; margin-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.08); width: 100%;">
-                    <span style="color: #94a3b8; font-size: 8px; font-weight: 700;">획득자:</span>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 5px; padding-top: 5px; margin-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.08); width: 100%;">
+                    <span style="color: #94a3b8; font-size: 8px; font-weight: 700;">최신 획득:</span>
                     ${holdersHTML}
                 </div>
             `;
@@ -8515,6 +8593,141 @@ function createShootingStar(board, tx, ty) {
         setTimeout(() => s.remove(), 500);
     }, 850);
 }
+
+
+// =========================================================================
+// 🧪 [모바일 전용 UI & 테스트 지원 모듈]
+// 모바일 화면 오른쪽 아래 '🧪 테스트' 버튼을 터치하여 터치만으로 왕좌 이관 검증 가능
+// =========================================================================
+
+// 1. 모바일 테스트 전용 UI 생성 및 토글 함수
+window.toggleMobileTestPanel = function(show) {
+    let panel = document.getElementById('mobileTestModal');
+    
+    if (!panel && show) {
+        // currentData 기반 회원 옵션 생성
+        let memberOptions = '<option value="">-- 회원 선택 --</option>';
+        if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+            currentData.forEach(m => {
+                memberOptions += `<option value="${m.id}">${m.name} (${m.id})</option>`;
+            });
+        }
+        if (memberOptions === '<option value="">-- 회원 선택 --</option>') {
+            memberOptions += `<option value="test_user_01">테스터 1 (test_user_01)</option>`;
+        }
+
+        const panelHtml = `
+            <div id="mobileTestModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10090; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;" onclick="window.toggleMobileTestPanel(false)">
+                <div style="width: 100%; max-width: 320px; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.9); box-sizing: border-box;" onclick="event.stopPropagation()">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4 style="color: #38bdf8; font-size: 1rem; font-weight: 800; margin: 0;">🧪 모바일 이펙트 테스트</h4>
+                        <button onclick="window.toggleMobileTestPanel(false)" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;">
+                        <div>
+                            <label style="color: #94a3b8; display: block; margin-bottom: 4px; font-size: 0.75rem;">대상 회원 선택</label>
+                            <select id="mTestMemberSelect" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; font-size: 0.85rem;">
+                                ${memberOptions}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="color: #94a3b8; display: block; margin-bottom: 4px; font-size: 0.75rem;">부여 분기 (예: 2Q, 3Q)</label>
+                            <input type="text" id="mTestQuarter" value="2Q" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; font-size: 0.85rem; box-sizing: border-box;">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+                            <button onclick="window.applyMobileTest('super')" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(245, 158, 11, 0.4)); border: 1px solid #ef4444; color: #fff; font-weight: 800; padding: 10px 0; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">
+                                🔥 슈퍼별 부여
+                            </button>
+                            <button onclick="window.applyMobileTest('special')" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(16, 185, 129, 0.4)); border: 1px solid #a855f7; color: #fff; font-weight: 800; padding: 10px 0; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">
+                                ✨ 스페셜별 부여
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', panelHtml);
+        return;
+    }
+
+    if (panel) {
+        panel.style.display = show ? 'flex' : 'none';
+    }
+};
+
+// 2. 모바일 UI에서 [부여] 버튼 터치 시 실행 함수
+window.applyMobileTest = function(starType) {
+    const select = document.getElementById('mTestMemberSelect');
+    const quarterInput = document.getElementById('mTestQuarter');
+
+    if (!select || !select.value) {
+        alert("회원을 선택해 주세요!");
+        return;
+    }
+
+    const memberId = select.value;
+    const quarter = quarterInput ? quarterInput.value : "2Q";
+
+    // 공통 실행 함수 실행
+    window.testSetSpecialStar(memberId, null, starType, quarter);
+
+    window.toggleMobileTestPanel(false);
+};
+
+// 3. 테스트 전용 보조 핵심 실행 함수 (PC/모바일 공용)
+window.testSetSpecialStar = function(memberId, memberName, starType = "super", quarter = "2Q") {
+    if (typeof currentData === 'undefined') window.currentData = [];
+
+    let target = currentData.find(m => m.id === memberId || m.name === memberName || (memberName && m.name === memberName));
+    
+    if (!target) {
+        target = { id: memberId || "test_user_01", name: memberName || "테스터", specialStars: [] };
+        currentData.push(target);
+    }
+
+    if (!target.specialStars) target.specialStars = [];
+
+    const newRecord = {
+        starType: starType,
+        quarter: quarter,
+        year: new Date().getFullYear(),
+        timestamp: Date.now() // 최신 시점 기록 적용 ➔ 왕좌 실시간 이관
+    };
+
+    target.specialStars.push(newRecord);
+    
+    // 은하수 모달이 열려 있다면 즉시 화면 리프레시
+    if (window.showMilkyWay) {
+        window.showMilkyWay(target.id, target.name);
+    }
+};
+
+// 4. 은하수 모달 오픈 시 모바일 테스트 플로팅 버튼 자동 주입 (기존 showMilkyWay 연동용)
+const originalShowMilkyWay = window.showMilkyWay;
+window.showMilkyWay = async function(mId, mName) {
+    if (originalShowMilkyWay) {
+        await originalShowMilkyWay(mId, mName);
+    }
+
+    // 모바일 테스트 플로팅 버튼 주입 (#mwTestFloatBtn)
+    if (!document.getElementById('mwTestFloatBtn')) {
+        const floatBtnHtml = `
+            <button id="mwTestFloatBtn" onclick="window.toggleMobileTestPanel(true)" style="position: absolute; bottom: 20px; right: 20px; z-index: 10025; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                🧪 테스트
+            </button>
+        `;
+        const modal = document.getElementById('milkyWayModal');
+        if (modal) modal.insertAdjacentHTML('beforeend', floatBtnHtml);
+    }
+};
+
+        
+                
 
              
 window.currentScrollLogs = []; 
