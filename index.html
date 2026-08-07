@@ -2467,34 +2467,9 @@ border-width: 1.8px !important;
 .active-q { background: white !important; color: #3b82f6 !important; }
 
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
-/* 🟢 수정한 등급표 모달 축소 CSS */
-.modal-content { 
-  background: white; 
-  border-radius: 20px; 
-  width: 100%; 
-  max-width: 340px; /* 기존 420px에서 320px로 축소 */
-  max-height: 80vh; 
-  overflow-y: auto; 
-  padding: 14px; /* 패딩 축소 */
-}
-
-.guide-grid { 
-  display: grid; 
-  grid-template-columns: repeat(3, 1fr); 
-  gap: 7px; /* 카드 간 간격 10px -> 6px로 축소 */
-}
-
-.guide-item { 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  gap: 3px; /* 카드 내부 위아래 간격 5px -> 2px로 축소 */
-  padding: 6px 4px; /* 카드 내부 여백 10px -> 6px로 축소 */
-  border-radius: 12px; 
-  border: 1px solid #f1f5f9; 
-  background: #fafafa; 
-  font-size: 0.75rem; 
-}
+.modal-content { background: white; border-radius: 24px; width: 100%; max-width: 420px; max-height: 85vh; overflow-y: auto; padding: 16px; }
+.guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.guide-item { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 5px; border-radius: 15px; border: 1px solid #f1f5f9; background: #fafafa; }
 
 /* 명예의 전당 추가 스타일 */
 .hall-of-fame-btn { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #facc15; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2); }
@@ -3080,26 +3055,13 @@ overflow: hidden;
     
 
 
-<!-- 🔴 모달 전체 크기 및 세로 간격 축소 적용 -->
 <div id="levelModal" class="modal-overlay" onclick="toggleModal(false)">
-<div class="modal-content !p-4 max-w-[320px] w-full text-center" onclick="event.stopPropagation()">
-  
-  <p class="text-[9px] font-black tracking-widest text-emerald-600/80 uppercase mb-0.5">
-    SANWOORI HONOR SYSTEM
-  </p>
-
-  <h2 class="text-base font-black mb-2.5 text-slate-800">
-    📊 산:우리 등급 체계
-  </h2>
-  
-  <div id="levelGuideGrid" class="guide-grid"></div>
-  
-  <button onclick="toggleModal(false)" class="w-full mt-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs">
-    닫기
-  </button>
+<div class="modal-content" onclick="event.stopPropagation()">
+<h2 class="text-lg font-black mb-5 text-center text-slate-800">📊 산:우리 등급 체계</h2>
+<div id="levelGuideGrid" class="guide-grid"></div>
+<button onclick="toggleModal(false)" class="w-full mt-6 py-3 bg-slate-800 text-white rounded-xl font-bold">닫기</button>
 </div>
-
-
+</div>
 
 <div id="vibeModal" class="modal-overlay" onclick="toggleVibeModal(false)">
 <div class="modal-content !p-6" onclick="event.stopPropagation()">
