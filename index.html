@@ -4351,7 +4351,9 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
 
-// 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
+ 
+
+            // 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
 window.hallTimerInterval = null;
 window.currentHallTab = 'live';
 
@@ -4369,7 +4371,7 @@ window.toggleHallModal = async (show) => {
     modal.style.display = show ? 'flex' : 'none';
     
     if (show) {
-        // [수정] 모달을 열 때마다 항상 '실황정보(live)' 탭으로 초기화
+        // 모달을 열 때마다 항상 '실황정보(live)' 탭으로 초기화
         window.currentHallTab = 'live'; 
         renderHallModalStructure();
         renderHallList();
@@ -4503,13 +4505,11 @@ function renderHallList() {
     const listArea = document.getElementById('hallListArea');
     if (!listArea) return;
     
-    // [수정] 세로 높이를 430px로 고정 (height, min-height 추가)하여 모든 탭에서 높이가 일정하게 유지되도록 설정
+    // [해결] 강제 고정 높이(430px)를 제거하고 실황정보 탭 본래 여백(오른쪽 원본)대로 최대 높이를 유연하게 맞춤
     listArea.setAttribute('style', `
         padding-top: 0px !important; 
         margin-top: 2px !important; 
-        height: 430px !important;
-        min-height: 430px !important;
-        max-height: 430px !important; 
+        max-height: 70vh !important; 
         overflow-y: auto !important; 
         width: 100%; 
         box-sizing: border-box;
@@ -4771,10 +4771,7 @@ function renderHallList() {
 
     listArea.innerHTML = combinedHtml;
 }
-            
 
-                 
-                                
 
     
 window.toggleVibeModal = (show) => { document.getElementById('vibeModal').style.display = show ? 'flex' : 'none'; };
