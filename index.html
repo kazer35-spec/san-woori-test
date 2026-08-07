@@ -14,36 +14,35 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 /* ==========================================
-   명예의 전당 모달 여백 강제 고정 (최종)
+/* ==========================================
+   명예의 전당 모달 여백 재배치 (상단 확보 / 하단 축소)
    ========================================== */
 
-/* 1. 모달 전체 직계 자식들의 마진 초기화 */
-#hallModal .modal-content > * {
+/* 1. 탭 바 아래 여백 확보 (타이머 박스 상단 잘림 해결) */
+#hallTabWrapper {
+    margin-top: 6px !important;
+    margin-bottom: 10px !important; /* 탭 바와 타이머 박스 사이 간격 부여 */
+}
+
+/* 2. 타이머 박스 상단 마진 정돈 */
+#hallLiveTimerContainer {
     margin-top: 0 !important;
+    margin-bottom: 8px !important;
+}
+
+/* 3. 카드 컨테이너 flex 정렬 (카드 사이 과도한 공백 제거) */
+#hallListArea {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important; /* 요소들이 위로 착 밀착되도록 설정 */
+    gap: 8px !important; /* 카드 간 적절한 간격 고정 */
+}
+
+/* 4. 카드 자체 하단 마진 중복 제거 */
+#hallListArea .hall-card {
     margin-bottom: 0 !important;
 }
 
-/* 2. 서브타이틀(HALL OF FAME...) 아래 여백 */
-#hallModal .modal-content p,
-#hallModal .modal-content .text-gray-400 {
-    margin-bottom: 6px !important;
-}
-
-/* 3. 탭 바 자체의 위/아래 여백 (여기서 탭 바 위치의 간격을 결정합니다) */
-#hallTabWrapper {
-    margin-top: 6px !important;
-    margin-bottom: 12px !important;
-    position: relative !important;
-    z-index: 10 !important;
-}
-
-/* 4. 탭 바 아래 들어오는 리스트/타이머 박스 상단 마진 제거 */
-#hallListArea,
-#hallLiveTimerContainer,
-#hallListArea > * {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
 
     
     /* 첫 번째 컬럼(회원명)의 CLICK 텍스트 위치 미세 보정 */
@@ -4610,19 +4609,22 @@ function renderHallList() {
         };
 
         // 타이머 UI 부분의 margin-top을 0px !important 로 설정
-    combinedHtml += `
-    <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 12px; margin-top: 2px !important; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
-        <span style="font-size: 10.5px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 5px;">
-            ✨️ ${currentQuarter}분기 전설의 시작까지
+    // renderHallList() 함수 내부의 타이머 HTML 생성 부분
+
+combinedHtml += `
+<div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 12px; margin-top: 0px !important; margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+    <span style="font-size: 10.5px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+        ✨️ ${currentQuarter}분기 전설의 시작까지
+    </span>
+    <div style="display: flex; align-items: center; gap: 5px;">
+        <span style="display: flex; position: relative; width: 5px; height: 5px;">
+            <span id="hallPulseBg" style="animation: hallPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; position: absolute; inline-size: 100%; block-size: 100%; border-radius: 50%; background-color: #10b981; opacity: 0.75;"></span>
+            <span id="hallPulseDot" style="position: relative; display: inline-flex; border-radius: 50%; width: 5px; height: 5px; background-color: #10b981;"></span>
         </span>
-        <div style="display: flex; align-items: center; gap: 5px;">
-            <span style="display: flex; position: relative; width: 5px; height: 5px;">
-                <span id="hallPulseBg" style="animation: hallPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; position: absolute; inline-size: 100%; block-size: 100%; border-radius: 50%; background-color: #10b981; opacity: 0.75;"></span>
-                <span id="hallPulseDot" style="position: relative; display: inline-flex; border-radius: 50%; width: 5px; height: 5px; background-color: #10b981;"></span>
-            </span>
-            <span id="hallLiveCountdown" style="font-size: 10.5px; color: #0d9488; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;">계산 중...</span>
-        </div>
-        </div>
+        <span id="hallLiveCountdown" style="font-size: 10.5px; color: #0d9488; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;">계산 중...</span>
+    </div>
+</div>
+
         <style>@keyframes hallPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(1.4); } }</style>`;
 
         // 1-1. 실황 - 우정대장
