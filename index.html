@@ -3182,8 +3182,7 @@ overflow: hidden;
 </div>
 
 
-  
-              <!-- 🟢 변경 후 (hidden 추가) -->
+ <!-- 🟢 변경 후 (hidden 추가) -->
 <div id="mapModal" class="modal-overlay fixed inset-0 z-50 p-4 hidden items-center justify-center overflow-y-auto bg-black/50" onclick="toggleMapModal(false)">
 
   <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-y-auto max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
@@ -3269,7 +3268,8 @@ overflow: hidden;
         <div class="flex-1 flex flex-col min-h-0">
           <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
           <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
-            <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
+            <!-- 💡 스크롤 리셋 대상 ID: top100ScrollContainer -->
+            <div id="top100ScrollContainer" class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
               <div id="top100MountainGrid" class="space-y-1.5"></div>
               <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
                 더보기
@@ -3279,7 +3279,8 @@ overflow: hidden;
 
           <!-- Tab 2: 일반 정복한 산 목록 -->
           <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
-            <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
+            <!-- 💡 스크롤 리셋 대상 ID: normalScrollContainer -->
+            <div id="normalScrollContainer" class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
               <div id="normalMountainGrid" class="space-y-1.5"></div>
               <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
                 더보기
@@ -3294,9 +3295,9 @@ overflow: hidden;
         </div>
 
       </div>
-    </div>
-
-    <!-- 하단 닫기 버튼 (항상 노출 및 고정 위치 감싸기) -->
+    </div> 
+              
+          <!-- 하단 닫기 버튼 (항상 노출 및 고정 위치 감싸기) -->
     <div class="flex-shrink-0 pt-3">
       <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
         닫기
@@ -3306,7 +3307,6 @@ overflow: hidden;
   </div>
 </div>
 
-      
 
           
       
@@ -5589,6 +5589,13 @@ window.openMountainInfoModal = function(type, event) {
 
 
     
+
+                    
+
+    
+
+
+
 // 캐시 유효 시간 (5분)
 const MAP_CACHE_EXPIRY = 5 * 60 * 1000;
 
@@ -5598,6 +5605,17 @@ let top100DisplayCount = 20;
 
 let normalFullList = [];
 let normalDisplayCount = 20;
+
+// 🟢 [추가] 목록 스크롤 초기화 전용 함수
+window.resetListScrolls = () => {
+    const top100Scroll = document.getElementById('top100ScrollContainer');
+    const normalScroll = document.getElementById('normalScrollContainer');
+    const regionScroll = document.getElementById('conquerRegionGrid');
+
+    if (top100Scroll) top100Scroll.scrollTop = 0;
+    if (normalScroll) normalScroll.scrollTop = 0;
+    if (regionScroll) regionScroll.scrollTop = 0;
+};
 
 // [1] 모달 뷰 전환 및 탭 전환 함수
 window.toggleMapView = (viewType) => {
@@ -5661,8 +5679,6 @@ window.switchStatsTab = (tabName) => {
         if(tabRegion) tabRegion.className = activeBase;
     }
 };
-
-
 
 // [2-1] 100대 명산 20개씩 더보기 렌더링
 window.renderMoreTop100 = () => {
@@ -5745,7 +5761,9 @@ window.showMemberMap = async (mId, mName) => {
     toggleMapModal(true);
     document.getElementById('mapModalContent').scrollTop = 0;
     toggleMapView('main');
-    switchStatsTab('top100'); // 🟢 [수정] 기본 탭을 100대 명산으로 설정
+    switchStatsTab('top100'); // 기본 탭 설정
+    resetListScrolls(); // 🟢 목록 내부 스크롤 최상단 리셋
+
     document.getElementById('mapMemberName').innerText = mName;
 
     const pointsBoard = document.getElementById('conquerMapPoints');
@@ -5807,7 +5825,7 @@ window.showMemberMap = async (mId, mName) => {
         }
     });
 
-    // 💡 지역 점유율 전체 렌더링 (더보기 버튼 제거 & 스크롤로만 처리)
+    // 💡 지역 점유율 전체 렌더링
     const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
     if (sortedRegions.length === 0) {
         regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
@@ -5877,7 +5895,7 @@ window.toggleTimelineModal = (show) => {
     }
 };
 
-// 🟢 수정 후 toggleMapModal
+// 🟢 toggleMapModal (닫힐 때 스크롤 reset 추가)
 window.toggleMapModal = (show) => {
     const modal = document.getElementById('mapModal');
     if (!modal) return;
@@ -5889,17 +5907,17 @@ window.toggleMapModal = (show) => {
         modal.style.display = 'none';
         modal.classList.add('hidden');
         
-        // 닫힐 때 내부 뷰 및 탭 초기화
+        // 닫힐 때 내부 뷰, 탭 및 목록 스크롤 위치 초기화
         const statsView = document.getElementById('mapViewStats');
         const mainView = document.getElementById('mapViewMain');
         if (statsView && mainView) {
             statsView.classList.add('hidden-view');
             mainView.classList.remove('hidden-view');
         }
-        switchStatsTab('top100'); // 🟢 [추가] 닫힐 때 100대 명산 탭으로 원복
+        switchStatsTab('top100');
+        resetListScrolls(); // 🟢 닫을 때 스크롤 위치 초기화
     }
 };
-
 
 window.toggleLogPopup = (show) => {
     const popup = document.getElementById('logPopup');
