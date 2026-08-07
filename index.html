@@ -3082,19 +3082,23 @@ overflow: hidden;
 
 <!-- 🔴 모달 전체 크기 및 세로 간격 축소 적용 -->
 <div id="levelModal" class="modal-overlay" onclick="toggleModal(false)">
-  <div class="modal-content !p-4 max-w-[320px] w-full" onclick="event.stopPropagation()">
-    <!-- 타이틀: 폰트 크기 및 하단 여백 축소 (mb-5 -> mb-2.5) -->
-    <h2 class="text-base font-black mb-2.5 text-center text-slate-800">📊 산:우리 등급 체계</h2>
-    
-    <!-- 등급 리스트 영역 -->
-    <div id="levelGuideGrid" class="guide-grid"></div>
-    
-    <!-- 닫기 버튼: 상단 여백 및 높이 축소 (mt-6/py-3 -> mt-3 py-2) -->
-    <button onclick="toggleModal(false)" class="w-full mt-3 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition-colors">
-      닫기
-    </button>
-  </div>
+<div class="modal-content !p-4 max-w-[320px] w-full text-center" onclick="event.stopPropagation()">
+  
+  <p class="text-[9px] font-black tracking-widest text-emerald-600/80 uppercase mb-0.5">
+    SANWOORI HONOR SYSTEM
+  </p>
+
+  <h2 class="text-base font-black mb-2.5 text-slate-800">
+    📊 산:우리 등급 체계
+  </h2>
+  
+  <div id="levelGuideGrid" class="guide-grid"></div>
+  
+  <button onclick="toggleModal(false)" class="w-full mt-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs">
+    닫기
+  </button>
 </div>
+
 
 
 <div id="vibeModal" class="modal-overlay" onclick="toggleVibeModal(false)">
