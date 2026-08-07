@@ -14,43 +14,68 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 /* ==========================================
-   명예의 전당 모달 좌우 대칭 & 카드 내부 잘림 방지
+   명예의 전당 모달 디자인 통합 수정 코드
    ========================================== */
 
-/* 1. 모달 내부 좌우 패딩을 기준점으로 동일하게 고정 */
+/* 1. 모달 전체 좌우 패딩 대칭 맞춤 */
 #hallModal .modal-content {
-    padding-left: 18px !important;
-    padding-right: 18px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
     box-sizing: border-box !important;
 }
 
-/* 2. 탭 바 너비를 모달 폭에 맞추어 좌우 여백 대칭 맞춤 */
+/* 2. 메인 제목 / 부제목 간격 및 정렬 */
+#hallModal .modal-title {
+    margin-top: 10px !important;
+    margin-bottom: 2px !important;
+    text-align: center !important;
+}
+
+#hallModal .modal-subtitle,
+#hallModal p.hall-subtitle {
+    margin-top: 0 !important;
+    margin-bottom: 8px !important; /* 부제목 ↔ 탭버튼 사이 간격 */
+    text-align: center !important;
+}
+
+/* 3. 탭 바 전체 너비 및 좌우 여백 대칭 */
 #hallTabWrapper {
     width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-top: 10px !important;
-    margin-bottom: 12px !important;
+    margin: 0 0 12px 0 !important;
+    padding: 3px !important;
+    display: flex !important;
+    justify-content: space-between !important;
     box-sizing: border-box !important;
 }
 
-/* 3. 각 분기별 카드 고정 높이 해제 (카드가 안 잘리고 끝까지 늘어나도록 함) */
+/* 4. [우정/등산/벙의달인] 탭 버튼 4개 크기 균등 분배 (글자 잘림 방지) */
+#hallTabWrapper button,
+#hallTabWrapper .tab-btn {
+    flex: 1 1 0% !important;        /* 4개 버튼 폭을 정확히 1/4씩 균등하게 나눔 */
+    min-width: 0 !important;         /* 모바일 폭이 좁아도 넘치거나 잘리지 않음 */
+    padding: 10px 2px !important;     /* 버튼 내부 여백 */
+    font-size: 11px !important;      /* 탭 글씨 크기 적정화 */
+    white-space: nowrap !important;  /* 줄바꿈 방지 */
+    text-align: center !important;
+}
+
+/* 5. 3분기, 2분기, 1분기 등 카드 내부 높이 잘림 방지 */
 .hall-card {
     height: auto !important;
     min-height: auto !important;
-    padding: 14px 14px 18px 14px !important;
+    padding: 14px 12px 16px 12px !important;
     overflow: visible !important;
     box-sizing: border-box !important;
 }
 
-/* 4. 카드 내부 랭킹 아이템 하단 여백 정돈 */
+/* 6. 카드 내부 랭킹 아이템(흰색 박스) 하단 여백 확보 */
 .hall-rank-item {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     gap: 4px !important;
-    padding: 10px 4px 12px 4px !important;
+    padding: 10px 4px 10px 4px !important;
     box-sizing: border-box !important;
 }
 
