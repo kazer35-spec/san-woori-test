@@ -4464,7 +4464,7 @@ window.toggleHallModal = async (show) => {
    3. 탭 UI 구조 및 모달 헤더 생성 (여백 버그 완벽 수정)
    ========================================== */
  
-                 function renderHallModalStructure() {
+  function renderHallModalStructure() {
     const modal = document.getElementById('hallModal');
     if (!modal) return;
 
@@ -4472,17 +4472,7 @@ window.toggleHallModal = async (show) => {
 
     if (modalContent) {
         modalContent.style.position = 'relative';
-        modalContent.style.setProperty('padding-left', '16px', 'important');
-        modalContent.style.setProperty('padding-right', '16px', 'important');
-        modalContent.style.setProperty('box-sizing', 'border-box', 'important');
-        modalContent.style.setProperty('gap', '0px', 'important'); // 모달 내부 자동 gap 무력화
-
-        // 이전 시도 생성 임시 태그 삭제
-        ['hallTabTopSpacer', 'hallTabGapSpacer'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        });
-
+        
         // 닫기 버튼 처리
         const bottomCloseBtns = modalContent.querySelectorAll('button, .modal-footer, .close-btn');
         bottomCloseBtns.forEach(btn => {
@@ -4496,96 +4486,68 @@ window.toggleHallModal = async (show) => {
             closeBtn.id = 'hallModalCloseBtn';
             closeBtn.innerHTML = '✕';
             closeBtn.setAttribute('style', `
-                position: absolute; top: 18px; right: 20px;
-                background: none; border: none; font-size: 22px;
-                font-weight: bold; color: #94a3b8; cursor: pointer;
-                padding: 4px; line-height: 1; z-index: 100;
+                position: absolute;
+                top: 18px;
+                right: 20px;
+                background: none;
+                border: none;
+                font-size: 22px;
+                font-weight: bold;
+                color: #94a3b8;
+                cursor: pointer;
+                padding: 4px;
+                line-height: 1;
+                z-index: 100;
             `);
             closeBtn.onclick = () => toggleHallModal(false);
             modalContent.appendChild(closeBtn);
         }
     }
 
-    // 1. 부제목(HALL OF FAME) 및 이를 감싸고 있는 상위 '헤더 감싸기 div' 마진까지 모조리 강제 초기화
-    let subtitleNode = null;
-    const allElements = modal.querySelectorAll('*');
-    for (let i = 0; i < allElements.length; i++) {
-        const el = allElements[i];
-        if (el.children.length === 0 && el.textContent && el.textContent.includes('HALL OF FAME')) {
-            subtitleNode = el;
-            break;
-        }
-    }
-
-    if (subtitleNode) {
-        // 부제목 자체 마진 제거
-        subtitleNode.style.setProperty('margin-bottom', '0px', 'important');
-        subtitleNode.style.setProperty('padding-bottom', '0px', 'important');
-
-        // 부제목을 감싸는 상위 헤더 박스(mb-6 등이 박혀있는 div) 마진까지 상위로 추적해서 제거
-        let parentBox = subtitleNode.parentElement;
-        while (parentBox && parentBox !== modalContent) {
-            parentBox.style.setProperty('margin-bottom', '0px', 'important');
-            parentBox.style.setProperty('padding-bottom', '0px', 'important');
-            if (parentBox.parentElement === modalContent) break;
-            parentBox = parentBox.parentElement;
-        }
-    }
-
-    // 2. 탭 바 컨테이너 위치 잡기
+    // 탭 컨테이너 위치 잡기 (listArea 바로 직전에 배치)
+    const listArea = document.getElementById('hallListArea');
     let tabWrapper = document.getElementById('hallTabWrapper');
+    
     if (!tabWrapper) {
         tabWrapper = document.createElement('div');
         tabWrapper.id = 'hallTabWrapper';
+        
+        if (listArea && listArea.parentNode) {
+            listArea.parentNode.insertBefore(tabWrapper, listArea);
+        }
     }
 
-    const listArea = document.getElementById('hallListArea');
-    let insertAnchor = subtitleNode ? (subtitleNode.parentElement.parentElement === modalContent ? subtitleNode.parentElement : subtitleNode) : null;
-
-    if (insertAnchor && insertAnchor.parentNode) {
-        insertAnchor.parentNode.insertBefore(tabWrapper, insertAnchor.nextSibling);
-    } else if (listArea && listArea.parentNode) {
-        listArea.parentNode.insertBefore(tabWrapper, listArea);
-    }
-
-    // 3. 탭 바 간격 직접 지정 (상단 8px, 하단 10px로 균형 맞춤)
+    // 탭 컨테이너: 요청하신 슬림하고 둥근 배경 스타일 적용
     tabWrapper.className = 'hall-tab-container-95';
-    tabWrapper.setAttribute('style', `
-        width: 100% !important;
-        margin-top: 8px !important;       /* 부제목과의 딱 좋은 균형 간격 */
-        margin-bottom: 10px !important;   /* 아래 내용과의 간격 */
-        padding: 3px !important;
-        box-sizing: border-box !important;
-        display: flex !important;
-        gap: 2px !important;
-        background-color: #f1f5f9 !important;
-        border-radius: 30px !important;
-    `);
+    tabWrapper.setAttribute('style', 'margin: 12px auto 16px auto !important; width: 100% !important; padding: 4px !important; box-sizing: border-box; display: flex; gap: 2px; background-color: #f1f5f9; border-radius: 30px;');
 
     const currentTab = window.currentHallTab || 'live';
 
-    // 버튼 스타일 설정 (4개 버튼 폭 동일 지정)
+    // 버튼 스타일: 요청해주신 btnStyle + 활성/비활성 처리
     const getBtnStyle = (tabKey) => {
         const isActive = currentTab === tabKey;
         return `
-            flex: 1 1 0% !important; 
-            min-width: 0 !important;
-            display: flex !important; 
-            align-items: center !important; 
-            justify-content: center !important; 
-            gap: 2px !important;
-            padding: 8px 0 !important; 
-            font-size: 11.5px !important; 
-            font-weight: 700 !important; 
-            line-height: 1 !important; 
-            margin: 0 !important; 
-            white-space: nowrap !important;
-            border-radius: 24px !important;
-            border: none !important;
-            cursor: pointer !important;
-            background-color: ${isActive ? '#ffffff' : 'transparent'} !important;
-            color: ${isActive ? '#1e293b' : '#64748b'} !important;
-            box-shadow: ${isActive ? '0 2px 5px rgba(0,0,0,0.08)' : 'none'} !important;
+            flex: 1; 
+            min-width: 0;
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 3px;
+            padding: 12px 0; 
+            font-size: 11.5px; 
+            font-weight: 700; 
+            line-height: 1; 
+            margin: 0; 
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-radius: 24px;
+            box-sizing: border-box;
+            border: none;
+            cursor: pointer;
+            background-color: ${isActive ? '#ffffff' : 'transparent'};
+            color: ${isActive ? '#1e293b' : '#64748b'};
+            box-shadow: ${isActive ? '0 2px 5px rgba(0,0,0,0.08)' : 'none'};
         `;
     };
 
@@ -4596,7 +4558,7 @@ window.toggleHallModal = async (show) => {
         <button type="button" class="hall-tab-btn" style="${getBtnStyle('host')}" onclick="window.switchHallTab('host')">🏅 벙의달인</button>
     `;
 }
-
+               
 
 
 
