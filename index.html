@@ -4404,7 +4404,7 @@ window.toggleHallModal = async (show) => {
 };
 
 /* ==========================================
-   3. 탭 UI 구조 및 모달 헤더 생성
+   3. 탭 UI 구조 및 모달 헤더 생성 (여백 버그 완벽 수정)
    ========================================== */
 function renderHallModalStructure() {
     const modal = document.getElementById('hallModal');
@@ -4415,6 +4415,14 @@ function renderHallModalStructure() {
     if (modalContent) {
         modalContent.style.position = 'relative';
         
+        // [핵심 1] Tailwind의 space-y (자식 요소 간격 강제 부여) 무력화
+        modalContent.classList.remove('space-y-2', 'space-y-3', 'space-y-4', 'space-y-6', 'gap-2', 'gap-3', 'gap-4');
+        
+        // 모달 내부의 모든 직계 자식들의 space-y 마진 재설정
+        Array.from(modalContent.children).forEach(child => {
+            child.style.setProperty('margin-top', '0px', 'important');
+        });
+
         // 하단 닫기 버튼 강제 숨김
         const bottomCloseBtns = modalContent.querySelectorAll('button, .modal-footer, .close-btn');
         bottomCloseBtns.forEach(btn => {
@@ -4447,13 +4455,22 @@ function renderHallModalStructure() {
         }
     }
 
-    // 서브타이틀 아래 마진 정리
+    // [핵심 2] 서브타이틀 마진 제거
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     if (originalSubtitle) {
-        originalSubtitle.style.setProperty('margin-bottom', '0px', 'important');
+        originalSubtitle.style.setProperty('margin-top', '2px', 'important');
+        originalSubtitle.style.setProperty('margin-bottom', '8px', 'important');
+        originalSubtitle.style.setProperty('padding-bottom', '0px', 'important');
     }
 
-    // 탭 컨테이너 위치 잡기 (서브타이틀 바로 다음)
+    // [핵심 3] listArea(콘텐츠 영역) 상단 마진 초기화
+    const listArea = document.getElementById('hallListArea');
+    if (listArea) {
+        listArea.style.setProperty('margin-top', '0px', 'important');
+        listArea.style.setProperty('padding-top', '0px', 'important');
+    }
+
+    // 탭 컨테이너 생성 및 위치 고정
     let tabWrapper = document.getElementById('hallTabWrapper');
     if (!tabWrapper) {
         tabWrapper = document.createElement('div');
@@ -4462,17 +4479,15 @@ function renderHallModalStructure() {
         
         if (originalSubtitle && originalSubtitle.parentNode) {
             originalSubtitle.parentNode.insertBefore(tabWrapper, originalSubtitle.nextSibling);
-        } else {
-            const listArea = document.getElementById('hallListArea');
-            if (listArea && listArea.parentNode) {
-                listArea.parentNode.insertBefore(tabWrapper, listArea);
-            }
+        } else if (listArea && listArea.parentNode) {
+            listArea.parentNode.insertBefore(tabWrapper, listArea);
         }
     }
 
-    // [간격 조절 핵심] margin: 10px auto 12px auto 로 위/아래 살짝의 여백만 유지
+    // [핵심 4] 위(서브타이틀)와의 간격 8px, 아래(타이머/카드)와의 간격 8px 로 예쁘게 균형 맞춤
     tabWrapper.setAttribute('style', `
-        margin: 10px auto 12px auto !important; 
+        margin-top: 8px !important; 
+        margin-bottom: 8px !important; 
         width: 100% !important; 
         padding: 3px !important; 
         box-sizing: border-box; 
