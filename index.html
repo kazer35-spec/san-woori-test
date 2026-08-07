@@ -3080,24 +3080,30 @@ overflow: hidden;
     
 
 
-<!-- 🔴 모달 전체 크기 및 세로 간격 축소 적용 -->
+<!-- 🟢 닫는 태그(</div>) 수정 완료된 코드 -->
 <div id="levelModal" class="modal-overlay" onclick="toggleModal(false)">
-<div class="modal-content !p-4 max-w-[320px] w-full text-center" onclick="event.stopPropagation()">
-  
-  <p class="text-[9px] font-black tracking-widest text-emerald-600/80 uppercase mb-0.5">
-    SANWOORI HONOR SYSTEM
-  </p>
+  <div class="modal-content !p-4 max-w-[320px] w-full text-center" onclick="event.stopPropagation()">
+    
+    <!-- 영문 타이틀 -->
+    <p class="text-[9px] font-black tracking-widest text-emerald-600/80 uppercase mb-0.5">
+      SANWOORI HONOR SYSTEM
+    </p>
 
-  <h2 class="text-base font-black mb-2.5 text-slate-800">
-    📊 산:우리 등급 체계
-  </h2>
-  
-  <div id="levelGuideGrid" class="guide-grid"></div>
-  
-  <button onclick="toggleModal(false)" class="w-full mt-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs">
-    닫기
-  </button>
-</div>
+    <!-- 메인 타이틀 -->
+    <h2 class="text-base font-black mb-2.5 text-slate-800">
+      📊 산:우리 등급 체계
+    </h2>
+    
+    <!-- 등급 목록 -->
+    <div id="levelGuideGrid" class="guide-grid"></div>
+    
+    <!-- 닫기 버튼 -->
+    <button onclick="toggleModal(false)" class="w-full mt-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs">
+      닫기
+    </button>
+  </div>
+</div> <!-- 👈 요 녀석(levelModal을 닫는 div)이 누락되어 다른 모달들이 안 떴던 것입니다! -->
+
 
 
 
