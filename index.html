@@ -4393,7 +4393,7 @@ function renderHallModalStructure() {
     if (modalContent) {
         modalContent.style.position = 'relative'; // X 버튼 기준점
         
-        // 하단 닫기 버튼 및 불필요한 여백 요소 강제 숨김
+        // 하단 닫기 버튼 강제 숨김
         const bottomCloseBtns = modalContent.querySelectorAll('button, .modal-footer, .close-btn');
         bottomCloseBtns.forEach(btn => {
             if (btn.innerText.includes('닫기') && btn.id !== 'hallModalCloseBtn') {
@@ -4425,7 +4425,7 @@ function renderHallModalStructure() {
         }
     }
 
-    // 서브타이틀 아래 마진 및 패딩 완전 제거 (상단 여백 최소화)
+    // 서브타이틀 아래 마진 및 패딩 완전 제거
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     if (originalSubtitle) {
         originalSubtitle.style.setProperty('margin-bottom', '0px', 'important');
@@ -4444,9 +4444,9 @@ function renderHallModalStructure() {
         }
     }
 
-    // 탭 컨테이너 마진 조절 (여백 제거)
+    // [핵심 수정] 탭 바 아래쪽 마진을 0으로 꽉 차게 조절
     tabWrapper.setAttribute('style', `
-        margin: 6px auto 0px auto !important; 
+        margin: 4px auto 0px auto !important; 
         width: 100% !important; 
         padding: 3px !important; 
         box-sizing: border-box; 
@@ -4496,18 +4496,20 @@ function renderHallModalStructure() {
     `;
 }
 
+
 /* ==========================================
    4. 명단 리스트 렌더링
    ========================================== */
 function renderHallList() {
+function renderHallList() {
     const listArea = document.getElementById('hallListArea');
     if (!listArea) return;
     
-    // 실황정보 높이(약 405px)에 맞춰 다른 탭들의 높이를 동일하게 고정하고 스크롤 적용
     const isLive = (window.currentHallTab === 'live');
     
+    // [핵심 수정] 리스트 영역의 상단 패딩/마진을 최대로 축소
     listArea.setAttribute('style', `
-        padding-top: 6px !important; 
+        padding-top: 2px !important; 
         margin-top: 0px !important; 
         height: ${isLive ? 'auto' : '405px'} !important;
         max-height: 405px !important; 
@@ -4515,7 +4517,7 @@ function renderHallList() {
         width: 100%; 
         box-sizing: border-box;
     `);
-
+    
     let combinedHtml = "";
     
     const now = new Date();
@@ -4587,19 +4589,19 @@ function renderHallList() {
             </div>`;
         };
 
-        // 타이머 UI
-        combinedHtml += `
-        <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 12px; margin-top: 0px !important; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
-            <span style="font-size: 10.5px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 5px;">
-                ✨️ ${currentQuarter}분기 전설의 시작까지
+        // 타이머 UI 부분의 margin-top을 0px !important 로 설정
+    combinedHtml += `
+    <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 12px; margin-top: 2px !important; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+        <span style="font-size: 10.5px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+            ✨️ ${currentQuarter}분기 전설의 시작까지
+        </span>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <span style="display: flex; position: relative; width: 5px; height: 5px;">
+                <span id="hallPulseBg" style="animation: hallPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; position: absolute; inline-size: 100%; block-size: 100%; border-radius: 50%; background-color: #10b981; opacity: 0.75;"></span>
+                <span id="hallPulseDot" style="position: relative; display: inline-flex; border-radius: 50%; width: 5px; height: 5px; background-color: #10b981;"></span>
             </span>
-            <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="display: flex; position: relative; width: 5px; height: 5px;">
-                    <span id="hallPulseBg" style="animation: hallPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; position: absolute; inline-size: 100%; block-size: 100%; border-radius: 50%; background-color: #10b981; opacity: 0.75;"></span>
-                    <span id="hallPulseDot" style="position: relative; display: inline-flex; border-radius: 50%; width: 5px; height: 5px; background-color: #10b981;"></span>
-                </span>
-                <span id="hallLiveCountdown" style="font-size: 10.5px; color: #0d9488; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;">계산 중...</span>
-            </div>
+            <span id="hallLiveCountdown" style="font-size: 10.5px; color: #0d9488; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;">계산 중...</span>
+        </div>
         </div>
         <style>@keyframes hallPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(1.4); } }</style>`;
 
