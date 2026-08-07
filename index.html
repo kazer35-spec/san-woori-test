@@ -4464,8 +4464,7 @@ window.toggleHallModal = async (show) => {
    3. 탭 UI 구조 및 모달 헤더 생성 (여백 버그 완벽 수정)
    ========================================== */
  
-    const currentTab = window.currentHallTab || 'live';
-function renderHallModalStructure() {
+    function renderHallModalStructure() {
     const modal = document.getElementById('hallModal');
     if (!modal) return;
 
@@ -4473,7 +4472,7 @@ function renderHallModalStructure() {
 
     if (modalContent) {
         modalContent.style.position = 'relative';
-        // [추가] 모달 좌우 안쪽 여백 대칭 및 정돈
+        // 모달 좌우 안쪽 여백 대칭 및 정돈
         modalContent.style.setProperty('padding-left', '16px', 'important');
         modalContent.style.setProperty('padding-right', '16px', 'important');
         modalContent.style.setProperty('box-sizing', 'border-box', 'important');
@@ -4507,34 +4506,41 @@ function renderHallModalStructure() {
             closeBtn.onclick = () => toggleHallModal(false);
             modalContent.appendChild(closeBtn);
         }
-
-        // [핵심] 부제목(HALL OF FAME...) 하단 마진 강제 제거 (간격 중복 방지)
-        const subtitleEl = modalContent.querySelector('p') || modalContent.querySelector('.modal-subtitle');
-        if (subtitleEl) {
-            subtitleEl.style.setProperty('margin-bottom', '0px', 'important');
-            subtitleEl.style.setProperty('padding-bottom', '0px', 'important');
-        }
     }
 
-    // 탭 컨테이너 위치 잡기 (listArea 바로 직전에 배치)
+    // [핵심 해결] 부제목 요소를 정확히 타겟팅
+    const allParagraphs = modal.querySelectorAll('p, div');
+    let subtitleEl = null;
+
+    // textContent에 'HALL OF FAME' 문구가 들어있는 태그를 정확히 찾음
+    allParagraphs.forEach(el => {
+        if (el.textContent && el.textContent.includes('HALL OF FAME')) {
+            subtitleEl = el;
+        }
+    });
+
     const listArea = document.getElementById('hallListArea');
     let tabWrapper = document.getElementById('hallTabWrapper');
     
     if (!tabWrapper) {
         tabWrapper = document.createElement('div');
         tabWrapper.id = 'hallTabWrapper';
-        
-        if (listArea && listArea.parentNode) {
-            listArea.parentNode.insertBefore(tabWrapper, listArea);
-        }
     }
 
-    // [핵심] 탭 바 자체 레이아웃 & 간격 설정
+    // [핵심] 부제목(HALL OF FAME)이 존재하면 바로 그 아래에 탭 바를 강제로 이동 배치
+    if (subtitleEl && subtitleEl.parentNode) {
+        subtitleEl.style.setProperty('margin-bottom', '0px', 'important');
+        subtitleEl.parentNode.insertBefore(tabWrapper, subtitleEl.nextSibling);
+    } else if (listArea && listArea.parentNode) {
+        listArea.parentNode.insertBefore(tabWrapper, listArea);
+    }
+
+    // 탭 바 레이아웃 및 간격 (margin-top으로 부제목과의 간격 확실히 적용)
     tabWrapper.className = 'hall-tab-container-95';
     tabWrapper.style.cssText = `
         width: 100% !important;
-        margin-top: 8px !important;    /* ← [간격 조절] 부제목과 탭 바 사이 간격! (더 벌리려면 18px 등으로 변경) */
-        margin-bottom: 12px !important; /* ← 탭 바와 아래 내용 사이 간격 */
+        margin-top: 8px !important;    /* ← [간격 조절] 부제목과 탭 바 사이 간격 (필요시 수치 조절) */
+        margin-bottom: 12px !important; /* ← 탭 바와 아래 내용(타이머/카드) 사이 간격 */
         padding: 3px !important;
         box-sizing: border-box !important;
         display: flex !important;
@@ -4545,7 +4551,7 @@ function renderHallModalStructure() {
 
     const currentTab = window.currentHallTab || 'live';
 
-    // 버튼 생성 함수 (4개 버튼 폭 균등 분배 & 글자 안 잘리게 설정)
+    // 버튼 생성 함수
     const getBtnStyle = (tabKey) => {
         const isActive = currentTab === tabKey;
         return `
