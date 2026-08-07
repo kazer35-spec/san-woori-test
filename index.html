@@ -4475,7 +4475,7 @@ window.toggleHallModal = async (show) => {
         modalContent.style.setProperty('padding-left', '16px', 'important');
         modalContent.style.setProperty('padding-right', '16px', 'important');
         modalContent.style.setProperty('box-sizing', 'border-box', 'important');
-        
+
         // 닫기 버튼 처리
         const bottomCloseBtns = modalContent.querySelectorAll('button, .modal-footer, .close-btn');
         bottomCloseBtns.forEach(btn => {
@@ -4499,51 +4499,53 @@ window.toggleHallModal = async (show) => {
         }
     }
 
-    // 1. 부제목(HALL OF FAME) 요소 찾기 및 여백 강제 초기화
-    let subtitleEl = null;
-    const targets = modal.querySelectorAll('p, div, span, h1, h2, h3, h4');
-    targets.forEach(el => {
-        if (el.children.length === 0 && el.textContent.includes('HALL OF FAME')) {
-            subtitleEl = el;
+    // 1. 모달 내 기존 부제목(HALL OF FAME...) 찾기 및 외부 여백 강제 해제
+    let subtitleNode = null;
+    const allElements = modal.querySelectorAll('*');
+    for (let i = 0; i < allElements.length; i++) {
+        const el = allElements[i];
+        if (el.children.length === 0 && el.textContent && el.textContent.includes('HALL OF FAME')) {
+            subtitleNode = el;
+            break;
         }
-    });
-
-    if (subtitleEl) {
-        // 기존 부제목의 상하 여백을 완전히 지워버림
-        subtitleEl.style.setProperty('margin-bottom', '0px', 'important');
-        subtitleEl.style.setProperty('padding-bottom', '0px', 'important');
     }
 
-    // 2. 부제목 ↔ 탭 바 사이를 밀어낼 강제 Spacer(빈 공간) 생성 또는 가져오기
-    let topSpacer = document.getElementById('hallTabTopSpacer');
-    if (!topSpacer) {
-        topSpacer = document.createElement('div');
-        topSpacer.id = 'hallTabTopSpacer';
+    if (subtitleNode) {
+        subtitleNode.style.setProperty('margin-bottom', '0px', 'important');
+        subtitleNode.style.setProperty('padding-bottom', '0px', 'important');
     }
-    // [간격 수치] 부제목과 탭 바 사이 간격 높이 (원하는 픽셀 수치로 조절하세요)
-    topSpacer.style.cssText = 'height: 2px !important; width: 100% !important; clear: both !important; display: block !important;';
 
-    // 3. 탭 바 생성 또는 가져오기
-    const listArea = document.getElementById('hallListArea');
+    // 2. 강제 간격용 Spacer 태그 생성 (상단 부제목 ↔ 탭 바 사이)
+    let gapSpacer = document.getElementById('hallTabGapSpacer');
+    if (!gapSpacer) {
+        gapSpacer = document.createElement('div');
+        gapSpacer.id = 'hallTabGapSpacer';
+    }
+    // [원하는 간격을 수치로 지정] 14px 만큼 물리적 높이를 벌려줍니다.
+    gapSpacer.setAttribute('style', 'height: 8px !important; min-height: 14px !important; width: 100% !important; display: block !important; clear: both !important; margin: 0 !important; padding: 0 !important;');
+
+    // 3. 탭 바 Wrapper 조립
     let tabWrapper = document.getElementById('hallTabWrapper');
     if (!tabWrapper) {
         tabWrapper = document.createElement('div');
         tabWrapper.id = 'hallTabWrapper';
     }
 
-    // 4. DOM 순서 강제 재배치 (부제목 -> Spacer -> 탭 바 -> 리스트 영역)
-    if (subtitleEl && subtitleEl.parentNode) {
-        const parent = subtitleEl.parentNode;
-        parent.insertBefore(topSpacer, subtitleEl.nextSibling);
-        parent.insertBefore(tabWrapper, topSpacer.nextSibling);
+    const listArea = document.getElementById('hallListArea');
+
+    // 4. 강제 순서 정렬 (부제목 -> Spacer -> 탭 바 -> 리스트 영역)
+    if (subtitleNode && subtitleNode.parentNode) {
+        const parent = subtitleNode.parentNode;
+        parent.insertBefore(gapSpacer, subtitleNode.nextSibling);
+        parent.insertBefore(tabWrapper, gapSpacer.nextSibling);
     } else if (listArea && listArea.parentNode) {
-        listArea.parentNode.insertBefore(topSpacer, listArea);
+        listArea.parentNode.insertBefore(gapSpacer, listArea);
         listArea.parentNode.insertBefore(tabWrapper, listArea);
     }
 
-    // 5. 탭 바 레이아웃 스타일 적용
+    // 탭 바 자체 레이아웃
     tabWrapper.className = 'hall-tab-container-95';
-    tabWrapper.style.cssText = `
+    tabWrapper.setAttribute('style', `
         width: 100% !important;
         margin-top: 0px !important;
         margin-bottom: 12px !important;
@@ -4553,11 +4555,11 @@ window.toggleHallModal = async (show) => {
         gap: 2px !important;
         background-color: #f1f5f9 !important;
         border-radius: 30px !important;
-    `;
+    `);
 
     const currentTab = window.currentHallTab || 'live';
 
-    // 버튼 생성 함수 (4개 버튼 폭 완전 동일 분배)
+    // 탭 버튼 생성 (4개 버튼 완전 대칭 및 폭 동일 지정)
     const getBtnStyle = (tabKey) => {
         const isActive = currentTab === tabKey;
         return `
@@ -4589,6 +4591,7 @@ window.toggleHallModal = async (show) => {
         <button type="button" class="hall-tab-btn" style="${getBtnStyle('host')}" onclick="window.switchHallTab('host')">🏅 벙의달인</button>
     `;
 }
+
 
 
 /* ==========================================
