@@ -4377,12 +4377,41 @@ window.toggleHallModal = async (show) => {
 };
 
 /* ==========================================
-   3. 탭 UI 구조 생성 (이미지 맞춤형 한 줄 정렬 버전)
+   3. 탭 UI 구조 및 모달 헤더 생성 (우측 상단 X 버튼 추가 버전)
    ========================================== */
 function renderHallModalStructure() {
     const modal = document.getElementById('hallModal');
+    if (!modal) return;
+
+    // 1) 우측 상단 닫기(X) 버튼 처리 (모달 컨텐츠 상단에 배치)
+    const modalContent = modal.querySelector('.modal-content') || modal.firstElementChild;
+    if (modalContent && !document.getElementById('hallModalCloseBtn')) {
+        modalContent.style.position = 'relative'; // X 버튼 위치 고정용
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.id = 'hallModalCloseBtn';
+        closeBtn.innerHTML = '✕';
+        closeBtn.setAttribute('style', `
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+            z-index: 10;
+            transition: color 0.2s;
+        `);
+        closeBtn.onclick = () => toggleHallModal(false);
+        modalContent.appendChild(closeBtn);
+    }
+
+    // 2) 탭 컨테이너 위치 및 생성
     let tabWrapper = document.getElementById('hallTabWrapper');
-    
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     
     if (!tabWrapper) {
@@ -4395,10 +4424,9 @@ function renderHallModalStructure() {
         }
     }
 
-    // 탭 컨테이너: 이미지처럼 슬림하고 둥근 배경 스타일링
-    tabWrapper.setAttribute('style', 'margin: 12px auto 16px auto !important; width: 100% !important; padding: 4px !important; box-sizing: border-box; display: flex; gap: 2px; background-color: #f1f5f9; border-radius: 30px;');
+    // 탭 컨테이너: 아래쪽 마진(margin-bottom)을 4px로 바짝 줄여 타이머와의 간격을 최소화
+    tabWrapper.setAttribute('style', 'margin: 10px auto 4px auto !important; width: 100% !important; padding: 4px !important; box-sizing: border-box; display: flex; gap: 2px; background-color: #f1f5f9; border-radius: 30px;');
 
-    // 버튼 스타일: 한 줄 배치(row), flex-shrink 방지, 글자 크기 최적화로 절대 안 깨지게 처리
     const btnStyle = `
         flex: 1; 
         min-width: 0;
@@ -4407,7 +4435,7 @@ function renderHallModalStructure() {
         align-items: center; 
         justify-content: center; 
         gap: 3px;
-        padding: 12px 0; 
+        padding: 10px 0; 
         font-size: 11.5px; 
         font-weight: 700; 
         line-height: 1; 
@@ -4434,34 +4462,22 @@ function renderHallModalStructure() {
     `;
 }
 
-window.switchHallTab = (tabType) => {
-    window.currentHallTab = tabType;
-    if (window.hallTimerInterval) {
-        clearInterval(window.hallTimerInterval);
-        window.hallTimerInterval = null;
-    }
-    renderHallModalStructure(); 
-    renderHallList();           
-};
-
-
-                        
-    /* ==========================================
-   4. 명단 리스트 렌더링 (타이머 최상단 복구 버전)
+/* ==========================================
+   4. 명단 리스트 렌더링
    ========================================== */
 function renderHallList() {
     const listArea = document.getElementById('hallListArea');
     if (!listArea) return;
     
-    // max-height를 조금 더 타이트하게 잡아주어 닫기 버튼이 화면 아래로 밀려 나가지 않도록 설정합니다.
-listArea.setAttribute('style', `
-    padding-top: 0px !important; 
-    margin-top: 0px !important; 
-    max-height: 380px !important; /* 기존 440px에서 줄여서 닫기 버튼 공간 확보 */
-    overflow-y: auto !important; 
-    width: 100%; 
-    box-sizing: border-box;
-`);
+    // 리스트 영역 상단 마진을 0으로 설정하여 탭과의 거리 밀착
+    listArea.setAttribute('style', `
+        padding-top: 0px !important; 
+        margin-top: 0px !important; 
+        max-height: 420px !important; 
+        overflow-y: auto !important; 
+        width: 100%; 
+        box-sizing: border-box;
+    `);
 
     let combinedHtml = "";
     
@@ -4475,9 +4491,7 @@ listArea.setAttribute('style', `
     let loopQuarter = currentQuarter;
     
     while (true) {
-        if (loopYear < 2025 || (loopYear === 2025 && loopQuarter < 4)) {
-            break;
-        }
+        if (loopYear < 2025 || (loopYear === 2025 && loopQuarter < 4)) break;
         const seasonNum = ((loopYear - 2025) * 4) + loopQuarter - 3;
         seasons.push({ year: loopYear, quarter: loopQuarter, seasonNum: seasonNum });
         
@@ -4499,19 +4513,16 @@ listArea.setAttribute('style', `
         let liveHost = [];
 
         if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-            // 1. 우정대장 
             liveWith = [...currentData]
                 .filter(m => !m.isHidden && m.name !== "오즈" && (m.qCount || 0) > 0)
                 .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || b.level - a.level)
                 .slice(0, 3);
 
-            // 2. 등산의신 
             liveMountain = [...currentData]
                 .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
                 .sort((a, b) => (b.quarterlyStats?.[qKey]?.hike || 0) - (a.quarterlyStats?.[qKey]?.hike || 0) || b.level - a.level)
                 .slice(0, 3);
 
-            // 3. 벙의달인 
             liveHost = [...currentData]
                 .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
                 .sort((a, b) => (b.quarterlyStats?.[qKey]?.hosted || 0) - (a.quarterlyStats?.[qKey]?.hosted || 0) || b.level - a.level)
@@ -4539,9 +4550,9 @@ listArea.setAttribute('style', `
             </div>`;
         };
 
-        // ★ 실시간 남은 시간 타이머 위치를 최상단(우정대장 위)으로 이동 및 여백 조정
+        // 타이머 카드 margin-top: 2px 로 최소화
         combinedHtml += `
-        <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 9px 12px; margin-top: 0px !important; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+        <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 12px; margin-top: 2px !important; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
             <span style="font-size: 10.5px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 5px;">
                 ✨️ ${currentQuarter}분기 전설의 시작까지
             </span>
@@ -4555,7 +4566,7 @@ listArea.setAttribute('style', `
         </div>
         <style>@keyframes hallPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(1.4); } }</style>`;
 
-        // 1-1. 실황 - 우정대장 카드 (타이머 아랫부분 margin-top 조정 반영)
+        // 1-1. 실황 - 우정대장
         if (liveWith.length > 0) {
             combinedHtml += `
             <div class="hall-card" style="margin-top: 0px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ffedd5; background: linear-gradient(180deg, #fffbee 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(251, 146, 60, 0.04);">
@@ -4574,7 +4585,7 @@ listArea.setAttribute('style', `
             </div>`;
         }
 
-        // 1-2. 실황 - 등산의신 카드
+        // 1-2. 실황 - 등산의신
         if (liveMountain.length > 0) {
             combinedHtml += `
             <div class="hall-card" style="margin-top: 10px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ccfbf1; background: linear-gradient(180deg, #f0fdfa 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(26, 188, 156, 0.04);">
@@ -4593,7 +4604,7 @@ listArea.setAttribute('style', `
             </div>`;
         }
 
-        // 1-3. 실황 - 벙의달인 카드
+        // 1-3. 실황 - 벙의달인
         if (liveHost.length > 0) {
             combinedHtml += `
             <div class="hall-card" style="margin-top: 10px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #e0f2fe; background: linear-gradient(180deg, #f0f9ff 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(0, 191, 255, 0.04);">
@@ -4647,16 +4658,12 @@ listArea.setAttribute('style', `
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 개별 시즌 아카이브 탭 클릭 시
+    // [CASE 2] 아카이브 탭
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
-        
-        if (window.currentHallTab === 'mountain') {
-            rankLabels = ["🥇산신령", "🥈심마니", "🥉나무꾼"];
-        } else if (window.currentHallTab === 'host') {
-            rankLabels = ["🥇개척자", "🥈선구자", "🥉파수꾼"];
-        }
+        if (window.currentHallTab === 'mountain') rankLabels = ["🥇산신령", "🥈심마니", "🥉나무꾼"];
+        else if (window.currentHallTab === 'host') rankLabels = ["🥇개척자", "🥈선구자", "🥉파수꾼"];
 
         for (const s of seasons) {
             let top3 = [];
@@ -4669,40 +4676,29 @@ listArea.setAttribute('style', `
                         top3 = [...currentData]
                             .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[loopQKey]?.hike) || 0) > 0)
                             .sort((a, b) => (b.quarterlyStats?.[loopQKey]?.hike || 0) - (a.quarterlyStats?.[loopQKey]?.hike || 0) || b.level - a.level)
-                            .slice(0, 3)
-                            .map(m => ({ name: m.name }));
+                            .slice(0, 3).map(m => ({ name: m.name }));
                     } else if (window.currentHallTab === 'host') {
                         top3 = [...currentData]
                             .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[loopQKey]?.hosted) || 0) > 0)
                             .sort((a, b) => (b.quarterlyStats?.[loopQKey]?.hosted || 0) - (a.quarterlyStats?.[loopQKey]?.hosted || 0) || b.level - a.level)
-                            .slice(0, 3)
-                            .map(m => ({ name: m.name }));
+                            .slice(0, 3).map(m => ({ name: m.name }));
                     } else {
                         top3 = [...currentData]
                             .filter(m => !m.isHidden && m.name !== "오즈" && (m.qCount || 0) > 0)
                             .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || b.level - a.level)
-                            .slice(0, 3)
-                            .map(m => ({ name: m.name }));
+                            .slice(0, 3).map(m => ({ name: m.name }));
                     }
                 }
             } 
             else if (s.year === 2026 && s.quarter === 2) {
-                if (window.currentHallTab === 'mountain') {
-                    top3 = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
-                } else if (window.currentHallTab === 'host') {
-                    top3 = [{ name: "아랑" }, { name: "해수" }, { name: "유스" }]; 
-                } else {
-                    top3 = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }]; 
-                }
+                if (window.currentHallTab === 'mountain') top3 = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
+                else if (window.currentHallTab === 'host') top3 = [{ name: "아랑" }, { name: "해수" }, { name: "유스" }]; 
+                else top3 = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }]; 
             }
             else if (s.year === 2026 && s.quarter === 1) {
-                if (window.currentHallTab === 'mountain') {
-                    top3 = [{ name: "지니" }, { name: "나스" }, { name: "해수" }];
-                } else if (window.currentHallTab === 'host') {
-                    top3 = [{ name: "지니" }, { name: "해수" }, { name: "용삼" }]; 
-                } else {
-                    top3 = [{ name: "지니" }, { name: "해수" }, { name: "하트" }];
-                }
+                if (window.currentHallTab === 'mountain') top3 = [{ name: "지니" }, { name: "나스" }, { name: "해수" }];
+                else if (window.currentHallTab === 'host') top3 = [{ name: "지니" }, { name: "해수" }, { name: "용삼" }]; 
+                else top3 = [{ name: "지니" }, { name: "해수" }, { name: "하트" }];
             }
             else if (s.year === 2025 && s.quarter === 4) {
                 top3 = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }];
@@ -4710,7 +4706,6 @@ listArea.setAttribute('style', `
 
             if (top3.length > 0) {
                 const cardMarginStyle = isCurrent ? 'margin-top: 0px !important;' : 'margin-top: 10px !important;';
-                
                 combinedHtml += `
                 <div class="hall-card ${isCurrent ? 'border-blue-100 bg-blue-50/30' : ''}" style="${cardMarginStyle} padding: 10px 10px !important; border-radius: 18px;">
                     <div class="hall-season-title" style="margin-bottom: 8px !important;">
@@ -4738,17 +4733,14 @@ listArea.setAttribute('style', `
         }
     }
 
-    combinedHtml += `
-    <p class="hall-rule-notice" style="font-size: 10.5px !important; color: #0d9488 !important; text-align: center; margin-top: 12px; margin-bottom: 6px; font-weight: 700;">
-        ※ 점수와 횟수가 동률일 경우 레벨이 높은 순서입니다.
-    </p>`;
-    
+    // 동률 안내 문구 및 하단 닫기 버튼을 삭제했습니다.
     listArea.innerHTML = combinedHtml;
 }
+
+                                        
                              
   
-                                     
-
+                        
             
     
 window.toggleVibeModal = (show) => { document.getElementById('vibeModal').style.display = show ? 'flex' : 'none'; };
