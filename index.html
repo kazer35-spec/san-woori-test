@@ -13,53 +13,50 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* ================= 은하수 등급별 모달 테두리 & 글로우 스타일 ================= */
-/* ================= 은하수 등급별 모달 테두리 그라데이션 스타일 ================= */
+/* ================= 은하수 최외곽 단일 테두리 그라데이션 스타일 ================= */
+
+/* 1. 최외곽 모달 컨테이너 기본 정의 (안쪽 자식 요소 테두리 간섭 제거) */
 #milkyWayModal .relative {
     position: relative;
     transition: all 0.4s ease;
-    border: 1.5px solid rgba(255, 255, 255, 0.15); /* 기본 테두리 */
+    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* 🔥 슈퍼별 보유자: 레드 ~ 골드 그라데이션 테두리 & 글로우 */
+/* 2. 안쪽 별자리 캔버스(#constellationBoard) 테두리 및 그림자 완전 제거 */
+#constellationBoard,
+#milkyWayModal #constellationBoard,
+#milkyWayModal .relative > div:nth-child(2) {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* 🔥 슈퍼별 보유자: 최외곽 테두리만 레드 ~ 골드 그라데이션 & 글로우 */
 #milkyWayModal.is-super .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #FF0000 0%, #FFD700 100%) !important;
     background-origin: border-box !important;
     background-clip: padding-box, border-box !important;
-    box-shadow: 0 0 25px rgba(255, 0, 0, 0.4), 0 0 45px rgba(255, 215, 0, 0.25) !important;
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.35), 0 0 45px rgba(255, 215, 0, 0.2) !important;
 }
 #milkyWayModal.is-super h3 {
     color: #ffaa00 !important;
     text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
 }
 
-/* ✨ 스페셜별 보유자: 퍼플 ~ 에메랄드 그라데이션 테두리 & 글로우 */
+/* ✨ 스페셜별 보유자: 최외곽 테두리만 퍼플 ~ 에메랄드 그라데이션 & 글로우 */
 #milkyWayModal.is-special .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #A020F0 0%, #00FF7F 100%) !important;
     background-origin: border-box !important;
     background-clip: padding-box, border-box !important;
-    box-shadow: 0 0 25px rgba(160, 32, 240, 0.4), 0 0 45px rgba(0, 255, 127, 0.25) !important;
+    box-shadow: 0 0 25px rgba(160, 32, 240, 0.35), 0 0 45px rgba(0, 255, 127, 0.2) !important;
 }
 #milkyWayModal.is-special h3 {
     color: #c084fc !important;
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
 }
 
-/* 🌟 스타 가이드: 획득자 강조 태그 스타일 */
-.latest-holder-tag {
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(168, 85, 247, 0.25)) !important;
-    border: 1px solid rgba(56, 189, 248, 0.6) !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-    animation: holderPulse 2s infinite alternate ease-in-out;
-}
-
-@keyframes holderPulse {
-    0% { transform: scale(1); box-shadow: 0 0 5px rgba(56, 189, 248, 0.3); }
-    100% { transform: scale(1.05); box-shadow: 0 0 10px rgba(168, 85, 247, 0.6); }
-}
 
     
     /* 첫 번째 컬럼(회원명)의 CLICK 텍스트 위치 미세 보정 */
