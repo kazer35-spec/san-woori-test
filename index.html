@@ -13,7 +13,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* ================= 은하수 모달 & 캔버스 구분선 스타일 ================= */
+/* ================= 은하수 모달 & 캔버스 초슬림 구분선 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
 #milkyWayModal .relative {
@@ -22,13 +22,20 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* 2. 안쪽 별자리 캔버스(#constellationBoard) 희미한 은은한 구분선 부여 */
-#constellationBoard {
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5) !important;
+/* 2. ✨ 안쪽 별자리 캔버스(#constellationBoard): 더욱 얇고 은은한 극초슬림 구분선 */
+#constellationBoard,
+#milkyWayModal #constellationBoard,
+#milkyWayModal.is-super #constellationBoard,
+#milkyWayModal.is-special #constellationBoard {
+    /* 얇고 실선에 가까운 아주 미세한 테두리 (투명도 0.04) */
+    border: 0.5px solid rgba(255, 255, 255, 0.04) !important;
+    background-image: none !important;
+    /* 안쪽 그림자도 과하지 않게 아주 살짝만 유지 */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3) !important;
+    outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 최외곽 테두리만 레드 ~ 골드 그라데이션 & 글로우 */
+/* 🔥 슈퍼별 보유자: 최외곽(외곽창)만 레드 ~ 골드 그라데이션 & 글로우 */
 #milkyWayModal.is-super .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #FF0000 0%, #FFD700 100%) !important;
@@ -41,7 +48,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
 }
 
-/* ✨ 스페셜별 보유자: 최외곽 테두리만 퍼플 ~ 에메랄드 그라데이션 & 글로우 */
+/* ✨ 스페셜별 보유자: 최외곽(외곽창)만 퍼플 ~ 에메랄드 그라데이션 & 글로우 */
 #milkyWayModal.is-special .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #A020F0 0%, #00FF7F 100%) !important;
@@ -53,7 +60,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #c084fc !important;
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
 }
-
 
     
     /* 첫 번째 컬럼(회원명)의 CLICK 텍스트 위치 미세 보정 */
