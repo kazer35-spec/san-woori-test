@@ -13,22 +13,19 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* ================= 은하수 최외곽 단일 테두리 그라데이션 스타일 ================= */
+/* ================= 은하수 모달 & 캔버스 구분선 스타일 ================= */
 
-/* 1. 최외곽 모달 컨테이너 기본 정의 (안쪽 자식 요소 테두리 간섭 제거) */
+/* 1. 최외곽 모달 컨테이너 기본 정의 */
 #milkyWayModal .relative {
     position: relative;
     transition: all 0.4s ease;
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* 2. 안쪽 별자리 캔버스(#constellationBoard) 테두리 및 그림자 완전 제거 */
-#constellationBoard,
-#milkyWayModal #constellationBoard,
-#milkyWayModal .relative > div:nth-child(2) {
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+/* 2. 안쪽 별자리 캔버스(#constellationBoard) 희미한 은은한 구분선 부여 */
+#constellationBoard {
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* 🔥 슈퍼별 보유자: 최외곽 테두리만 레드 ~ 골드 그라데이션 & 글로우 */
