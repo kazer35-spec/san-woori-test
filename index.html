@@ -4350,12 +4350,12 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
     }
 };
 
-            
-    // 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
-window.hallTimerInterval = null;
-window.currentHallTab = window.currentHallTab || 'live';
 
-// [핵심] switchHallTab 함수를 window 전역에 정확히 등록 (탭 클릭 안 됨 해결)
+// 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
+window.hallTimerInterval = null;
+window.currentHallTab = 'live';
+
+// switchHallTab 함수를 window 전역에 등록
 window.switchHallTab = function(tabName) {
     window.currentHallTab = tabName;
     renderHallModalStructure(); // 탭 버튼 활성화 상태 갱신
@@ -4369,9 +4369,8 @@ window.toggleHallModal = async (show) => {
     modal.style.display = show ? 'flex' : 'none';
     
     if (show) {
-        if (!window.currentHallTab) {
-            window.currentHallTab = 'live'; 
-        }
+        // [수정] 모달을 열 때마다 항상 '실황정보(live)' 탭으로 초기화
+        window.currentHallTab = 'live'; 
         renderHallModalStructure();
         renderHallList();
     } else {
@@ -4426,7 +4425,7 @@ function renderHallModalStructure() {
         }
     }
 
-    // [여백 축소 1] 서브타이틀 아래 마진을 2px로 축소
+    // 서브타이틀 아래 마진 축소
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     if (originalSubtitle) {
         originalSubtitle.style.setProperty('margin-bottom', '2px', 'important');
@@ -4445,7 +4444,7 @@ function renderHallModalStructure() {
         }
     }
 
-    // [여백 축소 2] 탭 컨테이너 자체 마진 축소 (상단 4px, 하단 2px) + z-index 20 부여
+    // 탭 컨테이너 자체 마진 축소 + z-index 20
     tabWrapper.setAttribute('style', `
         margin: 4px auto 2px auto !important; 
         width: 100% !important; 
@@ -4489,7 +4488,6 @@ function renderHallModalStructure() {
         `;
     };
 
-    // [클릭 문제 해결] onclick에 window.switchHallTab 지정
     tabWrapper.innerHTML = `
         <button type="button" class="hall-tab-btn" style="${getBtnStyle('live')}" onclick="window.switchHallTab('live')">⚡️ 실황정보</button>
         <button type="button" class="hall-tab-btn" style="${getBtnStyle('with')}" onclick="window.switchHallTab('with')">👑 우정대장</button>
@@ -4505,11 +4503,13 @@ function renderHallList() {
     const listArea = document.getElementById('hallListArea');
     if (!listArea) return;
     
-    // [여백 축소 3] 리스트 영역 상단 padding, margin 바짝 밀착
+    // [수정] 세로 높이를 430px로 고정 (height, min-height 추가)하여 모든 탭에서 높이가 일정하게 유지되도록 설정
     listArea.setAttribute('style', `
         padding-top: 0px !important; 
         margin-top: 2px !important; 
-        max-height: 480px !important; 
+        height: 430px !important;
+        min-height: 430px !important;
+        max-height: 430px !important; 
         overflow-y: auto !important; 
         width: 100%; 
         box-sizing: border-box;
@@ -4586,7 +4586,7 @@ function renderHallList() {
             </div>`;
         };
 
-        // [여백 축소 4] 타이머 상단 margin-top: 0px 밀착
+        // 타이머 UI
         combinedHtml += `
         <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 8px 12px; margin-top: 0px !important; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
             <span style="font-size: 10.5px; color: #475569; font-weight: 700; display: flex; align-items: center; gap: 5px;">
@@ -4771,7 +4771,7 @@ function renderHallList() {
 
     listArea.innerHTML = combinedHtml;
 }
-                   
+            
 
                  
                                 
