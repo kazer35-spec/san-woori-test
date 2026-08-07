@@ -4351,9 +4351,7 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
 
- 
-
-            // 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
+ // 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
 window.hallTimerInterval = null;
 window.currentHallTab = 'live';
 
@@ -4395,11 +4393,11 @@ function renderHallModalStructure() {
     if (modalContent) {
         modalContent.style.position = 'relative'; // X 버튼 기준점
         
-        // 하단 닫기 버튼 숨김
-        const bottomCloseBtns = modalContent.querySelectorAll('button');
+        // 하단 닫기 버튼 및 불필요한 여백 요소 강제 숨김
+        const bottomCloseBtns = modalContent.querySelectorAll('button, .modal-footer, .close-btn');
         bottomCloseBtns.forEach(btn => {
-            if (btn.innerText.trim() === '닫기' && btn.id !== 'hallModalCloseBtn') {
-                btn.style.display = 'none';
+            if (btn.innerText.includes('닫기') && btn.id !== 'hallModalCloseBtn') {
+                btn.style.setProperty('display', 'none', 'important');
             }
         });
 
@@ -4427,10 +4425,10 @@ function renderHallModalStructure() {
         }
     }
 
-    // 서브타이틀 아래 마진 축소
+    // 서브타이틀 아래 마진 및 패딩 완전 제거 (상단 여백 최소화)
     const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
     if (originalSubtitle) {
-        originalSubtitle.style.setProperty('margin-bottom', '2px', 'important');
+        originalSubtitle.style.setProperty('margin-bottom', '0px', 'important');
         originalSubtitle.style.setProperty('padding-bottom', '0px', 'important');
     }
 
@@ -4446,9 +4444,9 @@ function renderHallModalStructure() {
         }
     }
 
-    // 탭 컨테이너 자체 마진 축소 + z-index 20
+    // 탭 컨테이너 마진 조절 (여백 제거)
     tabWrapper.setAttribute('style', `
-        margin: 4px auto 2px auto !important; 
+        margin: 6px auto 0px auto !important; 
         width: 100% !important; 
         padding: 3px !important; 
         box-sizing: border-box; 
@@ -4462,7 +4460,7 @@ function renderHallModalStructure() {
 
     const currentTab = window.currentHallTab || 'live';
 
-    // 탭 버튼 스타일 동적 계산
+    // 탭 버튼 스타일
     const getBtnStyle = (tabKey) => {
         const isActive = currentTab === tabKey;
         return `
@@ -4505,11 +4503,14 @@ function renderHallList() {
     const listArea = document.getElementById('hallListArea');
     if (!listArea) return;
     
-    // [해결] 강제 고정 높이(430px)를 제거하고 실황정보 탭 본래 여백(오른쪽 원본)대로 최대 높이를 유연하게 맞춤
+    // 실황정보 높이(약 405px)에 맞춰 다른 탭들의 높이를 동일하게 고정하고 스크롤 적용
+    const isLive = (window.currentHallTab === 'live');
+    
     listArea.setAttribute('style', `
-        padding-top: 0px !important; 
-        margin-top: 2px !important; 
-        max-height: 70vh !important; 
+        padding-top: 6px !important; 
+        margin-top: 0px !important; 
+        height: ${isLive ? 'auto' : '405px'} !important;
+        max-height: 405px !important; 
         overflow-y: auto !important; 
         width: 100%; 
         box-sizing: border-box;
@@ -4772,6 +4773,10 @@ function renderHallList() {
     listArea.innerHTML = combinedHtml;
 }
 
+
+            
+        
+        
 
     
 window.toggleVibeModal = (show) => { document.getElementById('vibeModal').style.display = show ? 'flex' : 'none'; };
