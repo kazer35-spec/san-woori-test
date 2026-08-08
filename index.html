@@ -13,7 +13,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
@@ -34,11 +33,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 살아 움직이는 태양/골드-레드 네온 오라 애니메이션 */
+/* 🔥 슈퍼별 보유자: 테두리 선 없이 레드 ⇄ 골드 2색 조합이 은은하게 순환하는 광원 */
 #milkyWayModal.is-super .relative {
-    border: 1.5px solid rgba(255, 215, 0, 0.6) !important;
+    border: none !important;
     background-image: none !important;
-    animation: superPulse 3s infinite ease-in-out alternate;
+    animation: superGlowFade 4s infinite ease-in-out alternate;
 }
 #milkyWayModal.is-super h3 {
     color: #ffaa00 !important;
@@ -53,11 +52,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     letter-spacing: -0.2px;
 }
 
-/* ✨ 스페셜별 보유자: 살아 움직이는 오로라/퍼플-에메랄드 네온 오라 애니메이션 */
+/* ✨ 스페셜별 보유자: 테두리 선 없이 퍼플 ⇄ 에메랄드 2색 조합이 은은하게 순환하는 광원 */
 #milkyWayModal.is-special .relative {
-    border: 1.5px solid rgba(0, 255, 127, 0.6) !important;
+    border: none !important;
     background-image: none !important;
-    animation: specialPulse 3.5s infinite ease-in-out alternate;
+    animation: specialGlowFade 4.5s infinite ease-in-out alternate;
 }
 #milkyWayModal.is-special h3 {
     color: #c084fc !important;
@@ -81,51 +80,33 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     animation: holderPulse 2s infinite alternate ease-in-out;
 }
 
-/* ================= 🎬 레전드 네온 펄스 애니메이션 키프레임 ================= */
+/* ================= 🎬 레전드 2색 은은한 교차 순환 키프레임 ================= */
 
-/* 슈퍼별: 태양처럼 강렬하게 뿜어져 나오는 골드-레드 네온 파동 */
-@keyframes superPulse {
+/* 슈퍼별: 레드(1단계) ⇄ 골드(2단계) 중심의 부드러운 오라 변화 */
+@keyframes superGlowFade {
     0% {
-        border-color: rgba(255, 215, 0, 0.5);
-        box-shadow: 0 0 12px rgba(255, 0, 0, 0.4),
-                    0 0 25px rgba(255, 215, 0, 0.25),
-                    inset 0 0 10px rgba(255, 0, 0, 0.15);
-    }
-    50% {
-        border-color: rgba(255, 80, 0, 0.8);
-        box-shadow: 0 0 22px rgba(255, 0, 0, 0.75),
-                    0 0 45px rgba(255, 215, 0, 0.5),
-                    0 0 65px rgba(255, 60, 0, 0.3),
-                    inset 0 0 20px rgba(255, 170, 0, 0.2);
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.55),
+                    0 0 40px rgba(255, 0, 0, 0.25),
+                    inset 0 0 12px rgba(255, 0, 0, 0.15);
     }
     100% {
-        border-color: rgba(255, 215, 0, 0.9);
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.5),
-                    0 0 35px rgba(255, 215, 0, 0.4),
-                    inset 0 0 12px rgba(255, 0, 0, 0.2);
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.6),
+                    0 0 50px rgba(255, 215, 0, 0.3),
+                    inset 0 0 15px rgba(255, 215, 0, 0.18);
     }
 }
 
-/* 스페셜별: 신비로운 오로라처럼 퍼플과 에메랄드가 교차하는 에픽 네온 파동 */
-@keyframes specialPulse {
+/* 스페셜별: 퍼플(1단계) ⇄ 에메랄드(2단계) 중심의 부드러운 오라 변화 */
+@keyframes specialGlowFade {
     0% {
-        border-color: rgba(160, 32, 240, 0.5);
-        box-shadow: 0 0 12px rgba(160, 32, 240, 0.4),
-                    0 0 25px rgba(0, 255, 127, 0.25),
-                    inset 0 0 10px rgba(160, 32, 240, 0.15);
-    }
-    50% {
-        border-color: rgba(0, 255, 127, 0.8);
-        box-shadow: 0 0 22px rgba(0, 255, 127, 0.7),
-                    0 0 45px rgba(160, 32, 240, 0.55),
-                    0 0 65px rgba(0, 255, 127, 0.3),
-                    inset 0 0 20px rgba(168, 85, 247, 0.2);
+        box-shadow: 0 0 20px rgba(160, 32, 240, 0.55),
+                    0 0 40px rgba(160, 32, 240, 0.25),
+                    inset 0 0 12px rgba(160, 32, 240, 0.15);
     }
     100% {
-        border-color: rgba(192, 132, 252, 0.9);
-        box-shadow: 0 0 15px rgba(160, 32, 240, 0.5),
-                    0 0 35px rgba(0, 255, 127, 0.4),
-                    inset 0 0 12px rgba(160, 32, 240, 0.2);
+        box-shadow: 0 0 25px rgba(0, 255, 127, 0.6),
+                    0 0 50px rgba(0, 255, 127, 0.3),
+                    inset 0 0 15px rgba(0, 255, 127, 0.18);
     }
 }
 
@@ -140,7 +121,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     }
 }
 
- 
+
 
 
     
