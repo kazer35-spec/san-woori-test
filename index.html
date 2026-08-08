@@ -13,7 +13,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* ================= 은하수 모달 & 캔버스 기본 구분선 스타일 ================= */
+/* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
 #milkyWayModal .relative {
@@ -22,7 +22,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* 2. 안쪽 별자리 캔버스(#constellationBoard): 은은한 1px 희미한 테두리 */
+/* 2. 안쪽 별자리 캔버스(#constellationBoard): 희미한 1px 구분선 유지 */
 #constellationBoard,
 #milkyWayModal #constellationBoard,
 #milkyWayModal.is-super #constellationBoard,
@@ -33,7 +33,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 최외곽 테두리, 제목(h3), 하단 설명 문구(p) */
+/* 🔥 슈퍼별 보유자: 최외곽(외곽창)만 레드 ~ 골드 그라데이션 & 글로우 */
 #milkyWayModal.is-super .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #FF0000 0%, #FFD700 100%) !important;
@@ -45,14 +45,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #ffaa00 !important;
     text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
 }
-#milkyWayModal.is-super p,
-#milkyWayModal.is-super .relative p {
-    color: #fcd34d !important;
-    text-shadow: 0 0 8px rgba(245, 158, 11, 0.5) !important;
-    opacity: 0.95 !important;
-}
 
-/* ✨ 스페셜별 보유자: 최외곽 테두리, 제목(h3), 하단 설명 문구(p) */
+/* ✨ 스페셜별 보유자: 최외곽(외곽창)만 퍼플 ~ 에메랄드 그라데이션 & 글로우 */
 #milkyWayModal.is-special .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #A020F0 0%, #00FF7F 100%) !important;
@@ -64,13 +58,26 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #c084fc !important;
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
 }
-#milkyWayModal.is-special p,
-#milkyWayModal.is-special .relative p {
-    color: #d8b4fe !important;
-    text-shadow: 0 0 8px rgba(168, 85, 247, 0.5) !important;
-    opacity: 0.95 !important;
+
+/* 🌟 스타 가이드: 획득자 입체 강조 태그 및 펄스 애니메이션 복원 */
+.latest-holder-tag {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.3)) !important;
+    border: 1px solid rgba(56, 189, 248, 0.6) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    animation: holderPulse 2s infinite alternate ease-in-out;
 }
 
+@keyframes holderPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 4px rgba(56, 189, 248, 0.3);
+    }
+    100% {
+        transform: scale(1.04);
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+    }
+}
 
 
     
@@ -8480,6 +8487,7 @@ window.showAllHolders = (starName, holdersJson) => {
 };
 
 // 8. 가이드 항목 랜더링 함수 (1번 최신 획득자 태그 강화 반영)
+// 가이드 항목 랜더링 함수 (문구 및 배지 아이콘 변경 반영)
 async function renderStarGuideItems() {
     const grid = document.getElementById('guideGrid');
     if (!grid) return;
@@ -8494,7 +8502,7 @@ async function renderStarGuideItems() {
         { 
             id: "super", 
             name: "슈퍼별", 
-            badge: "🔥",
+            badge: "🔥", // 배지 변경
             prob: "3%", 
             desc: "타오르는 태양의 전설", 
             style: "background: radial-gradient(circle, #FF0000 10%, #FFFF00 70%, #fff 100%); box-shadow: 0 0 12px 3px #FF0000, 0 0 20px 6px rgba(255, 255, 0, 0.6);", 
@@ -8506,7 +8514,7 @@ async function renderStarGuideItems() {
         { 
             id: "special", 
             name: "스페셜별", 
-            badge: "✨",
+            badge: "✨", // 배지 변경
             prob: "7%", 
             desc: "신비로운 에픽 오로라", 
             style: "background: radial-gradient(circle, #A020F0 10%, #00FF7F 70%, #fff 100%); box-shadow: 0 0 12px 3px #A020F0, 0 0 20px 6px rgba(0, 255, 127, 0.6);", 
@@ -8543,6 +8551,7 @@ async function renderStarGuideItems() {
 
             if (list.length > 0) {
                 const latest = list[0]; 
+                // 획득자 태그 내 배지 아이콘 적용 (s.badge)
                 holdersHTML = `
                     <span class="latest-holder-tag" style="font-size: 8px; font-weight: 800; padding: 2px 7px; border-radius: 6px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;">
                         <span style="color: #38bdf8; font-weight: 900; font-size: 7.5px;">[${latest.quarter}]</span> ${latest.name} ${s.badge}
@@ -8562,6 +8571,7 @@ async function renderStarGuideItems() {
                 holdersHTML = `<span style="color: #64748b; font-size: 8px; font-style: italic;">아직 획득자 없음</span>`;
             }
 
+            // '최근 획득' ➔ '획득자'로 변경
             legendHoldersSection = `
                 <div style="display: flex; justify-content: center; align-items: center; gap: 5px; padding-top: 5px; margin-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.08); width: 100%;">
                     <span style="color: #94a3b8; font-size: 8px; font-weight: 700;">획득자:</span>
@@ -8596,6 +8606,7 @@ async function renderStarGuideItems() {
 
     grid.innerHTML = cardsHTML;
 }
+
 
 
 // 9. 슈팅스타(유성) 애니메이션 생성 함수
