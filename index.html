@@ -59,63 +59,57 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
 }
 
-/* ================= 🌟 스타 가이드: 별빛별 은은한 획득자 태그 스타일 ================= */
+/* ================= 🌟 스타 가이드: 은은한 획득자 태그 스타일 ================= */
 
+/* 공통 태그 기본 정의 */
+#milkyWayModal .latest-holder-tag,
 .latest-holder-tag {
     color: #ffffff !important;
     backdrop-filter: blur(4px);
     transition: all 0.3s ease;
 }
 
-/* 🔥 슈퍼별 획득자: 레드 ~ 골드 은은한 비주얼 */
+/* 🔥 슈퍼별 획득자: 레드 ~ 골드 은은한 비주얼 & 글로우 */
+#milkyWayModal .latest-holder-tag.tag-super,
 .latest-holder-tag.tag-super {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15)) !important;
-    border: 1px solid rgba(239, 68, 68, 0.35) !important;
-    box-shadow: 0 0 6px rgba(239, 68, 68, 0.2);
-    animation: superTagPulse 2.5s infinite alternate ease-in-out;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2)) !important;
+    border: 1px solid rgba(245, 158, 11, 0.45) !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.25) !important;
+    animation: superTagPulse 2.5s infinite alternate ease-in-out !important;
 }
 
-/* ✨ 스페셜별 획득자: 퍼플 ~ 에메랄드 은은한 비주얼 */
+/* ✨ 스페셜별 획득자: 퍼플 ~ 에메랄드 은은한 비주얼 & 글로우 */
+#milkyWayModal .latest-holder-tag.tag-special,
 .latest-holder-tag.tag-special {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(16, 185, 129, 0.15)) !important;
-    border: 1px solid rgba(168, 85, 247, 0.35) !important;
-    box-shadow: 0 0 6px rgba(168, 85, 247, 0.2);
-    animation: specialTagPulse 2.5s infinite alternate ease-in-out;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(16, 185, 129, 0.2)) !important;
+    border: 1px solid rgba(168, 85, 247, 0.45) !important;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.25) !important;
+    animation: specialTagPulse 2.5s infinite alternate ease-in-out !important;
 }
+
+/* ================= 🎬 키프레임 애니메이션 ================= */
 
 /* 🔥 슈퍼별 은은한 펄스 */
 @keyframes superTagPulse {
     0% {
-        box-shadow: 0 0 4px rgba(239, 68, 68, 0.15);
-        border-color: rgba(239, 68, 68, 0.3);
+        box-shadow: 0 0 4px rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.4);
     }
     100% {
-        box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
-        border-color: rgba(245, 158, 11, 0.5);
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+        border-color: rgba(245, 158, 11, 0.7);
     }
 }
 
 /* ✨ 스페셜별 은은한 펄스 */
 @keyframes specialTagPulse {
     0% {
-        box-shadow: 0 0 4px rgba(168, 85, 247, 0.15);
-        border-color: rgba(168, 85, 247, 0.3);
+        box-shadow: 0 0 4px rgba(168, 85, 247, 0.2);
+        border-color: rgba(168, 85, 247, 0.4);
     }
     100% {
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
-        border-color: rgba(16, 185, 129, 0.5);
-    }
-}
-
-
-@keyframes holderPulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 4px rgba(56, 189, 248, 0.3);
-    }
-    100% {
-        transform: scale(1.04);
-        box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+        border-color: rgba(16, 185, 129, 0.7);
     }
 }
 
