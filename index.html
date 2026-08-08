@@ -33,7 +33,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 테두리 없이 3단계(빨강) ⇄ 2단계(노랑) 은은한 교차 오라 */
+/* 🔥 슈퍼별 보유자: 테두리 없이 2단계(노랑 은은) ⇄ 3단계(레드 강렬) 순환 광원 */
 #milkyWayModal.is-super .relative {
     border: none !important;
     background-image: none !important;
@@ -52,7 +52,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     letter-spacing: -0.2px;
 }
 
-/* ✨ 스페셜별 보유자: 테두리 없이 3단계(보라/파랑) ⇄ 2단계(녹색) 은은한 교차 오라 */
+/* ✨ 스페셜별 보유자: 테두리 없이 2단계(녹색 은은) ⇄ 3단계(보라/파랑 강렬) 순환 광원 */
 #milkyWayModal.is-special .relative {
     border: none !important;
     background-image: none !important;
@@ -80,33 +80,35 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     animation: holderPulse 2s infinite alternate ease-in-out;
 }
 
-/* ================= 🎬 3단계 ⇄ 2단계 순환 키프레임 ================= */
+/* ================= 🎬 2단계(은은) ⇄ 3단계(강렬) 광원 키프레임 ================= */
 
-/* 슈퍼별: 3단계 빨강 계열 (0%) → 2단계 노랑 계열 (100%) */
+/* 슈퍼별: 2단계 노랑(은은) → 3단계 레드(3중 폭발적 광원) */
 @keyframes superGlowFade {
     0% {
-        box-shadow: 0 0 22px rgba(255, 30, 39, 0.6),
-                    0 0 45px rgba(255, 30, 39, 0.28),
-                    inset 0 0 12px rgba(255, 30, 39, 0.15);
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.45),
+                    0 0 35px rgba(255, 215, 0, 0.2),
+                    inset 0 0 10px rgba(255, 215, 0, 0.12);
     }
     100% {
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.6),
-                    0 0 50px rgba(255, 215, 0, 0.3),
-                    inset 0 0 15px rgba(255, 215, 0, 0.18);
+        box-shadow: 0 0 25px rgba(255, 30, 39, 0.8),
+                    0 0 50px rgba(255, 30, 39, 0.5),
+                    0 0 70px rgba(255, 80, 0, 0.3),
+                    inset 0 0 18px rgba(255, 30, 39, 0.25);
     }
 }
 
-/* 스페셜별: 3단계 보라/파랑 계열 (0%) → 2단계 녹색 계열 (100%) */
+/* 스페셜별: 2단계 녹색(은은) → 3단계 보라/파랑(3중 에픽 다중 광원) */
 @keyframes specialGlowFade {
     0% {
-        box-shadow: 0 0 22px rgba(139, 92, 246, 0.6),
-                    0 0 45px rgba(59, 130, 246, 0.3),
-                    inset 0 0 12px rgba(139, 92, 246, 0.15);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.45),
+                    0 0 35px rgba(16, 185, 129, 0.2),
+                    inset 0 0 10px rgba(16, 185, 129, 0.12);
     }
     100% {
-        box-shadow: 0 0 25px rgba(16, 185, 129, 0.6),
-                    0 0 50px rgba(16, 185, 129, 0.3),
-                    inset 0 0 15px rgba(16, 185, 129, 0.18);
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.8),
+                    0 0 50px rgba(59, 130, 246, 0.55),
+                    0 0 75px rgba(168, 85, 247, 0.35),
+                    inset 0 0 18px rgba(139, 92, 246, 0.25);
     }
 }
 
