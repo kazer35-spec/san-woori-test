@@ -13,7 +13,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* ================= 은하수 모달 & 캔버스 구분선 스타일 ================= */
+/* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
 #milkyWayModal .relative {
@@ -22,7 +22,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* 2. 안쪽 별자리 캔버스(#constellationBoard): 희미한 1px 구분선 복구 */
+/* 2. 안쪽 별자리 캔버스(#constellationBoard): 희미한 1px 구분선 유지 */
 #constellationBoard,
 #milkyWayModal #constellationBoard,
 #milkyWayModal.is-super #constellationBoard,
@@ -58,6 +58,27 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #c084fc !important;
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
 }
+
+/* 🌟 스타 가이드: 획득자 입체 강조 태그 및 펄스 애니메이션 복원 */
+.latest-holder-tag {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.3)) !important;
+    border: 1px solid rgba(56, 189, 248, 0.6) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    animation: holderPulse 2s infinite alternate ease-in-out;
+}
+
+@keyframes holderPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 4px rgba(56, 189, 248, 0.3);
+    }
+    100% {
+        transform: scale(1.04);
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+    }
+}
+
 
     
     /* 첫 번째 컬럼(회원명)의 CLICK 텍스트 위치 미세 보정 */
