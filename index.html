@@ -13,7 +13,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* ================= 은하수 모달 & 캔버스 초슬림 구분선 스타일 ================= */
+/* ================= 은하수 모달 & 캔버스 구분선 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
 #milkyWayModal .relative {
@@ -22,16 +22,14 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
 }
 
-/* 2. ✨ 안쪽 별자리 캔버스(#constellationBoard): 더욱 얇고 은은한 극초슬림 구분선 */
+/* 2. 안쪽 별자리 캔버스(#constellationBoard): 희미한 1px 구분선 복구 */
 #constellationBoard,
 #milkyWayModal #constellationBoard,
 #milkyWayModal.is-super #constellationBoard,
 #milkyWayModal.is-special #constellationBoard {
-    /* 얇고 실선에 가까운 아주 미세한 테두리 (투명도 0.04) */
-    border: 0.5px solid rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     background-image: none !important;
-    /* 안쪽 그림자도 과하지 않게 아주 살짝만 유지 */
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5) !important;
     outline: none !important;
 }
 
@@ -5648,16 +5646,18 @@ window.openGrowthInfoModal = function(event) {
 window.openMilkyWayInfoModal = function(event) {
     const title = `🌌 은하수 비주얼 안내`;
     const body = `
-        <ul>
+        <ul style="padding-left: 18px; margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.6;">
             <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
             <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
-            <li><strong>특별한 별빛:</strong> 정기산행(확률형 등급 별 생성) 및 명산(100대 명산) 산행 기록은 고유한 빛깔과 반짝임 효과를 가집니다.</li>
+            <li><strong>전설의 별빛:</strong> 정기산행 시 탐험 결과에 따라 타오르는 태양 <strong>슈퍼별(🔥)</strong>과 신비로운 <strong>스페셜별(✨)</strong>을 획득할 수 있습니다.</li>
+            <li><strong>전설의 프레임 오라:</strong> <strong>슈퍼별</strong> 또는 <strong>스페셜별</strong> 보유 시 모달 최외곽 테두리에 <strong>고유한 그라데이션 빛 효과</strong>가 켜집니다.</li>
             <li><strong>별똥별:</strong> 가장 최근 기록된 좌표를 향해 밤하늘의 별똥별이 떨어진 후 여운을 남깁니다.</li>
-            <li><strong>별 가이드 버튼:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼을 통해 각 별빛의 상세 정보를 확인하실 수 있습니다.</li>
+            <li><strong>별 가이드 & 획득자:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼에서 별빛 종류별 설명 및 분기별 <strong>슈퍼/스페셜별 획득자 명단</strong>을 확인하실 수 있습니다.</li>
         </ul>
     `;
     window.renderAndShowMwModal(title, body, event);
 };
+
 
 // 🌀 4. 나이테 / 🏔️ 산맥 안내 모달
 window.openMountainInfoModal = function(type, event) {
