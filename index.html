@@ -13,6 +13,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+
+
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
@@ -33,7 +35,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 최외곽(외곽창)만 레드 ~ 골드 그라데이션 & 글로우 */
+/* 🔥 슈퍼별 보유자: 최외곽(외곽창) 골드~레드 그라데이션 & 은은한 문구 글로우 */
 #milkyWayModal.is-super .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #FF0000 0%, #FFD700 100%) !important;
@@ -45,8 +47,16 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #ffaa00 !important;
     text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
 }
+#milkyWayModal.is-super p.mt-6 {
+    background: linear-gradient(135deg, #FFE259 0%, #FFAE00 50%, #FF5E62 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(255, 174, 0, 0.4), 0 0 20px rgba(255, 94, 98, 0.2);
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
 
-/* ✨ 스페셜별 보유자: 최외곽(외곽창)만 퍼플 ~ 에메랄드 그라데이션 & 글로우 */
+/* ✨ 스페셜별 보유자: 최외곽(외곽창) 퍼플~에메랄드 그라데이션 & 은은한 문구 글로우 */
 #milkyWayModal.is-special .relative {
     border: 2px solid transparent !important;
     background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #A020F0 0%, #00FF7F 100%) !important;
@@ -58,8 +68,16 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #c084fc !important;
     text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
 }
+#milkyWayModal.is-special p.mt-6 {
+    background: linear-gradient(135deg, #E9D5FF 0%, #C084FC 50%, #34D399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.4), 0 0 20px rgba(52, 211, 153, 0.2);
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
 
-/* 🌟 스타 가이드: 획득자 입체 강조 태그 및 펄스 애니메이션 복원 */
+/* 🌟 스타 가이드: 획득자 입체 강조 태그 및 펄스 애니메이션 */
 .latest-holder-tag {
     background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.3)) !important;
     border: 1px solid rgba(56, 189, 248, 0.6) !important;
@@ -8207,7 +8225,7 @@ window.showMilkyWay = async (mId, mName) => {
 
     if (!modal || !board) return;
 
-    // --- [ 1·2·3번 연출 초기화 및 최신 획득자 권한 검증 ] ---
+        // --- [ 1·2·3번 연출 초기화 및 최신 획득자 권한 검증 ] ---
     modal.classList.remove('is-super', 'is-special');
 
     const latestSuperHolderId = getLatestLegendHolderId('super');
@@ -8218,11 +8236,11 @@ window.showMilkyWay = async (mId, mName) => {
 
     // 3번 효과: 등급별 감성 문구 및 모달 테두리 클래스 동적 부여
     if (isCurrentSuperKing) {
-        modal.classList.add('is-super'); // 1번 효과
-        if (quoteLabel) quoteLabel.innerHTML = "타오르는 태양의 궤적이 밤하늘에서 가장 찬란한 전설이 됩니다."; // 3번 효과
+        modal.classList.add('is-super'); // 슈퍼별 전용 오라 & 문구 스타일
+        if (quoteLabel) quoteLabel.innerHTML = "타오르는 태양의 궤적이 밤하늘에서 가장 찬란한 전설이 됩니다.";
     } else if (isCurrentSpecialKing) {
-        modal.classList.add('is-special'); // 2번 효과 (배지 제외)
-        if (quoteLabel) quoteLabel.innerHTML = "신비로운 오로라의 빛이 은하수 깊은 곳을 에픽하게 수놓습니다."; // 3번 효과
+        modal.classList.add('is-special'); // 스페셜별 전용 오라 & 문구 스타일
+        if (quoteLabel) quoteLabel.innerHTML = "신비로운 오로라의 빛이 은하수 깊은 곳을 에픽하게 수놓습니다.";
     } else {
         if (quoteLabel) quoteLabel.innerHTML = "걸어온 궤적은 선이 되고, 마침내 밤하늘의 길이 됩니다."; // 일반 문구
     }
