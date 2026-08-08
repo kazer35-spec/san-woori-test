@@ -14,7 +14,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 
-
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
@@ -35,45 +34,41 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 최외곽(외곽창) 골드~레드 그라데이션 & 은은한 문구 글로우 */
+/* 🔥 슈퍼별 보유자: 살아 움직이는 태양/골드-레드 네온 오라 애니메이션 */
 #milkyWayModal.is-super .relative {
-    border: 2px solid transparent !important;
-    background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #FF0000 0%, #FFD700 100%) !important;
-    background-origin: border-box !important;
-    background-clip: padding-box, border-box !important;
-    box-shadow: 0 0 25px rgba(255, 0, 0, 0.35), 0 0 45px rgba(255, 215, 0, 0.2) !important;
+    border: 1.5px solid rgba(255, 215, 0, 0.6) !important;
+    background-image: none !important;
+    animation: superPulse 3s infinite ease-in-out alternate;
 }
 #milkyWayModal.is-super h3 {
     color: #ffaa00 !important;
-    text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.5);
 }
 #milkyWayModal.is-super p.mt-6 {
     background: linear-gradient(135deg, #FFE259 0%, #FFAE00 50%, #FF5E62 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 10px rgba(255, 174, 0, 0.4), 0 0 20px rgba(255, 94, 98, 0.2);
-    font-weight: 600;
+    text-shadow: 0 0 12px rgba(255, 174, 0, 0.5), 0 0 24px rgba(255, 94, 98, 0.3);
+    font-weight: 700;
     letter-spacing: -0.2px;
 }
 
-/* ✨ 스페셜별 보유자: 최외곽(외곽창) 퍼플~에메랄드 그라데이션 & 은은한 문구 글로우 */
+/* ✨ 스페셜별 보유자: 살아 움직이는 오로라/퍼플-에메랄드 네온 오라 애니메이션 */
 #milkyWayModal.is-special .relative {
-    border: 2px solid transparent !important;
-    background-image: linear-gradient(#090d16, #090d16), linear-gradient(135deg, #A020F0 0%, #00FF7F 100%) !important;
-    background-origin: border-box !important;
-    background-clip: padding-box, border-box !important;
-    box-shadow: 0 0 25px rgba(160, 32, 240, 0.35), 0 0 45px rgba(0, 255, 127, 0.2) !important;
+    border: 1.5px solid rgba(0, 255, 127, 0.6) !important;
+    background-image: none !important;
+    animation: specialPulse 3.5s infinite ease-in-out alternate;
 }
 #milkyWayModal.is-special h3 {
     color: #c084fc !important;
-    text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.8), 0 0 20px rgba(0, 255, 127, 0.5);
 }
 #milkyWayModal.is-special p.mt-6 {
     background: linear-gradient(135deg, #E9D5FF 0%, #C084FC 50%, #34D399 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 10px rgba(192, 132, 252, 0.4), 0 0 20px rgba(52, 211, 153, 0.2);
-    font-weight: 600;
+    text-shadow: 0 0 12px rgba(192, 132, 252, 0.5), 0 0 24px rgba(52, 211, 153, 0.3);
+    font-weight: 700;
     letter-spacing: -0.2px;
 }
 
@@ -86,6 +81,54 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     animation: holderPulse 2s infinite alternate ease-in-out;
 }
 
+/* ================= 🎬 레전드 네온 펄스 애니메이션 키프레임 ================= */
+
+/* 슈퍼별: 태양처럼 강렬하게 뿜어져 나오는 골드-레드 네온 파동 */
+@keyframes superPulse {
+    0% {
+        border-color: rgba(255, 215, 0, 0.5);
+        box-shadow: 0 0 12px rgba(255, 0, 0, 0.4),
+                    0 0 25px rgba(255, 215, 0, 0.25),
+                    inset 0 0 10px rgba(255, 0, 0, 0.15);
+    }
+    50% {
+        border-color: rgba(255, 80, 0, 0.8);
+        box-shadow: 0 0 22px rgba(255, 0, 0, 0.75),
+                    0 0 45px rgba(255, 215, 0, 0.5),
+                    0 0 65px rgba(255, 60, 0, 0.3),
+                    inset 0 0 20px rgba(255, 170, 0, 0.2);
+    }
+    100% {
+        border-color: rgba(255, 215, 0, 0.9);
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.5),
+                    0 0 35px rgba(255, 215, 0, 0.4),
+                    inset 0 0 12px rgba(255, 0, 0, 0.2);
+    }
+}
+
+/* 스페셜별: 신비로운 오로라처럼 퍼플과 에메랄드가 교차하는 에픽 네온 파동 */
+@keyframes specialPulse {
+    0% {
+        border-color: rgba(160, 32, 240, 0.5);
+        box-shadow: 0 0 12px rgba(160, 32, 240, 0.4),
+                    0 0 25px rgba(0, 255, 127, 0.25),
+                    inset 0 0 10px rgba(160, 32, 240, 0.15);
+    }
+    50% {
+        border-color: rgba(0, 255, 127, 0.8);
+        box-shadow: 0 0 22px rgba(0, 255, 127, 0.7),
+                    0 0 45px rgba(160, 32, 240, 0.55),
+                    0 0 65px rgba(0, 255, 127, 0.3),
+                    inset 0 0 20px rgba(168, 85, 247, 0.2);
+    }
+    100% {
+        border-color: rgba(192, 132, 252, 0.9);
+        box-shadow: 0 0 15px rgba(160, 32, 240, 0.5),
+                    0 0 35px rgba(0, 255, 127, 0.4),
+                    inset 0 0 12px rgba(160, 32, 240, 0.2);
+    }
+}
+
 @keyframes holderPulse {
     0% {
         transform: scale(1);
@@ -96,6 +139,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
         box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
     }
 }
+
+ 
 
 
     
