@@ -14,6 +14,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
         
+
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
@@ -34,11 +35,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 0% 노랑 ⇄ 100% 빨강(강력 광량) */
+/* 🔥 슈퍼별 보유자: 노랑 ➔ 주황 ➔ 빨강 (은은하고 길게 유지) */
 #milkyWayModal.is-super .relative {
     border: none !important;
     background-image: none !important;
-    animation: superGlowFade 4s infinite ease-in-out alternate;
+    animation: superGlowFade 6s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 #milkyWayModal.is-super h3 {
     color: #ffaa00 !important;
@@ -53,11 +54,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     letter-spacing: -0.2px;
 }
 
-/* ✨ 스페셜별 보유자: 0% 녹색 ⇄ 100% 보라/파랑(강력 광량) */
+/* ✨ 스페셜별 보유자: 녹색 ➔ 파랑 ➔ 보라 (은은하고 길게 유지) */
 #milkyWayModal.is-special .relative {
     border: none !important;
     background-image: none !important;
-    animation: specialGlowFade 4.5s infinite ease-in-out alternate;
+    animation: specialGlowFade 7s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 #milkyWayModal.is-special h3 {
     color: #c084fc !important;
@@ -81,35 +82,47 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     animation: holderPulse 2s infinite alternate ease-in-out;
 }
 
-/* ================= 🎬 지정 지정 순서(0% ⇄ 100%) 키프레임 ================= */
+/* ================= 🎬 노랑/주황/빨강 & 녹색/파랑/보라 지속 키프레임 ================= */
 
-/* 슈퍼별: 0% 노랑(차분) → 100% 빨강(최대 광량/100px 확산) */
+/* 슈퍼별: 노랑 (0%) ➔ 주황 (40%) ➔ 빨강 (70%~100% 깊고 넓은 유지) */
 @keyframes superGlowFade {
     0% {
-        box-shadow: 0 0 12px rgba(255, 215, 0, 0.5),
-                    0 0 25px rgba(255, 215, 0, 0.25),
+        box-shadow: 0 0 12px rgba(255, 215, 0, 0.45),
+                    0 0 25px rgba(255, 215, 0, 0.2),
                     inset 0 0 8px rgba(255, 215, 0, 0.1);
     }
-    100% {
-        box-shadow: 0 0 25px rgba(255, 30, 39, 0.9),
-                    0 0 55px rgba(255, 30, 39, 0.6),
-                    0 0 100px rgba(255, 80, 0, 0.35),
-                    inset 0 0 22px rgba(255, 30, 39, 0.3);
+    40% {
+        box-shadow: 0 0 20px rgba(255, 120, 0, 0.65),
+                    0 0 45px rgba(255, 120, 0, 0.35),
+                    0 0 70px rgba(255, 80, 0, 0.2),
+                    inset 0 0 15px rgba(255, 120, 0, 0.18);
+    }
+    70%, 100% {
+        box-shadow: 0 0 28px rgba(255, 30, 39, 0.9),
+                    0 0 60px rgba(255, 30, 39, 0.65),
+                    0 0 110px rgba(255, 50, 0, 0.4),
+                    inset 0 0 25px rgba(255, 30, 39, 0.3);
     }
 }
 
-/* 스페셜별: 0% 녹색(차분) → 100% 보라/파랑(최대 광량/100px 확산) */
+/* 스페셜별: 녹색 (0%) ➔ 파랑 (40%) ➔ 보라 (70%~100% 깊고 넓은 유지) */
 @keyframes specialGlowFade {
     0% {
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.5),
-                    0 0 25px rgba(16, 185, 129, 0.25),
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.45),
+                    0 0 25px rgba(16, 185, 129, 0.2),
                     inset 0 0 8px rgba(16, 185, 129, 0.1);
     }
-    100% {
-        box-shadow: 0 0 25px rgba(139, 92, 246, 0.9),
-                    0 0 55px rgba(59, 130, 246, 0.65),
-                    0 0 100px rgba(168, 85, 247, 0.4),
-                    inset 0 0 22px rgba(139, 92, 246, 0.3);
+    40% {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.65),
+                    0 0 45px rgba(59, 130, 246, 0.35),
+                    0 0 70px rgba(59, 130, 246, 0.2),
+                    inset 0 0 15px rgba(59, 130, 246, 0.18);
+    }
+    70%, 100% {
+        box-shadow: 0 0 28px rgba(139, 92, 246, 0.9),
+                    0 0 60px rgba(168, 85, 247, 0.65),
+                    0 0 110px rgba(139, 92, 246, 0.4),
+                    inset 0 0 25px rgba(139, 92, 246, 0.3);
     }
 }
 
@@ -123,6 +136,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
         box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
     }
 }
+
 
 
 
