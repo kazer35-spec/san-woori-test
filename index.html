@@ -13,7 +13,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-/* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
+        /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
 #milkyWayModal .relative {
@@ -33,7 +33,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     outline: none !important;
 }
 
-/* 🔥 슈퍼별 보유자: 테두리 없이 2단계(노랑 차분) ⇄ 3단계(레드 웅장한 넓은 광원) 순환 */
+/* 🔥 슈퍼별 보유자: 테두리 없이 3단계(레드 극강 광량) 시작 ⇄ 2단계(노랑 차분) 순환 */
 #milkyWayModal.is-super .relative {
     border: none !important;
     background-image: none !important;
@@ -52,7 +52,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     letter-spacing: -0.2px;
 }
 
-/* ✨ 스페셜별 보유자: 테두리 없이 2단계(녹색 차분) ⇄ 3단계(보라/파랑 웅장한 넓은 광원) 순환 */
+/* ✨ 스페셜별 보유자: 테두리 없이 3단계(보라/파랑 극강 광량) 시작 ⇄ 2단계(녹색 차분) 순환 */
 #milkyWayModal.is-special .relative {
     border: none !important;
     background-image: none !important;
@@ -80,35 +80,35 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     animation: holderPulse 2s infinite alternate ease-in-out;
 }
 
-/* ================= 🎬 2단계(차분) ⇄ 3단계(넓고 웅장함) 키프레임 ================= */
+/* ================= 🎬 3단계(극강 광량 시작) ⇄ 2단계(차분) 키프레임 ================= */
 
-/* 슈퍼별: 2단계 노랑(35px 차분함) → 3단계 레드(85px까지 웅장하게 퍼짐) */
+/* 슈퍼별: 3단계 레드 (0% 시작: 광량 최대/100px 확산) → 2단계 노랑 (100%: 35px 차분함) */
 @keyframes superGlowFade {
     0% {
+        box-shadow: 0 0 25px rgba(255, 30, 39, 0.9),
+                    0 0 55px rgba(255, 30, 39, 0.6),
+                    0 0 100px rgba(255, 80, 0, 0.35),
+                    inset 0 0 22px rgba(255, 30, 39, 0.3);
+    }
+    100% {
         box-shadow: 0 0 12px rgba(255, 215, 0, 0.5),
                     0 0 25px rgba(255, 215, 0, 0.25),
                     inset 0 0 8px rgba(255, 215, 0, 0.1);
     }
-    100% {
-        box-shadow: 0 0 20px rgba(255, 30, 39, 0.75),
-                    0 0 50px rgba(255, 30, 39, 0.45),
-                    0 0 85px rgba(255, 80, 0, 0.25),
-                    inset 0 0 18px rgba(255, 30, 39, 0.2);
-    }
 }
 
-/* 스페셜별: 2단계 녹색(35px 차분함) → 3단계 보라/파랑(90px까지 웅장하게 퍼짐) */
+/* 스페셜별: 3단계 보라/파랑 (0% 시작: 광량 최대/100px 확산) → 2단계 녹색 (100%: 35px 차분함) */
 @keyframes specialGlowFade {
     0% {
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.9),
+                    0 0 55px rgba(59, 130, 246, 0.65),
+                    0 0 100px rgba(168, 85, 247, 0.4),
+                    inset 0 0 22px rgba(139, 92, 246, 0.3);
+    }
+    100% {
         box-shadow: 0 0 12px rgba(16, 185, 129, 0.5),
                     0 0 25px rgba(16, 185, 129, 0.25),
                     inset 0 0 8px rgba(16, 185, 129, 0.1);
-    }
-    100% {
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.75),
-                    0 0 50px rgba(59, 130, 246, 0.5),
-                    0 0 90px rgba(168, 85, 247, 0.3),
-                    inset 0 0 18px rgba(139, 92, 246, 0.2);
     }
 }
 
@@ -122,6 +122,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
         box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
     }
 }
+
 
 
     
