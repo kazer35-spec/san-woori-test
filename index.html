@@ -9261,8 +9261,7 @@ document.addEventListener('touchstart', (e) => {
 
 
 
-
-            // ===================================================
+// ===================================================
 // [최종 수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
 // ===================================================
 (function() {
@@ -9282,8 +9281,10 @@ document.addEventListener('touchstart', (e) => {
         'grassPopup'
     ];
 
+    // 스택 관리: ['modalId', ...]
     let activeModalStack = [];
 
+    // 모달 감지 기준 (opacity 및 flex/block 모두 감지)
     function isModalOpen(id) {
         const el = document.getElementById(id);
         if (!el) return false;
@@ -9296,6 +9297,7 @@ document.addEventListener('touchstart', (e) => {
         return isDisplayed && isOpaque;
     }
 
+    // 모달별 안전한 닫기 처리
     function forceCloseModal(id) {
         switch (id) {
             case 'milkyWayModal':
@@ -9359,6 +9361,7 @@ document.addEventListener('touchstart', (e) => {
         }
     }
 
+    // 상태 동기화 및 history.pushState 관리
     function syncModalState() {
         MODAL_IDS.forEach(id => {
             const open = isModalOpen(id);
@@ -9369,14 +9372,16 @@ document.addEventListener('touchstart', (e) => {
                 activeModalStack.push(id);
                 history.pushState({ modalId: id }, '', location.href);
             } 
-            // 2. 버튼 클릭 등으로 직접 닫은 경우 (history.back()을 직접 호출하지 않고 스택만 정리하여 부모 모달 영향 제거)
+            // 2. 사용자가 X버튼이나 배경 클릭으로 직접 닫은 경우
+            // [수정 포인트] history.back() 호출로 인한 부모창 동시 닫힘 현상을 막기 위해
+            // 히스토리는 강제 트리거하지 않고 스택만 업데이트합니다.
             else if (!open && inStack) {
                 activeModalStack = activeModalStack.filter(item => item !== id);
             }
         });
     }
 
-    // 뒤로가기 버튼(popstate) 눌렀을 때만 가장 최상단 모달만 1개씩 순차적으로 닫히도록 처리
+    // 뒤로가기 버튼(popstate) 눌렀을 때의 동작
     window.addEventListener('popstate', (e) => {
         if (activeModalStack.length > 0) {
             const lastModalId = activeModalStack.pop();
@@ -9384,6 +9389,7 @@ document.addEventListener('touchstart', (e) => {
         }
     });
 
+    // 실시간 DOM 감지
     const observer = new MutationObserver(() => {
         syncModalState();
     });
