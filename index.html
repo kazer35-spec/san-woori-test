@@ -3891,6 +3891,9 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
+
+
+// 현황 테이블 렌더링 함수
 window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
@@ -3915,7 +3918,7 @@ window.renderStatusTable = function() {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기
+        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 식별
         const latestSuperHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('super') : null;
         const latestSpecialHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('special') : null;
 
@@ -3995,11 +3998,11 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-            // 👑 슈퍼/스페셜 왕좌 상태 체크
+            // 👑 최신 왕좌 보유 여부 확인
             const isSuper = (m.id === latestSuperHolderId || m.name === latestSuperHolderId);
             const isSpecial = (m.id === latestSpecialHolderId || m.name === latestSpecialHolderId);
 
-            // 레벨 스타일 및 핀 HTML 가져오기
+            // 스타일 및 우측 핀 HTML 수급
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
                 : { bg: '#fff', border: '#ccc', text: '#000', blink: '', pinHtml: '' };
@@ -4012,6 +4015,7 @@ window.renderStatusTable = function() {
                 ? (rawHeight / 1000).toFixed(1) + 'k' 
                 : rawHeight + 'm';
 
+            // ⬇️ 요청하신 HTML 구조로 완벽 통합된 렌더링 영역
             htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
             <td style="position: relative;" class="text-xs text-center">
                 ${clickTag}
@@ -4025,17 +4029,19 @@ window.renderStatusTable = function() {
             </td>
             <td style="position: relative;">
                 ${clickTag}
-                <div class="badge-level">
-                    <!-- 📍 pin-wrapper 구조에 미니 엠블럼 핀(style.pinHtml) 추가 -->
+                <div class="badge-level flex items-center justify-center gap-1">
+                    <!-- 레벨 배지 박스 -->
+                    <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
+                         onclick="showMilkyWay('${m.name}', '${m.name}')"
+                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                        <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
+                    </div>
+                    
+                    <!-- 📍 레벨 텍스트 + 우측 미니 핀 래퍼 -->
                     <div class="pin-wrapper">
-                        <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
-                             onclick="showMilkyWay('${m.name}', '${m.name}')"
-                             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
-                        </div>
+                        <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
                         ${style.pinHtml || ''}
                     </div>
-                    <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
                 </div>
             </td>
             <td style="position: relative;">
@@ -4063,7 +4069,7 @@ window.renderStatusTable = function() {
 
         list.innerHTML = htmlBuilder;
 
-        // 3초 간격 텍스트 교체 타이머
+        // 3초 간격 기록보기/D+D-day 토글 애니메이션
         let showDPlus = false;
         window.recordBtnToggleInterval = setInterval(() => {
             showDPlus = !showDPlus;
@@ -4091,14 +4097,6 @@ window.renderStatusTable = function() {
     }
 };
 
-
-
-
-
-
-      
-        
-        
             
 
         
