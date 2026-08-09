@@ -21,63 +21,59 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     display: inline-block;
 }
 
-/* 🔥 슈퍼별 미니 핀 (순수 이모지만 표시) */
+/* 🔥 슈퍼별 미니 핀 */
 .glow-pin-super {
     position: absolute;
     top: -4px;
     right: -4px;
-    background: transparent;  /* 배경 제거 */
-    border: none;             /* 테두리 제거 */
-    padding: 0;               /* 여백 제거 */
-    font-size: 0.6rem;        /* 축소된 크기 */
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.6rem;
     line-height: 1;
     z-index: 10;
     pointer-events: none;
-    animation: superPinBorderGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    /* ⚡ 시간을 1.2초로 줄여 템포를 빠르게 설정 */
+    animation: superPinBorderGlow 1.2s ease-in-out infinite alternate;
 }
 
-/* ✨ 스페셜별 미니 핀 (순수 이모지만 표시) */
+/* ✨ 스페셜별 미니 핀 */
 .glow-pin-special {
     position: absolute;
     top: -4px;
     right: -4px;
-    background: transparent;  /* 배경 제거 */
-    border: none;             /* 테두리 제거 */
-    padding: 0;               /* 여백 제거 */
-    font-size: 0.6rem;        /* 축소된 크기 */
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.6rem;
     line-height: 1;
     z-index: 10;
     pointer-events: none;
-    animation: specialPinBorderGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    /* ⚡ 시간을 1.5초로 설정 (슈퍼별과 살짝 다르게 템포 부여) */
+    animation: specialPinBorderGlow 1.5s ease-in-out infinite alternate;
 }
 
-
-/* 🔥 슈퍼별 애니메이션 (테두리/빛 잔상 없이 크기 모션만) */
+/* 🔥 슈퍼별 애니메이션 (확대 폭 증가 + 살짝 회전까지 추가) */
 @keyframes superPinBorderGlow {
     0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.06);
+        transform: scale(0.95) rotate(-5deg);
     }
     100% {
-        transform: scale(1.1);
+        transform: scale(1.35) rotate(10deg); /* 크기 1.35배 + 10도 회전 */
     }
 }
 
-/* ✨ 스페셜별 애니메이션 (테두리/빛 잔상 없이 크기 모션만) */
+/* ✨ 스페셜별 애니메이션 (확대 폭 증가 + 바운스 느낌) */
 @keyframes specialPinBorderGlow {
     0% {
-        transform: scale(1);
+        transform: scale(0.9) translateY(0);
     }
     50% {
-        transform: scale(1.06);
+        transform: scale(1.3) translateY(-2px); /* 살짝 위로 튀어오름 */
     }
     100% {
-        transform: scale(1.1);
+        transform: scale(1) translateY(0);
     }
-}
-
 }
 
 
