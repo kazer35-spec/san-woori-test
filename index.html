@@ -14,44 +14,42 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 
-/* ================= 레벨 배지 및 핀 래퍼 ================= */
+/* ================= 레벨 배지 핀 래퍼 ================= */
 .pin-wrapper {
     position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px; /* 레벨 텍스트와 미니 핀 사이의 간격 */
+    display: inline-block;
 }
 
-/* 🔥 슈퍼별 미니 핀 (레벨 표시 우측 배치 & 빨간색 불투명 30%) */
+/* 🔥 슈퍼별 미니 핀 (원래 크기 대비 25% 축소 & 빨간색 불투명 30%) */
 .glow-pin-super {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(220, 38, 38, 0.3); /* 빨간색 불투명 30% */
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: rgba(220, 38, 38, 0.3); /* 📌 빨간색(Red) 불투명 30% */
     backdrop-filter: blur(2px);
     border: 1px solid #ffd700;
     border-radius: 9999px;
-    padding: 1px 3px;
-    font-size: 0.5rem;                  /* 25% 축소 크기 유지 */
+    padding: 1px 3px;                 /* 여백 축소 (기존 1px 4px) */
+    font-size: 0.5rem;                /* 원래(0.65rem) 대비 약 23% 축소 */
     line-height: 1;
-    z-index: 2;
+    z-index: 10;
     pointer-events: none;
     animation: superPinBorderGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 
-/* ✨ 스페셜별 미니 핀 (레벨 표시 우측 배치 & 보라색 불투명 30%) */
+/* ✨ 스페셜별 미니 핀 (원래 크기 대비 25% 축소 & 보라색 불투명 30%) */
 .glow-pin-special {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(147, 51, 234, 0.3); /* 보라색 불투명 30% */
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: rgba(147, 51, 234, 0.3); /* 📌 보라색(Purple) 불투명 30% */
     backdrop-filter: blur(2px);
     border: 1px solid #10b981;
     border-radius: 9999px;
-    padding: 1px 3px;
-    font-size: 0.5rem;                  /* 25% 축소 크기 유지 */
+    padding: 1px 3px;                 /* 여백 축소 */
+    font-size: 0.5rem;                /* 원래(0.65rem) 대비 약 23% 축소 */
     line-height: 1;
-    z-index: 2;
+    z-index: 10;
     pointer-events: none;
     animation: specialPinBorderGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
@@ -60,18 +58,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 @keyframes superPinBorderGlow {
     0% {
         border-color: #ffd700;
-        box-shadow: 0 0 4px rgba(255, 215, 0, 0.8), inset 0 0 2px rgba(255, 215, 0, 0.3);
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.8), inset 0 0 3px rgba(255, 215, 0, 0.3);
         transform: scale(1);
     }
     50% {
         border-color: #ff7800;
-        box-shadow: 0 0 7px rgba(255, 120, 0, 0.9), inset 0 0 3px rgba(255, 120, 0, 0.4);
-        transform: scale(1.05);
+        box-shadow: 0 0 8px rgba(255, 120, 0, 0.9), inset 0 0 4px rgba(255, 120, 0, 0.4);
+        transform: scale(1.06);
     }
     100% {
         border-color: #ff1e27;
-        box-shadow: 0 0 10px rgba(255, 30, 39, 1), inset 0 0 4px rgba(255, 30, 39, 0.5);
-        transform: scale(1.08);
+        box-shadow: 0 0 12px rgba(255, 30, 39, 1), inset 0 0 5px rgba(255, 30, 39, 0.5);
+        transform: scale(1.1);
     }
 }
 
@@ -79,18 +77,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 @keyframes specialPinBorderGlow {
     0% {
         border-color: #10b981;
-        box-shadow: 0 0 4px rgba(16, 185, 129, 0.8), inset 0 0 2px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 5px rgba(16, 185, 129, 0.8), inset 0 0 3px rgba(16, 185, 129, 0.3);
         transform: scale(1);
     }
     50% {
         border-color: #3b82f6;
-        box-shadow: 0 0 7px rgba(59, 130, 246, 0.9), inset 0 0 3px rgba(59, 130, 246, 0.4);
-        transform: scale(1.05);
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.9), inset 0 0 4px rgba(59, 130, 246, 0.4);
+        transform: scale(1.06);
     }
     100% {
         border-color: #a855f7;
-        box-shadow: 0 0 10px rgba(168, 85, 247, 1), inset 0 0 4px rgba(168, 85, 247, 0.5);
-        transform: scale(1.08);
+        box-shadow: 0 0 12px rgba(168, 85, 247, 1), inset 0 0 5px rgba(168, 85, 247, 0.5);
+        transform: scale(1.1);
     }
 }
 
@@ -3891,9 +3889,6 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
-
-
-// 현황 테이블 렌더링 함수
 window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
@@ -3918,7 +3913,7 @@ window.renderStatusTable = function() {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 식별
+        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기
         const latestSuperHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('super') : null;
         const latestSpecialHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('special') : null;
 
@@ -3998,11 +3993,11 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-            // 👑 최신 왕좌 보유 여부 확인
+            // 👑 슈퍼/스페셜 왕좌 상태 체크
             const isSuper = (m.id === latestSuperHolderId || m.name === latestSuperHolderId);
             const isSpecial = (m.id === latestSpecialHolderId || m.name === latestSpecialHolderId);
 
-            // 스타일 및 우측 핀 HTML 수급
+            // 레벨 스타일 및 핀 HTML 가져오기
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
                 : { bg: '#fff', border: '#ccc', text: '#000', blink: '', pinHtml: '' };
@@ -4015,7 +4010,6 @@ window.renderStatusTable = function() {
                 ? (rawHeight / 1000).toFixed(1) + 'k' 
                 : rawHeight + 'm';
 
-            // ⬇️ 요청하신 HTML 구조로 완벽 통합된 렌더링 영역
             htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
             <td style="position: relative;" class="text-xs text-center">
                 ${clickTag}
@@ -4029,19 +4023,17 @@ window.renderStatusTable = function() {
             </td>
             <td style="position: relative;">
                 ${clickTag}
-                <div class="badge-level flex items-center justify-center gap-1">
-                    <!-- 레벨 배지 박스 -->
-                    <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
-                         onclick="showMilkyWay('${m.name}', '${m.name}')"
-                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                        <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
-                    </div>
-                    
-                    <!-- 📍 레벨 텍스트 + 우측 미니 핀 래퍼 -->
+                <div class="badge-level">
+                    <!-- 📍 pin-wrapper 구조에 미니 엠블럼 핀(style.pinHtml) 추가 -->
                     <div class="pin-wrapper">
-                        <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
+                        <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
+                             onclick="showMilkyWay('${m.name}', '${m.name}')"
+                             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
+                        </div>
                         ${style.pinHtml || ''}
                     </div>
+                    <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
                 </div>
             </td>
             <td style="position: relative;">
@@ -4069,7 +4061,7 @@ window.renderStatusTable = function() {
 
         list.innerHTML = htmlBuilder;
 
-        // 3초 간격 기록보기/D+D-day 토글 애니메이션
+        // 3초 간격 텍스트 교체 타이머
         let showDPlus = false;
         window.recordBtnToggleInterval = setInterval(() => {
             showDPlus = !showDPlus;
@@ -4097,6 +4089,14 @@ window.renderStatusTable = function() {
     }
 };
 
+
+
+
+
+
+      
+        
+        
             
 
         
