@@ -9259,8 +9259,8 @@ document.addEventListener('touchstart', (e) => {
 
 
 
-     // ===================================================
-// [수정 완료] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
+// ===================================================
+// [수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
 // ===================================================
 (function() {
     const MODAL_IDS = [
@@ -9279,11 +9279,13 @@ document.addEventListener('touchstart', (e) => {
         'grassPopup'
     ];
 
-    // 스택 관리
+    // 스택 관리: [{ id: 'modalId', pushed: true/false }]
     let activeModalStack = [];
-    // programmatically(X버튼/배경클릭) 닫힐 때 popstate 중복 실행 방지 플래그
-    let isClosingByScript = false;
+    
+    // X버튼/배경 클릭 등으로 인해 history.back() 실행 시 popstate 연쇄 반응 방지용 플래그
+    let isIgnorePopstate = false;
 
+    // 모달 감지 기준 완화 (opacity 및 flex/block 모두 감지)
     function isModalOpen(id) {
         const el = document.getElementById(id);
         if (!el) return false;
@@ -9296,6 +9298,7 @@ document.addEventListener('touchstart', (e) => {
         return isDisplayed && isOpaque;
     }
 
+    // 모달별 안전한 닫기 처리
     function forceCloseModal(id) {
         switch (id) {
             case 'milkyWayModal':
@@ -9359,37 +9362,35 @@ document.addEventListener('touchstart', (e) => {
         }
     }
 
-    // 모달 상태 동기화
+    // 상태 동기화 및 history.pushState 관리
     function syncModalState() {
-        if (isClosingByScript) return; // 뒤로가기 처리 중엔 동기화 건너뜀
-
         MODAL_IDS.forEach(id => {
             const open = isModalOpen(id);
             const inStack = activeModalStack.includes(id);
 
-            // 1. 새 모달이 열리면 스택에 추가 & 히스토리 Push
+            // 1. 모달이 열렸는데 스택에 없으면 추가 & History Push
             if (open && !inStack) {
                 activeModalStack.push(id);
                 history.pushState({ modalId: id }, '', location.href);
             } 
-            // 2. 사용자가 X 버튼 등으로 직접 닫은 경우
+            // 2. 사용자가 X버튼이나 배경 클릭으로 직접 닫은 경우
             else if (!open && inStack) {
                 activeModalStack = activeModalStack.filter(item => item !== id);
-                // history.back()을 호출하여 쌓인 히스토리를 지우되, 
-                // popstate 이벤트에서 서브창까지 닫히지 않도록 플래그 세팅
+                // 브라우저 뒤로가기 상태와 갯수 동기화 (히스토리 정리)
                 if (history.state && history.state.modalId === id) {
-                    isClosingByScript = true;
+                    isIgnorePopstate = true; // X버튼으로 히스토리를 깎을 때는 popstate 처리 건너뜀
                     history.back();
-                    setTimeout(() => { isClosingByScript = false; }, 100);
                 }
             }
         });
     }
 
-    // 스마트폰/브라우저 뒤로가기 버튼(popstate) 동작
+    // 뒤로가기 버튼(popstate) 눌렀을 때의 동작
     window.addEventListener('popstate', (e) => {
-        // X 버튼 클릭 등으로 인한 history.back() 수행 중일 때는 모달을 중복으로 닫지 않음
-        if (isClosingByScript) return;
+        if (isIgnorePopstate) {
+            isIgnorePopstate = false;
+            return;
+        }
 
         if (activeModalStack.length > 0) {
             const lastModalId = activeModalStack.pop();
@@ -9397,6 +9398,7 @@ document.addEventListener('touchstart', (e) => {
         }
     });
 
+    // 실시간 DOM 감지
     const observer = new MutationObserver(() => {
         syncModalState();
     });
