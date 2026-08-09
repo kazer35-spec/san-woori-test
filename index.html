@@ -14,71 +14,70 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 
+/* =========================================================
+   🔥 슈퍼별 (Super Star) 전용 스타일 & 애니메이션
+   ========================================================= */
 
-    /* 🔥 슈퍼별 텍스트 & 마크 그라데이션 (빨강 -> 주황 -> 노랑) */
+/* 🔥 슈퍼별 배지 박스 (배경 + 테두리 + 글로우) */
+.badge-super-box {
+    background: linear-gradient(135deg, #2a0808 0%, #4a1205 50%, #2b1a00 100%) !important;
+    border: 1.5px solid transparent !important;
+    border-image: linear-gradient(135deg, #ff1e27, #ff7800, #ffd700) 1 !important;
+    animation: superBoxGlow 2.5s ease-in-out infinite alternate;
+}
+
+/* 🔥 슈퍼별 텍스트 & 마크 그라데이션 */
 .text-super-gradient {
     background: linear-gradient(135deg, #ff1e27 0%, #ff7800 50%, #ffd700 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800 !important;
-    filter: drop-shadow(0px 0px 2px rgba(255, 120, 0, 0.5));
+    filter: drop-shadow(0px 0px 2px rgba(255, 120, 0, 0.6));
 }
 
-/* ✨ 스페셜별 텍스트 & 마크 그라데이션 (보라 -> 파랑 -> 청록) */
+/* 🔥 슈퍼별 글로우 키프레임 */
+@keyframes superBoxGlow {
+    0% {
+        box-shadow: 0 0 6px rgba(255, 30, 39, 0.7), inset 0 0 4px rgba(255, 215, 0, 0.4);
+        transform: scale(1);
+    }
+    100% {
+        box-shadow: 0 0 14px rgba(255, 120, 0, 0.9), inset 0 0 8px rgba(255, 30, 39, 0.6);
+        transform: scale(1.05);
+    }
+}
+
+
+/* =========================================================
+   ✨ 스페셜별 (Special Star) 전용 스타일 & 애니메이션
+   ========================================================= */
+
+/* ✨ 스페셜별 배지 박스 (배경 + 테두리 + 글로우) */
+.badge-special-box {
+    background: linear-gradient(135deg, #150d2a 0%, #0b1e36 50%, #06241b 100%) !important;
+    border: 1.5px solid transparent !important;
+    border-image: linear-gradient(135deg, #a855f7, #3b82f6, #10b981) 1 !important;
+    animation: specialBoxGlow 2.5s ease-in-out infinite alternate;
+}
+
+/* ✨ 스페셜별 텍스트 & 마크 그라데이션 */
 .text-special-gradient {
     background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #10b981 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800 !important;
-    filter: drop-shadow(0px 0px 2px rgba(59, 130, 246, 0.5));
+    filter: drop-shadow(0px 0px 2px rgba(59, 130, 246, 0.6));
 }
 
-
-/* 🔥 슈퍼별 보유자 배지 스타일 (빨강/주황/노랑 그라데이션 + 네온 빛) */
-.badge-super-glow {
-    background: linear-gradient(135deg, #ff1e27 0%, #ff7800 50%, #ffd700 100%) !important;
-    border: 1.5px solid #ffffff !important;
-    color: #ffffff !important;
-    animation: superBadgeGlow 3s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
-}
-
-/* ✨ 스페셜별 보유자 배지 스타일 (보라/파랑/녹색 그라데이션 + 네온 빛) */
-.badge-special-glow {
-    background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #10b981 100%) !important;
-    border: 1.5px solid #ffffff !important;
-    color: #ffffff !important;
-    animation: specialBadgeGlow 3s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
-}
-
-/* 🔥 슈퍼별 배지 글로우 키프레임 */
-@keyframes superBadgeGlow {
+/* ✨ 스페셜별 글로우 키프레임 */
+@keyframes specialBoxGlow {
     0% {
-        box-shadow: 0 0 6px rgba(255, 30, 39, 0.8), inset 0 0 4px rgba(255, 215, 0, 0.6);
+        box-shadow: 0 0 6px rgba(168, 85, 247, 0.7), inset 0 0 4px rgba(16, 185, 129, 0.4);
         transform: scale(1);
     }
-    50% {
-        box-shadow: 0 0 12px rgba(255, 120, 0, 0.9), inset 0 0 6px rgba(255, 255, 255, 0.8);
-        transform: scale(1.05);
-    }
     100% {
-        box-shadow: 0 0 16px rgba(255, 215, 0, 1), inset 0 0 8px rgba(255, 30, 39, 0.8);
-        transform: scale(1.08);
-    }
-}
-
-/* ✨ 스페셜별 배지 글로우 키프레임 */
-@keyframes specialBadgeGlow {
-    0% {
-        box-shadow: 0 0 6px rgba(168, 85, 247, 0.8), inset 0 0 4px rgba(16, 185, 129, 0.6);
-        transform: scale(1);
-    }
-    50% {
-        box-shadow: 0 0 12px rgba(59, 130, 246, 0.9), inset 0 0 6px rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 14px rgba(59, 130, 246, 0.9), inset 0 0 8px rgba(168, 85, 247, 0.6);
         transform: scale(1.05);
-    }
-    100% {
-        box-shadow: 0 0 16px rgba(16, 185, 129, 1), inset 0 0 8px rgba(168, 85, 247, 0.8);
-        transform: scale(1.08);
     }
 }
 
@@ -3748,23 +3747,25 @@ const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '', boxClass: '', gradClass: '' };
     else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '', boxClass: '', gradClass: '' };
 
-    // 기존 레벨 마크 (예: "⛰️ 산", "🌋 화산") 가져오기
+    // 기존 레벨 마크 (예: "⛰️ 산", "🌋 화산")
     const originalBadge = (typeof getLevelBadge === 'function') ? getLevelBadge(lv) : String(lv || 0);
     
-    // 이모지를 제외하고 뒤의 글자만 추출 ("⛰️ 산" -> "산")
+    // 이모지 제거 후 텍스트만 남김 ("⛰️ 산" -> "산")
     const badgeNameOnly = String(originalBadge).replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
 
     let badgeTxt = originalBadge;
 
-    // 👑 슈퍼별 / 스페셜별 보유자 처리 (이모지만 🔥/✨로 교체 -> "🔥 산", "✨ 화산")
+    // 🔥 슈퍼별 보유자 분기 (빨강/주황/노랑 그라데이션)
     if (isSuper) {
         badgeTxt = `🔥 ${badgeNameOnly}`;
-        base.boxClass = 'badge-milkyway-box';
-        base.gradClass = 'text-milkyway-gradient';
-    } else if (isSpecial) {
+        base.boxClass = 'badge-super-box';
+        base.gradClass = 'text-super-gradient';
+    } 
+    // ✨ 스페셜별 보유자 분기 (보라/파랑/녹색 그라데이션)
+    else if (isSpecial) {
         badgeTxt = `✨ ${badgeNameOnly}`;
-        base.boxClass = 'badge-milkyway-box';
-        base.gradClass = 'text-milkyway-gradient';
+        base.boxClass = 'badge-special-box';
+        base.gradClass = 'text-special-gradient';
     }
 
     return { ...base, badgeTxt };
