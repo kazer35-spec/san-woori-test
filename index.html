@@ -14,81 +14,64 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 
-/* ================= 레벨 배지 핀 래퍼 ================= */
+
+        /* ================= 레벨 배지 래퍼 ================= */
 .pin-wrapper {
     position: relative;
     display: inline-block;
 }
 
-/* 🔥 슈퍼별 미니 핀 (원래 크기 대비 25% 축소 & 빨간색 불투명 30%) */
-.glow-pin-super {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: rgba(220, 38, 38, 0.3); /* 📌 빨간색(Red) 불투명 30% */
-    backdrop-filter: blur(2px);
-    border: 1px solid #ffd700;
-    border-radius: 9999px;
-    padding: 1px 3px;                 /* 여백 축소 (기존 1px 4px) */
-    font-size: 0.5rem;                /* 원래(0.65rem) 대비 약 23% 축소 */
-    line-height: 1;
-    z-index: 10;
-    pointer-events: none;
-    animation: superPinBorderGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+/* 🔥 슈퍼별 보유자 애니메이션 (배지 박스 & 레벨 텍스트 공통) */
+.glow-super-target {
+    animation: superGlowEffect 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
 
-/* ✨ 스페셜별 미니 핀 (원래 크기 대비 25% 축소 & 보라색 불투명 30%) */
-.glow-pin-special {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: rgba(147, 51, 234, 0.3); /* 📌 보라색(Purple) 불투명 30% */
-    backdrop-filter: blur(2px);
-    border: 1px solid #10b981;
-    border-radius: 9999px;
-    padding: 1px 3px;                 /* 여백 축소 */
-    font-size: 0.5rem;                /* 원래(0.65rem) 대비 약 23% 축소 */
-    line-height: 1;
-    z-index: 10;
-    pointer-events: none;
-    animation: specialPinBorderGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+/* ✨ 스페셜별 보유자 애니메이션 (배지 박스 & 레벨 텍스트 공통) */
+.glow-special-target {
+    animation: specialGlowEffect 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
 
-/* 🔥 슈퍼별 테두리 & 빛 애니메이션 */
-@keyframes superPinBorderGlow {
+/* 🔥 슈퍼별 글로우 키프레임 (테두리, 그림자, 텍스트 색상 전환) */
+@keyframes superGlowEffect {
     0% {
-        border-color: #ffd700;
-        box-shadow: 0 0 5px rgba(255, 215, 0, 0.8), inset 0 0 3px rgba(255, 215, 0, 0.3);
+        border-color: #ffd700 !important;
+        color: #ffd700 !important;
+        box-shadow: 0 0 6px rgba(255, 215, 0, 0.8), inset 0 0 3px rgba(255, 215, 0, 0.3);
         transform: scale(1);
     }
     50% {
-        border-color: #ff7800;
-        box-shadow: 0 0 8px rgba(255, 120, 0, 0.9), inset 0 0 4px rgba(255, 120, 0, 0.4);
-        transform: scale(1.06);
+        border-color: #ff7800 !important;
+        color: #ff7800 !important;
+        box-shadow: 0 0 10px rgba(255, 120, 0, 0.9), inset 0 0 4px rgba(255, 120, 0, 0.4);
+        transform: scale(1.04);
     }
     100% {
-        border-color: #ff1e27;
-        box-shadow: 0 0 12px rgba(255, 30, 39, 1), inset 0 0 5px rgba(255, 30, 39, 0.5);
-        transform: scale(1.1);
+        border-color: #ff1e27 !important;
+        color: #ff1e27 !important;
+        box-shadow: 0 0 14px rgba(255, 30, 39, 1), inset 0 0 5px rgba(255, 30, 39, 0.5);
+        transform: scale(1.08);
     }
 }
 
-/* ✨ 스페셜별 테두리 & 빛 애니메이션 */
-@keyframes specialPinBorderGlow {
+/* ✨ 스페셜별 글로우 키프레임 */
+@keyframes specialGlowEffect {
     0% {
-        border-color: #10b981;
-        box-shadow: 0 0 5px rgba(16, 185, 129, 0.8), inset 0 0 3px rgba(16, 185, 129, 0.3);
+        border-color: #10b981 !important;
+        color: #10b981 !important;
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.8), inset 0 0 3px rgba(16, 185, 129, 0.3);
         transform: scale(1);
     }
     50% {
-        border-color: #3b82f6;
-        box-shadow: 0 0 8px rgba(59, 130, 246, 0.9), inset 0 0 4px rgba(59, 130, 246, 0.4);
-        transform: scale(1.06);
+        border-color: #3b82f6 !important;
+        color: #3b82f6 !important;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.9), inset 0 0 4px rgba(59, 130, 246, 0.4);
+        transform: scale(1.04);
     }
     100% {
-        border-color: #a855f7;
-        box-shadow: 0 0 12px rgba(168, 85, 247, 1), inset 0 0 5px rgba(168, 85, 247, 0.5);
-        transform: scale(1.1);
+        border-color: #a855f7 !important;
+        color: #a855f7 !important;
+        box-shadow: 0 0 14px rgba(168, 85, 247, 1), inset 0 0 5px rgba(168, 85, 247, 0.5);
+        transform: scale(1.08);
     }
 }
 
@@ -3739,7 +3722,12 @@ const levelThresholds = [
 ];
 
 
-    const getLevelBadge = (lv) => { for (const t of levelThresholds) { if (lv >= t.lv) return t.name; } return "🫘 신입"; };
+    const getLevelBadge = (lv) => { 
+    for (const t of levelThresholds) { 
+        if (lv >= t.lv) return t.name; 
+    } 
+    return "🫘 신입"; 
+};
 
 const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     let base = { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '' };
@@ -3756,16 +3744,23 @@ const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '' };
     else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '' };
 
-    // 📍 우측 상단 미니 엠블럼 핀 HTML 생성 (1번 글로우 애니메이션 적용)
-    let pinHtml = '';
+    // 🌟 슈퍼별 / 스페셜별 보유자 처리 (이모지 변경 & 글로우 클래스 추가)
+    let glowClass = '';
+    let badgeTxt = getLevelBadge(lv);
+
     if (isSuper) {
-        pinHtml = `<span class="glow-pin-super">🔥</span>`;
+        // 기존 배지 텍스트의 첫 이모지를 🔥로 교체 (예: 🌳 나무 -> 🔥 나무)
+        badgeTxt = badgeTxt.replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '🔥');
+        glowClass = 'glow-super-target';
     } else if (isSpecial) {
-        pinHtml = `<span class="glow-pin-special">✨</span>`;
+        // 기존 배지 텍스트의 첫 이모지를 ✨로 교체 (예: ⛰️ 산 -> ✨ 산)
+        badgeTxt = badgeTxt.replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '✨');
+        glowClass = 'glow-special-target';
     }
 
-    return { ...base, pinHtml };
+    return { ...base, badgeTxt, glowClass };
 };
+
 
 
 async function updateVisitorCount() {
@@ -3889,6 +3884,7 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
+
 window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
@@ -3913,7 +3909,7 @@ window.renderStatusTable = function() {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기
+        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기 (자동 승계 처리)
         const latestSuperHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('super') : null;
         const latestSpecialHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('special') : null;
 
@@ -3962,7 +3958,6 @@ window.renderStatusTable = function() {
 
         processedData.forEach((m) => {
             if (typeof isAdminLoggedIn !== 'undefined' && !isAdminLoggedIn && m.isHidden) return;
-            
             if (search && !isMatchName(m.name, search)) return;
 
             let clickTag = "";
@@ -3993,16 +3988,15 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-            // 👑 슈퍼/스페셜 왕좌 상태 체크
+            // 👑 슈퍼/스페셜 보유 여부 판단 (ID 또는 Name 일치)
             const isSuper = (m.id === latestSuperHolderId || m.name === latestSuperHolderId);
             const isSpecial = (m.id === latestSpecialHolderId || m.name === latestSpecialHolderId);
 
-            // 레벨 스타일 및 핀 HTML 가져오기
+            // 레벨 스타일, 변환된 배지 텍스트, 글로우 클래스 가져오기
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
-                : { bg: '#fff', border: '#ccc', text: '#000', blink: '', pinHtml: '' };
+                : { bg: '#fff', border: '#ccc', text: '#000', blink: '', badgeTxt: m.level || 0, glowClass: '' };
 
-            const badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(m.level) : (m.level || 0);
             const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
             const rawHeight = m.totalHeight || 0;
@@ -4024,16 +4018,16 @@ window.renderStatusTable = function() {
             <td style="position: relative;">
                 ${clickTag}
                 <div class="badge-level">
-                    <!-- 📍 pin-wrapper 구조에 미니 엠블럼 핀(style.pinHtml) 추가 -->
                     <div class="pin-wrapper">
-                        <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
+                        <!-- 📍 글로우 효과(style.glowClass)가 있으면 기존 테두리를 대체하며 애니메이션 적용 -->
+                        <div class="badge-icon-box ${style.blink || ''} ${style.glowClass} cursor-pointer"
                              onclick="showMilkyWay('${m.name}', '${m.name}')"
                              style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
+                            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${style.badgeTxt}</span>
                         </div>
-                        ${style.pinHtml || ''}
                     </div>
-                    <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
+                    <!-- 📍 Lv.XX 텍스트에도 동일하게 글로우 효과(style.glowClass) 적용 -->
+                    <span class="badge-lv-txt ${style.glowClass}" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
                 </div>
             </td>
             <td style="position: relative;">
@@ -4088,21 +4082,6 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
-
-
-
-
-
-
-      
-        
-        
-            
-
-        
-            
-            
-            
 
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
