@@ -21,78 +21,63 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     display: inline-block;
 }
 
-/* 🔥 슈퍼별 미니 핀 (크기 0.5rem 축소 & 빨간색 불투명 10%) */
+/* 🔥 슈퍼별 미니 핀 (순수 이모지만 표시) */
 .glow-pin-super {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: rgba(220, 38, 38, 0.1); /* 📌 빨간색(Red) 불투명 10% */
-    backdrop-filter: blur(2px);
-    border: 1px solid #ffd700;
-    border-radius: 9999px;
-    padding: 1px 3px;
-    font-size: 0.5rem;                /* ✅ 축소된 크기 유지 */
+    background: transparent;  /* 배경 제거 */
+    border: none;             /* 테두리 제거 */
+    padding: 0;               /* 여백 제거 */
+    font-size: 0.5rem;        /* 축소된 크기 */
     line-height: 1;
     z-index: 10;
     pointer-events: none;
     animation: superPinBorderGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 
-/* ✨ 스페셜별 미니 핀 (크기 0.5rem 축소 & 보라색 불투명 10%) */
+/* ✨ 스페셜별 미니 핀 (순수 이모지만 표시) */
 .glow-pin-special {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: rgba(147, 51, 234, 0.1); /* 📌 보라색(Purple) 불투명 10% */
-    backdrop-filter: blur(2px);
-    border: 1px solid #10b981;
-    border-radius: 9999px;
-    padding: 1px 3px;
-    font-size: 0.5rem;                /* ✅ 축소된 크기 유지 */
+    background: transparent;  /* 배경 제거 */
+    border: none;             /* 테두리 제거 */
+    padding: 0;               /* 여백 제거 */
+    font-size: 0.5rem;        /* 축소된 크기 */
     line-height: 1;
     z-index: 10;
     pointer-events: none;
     animation: specialPinBorderGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 
-/* 🔥 슈퍼별 테두리 & 빛 애니메이션 */
+/* 🔥 슈퍼별 애니메이션 (테두리/빛 잔상 없이 크기 모션만) */
 @keyframes superPinBorderGlow {
     0% {
-        border-color: #ffd700;
-        box-shadow: 0 0 5px rgba(255, 215, 0, 0.8), inset 0 0 3px rgba(255, 215, 0, 0.3);
         transform: scale(1);
     }
     50% {
-        border-color: #ff7800;
-        box-shadow: 0 0 8px rgba(255, 120, 0, 0.9), inset 0 0 4px rgba(255, 120, 0, 0.4);
         transform: scale(1.06);
     }
     100% {
-        border-color: #ff1e27;
-        box-shadow: 0 0 12px rgba(255, 30, 39, 1), inset 0 0 5px rgba(255, 30, 39, 0.5);
         transform: scale(1.1);
     }
 }
 
-/* ✨ 스페셜별 테두리 & 빛 애니메이션 */
+/* ✨ 스페셜별 애니메이션 (테두리/빛 잔상 없이 크기 모션만) */
 @keyframes specialPinBorderGlow {
     0% {
-        border-color: #10b981;
-        box-shadow: 0 0 5px rgba(16, 185, 129, 0.8), inset 0 0 3px rgba(16, 185, 129, 0.3);
         transform: scale(1);
     }
     50% {
-        border-color: #3b82f6;
-        box-shadow: 0 0 8px rgba(59, 130, 246, 0.9), inset 0 0 4px rgba(59, 130, 246, 0.4);
         transform: scale(1.06);
     }
     100% {
-        border-color: #a855f7;
-        box-shadow: 0 0 12px rgba(168, 85, 247, 1), inset 0 0 5px rgba(168, 85, 247, 0.5);
         transform: scale(1.1);
     }
 }
 
+}
 
 
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
