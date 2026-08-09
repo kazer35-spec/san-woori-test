@@ -9259,9 +9259,7 @@ document.addEventListener('touchstart', (e) => {
 
 
 
-
-    
-            // ===================================================
+// ===================================================
 // [최종 수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
 // ===================================================
 (function() {
@@ -9374,20 +9372,16 @@ document.addEventListener('touchstart', (e) => {
             // 1. 모달이 열렸는데 스택에 없으면 추가 & History Push
             if (open && !inStack) {
                 activeModalStack.push(id);
-                history.pushState({ modalId: id, isSanWooriModal: true }, '', location.href);
+                history.pushState({ modalId: id }, '', location.href);
             } 
-            // 2. 사용자가 뒤로가기가 아닌 버튼(X버튼, 배경 클릭 등)으로 직접 모달을 닫은 경우
+            // 2. 직접 X 버튼 등으로 닫힌 경우
             else if (!open && inStack) {
                 activeModalStack = activeModalStack.filter(item => item !== id);
-                // 브라우저 history에 push되었던 state 정리 (뒤로가기 스택 동기화)
-                if (history.state && history.state.isSanWooriModal) {
-                    history.back();
-                }
             }
         });
     }
 
-    // 뒤로가기(popstate) 실행 시 현재 열려있는 최상위 모달 닫기
+    // 뒤로가기(popstate) 실행 시 현재 열려있는 가장 최상위 모달 1개만 안전하게 닫기
     window.addEventListener('popstate', (e) => {
         if (activeModalStack.length > 0) {
             const lastModalId = activeModalStack.pop();
@@ -9417,6 +9411,7 @@ document.addEventListener('touchstart', (e) => {
         initObserver();
     }
 })();
+
 
 </script>
 </body>
