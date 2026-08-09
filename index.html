@@ -13,6 +13,82 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+    /* ================= 핀 래퍼 기본 ================= */
+.pin-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* 🔥 슈퍼별 글로우 미니 핀 (노랑 -> 주황 -> 빨강 순환 & 글로우) */
+.glow-pin-super {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    border-radius: 9999px;
+    padding: 1px 3px;
+    font-size: 0.6rem;
+    line-height: 1;
+    z-index: 2;
+    animation: superPinGlow 6s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+/* ✨ 스페셜별 글로우 미니 핀 (녹색 -> 파랑 -> 보라 순환 & 글로우) */
+.glow-pin-special {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    border-radius: 9999px;
+    padding: 1px 3px;
+    font-size: 0.6rem;
+    line-height: 1;
+    z-index: 2;
+    animation: specialPinGlow 7s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+/* 🔥 슈퍼별 핀 키프레임 (0% 노랑 -> 40% 주황 -> 100% 빨강) */
+@keyframes superPinGlow {
+    0% {
+        background: #ffd700;
+        border: 1px solid #ffffff;
+        box-shadow: 0 0 6px rgba(255, 215, 0, 0.9);
+        transform: scale(1);
+    }
+    40% {
+        background: #ff7800;
+        border: 1px solid #ffe259;
+        box-shadow: 0 0 9px rgba(255, 120, 0, 0.95);
+        transform: scale(1.08);
+    }
+    70%, 100% {
+        background: #ff1e27;
+        border: 1px solid #ffaa00;
+        box-shadow: 0 0 12px rgba(255, 30, 39, 1);
+        transform: scale(1.15);
+    }
+}
+
+/* ✨ 스페셜별 핀 키프레임 (0% 녹색 -> 40% 파랑 -> 100% 보라) */
+@keyframes specialPinGlow {
+    0% {
+        background: #10b981;
+        border: 1px solid #ffffff;
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.9);
+        transform: scale(1);
+    }
+    40% {
+        background: #3b82f6;
+        border: 1px solid #a7f3d0;
+        box-shadow: 0 0 9px rgba(59, 130, 246, 0.95);
+        transform: scale(1.08);
+    }
+    70%, 100% {
+        background: #a855f7;
+        border: 1px solid #c084fc;
+        box-shadow: 0 0 12px rgba(168, 85, 247, 1);
+        transform: scale(1.15);
+    }
+}
+
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
 /* 1. 최외곽 모달 컨테이너 기본 정의 */
@@ -3661,22 +3737,36 @@ const levelThresholds = [
 
     const getLevelBadge = (lv) => { for (const t of levelThresholds) { if (lv >= t.lv) return t.name; } return "🫘 신입"; };
 
-const getLevelStyle = (lv) => {
-if (lv >= 100) return { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', blink: 'level-blink-red' };
-if (lv >= 90) return { bg: '#fff7ed', border: '#f97316', text: '#c2410c', blink: 'level-blink-orange' };
-if (lv >= 80) return { bg: '#fefce8', border: '#facc15', text: '#a16207', blink: 'level-blink-yellow' };
-if (lv >= 70) return { bg: '#fff1f2', border: '#fb7185', text: '#e11d48', blink: '' };
-if (lv >= 60) return { bg: '#fff7ed', border: '#fb923c', text: '#ea580c', blink: '' };
-if (lv >= 50) return { bg: '#fefce8', border: '#fde047', text: '#a16207', blink: '' };
-if (lv >= 40) return { bg: '#f0fdf4', border: '#4ade80', text: '#166534', blink: '' };
-if (lv >= 30) return { bg: '#f0fdfa', border: '#2dd4bf', text: '#0d9488', blink: '' };
-if (lv >= 20) return { bg: '#eff6ff', border: '#60a5fa', text: '#1d4ed8', blink: '' };
-if (lv >= 10) return { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '' };
-if (lv >= 3) return { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '' };
-return { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '' };
+/* ==========================================================================
+   ✨ [1번 글로우 핀 조합] 레벨 스타일 및 네온 핀 반환 함수
+   ========================================================================== */
+const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
+    let base = { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '' };
+
+    if (lv >= 100) base = { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', blink: 'level-blink-red' };
+    else if (lv >= 90) base = { bg: '#fff7ed', border: '#f97316', text: '#c2410c', blink: 'level-blink-orange' };
+    else if (lv >= 80) base = { bg: '#fefce8', border: '#facc15', text: '#a16207', blink: 'level-blink-yellow' };
+    else if (lv >= 70) base = { bg: '#fff1f2', border: '#fb7185', text: '#e11d48', blink: '' };
+    else if (lv >= 60) base = { bg: '#fff7ed', border: '#fb923c', text: '#ea580c', blink: '' };
+    else if (lv >= 50) base = { bg: '#fefce8', border: '#fde047', text: '#a16207', blink: '' };
+    else if (lv >= 40) base = { bg: '#f0fdf4', border: '#4ade80', text: '#166534', blink: '' };
+    else if (lv >= 30) base = { bg: '#f0fdfa', border: '#2dd4bf', text: '#0d9488', blink: '' };
+    else if (lv >= 20) base = { bg: '#eff6ff', border: '#60a5fa', text: '#1d4ed8', blink: '' };
+    else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '' };
+    else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '' };
+
+    // 📍 1번 광원 애니메이션이 이식된 미니 핀 HTML
+    let pinHtml = '';
+    if (isSuper) {
+        pinHtml = `<span class="glow-pin-super">🔥</span>`;
+    } else if (isSpecial) {
+        pinHtml = `<span class="glow-pin-special">✨</span>`;
+    }
+
+    return { ...base, pinHtml };
 };
 
-    const getDDayStyle = (dday, level) => {
+const getDDayStyle = (dday, level) => {
     // 레벨이나 남은 날짜 조건 없이, 무조건 기본 회색 스타일로 통일합니다.
     return "bg-gray-soft"; 
 };
