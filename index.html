@@ -3919,7 +3919,6 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
-
 window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
@@ -3944,7 +3943,7 @@ window.renderStatusTable = function() {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기 (자동 승계 처리)
+        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기 (승계 지원)
         const latestSuperHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('super') : null;
         const latestSpecialHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('special') : null;
 
@@ -4023,45 +4022,46 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-                        // 👑 슈퍼/스페셜 보유 여부 판단
+            // 👑 슈퍼/스페셜 보유 여부 판단 (ID 또는 Name 일치)
             const isSuper = (m.id === latestSuperHolderId || m.name === latestSuperHolderId);
             const isSpecial = (m.id === latestSpecialHolderId || m.name === latestSpecialHolderId);
 
+            // 레벨 스타일, 변환된 배지 텍스트, 글로우 클래스 가져오기
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
                 : { bg: '#fff', border: '#ccc', text: '#000', blink: '', badgeTxt: m.level || 0, glowBoxClass: '', glowTextClass: '' };
 
-            // HTML 생성 구문 내부 레벨 배지 영역:
-            `<td style="position: relative;">
+            const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
+
+            const rawHeight = m.totalHeight || 0;
+            const displayHeight = rawHeight >= 10000 
+                ? (rawHeight / 1000).toFixed(1) + 'k' 
+                : rawHeight + 'm';
+
+            htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
+            <td style="position: relative;" class="text-xs text-center">
                 ${clickTag}
-                <div class="badge-level">
-                    <div class="pin-wrapper">
-                        <!-- 📍 박스에는 박스 전용 애니메이션 (glowBoxClass) 적용 -->
-                        <div class="badge-icon-box ${style.blink || ''} ${style.glowBoxClass} cursor-pointer"
-                             onclick="showMilkyWay('${m.name}', '${m.name}')"
-                             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                            <!-- 📍 상단 박스 내부 텍스트는 레벨 본래의 지정 텍스트 색상(style.text) 유지 -->
-                            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${style.badgeTxt}</span>
-                        </div>
-                    </div>
-                    <!-- 📍 하단 레벨 텍스트(Lv 11)에만 글자 색상 교체 애니메이션 (glowTextClass) 적용 -->
-                    <span class="badge-lv-txt ${style.glowTextClass}" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
+                <div class="flex flex-col items-center justify-center">
+                    ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
+                    <span class="font-bold ${nameColor} cursor-pointer hover:underline"
+                          onclick="showMemberMountain('${m.name}', '${m.name}')">
+                        ${m.name}
+                    </span>
                 </div>
             </td>
-
             <td style="position: relative;">
                 ${clickTag}
                 <div class="badge-level">
                     <div class="pin-wrapper">
-                        <!-- 📍 글로우 효과(style.glowClass)가 있으면 기존 테두리를 대체하며 애니메이션 적용 -->
-                        <div class="badge-icon-box ${style.blink || ''} ${style.glowClass} cursor-pointer"
+                        <!-- 박스용 테두리 글로우 애니메이션 (glowBoxClass) -->
+                        <div class="badge-icon-box ${style.blink || ''} ${style.glowBoxClass} cursor-pointer"
                              onclick="showMilkyWay('${m.name}', '${m.name}')"
                              style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
                             <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${style.badgeTxt}</span>
                         </div>
                     </div>
-                    <!-- 📍 Lv.XX 텍스트에도 동일하게 글로우 효과(style.glowClass) 적용 -->
-                    <span class="badge-lv-txt ${style.glowClass}" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
+                    <!-- 하단 Lv.XX 글자용 텍스트 글로우 애니메이션 (glowTextClass) -->
+                    <span class="badge-lv-txt ${style.glowTextClass}" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
                 </div>
             </td>
             <td style="position: relative;">
@@ -4117,6 +4117,9 @@ window.renderStatusTable = function() {
     }
 };
 
+
+                
+            
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
  window.showBondingForestModal = async (targetName, targetId) => {
