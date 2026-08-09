@@ -13,21 +13,19 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-
-
-        /* ================= 레벨 배지 래퍼 ================= */
+/* ================= 레벨 배지 래퍼 ================= */
 .pin-wrapper {
     position: relative;
     display: inline-block;
 }
 
 /* ---------------- 🔥 슈퍼별 애니메이션 ---------------- */
-/* 1) 배지 박스 (테두리 및 그림자만 애니메이션) */
+/* 1) 배지 박스 (테두리 그라데이션 & 빛 애니메이션) */
 .glow-super-box {
     animation: superBoxGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
 
-/* 2) 하단 Lv.XX 글씨 (글자 색상 및 텍스트 글로우 애니메이션) */
+/* 2) 하단 Lv.XX 글씨 (글자 그라데이션 색상 & 글로우) */
 .glow-super-text {
     animation: superTextGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
@@ -67,7 +65,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 
 
 /* ---------------- ✨ 스페셜별 애니메이션 ---------------- */
-/* 1) 배지 박스 (테두리 및 그림자) */
+/* 1) 배지 박스 (테두리 그라데이션 & 빛 애니메이션) */
 .glow-special-box {
     animation: specialBoxGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
@@ -109,6 +107,9 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
         text-shadow: 0 0 8px rgba(168, 85, 247, 0.9);
     }
 }
+
+
+        
 
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
@@ -3757,9 +3758,11 @@ const levelThresholds = [
 
 
     const getLevelBadge = (lv) => { 
-    for (const t of levelThresholds) { 
-        if (lv >= t.lv) return t.name; 
-    } 
+    if (typeof levelThresholds !== 'undefined' && Array.isArray(levelThresholds)) {
+        for (const t of levelThresholds) { 
+            if (lv >= t.lv) return t.name; 
+        } 
+    }
     return "🫘 신입"; 
 };
 
@@ -3780,16 +3783,12 @@ const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
 
     let glowBoxClass = '';
     let glowTextClass = '';
-    let badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(lv) : (lv || 0);
+    let badgeTxt = getLevelBadge(lv); // 📍 원래 마크(이모지) 그대로 유지
 
     if (isSuper) {
-        // 첫 이모지를 🔥로 교체 (예: ⛰️ 산 -> 🔥 산)
-        badgeTxt = String(badgeTxt).replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '🔥');
         glowBoxClass = 'glow-super-box';
         glowTextClass = 'glow-super-text';
     } else if (isSpecial) {
-        // 첫 이모지를 ✨로 교체
-        badgeTxt = String(badgeTxt).replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '✨');
         glowBoxClass = 'glow-special-box';
         glowTextClass = 'glow-special-text';
     }
@@ -3919,6 +3918,8 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
+
+         
 window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
@@ -3943,7 +3944,7 @@ window.renderStatusTable = function() {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기 (승계 지원)
+        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 가져오기
         const latestSuperHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('super') : null;
         const latestSpecialHolderId = (typeof getLatestLegendHolderId === 'function') ? getLatestLegendHolderId('special') : null;
 
@@ -4026,7 +4027,7 @@ window.renderStatusTable = function() {
             const isSuper = (m.id === latestSuperHolderId || m.name === latestSuperHolderId);
             const isSpecial = (m.id === latestSpecialHolderId || m.name === latestSpecialHolderId);
 
-            // 레벨 스타일, 변환된 배지 텍스트, 글로우 클래스 가져오기
+            // 레벨 스타일, 원본 배지 텍스트, 글로우 클래스 가져오기
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
                 : { bg: '#fff', border: '#ccc', text: '#000', blink: '', badgeTxt: m.level || 0, glowBoxClass: '', glowTextClass: '' };
@@ -4116,9 +4117,7 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
-
-
-                
+       
             
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
