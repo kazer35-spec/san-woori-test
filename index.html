@@ -2649,48 +2649,47 @@ box-sizing: border-box;
 
 
 
-/* 90레벨 전용 주황색 글로우 효과 */
 /* ==============================================
-   레벨별 글로우 효과 (천천히, 넓고 은은하게 번짐)
+   레벨별 글로우 효과 (반으로 줄인 적당한 번짐)
    ============================================== */
 
-/* [Yellow / 80레벨] - 주위에 은은하게 넓게 퍼지는 노란빛 */
+/* [Yellow / 80레벨] */
 @keyframes glow-yellow {
   0%, 100% {
     border-color: #facc15;
-    box-shadow: 0 0 6px rgba(250, 204, 21, 0.3);
+    box-shadow: 0 0 3px rgba(250, 204, 21, 0.3);
   }
   50% {
     border-color: #eab308;
-    box-shadow: 0 0 20px 4px rgba(234, 179, 8, 0.55);
+    box-shadow: 0 0 10px 2px rgba(234, 179, 8, 0.55);
   }
 }
 
-/* [Orange / 90레벨] - 묵직하고 은은하게 퍼지는 주황빛 */
+/* [Orange / 90레벨] */
 @keyframes glow-orange {
   0%, 100% {
     border-color: #f97316;
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.35);
+    box-shadow: 0 0 4px rgba(249, 115, 22, 0.35);
   }
   50% {
     border-color: #ea580c;
-    box-shadow: 0 0 24px 5px rgba(234, 88, 12, 0.6);
+    box-shadow: 0 0 12px 2.5px rgba(234, 88, 12, 0.6);
   }
 }
 
-/* [Red / 100레벨] - 강력하지만 부드럽게 퍼지는 붉은빛 */
+/* [Red / 100레벨] */
 @keyframes glow-red {
   0%, 100% {
     border-color: #ef4444;
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
   }
   50% {
     border-color: #dc2626;
-    box-shadow: 0 0 28px 6px rgba(220, 38, 38, 0.65);
+    box-shadow: 0 0 14px 3px rgba(220, 38, 38, 0.65);
   }
 }
 
-/* 클래스 적용 (주기를 3초~3.5초로 늘려 부드럽게 전환) */
+/* 클래스 적용 */
 .level-blink-yellow {
   animation: glow-yellow 3.5s infinite ease-in-out;
   border-width: 1.8px !important;
@@ -2705,6 +2704,7 @@ box-sizing: border-box;
   animation: glow-red 3.0s infinite ease-in-out;
   border-width: 1.8px !important;
 }
+
 
 .year-select-custom { padding: 4px 12px; border-radius: 20px; background: #f1f5f9; font-weight: 800; font-size: 0.8rem; height: 32px !important; width: auto !important; }
 #quarterTabs { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 4px; border-radius: 30px; }
