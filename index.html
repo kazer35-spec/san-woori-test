@@ -9259,8 +9259,10 @@ document.addEventListener('touchstart', (e) => {
 
 
 
+
+
 // ===================================================
-// [수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
+// [최종 수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
 // ===================================================
 (function() {
     const MODAL_IDS = [
@@ -9279,13 +9281,10 @@ document.addEventListener('touchstart', (e) => {
         'grassPopup'
     ];
 
-    // 스택 관리: [{ id: 'modalId', pushed: true/false }]
+    // 스택 관리: ['modalId', ...]
     let activeModalStack = [];
-    
-    // X버튼/배경 클릭 등으로 인해 history.back() 실행 시 popstate 연쇄 반응 방지용 플래그
-    let isIgnorePopstate = false;
 
-    // 모달 감지 기준 완화 (opacity 및 flex/block 모두 감지)
+    // 모달 감지 기준 (opacity 및 flex/block 모두 감지)
     function isModalOpen(id) {
         const el = document.getElementById(id);
         if (!el) return false;
@@ -9374,24 +9373,16 @@ document.addEventListener('touchstart', (e) => {
                 history.pushState({ modalId: id }, '', location.href);
             } 
             // 2. 사용자가 X버튼이나 배경 클릭으로 직접 닫은 경우
+            // [수정 포인트] history.back() 호출로 인한 부모창 동시 닫힘 현상을 막기 위해
+            // 히스토리는 강제 트리거하지 않고 스택만 업데이트합니다.
             else if (!open && inStack) {
                 activeModalStack = activeModalStack.filter(item => item !== id);
-                // 브라우저 뒤로가기 상태와 갯수 동기화 (히스토리 정리)
-                if (history.state && history.state.modalId === id) {
-                    isIgnorePopstate = true; // X버튼으로 히스토리를 깎을 때는 popstate 처리 건너뜀
-                    history.back();
-                }
             }
         });
     }
 
     // 뒤로가기 버튼(popstate) 눌렀을 때의 동작
     window.addEventListener('popstate', (e) => {
-        if (isIgnorePopstate) {
-            isIgnorePopstate = false;
-            return;
-        }
-
         if (activeModalStack.length > 0) {
             const lastModalId = activeModalStack.pop();
             forceCloseModal(lastModalId);
@@ -9421,6 +9412,7 @@ document.addEventListener('touchstart', (e) => {
         initObserver();
     }
 })();
+
 
 
 </script>
