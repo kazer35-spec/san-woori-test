@@ -9258,8 +9258,9 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: true });
 
 
+
 // ===================================================
-// [최종 수정] San:Woori mountainViewModal / milkyWayModal 연동 스크립트
+// [최종 수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
 // ===================================================
 (function() {
     const MODAL_IDS = [
@@ -9279,7 +9280,6 @@ document.addEventListener('touchstart', (e) => {
     ];
 
     let activeModalStack = [];
-    let isHandlingPopstate = false; // 뒤로가기 이벤트 처리 중 Flag
 
     function isModalOpen(id) {
         const el = document.getElementById(id);
@@ -9299,7 +9299,6 @@ document.addEventListener('touchstart', (e) => {
             case 'milkyWayModal':
                 if (typeof window.toggleMilkyWayModal === 'function') window.toggleMilkyWayModal(false);
                 else if (typeof window.closeMilkyWayModal === 'function') window.closeMilkyWayModal();
-                else if (typeof window.closeMilkyWay === 'function') window.closeMilkyWay();
                 else hideEl(id);
                 break;
             case 'starGuideModal':
@@ -9325,7 +9324,6 @@ document.addEventListener('touchstart', (e) => {
             case 'mountainViewModal':
                 if (typeof window.toggleMountainViewModal === 'function') window.toggleMountainViewModal(false);
                 else if (typeof window.closeMountainViewModal === 'function') window.closeMountainViewModal();
-                else if (typeof window.closeMountainView === 'function') window.closeMountainView();
                 else hideEl(id);
                 break;
             case 'levelModal':
@@ -9376,13 +9374,9 @@ document.addEventListener('touchstart', (e) => {
                 activeModalStack.push(id);
                 history.pushState({ modalId: id }, '', location.href);
             } 
-            // 2. 버튼/배경 클릭 등으로 사용자 인터랙션에 의해 직접 닫힌 경우
+            // 2. 직접 X 버튼 등으로 닫힌 경우
             else if (!open && inStack) {
                 activeModalStack = activeModalStack.filter(item => item !== id);
-                // popstate에 의한 닫기가 아닐 경우 push된 history 1개를 원복
-                if (!isHandlingPopstate) {
-                    history.back();
-                }
             }
         });
     }
@@ -9390,13 +9384,8 @@ document.addEventListener('touchstart', (e) => {
     // 뒤로가기(popstate) 실행 시 현재 열려있는 가장 최상위 모달 1개만 안전하게 닫기
     window.addEventListener('popstate', (e) => {
         if (activeModalStack.length > 0) {
-            isHandlingPopstate = true;
             const lastModalId = activeModalStack.pop();
             forceCloseModal(lastModalId);
-            // 상태 반영 후 Flag 해제
-            setTimeout(() => {
-                isHandlingPopstate = false;
-            }, 50);
         }
     });
 
@@ -9423,8 +9412,6 @@ document.addEventListener('touchstart', (e) => {
     }
 })();
 
-
-            
 
 </script>
 </body>
