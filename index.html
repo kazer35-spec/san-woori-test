@@ -3892,7 +3892,7 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
-window.renderStatusTable = function() {
+ window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
         const searchInput = document.getElementById('searchInput');
@@ -3993,7 +3993,20 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-            const style = (typeof getLevelStyle === 'function') ? getLevelStyle(m.level) : { bg: '#fff', border: '#ccc', text: '#000', blink: '' };
+            // 🌟 슈퍼별/스페셜별 보유 여부 판별 (글로벌 변수 안전 참조)
+            const superId = typeof latestSuperHolderId !== 'undefined' ? latestSuperHolderId : null;
+            const superName = typeof latestSuperHolderName !== 'undefined' ? latestSuperHolderName : null;
+            const specialId = typeof latestSpecialHolderId !== 'undefined' ? latestSpecialHolderId : null;
+            const specialName = typeof latestSpecialHolderName !== 'undefined' ? latestSpecialHolderName : null;
+
+            const isSuper = (m.id && m.id === superId) || (m.name && m.name === superName);
+            const isSpecial = (m.id && m.id === specialId) || (m.name && m.name === specialName);
+
+            // 🌟 getLevelStyle 호출 시 isSuper, isSpecial 넘겨 pinHtml 받아옴
+            const style = (typeof getLevelStyle === 'function') 
+                ? getLevelStyle(m.level, isSuper, isSpecial) 
+                : { bg: '#fff', border: '#ccc', text: '#000', blink: '', pinHtml: '' };
+
             const badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(m.level) : (m.level || 0);
             const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
@@ -4016,10 +4029,12 @@ window.renderStatusTable = function() {
             <td style="position: relative;">
                 ${clickTag}
                 <div class="badge-level">
-                    <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
-                         onclick="showMilkyWay('${m.name}', '${m.name}')"
-                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                        <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
+                    <div class="pin-wrapper cursor-pointer" onclick="showMilkyWay('${m.name}', '${m.name}')">
+                        <div class="badge-icon-box ${style.blink || ''}"
+                             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
+                        </div>
+                        ${style.pinHtml || ''}
                     </div>
                     <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
                 </div>
@@ -4076,7 +4091,6 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
-
 
 
 
