@@ -21,60 +21,94 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     display: inline-block;
 }
 
-/* 🔥 슈퍼별 보유자 애니메이션 (배지 박스 & 레벨 텍스트 공통) */
-.glow-super-target {
-    animation: superGlowEffect 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
+/* ---------------- 🔥 슈퍼별 애니메이션 ---------------- */
+/* 1) 배지 박스 (테두리 및 그림자만 애니메이션) */
+.glow-super-box {
+    animation: superBoxGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
 
-/* ✨ 스페셜별 보유자 애니메이션 (배지 박스 & 레벨 텍스트 공통) */
-.glow-special-target {
-    animation: specialGlowEffect 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
+/* 2) 하단 Lv.XX 글씨 (글자 색상 및 텍스트 글로우 애니메이션) */
+.glow-super-text {
+    animation: superTextGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
 }
 
-/* 🔥 슈퍼별 글로우 키프레임 (테두리, 그림자, 텍스트 색상 전환) */
-@keyframes superGlowEffect {
+@keyframes superBoxGlow {
     0% {
         border-color: #ffd700 !important;
-        color: #ffd700 !important;
         box-shadow: 0 0 6px rgba(255, 215, 0, 0.8), inset 0 0 3px rgba(255, 215, 0, 0.3);
         transform: scale(1);
     }
     50% {
         border-color: #ff7800 !important;
-        color: #ff7800 !important;
         box-shadow: 0 0 10px rgba(255, 120, 0, 0.9), inset 0 0 4px rgba(255, 120, 0, 0.4);
         transform: scale(1.04);
     }
     100% {
         border-color: #ff1e27 !important;
-        color: #ff1e27 !important;
         box-shadow: 0 0 14px rgba(255, 30, 39, 1), inset 0 0 5px rgba(255, 30, 39, 0.5);
         transform: scale(1.08);
     }
 }
 
-/* ✨ 스페셜별 글로우 키프레임 */
-@keyframes specialGlowEffect {
+@keyframes superTextGlow {
+    0% {
+        color: #d97706 !important; /* 금빛 주황 */
+        text-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
+    }
+    50% {
+        color: #ea580c !important; /* 오렌지 */
+        text-shadow: 0 0 6px rgba(255, 120, 0, 0.8);
+    }
+    100% {
+        color: #dc2626 !important; /* 빨강 */
+        text-shadow: 0 0 8px rgba(255, 30, 39, 0.9);
+    }
+}
+
+
+/* ---------------- ✨ 스페셜별 애니메이션 ---------------- */
+/* 1) 배지 박스 (테두리 및 그림자) */
+.glow-special-box {
+    animation: specialBoxGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
+}
+
+/* 2) 하단 Lv.XX 글씨 */
+.glow-special-text {
+    animation: specialTextGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate !important;
+}
+
+@keyframes specialBoxGlow {
     0% {
         border-color: #10b981 !important;
-        color: #10b981 !important;
         box-shadow: 0 0 6px rgba(16, 185, 129, 0.8), inset 0 0 3px rgba(16, 185, 129, 0.3);
         transform: scale(1);
     }
     50% {
         border-color: #3b82f6 !important;
-        color: #3b82f6 !important;
         box-shadow: 0 0 10px rgba(59, 130, 246, 0.9), inset 0 0 4px rgba(59, 130, 246, 0.4);
         transform: scale(1.04);
     }
     100% {
         border-color: #a855f7 !important;
-        color: #a855f7 !important;
         box-shadow: 0 0 14px rgba(168, 85, 247, 1), inset 0 0 5px rgba(168, 85, 247, 0.5);
         transform: scale(1.08);
     }
 }
 
+@keyframes specialTextGlow {
+    0% {
+        color: #059669 !important; /* 에메랄드 */
+        text-shadow: 0 0 4px rgba(16, 185, 129, 0.6);
+    }
+    50% {
+        color: #2563eb !important; /* 파랑 */
+        text-shadow: 0 0 6px rgba(59, 130, 246, 0.8);
+    }
+    100% {
+        color: #9333ea !important; /* 보라 */
+        text-shadow: 0 0 8px rgba(168, 85, 247, 0.9);
+    }
+}
 
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
@@ -3744,23 +3778,24 @@ const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '' };
     else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '' };
 
-    // 🌟 슈퍼별 / 스페셜별 보유자 처리 (이모지 변경 & 글로우 클래스 추가)
-    let glowClass = '';
-    let badgeTxt = getLevelBadge(lv);
+    let glowBoxClass = '';
+    let glowTextClass = '';
+    let badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(lv) : (lv || 0);
 
     if (isSuper) {
-        // 기존 배지 텍스트의 첫 이모지를 🔥로 교체 (예: 🌳 나무 -> 🔥 나무)
-        badgeTxt = badgeTxt.replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '🔥');
-        glowClass = 'glow-super-target';
+        // 첫 이모지를 🔥로 교체 (예: ⛰️ 산 -> 🔥 산)
+        badgeTxt = String(badgeTxt).replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '🔥');
+        glowBoxClass = 'glow-super-box';
+        glowTextClass = 'glow-super-text';
     } else if (isSpecial) {
-        // 기존 배지 텍스트의 첫 이모지를 ✨로 교체 (예: ⛰️ 산 -> ✨ 산)
-        badgeTxt = badgeTxt.replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '✨');
-        glowClass = 'glow-special-target';
+        // 첫 이모지를 ✨로 교체
+        badgeTxt = String(badgeTxt).replace(/^(\p{Extended_Pictographic}|\p{Emoji_Presentation})/u, '✨');
+        glowBoxClass = 'glow-special-box';
+        glowTextClass = 'glow-special-text';
     }
 
-    return { ...base, badgeTxt, glowClass };
+    return { ...base, badgeTxt, glowBoxClass, glowTextClass };
 };
-
 
 
 async function updateVisitorCount() {
@@ -3988,33 +4023,32 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-            // 👑 슈퍼/스페셜 보유 여부 판단 (ID 또는 Name 일치)
+                        // 👑 슈퍼/스페셜 보유 여부 판단
             const isSuper = (m.id === latestSuperHolderId || m.name === latestSuperHolderId);
             const isSpecial = (m.id === latestSpecialHolderId || m.name === latestSpecialHolderId);
 
-            // 레벨 스타일, 변환된 배지 텍스트, 글로우 클래스 가져오기
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
-                : { bg: '#fff', border: '#ccc', text: '#000', blink: '', badgeTxt: m.level || 0, glowClass: '' };
+                : { bg: '#fff', border: '#ccc', text: '#000', blink: '', badgeTxt: m.level || 0, glowBoxClass: '', glowTextClass: '' };
 
-            const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
-
-            const rawHeight = m.totalHeight || 0;
-            const displayHeight = rawHeight >= 10000 
-                ? (rawHeight / 1000).toFixed(1) + 'k' 
-                : rawHeight + 'm';
-
-            htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-            <td style="position: relative;" class="text-xs text-center">
+            // HTML 생성 구문 내부 레벨 배지 영역:
+            `<td style="position: relative;">
                 ${clickTag}
-                <div class="flex flex-col items-center justify-center">
-                    ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
-                    <span class="font-bold ${nameColor} cursor-pointer hover:underline"
-                          onclick="showMemberMountain('${m.name}', '${m.name}')">
-                        ${m.name}
-                    </span>
+                <div class="badge-level">
+                    <div class="pin-wrapper">
+                        <!-- 📍 박스에는 박스 전용 애니메이션 (glowBoxClass) 적용 -->
+                        <div class="badge-icon-box ${style.blink || ''} ${style.glowBoxClass} cursor-pointer"
+                             onclick="showMilkyWay('${m.name}', '${m.name}')"
+                             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                            <!-- 📍 상단 박스 내부 텍스트는 레벨 본래의 지정 텍스트 색상(style.text) 유지 -->
+                            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${style.badgeTxt}</span>
+                        </div>
+                    </div>
+                    <!-- 📍 하단 레벨 텍스트(Lv 11)에만 글자 색상 교체 애니메이션 (glowTextClass) 적용 -->
+                    <span class="badge-lv-txt ${style.glowTextClass}" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
                 </div>
             </td>
+
             <td style="position: relative;">
                 ${clickTag}
                 <div class="badge-level">
