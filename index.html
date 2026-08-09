@@ -13,6 +13,36 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+    /* 🌌 은하수창 스타일 그라데이션 테두리 & 배경 박스 */
+.badge-milkyway-box {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%) !important;
+    border: 1.5px solid transparent !important;
+    border-image: linear-gradient(135deg, #38bdf8, #c084fc, #f43f5e) 1 !important;
+    box-shadow: 0 0 10px rgba(192, 132, 252, 0.5), inset 0 0 6px rgba(56, 189, 248, 0.4);
+    animation: milkywayBoxGlow 3s ease-in-out infinite alternate;
+}
+
+/* 🌌 은하수창 텍스트 및 마크 그라데이션 (마크 이름 + 레벨 수치 공통 연동) */
+.text-milkyway-gradient {
+    background: linear-gradient(135deg, #38bdf8 0%, #c084fc 50%, #f43f5e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800 !important;
+    filter: drop-shadow(0px 0px 2px rgba(192, 132, 252, 0.6));
+}
+
+/* 🌌 은하수창 빛남 키프레임 애니메이션 */
+@keyframes milkywayBoxGlow {
+    0% {
+        box-shadow: 0 0 6px rgba(56, 189, 248, 0.6), inset 0 0 4px rgba(192, 132, 252, 0.4);
+        transform: scale(1);
+    }
+    100% {
+        box-shadow: 0 0 14px rgba(244, 63, 94, 0.8), inset 0 0 8px rgba(56, 189, 248, 0.7);
+        transform: scale(1.05);
+    }
+}
+
     /* 🔥 슈퍼별 텍스트 & 마크 그라데이션 (빨강 -> 주황 -> 노랑) */
 .text-super-gradient {
     background: linear-gradient(135deg, #ff1e27 0%, #ff7800 50%, #ffd700 100%);
@@ -3730,38 +3760,44 @@ const levelThresholds = [
 
     const getLevelBadge = (lv) => { for (const t of levelThresholds) { if (lv >= t.lv) return t.name; } return "🫘 신입"; };
 
-// 레벨 스타일 판별 함수
+// 레벨 스타일 및 마크 조합 함수
 const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
-    let base = { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '', customClass: '' };
+    let base = { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '', boxClass: '', gradClass: '' };
 
-    if (lv >= 100) base = { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', blink: 'level-blink-red', customClass: '' };
-    else if (lv >= 90) base = { bg: '#fff7ed', border: '#f97316', text: '#c2410c', blink: 'level-blink-orange', customClass: '' };
-    else if (lv >= 80) base = { bg: '#fefce8', border: '#facc15', text: '#a16207', blink: 'level-blink-yellow', customClass: '' };
-    else if (lv >= 70) base = { bg: '#fff1f2', border: '#fb7185', text: '#e11d48', blink: '', customClass: '' };
-    else if (lv >= 60) base = { bg: '#fff7ed', border: '#fb923c', text: '#ea580c', blink: '', customClass: '' };
-    else if (lv >= 50) base = { bg: '#fefce8', border: '#fde047', text: '#a16207', blink: '', customClass: '' };
-    else if (lv >= 40) base = { bg: '#f0fdf4', border: '#4ade80', text: '#166534', blink: '', customClass: '' };
-    else if (lv >= 30) base = { bg: '#f0fdfa', border: '#2dd4bf', text: '#0d9488', blink: '', customClass: '' };
-    else if (lv >= 20) base = { bg: '#eff6ff', border: '#60a5fa', text: '#1d4ed8', blink: '', customClass: '' };
-    else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '', customClass: '' };
-    else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '', customClass: '' };
+    if (lv >= 100) base = { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', blink: 'level-blink-red', boxClass: '', gradClass: '' };
+    else if (lv >= 90) base = { bg: '#fff7ed', border: '#f97316', text: '#c2410c', blink: 'level-blink-orange', boxClass: '', gradClass: '' };
+    else if (lv >= 80) base = { bg: '#fefce8', border: '#facc15', text: '#a16207', blink: 'level-blink-yellow', boxClass: '', gradClass: '' };
+    else if (lv >= 70) base = { bg: '#fff1f2', border: '#fb7185', text: '#e11d48', blink: '', boxClass: '', gradClass: '' };
+    else if (lv >= 60) base = { bg: '#fff7ed', border: '#fb923c', text: '#ea580c', blink: '', boxClass: '', gradClass: '' };
+    else if (lv >= 50) base = { bg: '#fefce8', border: '#fde047', text: '#a16207', blink: '', boxClass: '', gradClass: '' };
+    else if (lv >= 40) base = { bg: '#f0fdf4', border: '#4ade80', text: '#166534', blink: '', boxClass: '', gradClass: '' };
+    else if (lv >= 30) base = { bg: '#f0fdfa', border: '#2dd4bf', text: '#0d9488', blink: '', boxClass: '', gradClass: '' };
+    else if (lv >= 20) base = { bg: '#eff6ff', border: '#60a5fa', text: '#1d4ed8', blink: '', boxClass: '', gradClass: '' };
+    else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '', boxClass: '', gradClass: '' };
+    else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '', boxClass: '', gradClass: '' };
 
-    // 일반 레벨 마크 가져오기
-    let badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(lv) : (lv || 0);
+    // 기존 레벨 마크 (예: "⛰️ 산", "🌋 화산") 가져오기
+    const originalBadge = (typeof getLevelBadge === 'function') ? getLevelBadge(lv) : String(lv || 0);
+    
+    // 이모지를 제외하고 뒤의 글자만 추출 ("⛰️ 산" -> "산")
+    const badgeNameOnly = String(originalBadge).replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
 
-    // 👑 슈퍼별 / 스페셜별 보유자 처리 (이모지 교체 & 그라데이션 클래스 부여)
+    let badgeTxt = originalBadge;
+
+    // 👑 슈퍼별 / 스페셜별 보유자 처리 (이모지만 🔥/✨로 교체 -> "🔥 산", "✨ 화산")
     if (isSuper) {
-        badgeTxt = '🔥';
-        base.customClass = 'badge-super-glow';
-        base.text = '#ffffff';
+        badgeTxt = `🔥 ${badgeNameOnly}`;
+        base.boxClass = 'badge-milkyway-box';
+        base.gradClass = 'text-milkyway-gradient';
     } else if (isSpecial) {
-        badgeTxt = '✨';
-        base.customClass = 'badge-special-glow';
-        base.text = '#ffffff';
+        badgeTxt = `✨ ${badgeNameOnly}`;
+        base.boxClass = 'badge-milkyway-box';
+        base.gradClass = 'text-milkyway-gradient';
     }
 
     return { ...base, badgeTxt };
 };
+
     
 async function updateVisitorCount() {
 const d = new Date();
@@ -3884,10 +3920,8 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
-  
 
 // 현황 테이블 렌더링 함수
-
 window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
@@ -3992,11 +4026,11 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-            // 👑 슈퍼별 / 스페셜별 판별
+            // 👑 슈퍼별 / 스페셜별 여부 판별
             const isSuper = (m.id === latestSuperHolderId || m.name === latestSuperHolderId);
             const isSpecial = (m.id === latestSpecialHolderId || m.name === latestSpecialHolderId);
 
-            // 스타일 수급 (그라데이션 연동 클래스 포함)
+            // 스타일 수급 (이모지 교체 + 은하수 그라데이션)
             const style = getLevelStyle(m.level, isSuper, isSpecial);
 
             const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
@@ -4006,7 +4040,7 @@ window.renderStatusTable = function() {
                 ? (rawHeight / 1000).toFixed(1) + 'k' 
                 : rawHeight + 'm';
 
-            // 📍 마크 + Lv 글씨 그라데이션 연동 HTML 구조
+            // 📍 HTML 렌더링
             htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
             <td style="position: relative;" class="text-xs text-center">
                 ${clickTag}
@@ -4021,16 +4055,17 @@ window.renderStatusTable = function() {
             <td style="position: relative;">
                 ${clickTag}
                 <div class="badge-level flex items-center justify-center gap-1">
-                    <!-- 기존 배지 박스 유지 + 내부 마크(🔥/✨) 그라데이션 연동 -->
-                    <div class="badge-icon-box ${style.blink} cursor-pointer"
+                    <!-- 레벨 배지 박스 (은하수창 테두리) -->
+                    <div class="badge-icon-box ${style.blink} ${style.boxClass} cursor-pointer"
                          onclick="showMilkyWay('${m.name}', '${m.name}')"
-                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                         style="${style.boxClass ? '' : `background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;`}">
+                        <!-- 이모지만 교체된 마크 (🔥 산, ✨ 화산 등) -->
                         <span class="badge-icon-txt ${style.gradClass}" style="${style.gradClass ? '' : `color:${style.text};`} font-weight: bold;">
                             ${style.badgeTxt}
                         </span>
                     </div>
                     
-                    <!-- 레벨 글씨 (Lv XX)도 마크와 동일하게 그라데이션 연동 -->
+                    <!-- 레벨 글씨 (Lv XX)도 은하수 그라데이션 연동 -->
                     <span class="badge-lv-txt ${style.gradClass}" style="${style.gradClass ? '' : `color:${style.text};`} font-weight: bold;">
                         Lv ${m.level || 0}
                     </span>
@@ -4088,6 +4123,10 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
+
+                
+
+        
 
                 
 
