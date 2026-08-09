@@ -3739,8 +3739,8 @@ const levelThresholds = [
 
     const getLevelBadge = (lv) => { for (const t of levelThresholds) { if (lv >= t.lv) return t.name; } return "🫘 신입"; };
 
-/* ==========================================================================
-getLevelStyle 함수를 호이스팅이 가능하도록 function 키워드로 먼저 선언
+/* =================================================== */
+// 2. 그 다음 줄에 getLevelStyle 함수 배치
 function getLevelStyle(lv, isSuper = false, isSpecial = false) {
     let base = { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '' };
 
