@@ -14,42 +14,44 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 
-/* ================= 레벨 배지 핀 래퍼 ================= */
+/* ================= 레벨 배지 및 핀 래퍼 ================= */
 .pin-wrapper {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px; /* 레벨 텍스트와 미니 핀 사이의 간격 */
 }
 
-/* 🔥 슈퍼별 미니 핀 (원래 크기 대비 25% 축소 & 빨간색 불투명 30%) */
+/* 🔥 슈퍼별 미니 핀 (레벨 표시 우측 배치 & 빨간색 불투명 30%) */
 .glow-pin-super {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: rgba(220, 38, 38, 0.3); /* 📌 빨간색(Red) 불투명 30% */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(220, 38, 38, 0.3); /* 빨간색 불투명 30% */
     backdrop-filter: blur(2px);
     border: 1px solid #ffd700;
     border-radius: 9999px;
-    padding: 1px 3px;                 /* 여백 축소 (기존 1px 4px) */
-    font-size: 0.5rem;                /* 원래(0.65rem) 대비 약 23% 축소 */
+    padding: 1px 3px;
+    font-size: 0.5rem;                  /* 25% 축소 크기 유지 */
     line-height: 1;
-    z-index: 10;
+    z-index: 2;
     pointer-events: none;
     animation: superPinBorderGlow 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 
-/* ✨ 스페셜별 미니 핀 (원래 크기 대비 25% 축소 & 보라색 불투명 30%) */
+/* ✨ 스페셜별 미니 핀 (레벨 표시 우측 배치 & 보라색 불투명 30%) */
 .glow-pin-special {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: rgba(147, 51, 234, 0.3); /* 📌 보라색(Purple) 불투명 30% */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(147, 51, 234, 0.3); /* 보라색 불투명 30% */
     backdrop-filter: blur(2px);
     border: 1px solid #10b981;
     border-radius: 9999px;
-    padding: 1px 3px;                 /* 여백 축소 */
-    font-size: 0.5rem;                /* 원래(0.65rem) 대비 약 23% 축소 */
+    padding: 1px 3px;
+    font-size: 0.5rem;                  /* 25% 축소 크기 유지 */
     line-height: 1;
-    z-index: 10;
+    z-index: 2;
     pointer-events: none;
     animation: specialPinBorderGlow 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
@@ -58,18 +60,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 @keyframes superPinBorderGlow {
     0% {
         border-color: #ffd700;
-        box-shadow: 0 0 5px rgba(255, 215, 0, 0.8), inset 0 0 3px rgba(255, 215, 0, 0.3);
+        box-shadow: 0 0 4px rgba(255, 215, 0, 0.8), inset 0 0 2px rgba(255, 215, 0, 0.3);
         transform: scale(1);
     }
     50% {
         border-color: #ff7800;
-        box-shadow: 0 0 8px rgba(255, 120, 0, 0.9), inset 0 0 4px rgba(255, 120, 0, 0.4);
-        transform: scale(1.06);
+        box-shadow: 0 0 7px rgba(255, 120, 0, 0.9), inset 0 0 3px rgba(255, 120, 0, 0.4);
+        transform: scale(1.05);
     }
     100% {
         border-color: #ff1e27;
-        box-shadow: 0 0 12px rgba(255, 30, 39, 1), inset 0 0 5px rgba(255, 30, 39, 0.5);
-        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(255, 30, 39, 1), inset 0 0 4px rgba(255, 30, 39, 0.5);
+        transform: scale(1.08);
     }
 }
 
@@ -77,18 +79,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 @keyframes specialPinBorderGlow {
     0% {
         border-color: #10b981;
-        box-shadow: 0 0 5px rgba(16, 185, 129, 0.8), inset 0 0 3px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 4px rgba(16, 185, 129, 0.8), inset 0 0 2px rgba(16, 185, 129, 0.3);
         transform: scale(1);
     }
     50% {
         border-color: #3b82f6;
-        box-shadow: 0 0 8px rgba(59, 130, 246, 0.9), inset 0 0 4px rgba(59, 130, 246, 0.4);
-        transform: scale(1.06);
+        box-shadow: 0 0 7px rgba(59, 130, 246, 0.9), inset 0 0 3px rgba(59, 130, 246, 0.4);
+        transform: scale(1.05);
     }
     100% {
         border-color: #a855f7;
-        box-shadow: 0 0 12px rgba(168, 85, 247, 1), inset 0 0 5px rgba(168, 85, 247, 0.5);
-        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(168, 85, 247, 1), inset 0 0 4px rgba(168, 85, 247, 0.5);
+        transform: scale(1.08);
     }
 }
 
