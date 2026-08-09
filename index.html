@@ -9087,22 +9087,23 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
                              </script>
 
-<div id="mountainViewModal" class="mountain-modal" onclick="this.style.display='none'">
+<!-- [수정 전] onclick="this.style.display='none'" -->
+<!-- [수정 후] onclick="window.closeMountainViewModal()" -->
+<div id="mountainViewModal" class="mountain-modal" onclick="window.closeMountainViewModal()">
     <div id="integratedCard" class="integrated-member-card" onclick="event.stopPropagation()">
 
         <!-- [나이테 섹션] -->
         <div class="tree-ring-section">
             <div class="ring-header">
                 <!-- [나이테 섹션] 타이틀 그룹 부분 -->
-<div class="ring-title-group">
-    <span class="ring-label">ACTIVITY HISTORY</span>
-    
-    <!-- 💡 아래 h3 태그와 버튼에 position과 z-index를 추가하여 나이테 애니메이션 위로 버튼을 완전히 빼냅니다. -->
-    <h3 class="ring-main-title" style="position: relative; z-index: 100;">
-        활동 나이테 
-        <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
-    </h3>
-</div>
+                <div class="ring-title-group">
+                    <span class="ring-label">ACTIVITY HISTORY</span>
+                    
+                    <h3 class="ring-main-title" style="position: relative; z-index: 100;">
+                        활동 나이테 
+                        <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
+                    </h3>
+                </div>
 
                 <div class="ring-stats" style="text-align: right;">
                     <span id="activityMonths" class="ring-months-val">0</span>
@@ -9132,6 +9133,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 <div class="info-item">산우리 합산 <span id="globalTotalH" class="info-val">0</span>m</div>
             </div>
         </div>
+    </div>
+</div>
+
 
         <!-- ➕ [신규 추가] 도움말 안내 팝업 모달 -->
         <div id="mwInfoHelpModal" class="mw-info-modal" onclick="closeMountainInfoModal(event)">
