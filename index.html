@@ -2632,24 +2632,61 @@ box-sizing: border-box;
 
 
 /* 90레벨 전용 주황색 글로우 효과 */
+/* ==============================================
+   레벨별 글로우 효과 (반으로 줄인 적당한 번짐)
+   ============================================== */
+
+/* [Yellow / 80레벨] */
+@keyframes glow-yellow {
+  0%, 100% {
+    border-color: #facc15;
+    box-shadow: 0 0 3px rgba(250, 204, 21, 0.3);
+  }
+  50% {
+    border-color: #eab308;
+    box-shadow: 0 0 10px 2px rgba(234, 179, 8, 0.55);
+  }
+}
+
+/* [Orange / 90레벨] */
 @keyframes glow-orange {
-0% { border-color: #f97316; }
-50% { border-color: #ea580c; box-shadow: 0 0 8px rgba(234, 88, 12, 0.5); }
-100% { border-color: #f97316; }
+  0%, 100% {
+    border-color: #f97316;
+    box-shadow: 0 0 4px rgba(249, 115, 22, 0.35);
+  }
+  50% {
+    border-color: #ea580c;
+    box-shadow: 0 0 12px 2.5px rgba(234, 88, 12, 0.6);
+  }
 }
 
-/* 실제 적용되는 클래스 */
+/* [Red / 100레벨] */
+@keyframes glow-red {
+  0%, 100% {
+    border-color: #ef4444;
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    border-color: #dc2626;
+    box-shadow: 0 0 14px 3px rgba(220, 38, 38, 0.65);
+  }
+}
+
+/* 클래스 적용 */
+.level-blink-yellow {
+  animation: glow-yellow 3.5s infinite ease-in-out;
+  border-width: 1.8px !important;
+}
+
 .level-blink-orange {
-animation: glow-orange 1.5s infinite ease-in-out;
-border-width: 1.8px !important;
+  animation: glow-orange 3.2s infinite ease-in-out;
+  border-width: 1.8px !important;
 }
 
-@keyframes glow-orange { 0% { border-color: #f97316; } 50% { border-color: #ea580c; box-shadow: 0 0 8px rgba(234, 88, 12, 0.5); } 100% { border-color: #f97316; } }
-@keyframes glow-red { 0% { border-color: #ef4444; } 50% { border-color: #b91c1c; box-shadow: 0 0 10px rgba(185, 28, 28, 0.6); } 100% { border-color: #ef4444; } }
-@keyframes glow-yellow { 0% { border-color: #facc15; } 50% { border-color: #eab308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.5); } 100% { border-color: #facc15; } }
-.level-blink-orange { animation: glow-orange 1.5s infinite ease-in-out; border-width: 1.8px !important; }
-.level-blink-red { animation: glow-red 1.2s infinite ease-in-out; border-width: 1.8px !important; }
-.level-blink-yellow { animation: glow-yellow 1.8s infinite ease-in-out; border-width: 1.8px !important; }
+.level-blink-red {
+  animation: glow-red 3.0s infinite ease-in-out;
+  border-width: 1.8px !important;
+}
 
 .year-select-custom { padding: 4px 12px; border-radius: 20px; background: #f1f5f9; font-weight: 800; font-size: 0.8rem; height: 32px !important; width: auto !important; }
 #quarterTabs { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 4px; border-radius: 30px; }
