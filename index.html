@@ -13,7 +13,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-    /* ================= 핀 래퍼 기본 ================= */
+
+        /* ================= 핀 래퍼 기본 ================= */
 .pin-wrapper {
     position: relative;
     display: inline-block;
@@ -45,7 +46,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     animation: specialPinGlow 7s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
 }
 
-/* 🔥 슈퍼별 핀 키프레임 (0% 노랑 -> 40% 주황 -> 100% 빨강) */
+/* 🔥 슈퍼별 핀 키프레임 */
 @keyframes superPinGlow {
     0% {
         background: #ffd700;
@@ -67,7 +68,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     }
 }
 
-/* ✨ 스페셜별 핀 키프레임 (0% 녹색 -> 40% 파랑 -> 100% 보라) */
+/* ✨ 스페셜별 핀 키프레임 */
 @keyframes specialPinGlow {
     0% {
         background: #10b981;
@@ -88,6 +89,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
         transform: scale(1.15);
     }
 }
+
 
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
 
@@ -3738,9 +3740,8 @@ const levelThresholds = [
     const getLevelBadge = (lv) => { for (const t of levelThresholds) { if (lv >= t.lv) return t.name; } return "🫘 신입"; };
 
 /* ==========================================================================
-   ✨ [1번 글로우 핀 조합] 레벨 스타일 및 네온 핀 반환 함수
-   ========================================================================== */
-const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
+getLevelStyle 함수를 호이스팅이 가능하도록 function 키워드로 먼저 선언
+function getLevelStyle(lv, isSuper = false, isSpecial = false) {
     let base = { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '' };
 
     if (lv >= 100) base = { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', blink: 'level-blink-red' };
@@ -3755,16 +3756,22 @@ const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '' };
     else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '' };
 
-    // 📍 1번 광원 애니메이션이 이식된 미니 핀 HTML
+    // 📍 슈퍼별 / 스페셜별 최신 획득자 특수 연출 (은하수 그라데이션 & 미니 엠블럼)
     let pinHtml = '';
     if (isSuper) {
+        base.bg = 'linear-gradient(135deg, #fff7ed 0%, #fee2e2 100%)';
+        base.border = '#f97316';
+        base.text = '#c2410c';
         pinHtml = `<span class="glow-pin-super">🔥</span>`;
     } else if (isSpecial) {
+        base.bg = 'linear-gradient(135deg, #f5f3ff 0%, #f0fdfa 100%)';
+        base.border = '#a855f7';
+        base.text = '#7c3aed';
         pinHtml = `<span class="glow-pin-special">✨</span>`;
     }
 
     return { ...base, pinHtml };
-};
+}
 
 const getDDayStyle = (dday, level) => {
     // 레벨이나 남은 날짜 조건 없이, 무조건 기본 회색 스타일로 통일합니다.
@@ -3892,7 +3899,8 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
- window.renderStatusTable = function() {
+ 
+        window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
         const searchInput = document.getElementById('searchInput');
@@ -3962,8 +3970,8 @@ function isMatchName(name, searchKeyword) {
         processedData.forEach((m) => {
             if (typeof isAdminLoggedIn !== 'undefined' && !isAdminLoggedIn && m.isHidden) return;
             
-            // 🎯 초성/완성형 조합 매칭 체크
-            if (search && !isMatchName(m.name, search)) return;
+            // 초성/완성형 조합 매칭 체크
+            if (search && typeof isMatchName === 'function' && !isMatchName(m.name, search)) return;
 
             let clickTag = "";
             if (isFirstVisible && !m.isHidden) {
@@ -3993,7 +4001,7 @@ function isMatchName(name, searchKeyword) {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
-            // 🌟 슈퍼별/스페셜별 보유 여부 판별 (글로벌 변수 안전 참조)
+            // 슈퍼별/스페셜별 보유 여부 판별
             const superId = typeof latestSuperHolderId !== 'undefined' ? latestSuperHolderId : null;
             const superName = typeof latestSuperHolderName !== 'undefined' ? latestSuperHolderName : null;
             const specialId = typeof latestSpecialHolderId !== 'undefined' ? latestSpecialHolderId : null;
@@ -4002,10 +4010,8 @@ function isMatchName(name, searchKeyword) {
             const isSuper = (m.id && m.id === superId) || (m.name && m.name === superName);
             const isSpecial = (m.id && m.id === specialId) || (m.name && m.name === specialName);
 
-            // 🌟 getLevelStyle 호출 시 isSuper, isSpecial 넘겨 pinHtml 받아옴
-            const style = (typeof getLevelStyle === 'function') 
-                ? getLevelStyle(m.level, isSuper, isSpecial) 
-                : { bg: '#fff', border: '#ccc', text: '#000', blink: '', pinHtml: '' };
+            // getLevelStyle 호출
+            const style = getLevelStyle(m.level, isSuper, isSpecial);
 
             const badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(m.level) : (m.level || 0);
             const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
@@ -4015,6 +4021,7 @@ function isMatchName(name, searchKeyword) {
                 ? (rawHeight / 1000).toFixed(1) + 'k' 
                 : rawHeight + 'm';
 
+            // ⚠️ 핵심 수정 부분: background-color -> background 로 변경
             htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
             <td style="position: relative;" class="text-xs text-center">
                 ${clickTag}
@@ -4031,7 +4038,7 @@ function isMatchName(name, searchKeyword) {
                 <div class="badge-level">
                     <div class="pin-wrapper cursor-pointer" onclick="showMilkyWay('${m.name}', '${m.name}')">
                         <div class="badge-icon-box ${style.blink || ''}"
-                             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+                             style="background: ${style.bg}; border: 1.5px solid ${style.border} !important;">
                             <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
                         </div>
                         ${style.pinHtml || ''}
@@ -4091,12 +4098,6 @@ function isMatchName(name, searchKeyword) {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
-
-
-
-
-      
-        
         
             
 
