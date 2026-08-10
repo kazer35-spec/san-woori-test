@@ -21,60 +21,77 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     display: inline-block;
 }
 
-/* 🔥 슈퍼별 미니 핀 */
+/* 🔥 슈퍼별 미니 핀 (은은한 배경 + 테두리 네온) */
 .glow-pin-super {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    background: transparent;
-    border: none;
-    padding: 0;
+    top: -5px;
+    right: -5px;
+    background: rgba(220, 38, 38, 0.1);  /* 📌 빨간색 불투명 10% */
+    backdrop-filter: blur(2px);
+    border: 1px solid #ffd700;
+    border-radius: 9999px;
+    padding: 1px 3px;
     font-size: 0.6rem;
     line-height: 1;
     z-index: 10;
     pointer-events: none;
-    /* ⚡ 시간을 1.2초로 줄여 템포를 빠르게 설정 */
     animation: superPinBorderGlow 1.2s ease-in-out infinite alternate;
 }
 
-/* ✨ 스페셜별 미니 핀 */
+/* ✨ 스페셜별 미니 핀 (은은한 배경 + 테두리 네온) */
 .glow-pin-special {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    background: transparent;
-    border: none;
-    padding: 0;
+    top: -5px;
+    right: -5px;
+    background: rgba(147, 51, 234, 0.1); /* 📌 보라색 불투명 10% */
+    backdrop-filter: blur(2px);
+    border: 1px solid #10b981;
+    border-radius: 9999px;
+    padding: 1px 3px;
     font-size: 0.6rem;
     line-height: 1;
     z-index: 10;
     pointer-events: none;
-    /* ⚡ 시간을 1.5초로 설정 (슈퍼별과 살짝 다르게 템포 부여) */
     animation: specialPinBorderGlow 1.5s ease-in-out infinite alternate;
 }
 
-/* 🔥 슈퍼별 애니메이션 (확대 폭 증가 + 살짝 회전까지 추가) */
+/* 🔥 슈퍼별 테두리 & 빛 애니메이션 (골드 -> 주황 -> 레드 그라데이션 glow) */
 @keyframes superPinBorderGlow {
     0% {
-        transform: scale(0.95) rotate(0deg);
+        border-color: #ffd700;
+        box-shadow: 0 0 4px rgba(255, 215, 0, 0.8), inset 0 0 2px rgba(255, 215, 0, 0.3);
+        transform: scale(0.95);
+    }
+    50% {
+        border-color: #ff7800;
+        box-shadow: 0 0 7px rgba(255, 120, 0, 0.9), inset 0 0 3px rgba(255, 120, 0, 0.4);
     }
     100% {
-        transform: scale(1.15) rotate(0deg); /* 크기 1.35배 + 10도 회전 */
+        border-color: #ff1e27;
+        box-shadow: 0 0 10px rgba(255, 30, 39, 1), inset 0 0 4px rgba(255, 30, 39, 0.5);
+        transform: scale(1.15);
     }
 }
 
-/* ✨ 스페셜별 애니메이션 (확대 폭 증가 + 바운스 느낌) */
+/* ✨ 스페셜별 테두리 & 빛 애니메이션 (에메랄드 -> 블루 -> 퍼플 그라데이션 glow) */
 @keyframes specialPinBorderGlow {
     0% {
-        transform: scale(1) translateY(0);
+        border-color: #10b981;
+        box-shadow: 0 0 4px rgba(16, 185, 129, 0.8), inset 0 0 2px rgba(16, 185, 129, 0.3);
+        transform: scale(0.95);
     }
     50% {
-        transform: scale(1.2) translateY(0px); /* 살짝 위로 튀어오름 */
+        border-color: #3b82f6;
+        box-shadow: 0 0 7px rgba(59, 130, 246, 0.9), inset 0 0 3px rgba(59, 130, 246, 0.4);
+        transform: scale(1.15);
     }
     100% {
-        transform: scale(1) translateY(0);
+        border-color: #a855f7;
+        box-shadow: 0 0 10px rgba(168, 85, 247, 1), inset 0 0 4px rgba(168, 85, 247, 0.5);
+        transform: scale(0.95);
     }
 }
+
 
 
 /* ================= 은하수 모달 & 획득자 태그 통합 스타일 ================= */
