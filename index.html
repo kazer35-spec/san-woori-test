@@ -4121,8 +4121,7 @@ window.renderStatusTable = function() {
             
 
       // =========================================================================
-// 🧪 [모바일 전용 UI & 테스트 지원 모듈]
-// 모바일 화면 오른쪽 아래 '🧪 테스트' 버튼을 터치하여 터치만으로 왕좌 이관 검증 가능
+// 🧪 [모바일 전용 UI & 테스트 지원 모듈 - 수정완료]
 // =========================================================================
 
 // 1. 모바일 테스트 전용 UI 생성 및 토글 함수
@@ -4132,12 +4131,11 @@ window.toggleMobileTestPanel = function(show) {
     if (!panel && show) {
         // currentData 기반 회원 옵션 생성
         let memberOptions = '<option value="">-- 회원 선택 --</option>';
-        if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+        if (typeof currentData !== 'undefined' && Array.isArray(currentData) && currentData.length > 0) {
             currentData.forEach(m => {
-                memberOptions += `<option value="${m.id}">${m.name} (${m.id})</option>`;
+                memberOptions += `<option value="${m.id || m.name}">${m.name} (${m.id || 'ID없음'})</option>`;
             });
-        }
-        if (memberOptions === '<option value="">-- 회원 선택 --</option>') {
+        } else {
             memberOptions += `<option value="test_user_01">테스터 1 (test_user_01)</option>`;
         }
 
@@ -4177,7 +4175,7 @@ window.toggleMobileTestPanel = function(show) {
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', panelHtml);
-        return;
+        panel = document.getElementById('mobileTestModal');
     }
 
     if (panel) {
@@ -4208,10 +4206,10 @@ window.applyMobileTest = function(starType) {
 window.testSetSpecialStar = function(memberId, memberName, starType = "super", quarter = "2Q") {
     if (typeof currentData === 'undefined') window.currentData = [];
 
-    let target = currentData.find(m => m.id === memberId || m.name === memberName || (memberName && m.name === memberName));
+    let target = currentData.find(m => m.id === memberId || m.name === memberId || m.name === memberName);
     
     if (!target) {
-        target = { id: memberId || "test_user_01", name: memberName || "테스터", specialStars: [] };
+        target = { id: memberId || "test_user_01", name: memberName || memberId || "테스터", specialStars: [] };
         currentData.push(target);
     }
 
@@ -4225,32 +4223,50 @@ window.testSetSpecialStar = function(memberId, memberName, starType = "super", q
     };
 
     target.specialStars.push(newRecord);
+
+    // 🌟 [추가] 현황판 테이블(메인 화면) 즉시 리프레시 (핀/글로우 박스 즉시 변경 반영)
+    if (typeof window.renderStatusTable === 'function') {
+        window.renderStatusTable();
+    }
     
     // 은하수 모달이 열려 있다면 즉시 화면 리프레시
-    if (window.showMilkyWay) {
-        window.showMilkyWay(target.id, target.name);
+    if (typeof window.showMilkyWay === 'function') {
+        window.showMilkyWay(target.id || target.name, target.name);
     }
 };
 
-// 4. 은하수 모달 오픈 시 모바일 테스트 플로팅 버튼 자동 주입 (기존 showMilkyWay 연동용)
-const originalShowMilkyWay = window.showMilkyWay;
-window.showMilkyWay = async function(mId, mName) {
-    if (originalShowMilkyWay) {
-        await originalShowMilkyWay(mId, mName);
-    }
-
-    // 모바일 테스트 플로팅 버튼 주입 (#mwTestFloatBtn)
-    if (!document.getElementById('mwTestFloatBtn')) {
+// 4. 은하수 모달 오픈 시 플로팅 버튼 주입 (안전한 훅 처리)
+(function hookMilkyWayModal() {
+    const attachFloatBtn = () => {
+        if (document.getElementById('mwTestFloatBtn')) return;
+        
         const floatBtnHtml = `
-            <button id="mwTestFloatBtn" onclick="window.toggleMobileTestPanel(true)" style="position: absolute; bottom: 20px; right: 20px; z-index: 10025; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+            <button id="mwTestFloatBtn" onclick="window.toggleMobileTestPanel(true)" style="position: fixed; bottom: 20px; right: 20px; z-index: 10025; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-size: 0.75rem; font-weight: 800; padding: 8px 14px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; gap: 4px;">
                 🧪 테스트
             </button>
         `;
-        const modal = document.getElementById('milkyWayModal');
-        if (modal) modal.insertAdjacentHTML('beforeend', floatBtnHtml);
-    }
-};
-  
+        document.body.insertAdjacentHTML('beforeend', floatBtnHtml);
+    };
+
+    // 기존 showMilkyWay 함수를 안전하게 감싸는 래퍼
+    const injectHook = () => {
+        if (window.showMilkyWay && !window.showMilkyWay._isHooked) {
+            const originalFn = window.showMilkyWay;
+            window.showMilkyWay = async function(mId, mName) {
+                const res = await originalFn.apply(this, arguments);
+                setTimeout(attachFloatBtn, 100); // DOM 생성 기다린 후 버튼 주입
+                return res;
+            };
+            window.showMilkyWay._isHooked = true;
+        }
+    };
+
+    // 즉시 실행 시도 및 만약 아직 showMilkyWay가 안 만들어졌다면 0.5초 뒤 재시도
+    injectHook();
+    window.addEventListener('DOMContentLoaded', injectHook);
+    setTimeout(injectHook, 1000);
+})();
+
             
             
             
