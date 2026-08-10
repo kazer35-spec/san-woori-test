@@ -4585,8 +4585,11 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
 
-// 타이머 인터벌 및 더보기 상태 관리 변수
+
+        
+        // 타이머 인터벌, 더보기 상태 및 데이터 캐시 관리 변수
 window.hallTimerInterval = null;
+
 if (!window.expandedLiveSections) {
     window.expandedLiveSections = {
         with: false,
@@ -4594,6 +4597,15 @@ if (!window.expandedLiveSections) {
         host: false
     };
 }
+
+// [데이터 절약 모드] 데이터 캐시 객체
+window.hallDataCache = {
+    key: null,
+    withFull: null,
+    mountainFull: null,
+    hostFull: null,
+    ozStats: null
+};
 
 window.toggleHallModal = async (show) => {
     const modal = document.getElementById('hallModal');
@@ -4779,19 +4791,43 @@ function renderHallList() {
         let liveWithFull = [];
         let liveMountainFull = [];
         let liveHostFull = [];
+        let ozMember = null;
 
+        // [데이터 절약 모드] 캐시 체크 및 생성
         if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-            liveWithFull = [...currentData]
-                .filter(m => !m.isHidden && m.name !== "오즈" && (m.qCount || 0) > 0)
-                .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || b.level - a.level);
+            const cacheKey = `${qKey}_${currentData.length}`;
+            
+            if (window.hallDataCache.key === cacheKey) {
+                // 캐시된 데이터 사용
+                liveWithFull = window.hallDataCache.withFull;
+                liveMountainFull = window.hallDataCache.mountainFull;
+                liveHostFull = window.hallDataCache.hostFull;
+                ozMember = window.hallDataCache.ozStats;
+            } else {
+                // 신규 연산 및 캐시 저장
+                ozMember = currentData.find(m => m.name === "오즈") || null;
 
-            liveMountainFull = [...currentData]
-                .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
-                .sort((a, b) => (b.quarterlyStats?.[qKey]?.hike || 0) - (a.quarterlyStats?.[qKey]?.hike || 0) || b.level - a.level);
+                liveWithFull = [...currentData]
+                    .filter(m => !m.isHidden && m.name !== "오즈" && (m.qCount || 0) > 0)
+                    .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || b.level - a.level);
 
-            liveHostFull = [...currentData]
-                .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
-                .sort((a, b) => (b.quarterlyStats?.[qKey]?.hosted || 0) - (a.quarterlyStats?.[qKey]?.hosted || 0) || b.level - a.level);
+                liveMountainFull = [...currentData]
+                    .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
+                    .sort((a, b) => (b.quarterlyStats?.[qKey]?.hike || 0) - (a.quarterlyStats?.[qKey]?.hike || 0) || b.level - a.level);
+
+                liveHostFull = [...currentData]
+                    .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
+                    .sort((a, b) => (b.quarterlyStats?.[qKey]?.hosted || 0) - (a.quarterlyStats?.[qKey]?.hosted || 0) || b.level - a.level);
+
+                // 캐시 업데이트
+                window.hallDataCache = {
+                    key: cacheKey,
+                    withFull: liveWithFull,
+                    mountainFull: liveMountainFull,
+                    hostFull: liveHostFull,
+                    ozStats: ozMember
+                };
+            }
         }
 
         const liveWith = liveWithFull.slice(0, 3);
@@ -4819,19 +4855,35 @@ function renderHallList() {
             </div>`;
         };
 
-        // 4위부터 보여주는 더보기 헬퍼 함수
-        const makeMoreListFrom4thHtml = (fullList, scoreGetter, scoreTail) => {
-            const listFrom4th = fullList.slice(3); // 4위(index 3)부터 잘라냄
-            
-            if (listFrom4th.length === 0) {
-                return `
-                <div style="margin-top: 8px; padding: 8px 0; text-align: center; color: #94a3b8; font-size: 10.5px; border-top: 1px dashed #f1f5f9;">
-                    4위 이하 순위 데이터가 없습니다.
+        // 오즈 수치 상단 노출 + 4위부터 순위 표시 헬퍼
+        const makeMoreListFrom4thHtml = (fullList, ozScore, scoreGetter, scoreTail) => {
+            const listFrom4th = fullList.slice(3); // 4위부터 추출
+            let ozRowHtml = '';
+
+            // 오즈 데이터가 존재하는 경우 상단 특별 보드 구성
+            if (ozMember) {
+                ozRowHtml = `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; font-size: 11px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 9px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 1px 4px; border-radius: 4px; letter-spacing: -0.02em;">ADMIN</span>
+                        <span style="font-weight: 700; color: #334155;">오즈 <span style="font-size: 9.5px; color: #94a3b8; font-weight: normal;">(수치 참고)</span></span>
+                    </div>
+                    <span style="font-weight: 800; color: #4f46e5; font-size: 10.5px;">
+                        ${ozScore}${scoreTail}
+                    </span>
                 </div>`;
             }
-            
+
+            if (listFrom4th.length === 0) {
+                return `
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #f1f5f9;">
+                    ${ozRowHtml}
+                    <div style="text-align: center; color: #94a3b8; font-size: 10.5px; padding: 4px 0;">4위 이하 순위 데이터가 없습니다.</div>
+                </div>`;
+            }
+
             let rows = listFrom4th.map((m, idx) => {
-                const rank = idx + 4; // 4위부터 시작
+                const rank = idx + 4;
                 return `
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; font-size: 11px; border-bottom: 1px dashed #f1f5f9;">
                     <div style="display: flex; align-items: center; gap: 8px;">
@@ -4845,7 +4897,8 @@ function renderHallList() {
             }).join('');
 
             return `
-            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #f1f5f9; max-height: 160px; overflow-y: auto;">
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #f1f5f9; max-height: 180px; overflow-y: auto;">
+                ${ozRowHtml}
                 <div style="font-size: 10px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; padding-left: 4px;">
                     4위 이하 순위 (${listFrom4th.length}명)
                 </div>
@@ -4871,6 +4924,8 @@ function renderHallList() {
         // 1. 우정대장 카드
         if (liveWith.length > 0) {
             const isExpanded = window.expandedLiveSections.with;
+            const ozValue = ozMember ? (ozMember.qCount || 0) : 0;
+            
             combinedHtml += `
             <div class="hall-card" style="margin-top: 0px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ffedd5; background: linear-gradient(180deg, #fffbee 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(251, 146, 60, 0.04);">
                 <div class="hall-season-title" style="margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center;">
@@ -4878,7 +4933,6 @@ function renderHallList() {
                         <span style="display: inline-block; width: 3.5px; height: 12px; background-color: #f97316; border-radius: 2px;"></span>
                         👑 ${currentQuarter}분기 우정대장 현황 
                     </span>
-                    <!-- 더보기(왼쪽), LIVE(오른쪽) 위치 전환 -->
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <button onclick="toggleHallMore('with')" style="background: #fff; border: 1px solid #fdba74; color: #c2410c; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
                             ${isExpanded ? '접기 ▴' : '더보기 ▾'}
@@ -4891,13 +4945,15 @@ function renderHallList() {
                     ${makeLiveCompactRow("🥈길잡이", liveWith[1]?.name, liveWith[1]?.qCount || 0, "점", glowClasses[1])}
                     ${makeLiveCompactRow("🥉마당발", liveWith[2]?.name, liveWith[2]?.qCount || 0, "점", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml(liveWithFull, m => m.qCount || 0, "점") : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml(liveWithFull, ozValue, m => m.qCount || 0, "점") : ''}
             </div>`;
         }
 
         // 2. 등산의신 카드
         if (liveMountain.length > 0) {
             const isExpanded = window.expandedLiveSections.mountain;
+            const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.hike || 0) : 0;
+
             combinedHtml += `
             <div class="hall-card" style="margin-top: 10px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ccfbf1; background: linear-gradient(180deg, #f0fdfa 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(26, 188, 156, 0.04);">
                 <div class="hall-season-title" style="margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center;">
@@ -4905,7 +4961,6 @@ function renderHallList() {
                         <span style="display: inline-block; width: 3.5px; height: 12px; background-color: #1abc9c; border-radius: 2px;"></span>
                         🎖 ${currentQuarter}분기 등산의신 현황
                     </span>
-                    <!-- 더보기(왼쪽), LIVE(오른쪽) 위치 전환 -->
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <button onclick="toggleHallMore('mountain')" style="background: #fff; border: 1px solid #99f6e4; color: #0f766e; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
                             ${isExpanded ? '접기 ▴' : '더보기 ▾'}
@@ -4918,13 +4973,15 @@ function renderHallList() {
                     ${makeLiveCompactRow("🥈심마니", liveMountain[1]?.name, liveMountain[1]?.quarterlyStats?.[qKey]?.hike || 0, "회", glowClasses[1])}
                     ${makeLiveCompactRow("🥉나무꾼", liveMountain[2]?.name, liveMountain[2]?.quarterlyStats?.[qKey]?.hike || 0, "회", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml(liveMountainFull, m => m.quarterlyStats?.[qKey]?.hike || 0, "회") : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml(liveMountainFull, ozValue, m => m.quarterlyStats?.[qKey]?.hike || 0, "회") : ''}
             </div>`;
         }
 
         // 3. 벙의달인 카드
         if (liveHost.length > 0) {
             const isExpanded = window.expandedLiveSections.host;
+            const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.hosted || 0) : 0;
+
             combinedHtml += `
             <div class="hall-card" style="margin-top: 10px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #e0f2fe; background: linear-gradient(180deg, #f0f9ff 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(0, 191, 255, 0.04);">
                 <div class="hall-season-title" style="margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center;">
@@ -4932,7 +4989,6 @@ function renderHallList() {
                         <span style="display: inline-block; width: 3.5px; height: 12px; background-color: #00ced1; border-radius: 2px;"></span>
                         🏅 ${currentQuarter}분기 벙의달인 현황
                     </span>
-                    <!-- 더보기(왼쪽), LIVE(오른쪽) 위치 전환 -->
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <button onclick="toggleHallMore('host')" style="background: #fff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
                             ${isExpanded ? '접기 ▴' : '더보기 ▾'}
@@ -4945,7 +5001,7 @@ function renderHallList() {
                     ${makeLiveCompactRow("🥈선봉장", liveHost[1]?.name, liveHost[1]?.quarterlyStats?.[qKey]?.hosted || 0, "회", glowClasses[1])}
                     ${makeLiveCompactRow("🥉파수꾼", liveHost[2]?.name, liveHost[2]?.quarterlyStats?.[qKey]?.hosted || 0, "회", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml(liveHostFull, m => m.quarterlyStats?.[qKey]?.hosted || 0, "회") : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml(liveHostFull, ozValue, m => m.quarterlyStats?.[qKey]?.hosted || 0, "회") : ''}
             </div>`;
         }
 
