@@ -4868,57 +4868,58 @@ function renderHallList() {
             </div>`;
         };
 
-        // 더보기 펼침 UI (ADMIN 오즈 + 구분선 + 4위 이하 목록)
-        const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, scoreTail) => {
-            const listFrom4th = fullList.slice(3); // 4위부터 추출
-            let ozRowHtml = '';
+        /* ==========================================
+   더보기 4위 이하 목록 HTML 생성 헬퍼 (수정본)
+   ========================================== */
+const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, scoreTail) => {
+    const listFrom4th = fullList.slice(3); // 4위부터 추출
+    let ozRowHtml = '';
 
-            // 이미지 스타일이 반영된 ADMIN 오즈 수치 노출
-            if (ozMember) {
-                ozRowHtml = `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 11px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="font-size: 9.5px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 2px 6px; border-radius: 5px; letter-spacing: -0.02em;">ADMIN</span>
-                        <span style="font-weight: 700; color: #334155;">오즈 <span style="font-size: 9.5px; color: #94a3b8; font-weight: normal;"></span></span>
-                    </div>
-                    <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">
-                        ${ozScore}${scoreTail}
-                    </span>
-                </div>`;
-            }
+    // 1. ADMIN 오즈 영역 ((수치 참고) 문구 제거)
+    if (ozMember) {
+        ozRowHtml = `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 11px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 9.5px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 2px 6px; border-radius: 5px; letter-spacing: -0.02em;">ADMIN</span>
+                <span style="font-weight: 700; color: #334155;">오즈</span>
+            </div>
+            <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">
+                ${ozScore}${scoreTail}
+            </span>
+        </div>`;
+    }
 
-            if (listFrom4th.length === 0) {
-                return `
-                <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-                    ${ozRowHtml}
-                    <div style="text-align: center; color: #94a3b8; font-size: 10.5px; padding: 8px 0;">4위 이하 순위 데이터가 없습니다.</div>
-                </div>`;
-            }
+    if (listFrom4th.length === 0) {
+        return `
+        <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+            ${ozRowHtml}
+            <div style="text-align: center; color: #94a3b8; font-size: 10.5px; padding: 8px 0;">4위 이하 순위 데이터가 없습니다.</div>
+        </div>`;
+    }
 
-            // 4위 이하 리스트 정렬 & 디자인
-            let rows = listFrom4th.map((m, idx) => {
-                const rank = idx + 4;
-                return `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; font-size: 11px; border-bottom: 1px dashed #f1f5f9;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="font-weight: 800; color: #64748b; min-width: 26px;">${rank}위</span>
-                        <span style="font-weight: 700; color: #334155;">${m.name}</span>
-                    </div>
-                    <span style="font-weight: 700; color: #475569; font-size: 10.5px;">
-                        ${scoreGetter(m)}${scoreTail}
-                    </span>
-                </div>`;
-            }).join('');
+    // 2. 4위 이하 목록 생성
+    let rows = listFrom4th.map((m, idx) => {
+        const rank = idx + 4;
+        return `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; font-size: 11px; border-bottom: 1px dashed #f1f5f9;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-weight: 800; color: #64748b; min-width: 26px;">${rank}위</span>
+                <span style="font-weight: 700; color: #334155;">${m.name}</span>
+            </div>
+            <span style="font-weight: 700; color: #475569; font-size: 10.5px;">
+                ${scoreGetter(m)}${scoreTail}
+            </span>
+        </div>`;
+    }).join('');
 
-            return `
-            <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0; max-height: 200px; overflow-y: auto;">
-                ${ozRowHtml}
-                <div style="font-size: 10px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; padding-left: 2px;">
-                    4위 이하 순위 (${listFrom4th.length}명)
-                </div>
-                ${rows}
-            </div>`;
-        };
+    // '4위 이하 순위 (N명)' 소제목 항목 제거 후 바로 ADMIN 및 4위 목록 출력
+    return `
+    <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0; max-height: 200px; overflow-y: auto;">
+        ${ozRowHtml}
+        ${rows}
+    </div>`;
+};
+
 
         combinedHtml += `
         <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 9px 12px; margin-top: 0px !important; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
