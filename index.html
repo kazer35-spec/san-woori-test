@@ -4120,153 +4120,7 @@ window.renderStatusTable = function() {
         
             
 
-      // =========================================================================
-// 🧪 [모바일 전용 UI & 테스트 지원 모듈 - 수정완료]
-// =========================================================================
-
-// 1. 모바일 테스트 전용 UI 생성 및 토글 함수
-window.toggleMobileTestPanel = function(show) {
-    let panel = document.getElementById('mobileTestModal');
-    
-    if (!panel && show) {
-        // currentData 기반 회원 옵션 생성
-        let memberOptions = '<option value="">-- 회원 선택 --</option>';
-        if (typeof currentData !== 'undefined' && Array.isArray(currentData) && currentData.length > 0) {
-            currentData.forEach(m => {
-                memberOptions += `<option value="${m.id || m.name}">${m.name} (${m.id || 'ID없음'})</option>`;
-            });
-        } else {
-            memberOptions += `<option value="test_user_01">테스터 1 (test_user_01)</option>`;
-        }
-
-        const panelHtml = `
-            <div id="mobileTestModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10090; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;" onclick="window.toggleMobileTestPanel(false)">
-                <div style="width: 100%; max-width: 320px; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.9); box-sizing: border-box;" onclick="event.stopPropagation()">
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h4 style="color: #38bdf8; font-size: 1rem; font-weight: 800; margin: 0;">🧪 모바일 이펙트 테스트</h4>
-                        <button onclick="window.toggleMobileTestPanel(false)" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;">
-                        <div>
-                            <label style="color: #94a3b8; display: block; margin-bottom: 4px; font-size: 0.75rem;">대상 회원 선택</label>
-                            <select id="mTestMemberSelect" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; font-size: 0.85rem;">
-                                ${memberOptions}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label style="color: #94a3b8; display: block; margin-bottom: 4px; font-size: 0.75rem;">부여 분기 (예: 2Q, 3Q)</label>
-                            <input type="text" id="mTestQuarter" value="2Q" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; font-size: 0.85rem; box-sizing: border-box;">
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
-                            <button onclick="window.applyMobileTest('super')" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(245, 158, 11, 0.4)); border: 1px solid #ef4444; color: #fff; font-weight: 800; padding: 10px 0; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">
-                                🔥 슈퍼별 부여
-                            </button>
-                            <button onclick="window.applyMobileTest('special')" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(16, 185, 129, 0.4)); border: 1px solid #a855f7; color: #fff; font-weight: 800; padding: 10px 0; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">
-                                ✨ 스페셜별 부여
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', panelHtml);
-        panel = document.getElementById('mobileTestModal');
-    }
-
-    if (panel) {
-        panel.style.display = show ? 'flex' : 'none';
-    }
-};
-
-// 2. 모바일 UI에서 [부여] 버튼 터치 시 실행 함수
-window.applyMobileTest = function(starType) {
-    const select = document.getElementById('mTestMemberSelect');
-    const quarterInput = document.getElementById('mTestQuarter');
-
-    if (!select || !select.value) {
-        alert("회원을 선택해 주세요!");
-        return;
-    }
-
-    const memberId = select.value;
-    const quarter = quarterInput ? quarterInput.value : "2Q";
-
-    // 공통 실행 함수 실행
-    window.testSetSpecialStar(memberId, null, starType, quarter);
-
-    window.toggleMobileTestPanel(false);
-};
-
-// 3. 테스트 전용 보조 핵심 실행 함수 (PC/모바일 공용)
-window.testSetSpecialStar = function(memberId, memberName, starType = "super", quarter = "2Q") {
-    if (typeof currentData === 'undefined') window.currentData = [];
-
-    let target = currentData.find(m => m.id === memberId || m.name === memberId || m.name === memberName);
-    
-    if (!target) {
-        target = { id: memberId || "test_user_01", name: memberName || memberId || "테스터", specialStars: [] };
-        currentData.push(target);
-    }
-
-    if (!target.specialStars) target.specialStars = [];
-
-    const newRecord = {
-        starType: starType,
-        quarter: quarter,
-        year: new Date().getFullYear(),
-        timestamp: Date.now() // 최신 시점 기록 적용 ➔ 왕좌 실시간 이관
-    };
-
-    target.specialStars.push(newRecord);
-
-    // 🌟 [추가] 현황판 테이블(메인 화면) 즉시 리프레시 (핀/글로우 박스 즉시 변경 반영)
-    if (typeof window.renderStatusTable === 'function') {
-        window.renderStatusTable();
-    }
-    
-    // 은하수 모달이 열려 있다면 즉시 화면 리프레시
-    if (typeof window.showMilkyWay === 'function') {
-        window.showMilkyWay(target.id || target.name, target.name);
-    }
-};
-
-// 4. 은하수 모달 오픈 시 플로팅 버튼 주입 (안전한 훅 처리)
-(function hookMilkyWayModal() {
-    const attachFloatBtn = () => {
-        if (document.getElementById('mwTestFloatBtn')) return;
         
-        const floatBtnHtml = `
-            <button id="mwTestFloatBtn" onclick="window.toggleMobileTestPanel(true)" style="position: fixed; bottom: 20px; right: 20px; z-index: 10025; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-size: 0.75rem; font-weight: 800; padding: 8px 14px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                🧪 테스트
-            </button>
-        `;
-        document.body.insertAdjacentHTML('beforeend', floatBtnHtml);
-    };
-
-    // 기존 showMilkyWay 함수를 안전하게 감싸는 래퍼
-    const injectHook = () => {
-        if (window.showMilkyWay && !window.showMilkyWay._isHooked) {
-            const originalFn = window.showMilkyWay;
-            window.showMilkyWay = async function(mId, mName) {
-                const res = await originalFn.apply(this, arguments);
-                setTimeout(attachFloatBtn, 100); // DOM 생성 기다린 후 버튼 주입
-                return res;
-            };
-            window.showMilkyWay._isHooked = true;
-        }
-    };
-
-    // 즉시 실행 시도 및 만약 아직 showMilkyWay가 안 만들어졌다면 0.5초 뒤 재시도
-    injectHook();
-    window.addEventListener('DOMContentLoaded', injectHook);
-    setTimeout(injectHook, 1000);
-})();
-
             
             
             
@@ -4754,7 +4608,7 @@ window.hallDataCache = {
 };
 
 /* ==========================================
-   모달 열기/닫기
+   모달 열기/닫기 (닫을 때 더보기 상태 초기화 추가)
    ========================================== */
 window.toggleHallModal = async (show) => {
     const modal = document.getElementById('hallModal');
@@ -4769,6 +4623,14 @@ window.toggleHallModal = async (show) => {
         renderHallModalStructure();
         renderHallList();
     } else {
+        // 모달을 닫을 때 더보기 펼침 상태 모두 닫힘으로 초기화
+        if (window.expandedLiveSections) {
+            Object.keys(window.expandedLiveSections).forEach(key => {
+                window.expandedLiveSections[key] = false;
+            });
+        }
+
+        // 카운트다운 타이머 정지
         if (window.hallTimerInterval) {
             clearInterval(window.hallTimerInterval);
             window.hallTimerInterval = null;
@@ -4776,15 +4638,28 @@ window.toggleHallModal = async (show) => {
     }
 };
 
+
 /* ==========================================
-   더보기 토글 및 부드러운 자동 스크롤
+/* ==========================================
+   더보기 토글 (아코디언 방식: 하나만 열리도록) 및 자동 스크롤
    ========================================== */
 window.toggleHallMore = (sectionKey) => {
-    window.expandedLiveSections[sectionKey] = !window.expandedLiveSections[sectionKey];
+    // 1. 현재 클릭한 섹션의 다음 열림/닫림 상태 결정
+    const nextState = !window.expandedLiveSections[sectionKey];
+
+    // 2. 모든 섹션 상태를 닫힘(false)으로 초기화 (단일 오픈 아코디언 방식)
+    Object.keys(window.expandedLiveSections).forEach(key => {
+        window.expandedLiveSections[key] = false;
+    });
+
+    // 3. 클릭한 섹션에만 토글된 상태 반영
+    window.expandedLiveSections[sectionKey] = nextState;
+
+    // 4. UI 리렌더링
     renderHallList();
 
-    // 더보기 클릭 시 해당 섹션 하단으로 화면 부드럽게 이동
-    if (window.expandedLiveSections[sectionKey]) {
+    // 5. 열린 상태일 때 해당 섹션 하단으로 부드럽게 스크롤
+    if (nextState) {
         setTimeout(() => {
             const targetEl = document.getElementById(`hallMoreArea_${sectionKey}`);
             if (targetEl) {
@@ -4793,6 +4668,7 @@ window.toggleHallMore = (sectionKey) => {
         }, 50);
     }
 };
+
 
 /* ==========================================
    탭 UI 구조 생성 및 기존 버튼 정리
@@ -5096,7 +4972,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                     </span>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <button onclick="toggleHallMore('with')" style="background: #fff; border: 1px solid #fdba74; color: #c2410c; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
-                            ${isExpanded ? '접기 ▴' : '더보기 ▾'}
+                            ${isExpanded ? 'less ▴' : 'more ▾'}
                         </button>
                         <span class="live-pulse-badge" style="background-color: #ea580c !important; font-size: 9px; padding: 1px 4px;">LIVE</span>
                     </div>
@@ -5124,7 +5000,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                     </span>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <button onclick="toggleHallMore('mountain')" style="background: #fff; border: 1px solid #99f6e4; color: #0f766e; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
-                            ${isExpanded ? '접기 ▴' : '더보기 ▾'}
+                            ${isExpanded ? 'less ▴' : 'more ▾'}
                         </button>
                         <span class="live-pulse-badge" style="background-color: #0d9488 !important; font-size: 9px; padding: 1px 4px;">LIVE</span>
                     </div>
@@ -5152,7 +5028,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                     </span>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <button onclick="toggleHallMore('host')" style="background: #fff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 10px; cursor: pointer; transition: all 0.2s;">
-                            ${isExpanded ? '접기 ▴' : '더보기 ▾'}
+                            ${isExpanded ? 'less ▴' : 'more ▾'}
                         </button>
                         <span class="live-pulse-badge" style="background-color: #2563eb !important; font-size: 9px; padding: 1px 4px;">LIVE</span>
                     </div>
@@ -6122,10 +5998,10 @@ window.openMilkyWayInfoModal = function(event) {
     const body = `
         <ul style="padding-left: 18px; margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.6;">
             <li><strong>별자리 연결:</strong> 정복한 산행 기록들이 시간 순서대로 연결되어 나만의 밤하늘 궤도를 형성합니다.</li>
+            <li><strong>별똥별:</strong> 가장 최근 기록된 좌표를 향해 밤하늘의 별똥별이 떨어진 후 여운을 남깁니다.</li>
             <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
             <li><strong>전설의 별빛:</strong> 정기산행 시 탐험 결과에 따라 타오르는 태양 <strong>슈퍼별(🔥)</strong>과 신비로운 <strong>스페셜별(✨)</strong>을 획득할 수 있습니다.</li>
             <li><strong>전설의 프레임 오라:</strong> <strong>슈퍼별</strong> 또는 <strong>스페셜별</strong> 보유 시 모달 최외곽 테두리에 <strong>고유한 그라데이션 빛 효과</strong>가 켜집니다. (신규획득자 생성시 모든 효과 승계)</li>
-            <li><strong>별똥별:</strong> 가장 최근 기록된 좌표를 향해 밤하늘의 별똥별이 떨어진 후 여운을 남깁니다.</li>
             <li><strong>별 가이드 & 획득자:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼에서 별빛 종류별 설명 및 분기별 <strong>슈퍼/스페셜별 획득자 명단</strong>을 확인하실 수 있습니다.</li>
         </ul>
     `;
