@@ -4120,7 +4120,137 @@ window.renderStatusTable = function() {
         
             
 
-        
+      // =========================================================================
+// 🧪 [모바일 전용 UI & 테스트 지원 모듈]
+// 모바일 화면 오른쪽 아래 '🧪 테스트' 버튼을 터치하여 터치만으로 왕좌 이관 검증 가능
+// =========================================================================
+
+// 1. 모바일 테스트 전용 UI 생성 및 토글 함수
+window.toggleMobileTestPanel = function(show) {
+    let panel = document.getElementById('mobileTestModal');
+    
+    if (!panel && show) {
+        // currentData 기반 회원 옵션 생성
+        let memberOptions = '<option value="">-- 회원 선택 --</option>';
+        if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+            currentData.forEach(m => {
+                memberOptions += `<option value="${m.id}">${m.name} (${m.id})</option>`;
+            });
+        }
+        if (memberOptions === '<option value="">-- 회원 선택 --</option>') {
+            memberOptions += `<option value="test_user_01">테스터 1 (test_user_01)</option>`;
+        }
+
+        const panelHtml = `
+            <div id="mobileTestModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10090; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;" onclick="window.toggleMobileTestPanel(false)">
+                <div style="width: 100%; max-width: 320px; background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.9); box-sizing: border-box;" onclick="event.stopPropagation()">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h4 style="color: #38bdf8; font-size: 1rem; font-weight: 800; margin: 0;">🧪 모바일 이펙트 테스트</h4>
+                        <button onclick="window.toggleMobileTestPanel(false)" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem;">
+                        <div>
+                            <label style="color: #94a3b8; display: block; margin-bottom: 4px; font-size: 0.75rem;">대상 회원 선택</label>
+                            <select id="mTestMemberSelect" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; font-size: 0.85rem;">
+                                ${memberOptions}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="color: #94a3b8; display: block; margin-bottom: 4px; font-size: 0.75rem;">부여 분기 (예: 2Q, 3Q)</label>
+                            <input type="text" id="mTestQuarter" value="2Q" style="width: 100%; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px; font-size: 0.85rem; box-sizing: border-box;">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+                            <button onclick="window.applyMobileTest('super')" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(245, 158, 11, 0.4)); border: 1px solid #ef4444; color: #fff; font-weight: 800; padding: 10px 0; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">
+                                🔥 슈퍼별 부여
+                            </button>
+                            <button onclick="window.applyMobileTest('special')" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(16, 185, 129, 0.4)); border: 1px solid #a855f7; color: #fff; font-weight: 800; padding: 10px 0; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">
+                                ✨ 스페셜별 부여
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', panelHtml);
+        return;
+    }
+
+    if (panel) {
+        panel.style.display = show ? 'flex' : 'none';
+    }
+};
+
+// 2. 모바일 UI에서 [부여] 버튼 터치 시 실행 함수
+window.applyMobileTest = function(starType) {
+    const select = document.getElementById('mTestMemberSelect');
+    const quarterInput = document.getElementById('mTestQuarter');
+
+    if (!select || !select.value) {
+        alert("회원을 선택해 주세요!");
+        return;
+    }
+
+    const memberId = select.value;
+    const quarter = quarterInput ? quarterInput.value : "2Q";
+
+    // 공통 실행 함수 실행
+    window.testSetSpecialStar(memberId, null, starType, quarter);
+
+    window.toggleMobileTestPanel(false);
+};
+
+// 3. 테스트 전용 보조 핵심 실행 함수 (PC/모바일 공용)
+window.testSetSpecialStar = function(memberId, memberName, starType = "super", quarter = "2Q") {
+    if (typeof currentData === 'undefined') window.currentData = [];
+
+    let target = currentData.find(m => m.id === memberId || m.name === memberName || (memberName && m.name === memberName));
+    
+    if (!target) {
+        target = { id: memberId || "test_user_01", name: memberName || "테스터", specialStars: [] };
+        currentData.push(target);
+    }
+
+    if (!target.specialStars) target.specialStars = [];
+
+    const newRecord = {
+        starType: starType,
+        quarter: quarter,
+        year: new Date().getFullYear(),
+        timestamp: Date.now() // 최신 시점 기록 적용 ➔ 왕좌 실시간 이관
+    };
+
+    target.specialStars.push(newRecord);
+    
+    // 은하수 모달이 열려 있다면 즉시 화면 리프레시
+    if (window.showMilkyWay) {
+        window.showMilkyWay(target.id, target.name);
+    }
+};
+
+// 4. 은하수 모달 오픈 시 모바일 테스트 플로팅 버튼 자동 주입 (기존 showMilkyWay 연동용)
+const originalShowMilkyWay = window.showMilkyWay;
+window.showMilkyWay = async function(mId, mName) {
+    if (originalShowMilkyWay) {
+        await originalShowMilkyWay(mId, mName);
+    }
+
+    // 모바일 테스트 플로팅 버튼 주입 (#mwTestFloatBtn)
+    if (!document.getElementById('mwTestFloatBtn')) {
+        const floatBtnHtml = `
+            <button id="mwTestFloatBtn" onclick="window.toggleMobileTestPanel(true)" style="position: absolute; bottom: 20px; right: 20px; z-index: 10025; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-size: 0.75rem; font-weight: 800; padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                🧪 테스트
+            </button>
+        `;
+        const modal = document.getElementById('milkyWayModal');
+        if (modal) modal.insertAdjacentHTML('beforeend', floatBtnHtml);
+    }
+};
+  
             
             
             
