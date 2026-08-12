@@ -9184,6 +9184,13 @@ window.switchScrollTab = (category) => {
 
 // 🌟 스크롤 모달 목록 페이징 렌더링
 window.loadScrollLogsPage = (isFirstPage = false) => {
+        // 국립공원 산 목록 (함수 맨 위에 붙여넣기)
+const NATIONAL_PARKS = [
+  '가야산', '지리산', '설악산', '한라산', '북한산', '내장산', '덕유산', 
+  '주왕산', '오대산', '치악산', '월악산', '속리산', '계룡산', '무등산', 
+  '태백산', '소백산', '변산반도', '다도해', '한려해상', '월출산', '팔영산'
+];
+
     if (!window.scrollPagination) return;
     
     let { currentCategory, isEnd } = window.scrollPagination;
@@ -9257,11 +9264,15 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
             
             // 🎯 사각박스 뱃지 렌더링 (순서: 국 -> 산 -> BAC)
-            const isNationalParkLog = log.isNationalPark === true || log.isNationalPark === 'true' || log.isNationalPark == 1;
-            const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
+            const isNationalParkLog = log.isNationalPark === true || 
+                          log.isNationalPark === 'true' || 
+                          log.isNationalPark == 1 ||
+                          NATIONAL_PARKS.some(np => rawMountain.includes(np));
 
-            const npTag = isNationalParkLog ? '<span style="background: transparent; color: #1ABC9C; border: 1px solid #1ABC9C; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">국립</span>' : '';
-const top100Tag = isTop100Log ? '<span style="background: transparent; color: #2563eb; border: 1px solid #2563eb; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">산림</span>' : '';
+const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
+
+const npTag = isNationalParkLog ? '<span style="background: transparent; color: #10b981; border: 1px solid #10b981; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">국공</span>' : '';
+const top100Tag = isTop100Log ? '<span style="background: transparent; color: #2563eb; border: 1px solid #2563eb; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">산</span>' : '';
 const bacTag = log.isBAC ? '<span style="background: transparent; color: #ef4444; border: 1px solid #ef4444; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">BAC</span>' : '';
 
             const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
