@@ -4,6 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>산:우리 - 미니홈</title>
+        <script>
+(function() {
+  var userAgent = navigator.userAgent.toLowerCase();
+  var targetUrl = location.href;
+
+  if (userAgent.indexOf('kakaotalk') > -1) {
+    if (userAgent.indexOf('android') > -1) {
+      var parsedUrl = targetUrl.replace(/^https?:\/\//, '');
+      location.href = 'intent://' + parsedUrl + '#Intent;scheme=https;package=com.android.chrome;end';
+    } else if (userAgent.indexOf('iphone') > -1 || userAgent.indexOf('ipad') > -1 || userAgent.indexOf('ipod') > -1) {
+      location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(targetUrl);
+    }
+  }
+})();
+        </script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2901,10 +2916,13 @@ overflow: hidden;
 0% { transform: translateY(0) scale(1); opacity: 1; }
 100% { transform: translateY(-30px) scale(0.5); opacity: 0; }
 }
-</style>
+</style>        
 </head>
 <body>
 
+         
+       
+        
 <div id="levelUpCardModal" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md hidden items-center justify-center p-5">
 <div class="w-full max-w-[400px] text-center">
 <h2 id="modalTitle" class="text-2xl font-black mb-1 text-white">LEVEL UP!</h2>
@@ -9701,6 +9719,7 @@ document.addEventListener('touchstart', (e) => {
 
 
 </script>
+
 </body>
     </html>
     
