@@ -3131,19 +3131,27 @@ overflow: hidden;
       <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
 
       <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
-        <div class="flex items-center justify-between mb-2">
-          <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-          <div class="flex gap-2">
-            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-              <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-              <span class="text-[10px] font-black text-blue-600">100대명산</span>
-            </label>
-            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-              <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-              <span class="text-[10px] font-black text-red-500">BAC인증지</span>
-            </label>
-          </div>
-        </div>
+  <div class="flex items-center justify-between mb-2">
+    <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+    <div class="flex gap-2">
+      <!-- 1. 국립 체크박스 -->
+      <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isNationalParkCheck" class="w-3.5 h-3.5">
+        <span class="text-[10px] font-black text-emerald-600">국립</span>
+      </label>
+      <!-- 2. 산림청(기존 100대명산) 체크박스 -->
+      <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+        <span class="text-[10px] font-black text-blue-600">산림청</span>
+      </label>
+      <!-- 3. BAC 체크박스 -->
+      <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+        <span class="text-[10px] font-black text-red-500">BAC</span>
+      </label>
+    </div>
+  </div>
+  
 
         <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
           <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
@@ -5507,9 +5515,7 @@ function setupTimelineTabs() {
 }
 
 // 🌟 [추가 함수 2] 탭 클릭 시 클라이언트 사이드 즉시 필터링
-
-
-  window.filterMemberLogs = (category) => {
+window.filterMemberLogs = (category) => {
     const tabs = {
         all: document.getElementById('mTab-all'),
         hiking: document.getElementById('mTab-hiking'),
@@ -5528,70 +5534,63 @@ function setupTimelineTabs() {
         }
     });
 
-        // 2. 카테고리 필터 기준 정의 (이 부분만 교체하세요)
+    // 2. 카테고리 필터 기준 정의
     let filtered = [];
     if (category === 'all') {
         filtered = currentMemberLogs;
     } else if (category === 'hiking') {
-        // 순수산행 (런닝, 트레킹, 산책, 번외산행 모두 제외)
         filtered = currentMemberLogs.filter(log => 
             (!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike
         );
     } else if (category === 'running') {
-        // 번외산행 및 런닝/트레킹/산책 포함
         filtered = currentMemberLogs.filter(log => 
             log.isExtraHike || log.isRunning || log.isTracking || log.isWalking
         );
     }
 
+    // 범례 가이드 영역
+    const legendArea = document.getElementById('timelineLegend');
+    if (legendArea) {
+        const legends = {
+            regular: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5" style="background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);"></span>
+                <span>정기</span>
+            </div>`,
+            hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
+                <span>일정</span>
+            </div>`,
+            extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
+                <span>개인</span>
+            </div>`,
+            trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
+                <span>트레킹</span>
+            </div>`,
+            run: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFD1DC]"></span>
+                <span>런닝</span>
+            </div>`,
+            walk: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFCC80]"></span>
+                <span>산책</span>
+            </div>`
+        };
 
-            // 🎨 [수정] 범례 가이드 영역 조율 (도트 크기 8px, 텍스트 10px로 축소)
-const legendArea = document.getElementById('timelineLegend');
-if (legendArea) {
-    // 범례 조각 정의
-    const legends = {
-        regular: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5" style="background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);"></span>
-            <span>정기</span>
-        </div>`,
-        hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
-            <span>일정</span>
-        </div>`,
-        extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
-            <span>개인</span>
-        </div>`,
-        trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
-            <span>트레킹</span>
-        </div>`,
-        run: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFD1DC]"></span>
-            <span>런닝</span>
-        </div>`,
-        walk: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFCC80]"></span>
-            <span>산책</span>
-        </div>`
-    };
-
-    // 탭 종류에 따라 알맞은 범례 아이템 배치
-    if (category === 'hiking') {
-        legendArea.innerHTML = [legends.hike, legends.extraHike].join('');
-        legendArea.style.display = 'flex';
-    } else if (category === 'running') {
-        legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
-        legendArea.style.display = 'flex';
-    } else {
-        legendArea.innerHTML = Object.values(legends).join('');
-        legendArea.style.display = 'flex';
+        if (category === 'hiking') {
+            legendArea.innerHTML = [legends.hike, legends.extraHike].join('');
+            legendArea.style.display = 'flex';
+        } else if (category === 'running') {
+            legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
+            legendArea.style.display = 'flex';
+        } else {
+            legendArea.innerHTML = Object.values(legends).join('');
+            legendArea.style.display = 'flex';
+        }
     }
-}
 
-
-
-    // 3. 필터링된 영역만 리렌더링
+    // 3. 필터링된 영역 리렌더링
     const listArea = document.getElementById('filteredTimelineList');
     if (!listArea) return;
 
@@ -5603,27 +5602,29 @@ if (legendArea) {
     listArea.innerHTML = filtered.map(log => {
         const dayName = ['일','월','화','수','목','금','토'][log.date.getDay()];
         const top100Class = log.isTop100 ? 'text-blue-600 font-black' : '';
-        const bacTag = log.isBAC ? '<span class="bac-txt">BAC</span>' : '';
+
+        // 🎯 뱃지 렌더링 (순서: 국 -> 산 -> BAC)
+        const npTag = log.isNationalPark ? '<span class="bg-emerald-500 text-white text-[9px] font-bold px-1 py-0.5 rounded mr-1">국</span>' : '';
+        const top100Tag = log.isTop100 ? '<span class="bg-blue-600 text-white text-[9px] font-bold px-1 py-0.5 rounded mr-1">산</span>' : '';
+        const bacTag = log.isBAC ? '<span class="bg-red-500 text-white text-[9px] font-bold px-1 py-0.5 rounded mr-1">BAC</span>' : '';
+        const badges = `${npTag}${top100Tag}${bacTag}`;
         
         const heightVal = log.height || 0;
         const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
         const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
         const displayMountain = log.mountain || (log.isExtraHike ? "번외 산행" : "기록");
 
-        // 🎨 운동 종류별 잔디 색상 도트 생성 로직
+        // 운동 종류별 잔디 색상 도트 생성
         let dotStyle = "";
-        
         if (log.isRegular) {
-            // 정기산행: 프리미엄 그라데이션
             dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
         } else {
-            // 일반 활동별 정의된 잔디 색상
             const colors = {
-                hike: "#2ecc71",      // 등산 기본 (초록)
-                extraHike: "#5CE1D6", // 번외산행 (민트)
-                walk: "#FFCC80",      // 산책 (주황)
-                trek: "#E0B0FF",      // 트레킹 (보라)
-                run: "#FFD1DC"        // 런닝 (분홍)
+                hike: "#2ecc71",
+                extraHike: "#5CE1D6",
+                walk: "#FFCC80",
+                trek: "#E0B0FF",
+                run: "#FFD1DC"
             };
 
             let activeColors = [];
@@ -5644,7 +5645,6 @@ if (legendArea) {
             }
         }
 
-        // 🎯 텍스트(산 이름) 바로 앞에 오도록 여백 수정 (mr-1.5)
         const colorDotTag = `<span class="inline-block w-2.5 h-2.5 rounded-full mr-1.5 align-middle shadow-sm border border-black/5" style="${dotStyle}"></span>`;
 
         return `
@@ -5654,15 +5654,13 @@ if (legendArea) {
                     ${log.date.getFullYear()}.${log.date.getMonth()+1}.${log.date.getDate()} (${dayName})
                 </div>
                 <div class="timeline-desc ${top100Class}">
-                    ${colorDotTag}${bacTag}${displayMountain} (${heightVal}${unit}) ${log.isTop100 ? '⭐' : '✔️'}
+                    ${colorDotTag}${badges}${displayMountain} (${heightVal}${unit}) ${log.isTop100 ? '⭐' : '✔️'}
                 </div>
             </div>`;
     }).join('');
 };
-      
-    
 
-
+  
 
 // 1. 계절 색상 판별 함수 (파일 상단에 위치)
 window.getSeasonColor = (month) => {
@@ -6747,23 +6745,21 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 2. 기록 저장 핵심 로직    
- window.addMultiActivity = async () => {
+  
+window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
     const dateVal = dateInput.value;
-    
-    // 파이어베이스 내장 객체 안전장치 보강
     const _Timestamp = (typeof Timestamp !== 'undefined') ? Timestamp : { fromDate: (d) => d };
     
-    // 🎯 increment 오작동 방지를 위한 확실한 안전 매핑
     let _increment;
     if (typeof increment !== 'undefined') {
         _increment = increment;
     } else if (typeof window.increment !== 'undefined') {
         _increment = window.increment;
     } else {
-        _increment = (val) => val; // 폴백 방어
+        _increment = (val) => val;
     }
 
     const activityDateObj = new Date(dateVal + "T00:00:00");
@@ -6774,10 +6770,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const mName = document.getElementById('mountainName')?.value.trim() || "";
     const height = parseInt(document.getElementById('mountainHeight')?.value) || 0;
+    
+    // 🎯 체크박스 상태 수집 (국립 추가)
+    const isNationalPark = document.getElementById('isNationalParkCheck')?.checked || false;
     const isTop100 = document.getElementById('isTop100Check')?.checked || false;
     const isBAC = document.getElementById('isBACCheck')?.checked || false;
     
-    // 🎯 정기산행 체크박스를 '일정 체크박스'로 적용
     const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
     const isSchedule = document.getElementById('isScheduleCheck')?.checked || false; 
 
@@ -6793,17 +6791,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const pValley = parseInt(document.getElementById('pValley')?.value) || 0;
     
     const isExtraHike = isRunning && isTracking; 
-    
-    // 🌟 [핵심 변경 1] 트레킹 + 산책 동시 체크 시 순수산행과 동일한 인정 조건 부여
     const isSpecialTracking = isTracking && isWalking;
 
-    // isSpecial Tracking(트레킹+산책)인 경우는 Special 예외 처리에서 제외시킴
     const isSpecial = (isRunning || isOnlyLog || isExtraHike || (isTracking && !isSpecialTracking) || (isWalking && !isSpecialTracking));
-    
-    // 순수 산행이거나 [트레킹 + 산책] 동시 선택 시 순수산행 인정!
     const isRealHike = !isSpecial || isSpecialTracking; 
-
-    // 🔥 정기산행 방어 logic
     const isRegular = isRegularRaw && isRealHike; 
 
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
@@ -6826,8 +6817,15 @@ window.addEventListener('DOMContentLoaded', () => {
             const mSnap = await getDoc(mRef);
             
             const mountainData = {
-                height: height, isTop100: isTop100, isBAC: isBAC, region: region, updatedAt: new Date(),
-                pRock: pRock, pForest: pForest, pValley: pValley
+                height: height, 
+                isNationalPark: isNationalPark,
+                isTop100: isTop100, 
+                isBAC: isBAC, 
+                region: region, 
+                updatedAt: new Date(),
+                pRock: pRock, 
+                pForest: pForest, 
+                pValley: pValley
             };
             if (safeCoords) {
                 mountainData.x = safeCoords.x;
@@ -6837,7 +6835,6 @@ window.addEventListener('DOMContentLoaded', () => {
             else await setDoc(mRef, mountainData);
         }
 
-        // 🎯 [선택된 회원별 반복 업데이트 시작]
         for (const id of selectedMemberIds) {
             const member = currentData.find(m => m.id === id);
             if (!member) continue;
@@ -6851,7 +6848,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
-            // 🌟 [핵심 변경 2] isRealHike 또는 isSpecialTracking 일 때 레벨업 적용
             const realUpAmount = (isRealHike && !isExtraHike) ? up : 0;
             const oldLevel = member.level || 0;
             const newLevel = oldLevel + realUpAmount; 
@@ -6861,7 +6857,6 @@ window.addEventListener('DOMContentLoaded', () => {
             if (realUpAmount > 0) checkLevelUpgrade(member.name, oldLevel, newLevel);
             selectedNames.push(member.name);
 
-            // ─── 🅰️ 순수산행 OR (트레킹+산책) 지정 산행일 때 count 및 스탯 상승 ───
             if (isRealHike && !isExtraHike) {
                 updateData.count = _increment(1); 
                 updateData.lastDate = ts; 
@@ -6888,8 +6883,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     updateData.friendshipPoint = _increment(pointToAdd);
                     updateData[`fp_bins.${qKey}`] = _increment(pointToAdd);
                 }
-
-            // ─── 🅱️ 일반 번외산행 / 단일 러닝 / 단일 트레킹 / 단일 산책 일 때 (Count 고정) ───
             } else {
                 updateData[`quarterlyStats.${qKey}.total`] = _increment(1);
                 updateData[`quarterlyStats.${qKey}.hike`] = _increment(0); 
@@ -6906,7 +6899,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // ⚡ 벙주 체크박스 분기 누적
             if (window.selectedHostIds && window.selectedHostIds.includes(id)) {
                 updateData[`quarterlyStats.${qKey}.hosted`] = _increment(1);
             }
@@ -6915,9 +6907,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // ─── 🎯 세부 로그 적재 ───
             const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
-
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
             const baseDocId = rawMountainName || (isSpecialTracking ? "인정 트레킹" : (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))));
 
@@ -6940,12 +6930,13 @@ window.addEventListener('DOMContentLoaded', () => {
                     date: ts, 
                     mountain: baseDocId, 
                     height, coords: safeCoords,
+                    isNationalPark, // 🎯 국립 필드 포함
                     isTop100, isBAC, 
                     isRegular,   
                     isSchedule,  
                     isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
-                    isSpecial: isSpecialTracking ? false : isSpecial, // 인정 트레킹은 Special 제외 처리
+                    isSpecial: isSpecialTracking ? false : isSpecial,
                     pRock, pForest, pValley
                 };
 
@@ -6957,18 +6948,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 existingDocIds.add(customLogDocId);
-
                 await setDoc(doc(db, `sanwoori/${id}/logs`, customLogDocId), logPayload);
             }
         } 
 
-        // 🌟 [핵심 변경 3] 순수산행 및 (트레킹+산책) 조합에 대해 2인 이상 동행 시 bondingForest에 저장
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
             const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
             const cleanDate = dateVal.trim();
             let bondingDocId = `${cleanMountain}_${cleanDate}`;
 
-            // 동일 날짜, 동일 산/명칭 중복 저장 시 식별자 부여 (_2, _3...)
             let bondingRef = doc(db, "bondingForest", bondingDocId);
             let checkSnap = await getDoc(bondingRef);
             let dupSeq = 2;
@@ -6984,7 +6972,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 members: selectedNames, 
                 memberCount: selectedNames.length, 
                 date: cleanDate, 
-                type: "정식", // 인연의 숲 필터링 통과를 위한 타입 설정
+                type: "정식", 
                 createdAt: new Date()
             });
         }
@@ -6993,7 +6981,6 @@ window.addEventListener('DOMContentLoaded', () => {
         
         alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // 입력 폼 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
@@ -7008,7 +6995,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
-        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
+        const checkIds = ['isNationalParkCheck', 'isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
@@ -7028,6 +7015,7 @@ window.addEventListener('DOMContentLoaded', () => {
         alert("저장 실패: " + error.message);
     }
 };
+            
 
                     
 
@@ -8978,9 +8966,6 @@ function createShootingStar(board, tx, ty) {
 }
 
 
-
-                 
-             
 window.currentScrollLogs = []; 
 
 window.scrollPagination = {
@@ -9057,15 +9042,14 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // 🔥 순수산행(일반산행) + 정기산행 = 일정산행 횟수로 집계
         const counts = window.currentScrollLogs.reduce((acc, log) => {
             const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
             const isPureHike = !isKmActivity && !log.isExtraHike;
 
             if (isPureHike) {
-                acc.schedule++; // 순수산행(일반산행)이면 일정산행 +1
+                acc.schedule++;
                 if (log.isRegular) {
-                    acc.regular++; // 그중 정기산행이면 정기산행 +1
+                    acc.regular++;
                 }
             } else if (log.isExtraHike) {
                 acc.extra++;
@@ -9166,7 +9150,6 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     }
 };
 
-    // 🎯 4. 스크롤 모달 전용 통합 닫기 함수 신설
 window.closeScrollModal = function() {
     const modal = document.getElementById('scrollModal');
     if (modal) {
@@ -9199,11 +9182,11 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
+// 🌟 스크롤 모달 목록 페이징 렌더링
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
     let { currentCategory, isEnd } = window.scrollPagination;
-
     if (isEnd) return;
 
     const listBox = document.getElementById('scrollFilteredList');
@@ -9253,7 +9236,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
             const isPureRegularHike = log.isRegular && !isKmActivity; 
 
-            // 🎯 도트 색상
+            // 도트 색상
             let dotStyle = "";
             const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
             
@@ -9272,12 +9255,18 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const heightVal = log.height || 0;
             const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
             const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
-            const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
             
-            // 🎯 100대 명산 타입 안전 검사 (Boolean/String/Number 대응)
+            // 🎯 사각박스 뱃지 렌더링 (순서: 국 -> 산 -> BAC)
+            const isNationalParkLog = log.isNationalPark === true || log.isNationalPark === 'true' || log.isNationalPark == 1;
             const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
 
-            // 🎯 아이콘 태그 (★ / ✔)
+            const npTag = isNationalParkLog ? '<span style="background: #10b981; color: #ffffff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">국</span>' : '';
+            const top100Tag = isTop100Log ? '<span style="background: #2563eb; color: #ffffff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">산</span>' : '';
+            const bacTag = log.isBAC ? '<span style="background: #ef4444; color: #ffffff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">BAC</span>' : '';
+
+            const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
+
+            // 아이콘 태그 (★ / ✔)
             let starTag = '';
             if (isTop100Log) {
                 starTag = '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>';
@@ -9325,12 +9314,11 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 ? `<span style="margin-left: auto; background: linear-gradient(135deg, rgba(255, 105, 180, 0.15), rgba(160, 32, 240, 0.15)); color: #7e22ce; border: 1px solid rgba(160, 32, 240, 0.35); font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; display: inline-flex; align-items: center; line-height: 1; flex-shrink: 0;">정기산행</span>`
                 : '';
 
-            // 🎯 [핵심] 100대 명산 블루글씨 및 정기산행 무지개 글씨 렌더링 분기
+            // 🎯 100대 명산(산림청) 블루 텍스트 처리
             let mountainHtml = '';
             if (isPureRegularHike) {
                 mountainHtml = `${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`;
             } else if (isTop100Log) {
-                // top100-blue 클래스 부여 + 인라인 스타일로 파란색(#2563eb) 확실하게 고정
                 mountainHtml = `<span class="top100-blue" style="color: #2563eb !important; font-weight: 700;">${rawMountain} (${heightVal}${unit})</span>`;
             } else {
                 mountainHtml = `<span>${rawMountain} (${heightVal}${unit})</span>`;
@@ -9340,9 +9328,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 <div class="scroll-timeline-item">
                     <div class="scroll-item-date">${dateStr} (${dayName})</div>
                     <div class="scroll-item-body" style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                        <div style="display: flex; align-items: center; gap: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                             <span class="scroll-item-dot" style="${dotStyle}"></span>
-                            ${bacTag}
+                            ${badgeGroup}
                             <span class="scroll-item-name" style="display: inline-flex; align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 ${mountainHtml}
                             </span>
@@ -9379,16 +9367,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     }
 };
 
-   
-
-    
-            
-
-                                      
                  
-    
-
-            
+                
 
                              </script>
 
