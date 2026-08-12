@@ -9260,9 +9260,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const isNationalParkLog = log.isNationalPark === true || log.isNationalPark === 'true' || log.isNationalPark == 1;
             const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
 
-            const npTag = isNationalParkLog ? '<span style="background: rgba(26, 188, 156, 0.15); color: #1ABC9C; border: 1px solid #1ABC9C; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">국</span>' : '';
-const top100Tag = isTop100Log ? '<span style="background: #2563eb; color: #ffffff; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">산</span>' : '';
-const bacTag = log.isBAC ? '<span style="background: rgba(0, 206, 209, 0.15); color: #00CED1; border: 1px solid #00CED1; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">BAC</span>' : '';
+            const npTag = isNationalParkLog ? '<span style="background: transparent; color: #10b981; border: 1px solid #10b981; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">국</span>' : '';
+const top100Tag = isTop100Log ? '<span style="background: transparent; color: #2563eb; border: 1px solid #2563eb; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">산</span>' : '';
+const bacTag = log.isBAC ? '<span style="background: transparent; color: #ef4444; border: 1px solid #ef4444; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 3px; display: inline-block; line-height: 1.2;">BAC</span>' : '';
 
             const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
 
