@@ -9272,12 +9272,18 @@ const NATIONAL_PARKS = [
 
 const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
 
-const npTag = isNationalParkLog ? '<span style="background: transparent; color: #0d9488; border: 1px solid #0d9488; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">국립</span>' : '';
-const top100Tag = isTop100Log ? '<span style="background: transparent; color: #2563eb; border: 1px solid #2563eb; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">산림</span>' : '';
+// 🎯 3개 다 해당하는지 체크 (3개 모두 있으면 '국공'->'국', '산림'->'산'으로 축소)
+const isAllThree = isNationalParkLog && isTop100Log && log.isBAC;
+const npText = isAllThree ? '국' : '국공';
+const top100Text = isAllThree ? '산' : '산림';
+
+const npTag = isNationalParkLog ? `<span style="background: transparent; color: #0d9488; border: 1px solid #0d9488; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">${npText}</span>` : '';
+const top100Tag = isTop100Log ? `<span style="background: transparent; color: #2563eb; border: 1px solid #2563eb; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">${top100Text}</span>` : '';
 const bacTag = log.isBAC ? '<span style="background: transparent; color: #ef4444; border: 1px solid #ef4444; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">BAC</span>' : '';
 
-            const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
+const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
 
+        
             // 아이콘 태그 (★ / ✔)
             let starTag = '';
             if (isTop100Log) {
