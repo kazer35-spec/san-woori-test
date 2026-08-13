@@ -6745,7 +6745,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 2. 기록 저장 핵심 로직    
-  window.addMultiActivity = async () => {
+  Window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -6761,7 +6761,11 @@ window.addEventListener('DOMContentLoaded', () => {
         _increment = (val) => val;
     }
 
-    const activityDateObj = new Date(dateVal + "T00:00:00");
+    // 🎯 [수정] 선택한 날짜(dateVal)에 현재 시/분/초를 조합하여 저장
+    const now = new Date();
+    const [y, m, d] = dateVal.split('-').map(Number);
+    const activityDateObj = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds());
+    
     const ts = _Timestamp.fromDate(activityDateObj); 
     const currentYear = activityDateObj.getFullYear();
     const currentQuarter = Math.ceil((activityDateObj.getMonth() + 1) / 3);
@@ -6887,7 +6891,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 updateData[`quarterlyStats.${qKey}.hike`] = _increment(0); 
 
                 if (isDdayTargetActivity && isMultiHike && oldLevel > 0) {
-                    const todayZero = activityDateObj.getTime();
+                    // D-Day 계산 시 pure 날짜만 비교하도록 기준 수정
+                    const todayZero = new Date(activityDateObj.getFullYear(), activityDateObj.getMonth(), activityDateObj.getDate()).getTime();
                     const last = member.lastDate ? member.lastDate.toDate() : new Date();
                     const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
                     const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
@@ -6925,10 +6930,9 @@ window.addEventListener('DOMContentLoaded', () => {
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
 
-                // 🎯 createdAt 필드가 추가되었습니다.
                 const logPayload = {
-                    date: ts, 
-                    createdAt: new Date(), // ★ 저장 시점의 타임스탬프 기록
+                    date: ts, // 🎯 이제 선택한 날짜 + 저장 시점의 시/분/초가 그대로 포함됩니다.
+                    createdAt: new Date(), 
                     mountain: baseDocId, 
                     height, coords: safeCoords,
                     isNationalPark,
@@ -6963,7 +6967,7 @@ window.addEventListener('DOMContentLoaded', () => {
             let dupSeq = 2;
             while (checkSnap.exists()) {
                 bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-                bondingRef = doc(db, "bondingForest", bondingDocId);
+                bondingRef = doc(doc(db, "bondingForest", bondingDocId));
                 checkSnap = await getDoc(bondingRef);
                 dupSeq++;
             }
@@ -7016,6 +7020,7 @@ window.addEventListener('DOMContentLoaded', () => {
         alert("저장 실패: " + error.message);
     }
 };
+
 
 
                     
