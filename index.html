@@ -9285,9 +9285,11 @@ if (isTop100Log) activeBadges.push(`<span style="color: #2563eb;">${top100Text}<
 if (log.isBAC) activeBadges.push(`<span style="color: #ef4444;">BAC</span>`);
 
 // 4. 단일 캡슐 뱃지 그룹 완성 (해당하는 조건이 있을 때만 생성)
+// 4. 또렷하고 존재감 있는 단일 캡슐 뱃지
 const badgeGroup = activeBadges.length > 0 
-  ? `<span style="background: #f1f5f9; font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 12px; margin-left: 6px; display: inline-flex; align-items: center; gap: 3px; line-height: 1; vertical-align: middle;">${activeBadges.join('<span style="color: #cbd5e1; font-weight: 400;">·</span>')}</span>`
+  ? `<span style="background: #e2e8f0; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; margin-right: 6px; display: inline-flex; align-items: center; gap: 4px; line-height: 1; vertical-align: middle; border: 1px solid #cbd5e1;">${activeBadges.join('<span style="color: #94a3b8; font-weight: 600;">·</span>')}</span>`
   : '';
+
 
         
             // 아이콘 태그 (★ / ✔)
