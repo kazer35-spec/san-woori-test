@@ -6745,8 +6745,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 2. 기록 저장 핵심 로직    
-  
-window.addMultiActivity = async () => {
+  window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -6926,11 +6925,13 @@ window.addMultiActivity = async () => {
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
 
+                // 🎯 createdAt 필드가 추가되었습니다.
                 const logPayload = {
                     date: ts, 
+                    createdAt: new Date(), // ★ 저장 시점의 타임스탬프 기록
                     mountain: baseDocId, 
                     height, coords: safeCoords,
-                    isNationalPark, // 🎯 국립 필드 포함
+                    isNationalPark,
                     isTop100, isBAC, 
                     isRegular,   
                     isSchedule,  
@@ -7015,7 +7016,9 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
-            
+
+
+                    
 
                     
 
