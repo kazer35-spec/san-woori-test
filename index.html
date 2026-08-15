@@ -3208,11 +3208,12 @@ overflow: hidden;
             <option value="부산광역시">부산광역시</option>
             <option value="제주도">제주도</option>
           </select>
-                 <!-- [추가된 부분] 좌표 사용 체크박스 -->
-  <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-gray-700">
-    <input type="checkbox" id="isCoordEnabledCheck" class="w-3.5 h-3.5" checked> 좌표저장
-  </label>
+                  <!-- 🎯 toggleDisableCoord() 함수 연결 -->
+      <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white px-2 h-9 border rounded-lg shrink-0">
+        <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
+      </label>
         </div>
+        
 
 
         <div class="flex gap-2 mb-2">
@@ -6749,8 +6750,21 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 2. 기록 저장 핵심 로직    
-  window.addMultiActivity = async () => {
+    
+// 🎯 [신규] 좌표 OFF 체크박스 토글 시 화면 마커 및 좌표 변수 즉시 초기화
+window.toggleDisableCoord = () => {
+    const isOff = document.getElementById('disableCoordCheck')?.checked || false;
+    if (isOff) {
+        tempCoord = null;
+        const marker = document.getElementById('adminMapMarker');
+        if (marker) marker.classList.add('hidden');
+        
+        const display = document.getElementById('coordDisplay');
+        if (display) display.innerText = '좌표: 사용 안 함 (좌표 OFF)';
+    }
+};
+
+window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -6766,7 +6780,6 @@ window.addEventListener('DOMContentLoaded', () => {
         _increment = (val) => val;
     }
 
-    // 🎯 선택한 날짜(dateVal)에 현재 시/분/초를 조합하여 저장
     const now = new Date();
     const [y, m, d] = dateVal.split('-').map(Number);
     const activityDateObj = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds());
@@ -6779,7 +6792,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const mName = document.getElementById('mountainName')?.value.trim() || "";
     const height = parseInt(document.getElementById('mountainHeight')?.value) || 0;
     
-    // 🎯 체크박스 상태 수집
     const isNationalPark = document.getElementById('isNationalParkCheck')?.checked || false;
     const isTop100 = document.getElementById('isTop100Check')?.checked || false;
     const isBAC = document.getElementById('isBACCheck')?.checked || false;
@@ -6819,7 +6831,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const selectedNames = [];
     
-    // 🎯 좌표 OFF가 켜져있으면 tempCoord가 존재하더라도 null 처리
+    // 🎯 좌표 OFF가 켜져있으면 tempCoord 무시하고 unconditional null 처리
     const safeCoords = (!disableCoord && typeof tempCoord !== 'undefined' && tempCoord && tempCoord.x !== undefined) ? tempCoord : null;
 
     try {
@@ -6841,8 +6853,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 pValley: pValley
             };
 
-            // 좌표 OFF가 아니고 coordinates 데이터가 있을 때만 x, y 업데이트
-            if (safeCoords) {
+            // 🎯 핵심 수정: 좌표 OFF면 기존 DB의 x, y 좌표를 null로 강제 삭제/초기화합니다.
+            if (disableCoord) {
+                mountainData.x = null;
+                mountainData.y = null;
+            } else if (safeCoords) {
                 mountainData.x = safeCoords.x;
                 mountainData.y = safeCoords.y;
             }
@@ -6947,7 +6962,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     createdAt: new Date(), 
                     mountain: baseDocId, 
                     height, 
-                    coords: safeCoords, // 🎯 disableCoordCheck가 체크되면 null로 들어갑니다.
+                    coords: safeCoords, // 🎯 disableCoord가 true일 경우 null로 저장됨
                     isNationalPark,
                     isTop100, isBAC, 
                     isRegular,   
@@ -7022,6 +7037,12 @@ window.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('input[name="upAmount"]').forEach(radio => radio.checked = false);
 
         tempCoord = null; 
+        const marker = document.getElementById('adminMapMarker');
+        if (marker) marker.classList.add('hidden');
+        
+        const display = document.getElementById('coordDisplay');
+        if (display) display.innerText = '좌표: 없음 (지도 클릭)';
+
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
             dateInput.value = kstDate.toISOString().split('T')[0];
@@ -7033,6 +7054,7 @@ window.addEventListener('DOMContentLoaded', () => {
         alert("저장 실패: " + error.message);
     }
 };
+
 
                      
 
