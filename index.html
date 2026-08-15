@@ -3208,7 +3208,12 @@ overflow: hidden;
             <option value="부산광역시">부산광역시</option>
             <option value="제주도">제주도</option>
           </select>
+                 <!-- [추가된 부분] 좌표 사용 체크박스 -->
+  <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-gray-700">
+    <input type="checkbox" id="isCoordEnabledCheck" class="w-3.5 h-3.5" checked> 좌표저장
+  </label>
         </div>
+
 
         <div class="flex gap-2 mb-2">
           <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
@@ -6761,7 +6766,7 @@ window.addEventListener('DOMContentLoaded', () => {
         _increment = (val) => val;
     }
 
-    // 🎯 [수정] 선택한 날짜(dateVal)에 현재 시/분/초를 조합하여 저장
+    // 🎯 선택한 날짜(dateVal)에 현재 시/분/초를 조합하여 저장
     const now = new Date();
     const [y, m, d] = dateVal.split('-').map(Number);
     const activityDateObj = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds());
@@ -6774,7 +6779,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const mName = document.getElementById('mountainName')?.value.trim() || "";
     const height = parseInt(document.getElementById('mountainHeight')?.value) || 0;
     
-    // 🎯 체크박스 상태 수집 (국립 추가)
+    // 🎯 체크박스 상태 수집
     const isNationalPark = document.getElementById('isNationalParkCheck')?.checked || false;
     const isTop100 = document.getElementById('isTop100Check')?.checked || false;
     const isBAC = document.getElementById('isBACCheck')?.checked || false;
@@ -6788,6 +6793,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const isOnlyLog = document.getElementById('isOnlyLog')?.checked || false; 
     const region = document.getElementById('adminManualRegionSelect')?.value || "";
     const isQuarterOnlyOne = document.getElementById('isQuarterCheck')?.checked || false;
+    
+    // 🎯 좌표 OFF 체크 여부 확인
+    const disableCoord = document.getElementById('disableCoordCheck')?.checked || false;
     
     const pRock = parseInt(document.getElementById('pRock')?.value) || 0;
     const pForest = parseInt(document.getElementById('pForest')?.value) || 0;
@@ -6810,7 +6818,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const up = parseInt(upElement.value);
 
     const selectedNames = [];
-    const safeCoords = (typeof tempCoord !== 'undefined' && tempCoord && tempCoord.x !== undefined) ? tempCoord : null;
+    
+    // 🎯 좌표 OFF가 켜져있으면 tempCoord가 존재하더라도 null 처리
+    const safeCoords = (!disableCoord && typeof tempCoord !== 'undefined' && tempCoord && tempCoord.x !== undefined) ? tempCoord : null;
 
     try {
         pendingLevelUpCards = []; 
@@ -6830,10 +6840,13 @@ window.addEventListener('DOMContentLoaded', () => {
                 pForest: pForest, 
                 pValley: pValley
             };
+
+            // 좌표 OFF가 아니고 coordinates 데이터가 있을 때만 x, y 업데이트
             if (safeCoords) {
                 mountainData.x = safeCoords.x;
                 mountainData.y = safeCoords.y;
             }
+
             if (mSnap.exists()) await updateDoc(mRef, mountainData);
             else await setDoc(mRef, mountainData);
         }
@@ -6891,7 +6904,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 updateData[`quarterlyStats.${qKey}.hike`] = _increment(0); 
 
                 if (isDdayTargetActivity && isMultiHike && oldLevel > 0) {
-                    // D-Day 계산 시 pure 날짜만 비교하도록 기준 수정
                     const todayZero = new Date(activityDateObj.getFullYear(), activityDateObj.getMonth(), activityDateObj.getDate()).getTime();
                     const last = member.lastDate ? member.lastDate.toDate() : new Date();
                     const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
@@ -6931,10 +6943,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const logPayload = {
-                    date: ts, // 🎯 이제 선택한 날짜 + 저장 시점의 시/분/초가 그대로 포함됩니다.
+                    date: ts,
                     createdAt: new Date(), 
                     mountain: baseDocId, 
-                    height, coords: safeCoords,
+                    height, 
+                    coords: safeCoords, // 🎯 disableCoordCheck가 체크되면 null로 들어갑니다.
                     isNationalPark,
                     isTop100, isBAC, 
                     isRegular,   
@@ -7000,7 +7013,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
-        const checkIds = ['isNationalParkCheck', 'isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
+        const checkIds = ['isNationalParkCheck', 'isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck', 'disableCoordCheck'];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
@@ -7021,9 +7034,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 };
 
-
-
-                    
+                     
 
                     
 
