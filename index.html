@@ -6787,20 +6787,28 @@ window.toggleDisableCoord = () => {
     const isSpecial = document.getElementById('isSpecialTrackingCheck')?.checked || false;
 
     if (type === 'extra' && isExtra) {
-        // 번외산행: 런닝 + 트레킹 체크
+        // 🌲 번외산행: 런닝 + 트레킹 + 좌표 OFF 자동 체크 🎯
         if (document.getElementById('isSpecialTrackingCheck')) document.getElementById('isSpecialTrackingCheck').checked = false;
         if (document.getElementById('isRunningCheck')) document.getElementById('isRunningCheck').checked = true;
         if (document.getElementById('isTrackingCheck')) document.getElementById('isTrackingCheck').checked = true;
         if (document.getElementById('isWalkingCheck')) document.getElementById('isWalkingCheck').checked = false;
+
+        // 좌표 OFF 자동 체크 및 토글 함수 호출
+        const disableCb = document.getElementById('disableCoordCheck');
+        if (disableCb) {
+            disableCb.checked = true;
+            if (typeof toggleDisableCoord === 'function') toggleDisableCoord(); // 좌표 비활성화 UI 적용
+        }
     } else if (type === 'special' && isSpecial) {
-        // 🎯 인정 트레킹: 트레킹 + 산책 + 일정(🗓️) 자동 체크
+        // 🥾 인정 트레킹: 트레킹 + 산책 + 일정(🗓️) 자동 체크
         if (document.getElementById('isExtraHikeCheck')) document.getElementById('isExtraHikeCheck').checked = false;
         if (document.getElementById('isRunningCheck')) document.getElementById('isRunningCheck').checked = false;
         if (document.getElementById('isTrackingCheck')) document.getElementById('isTrackingCheck').checked = true;
         if (document.getElementById('isWalkingCheck')) document.getElementById('isWalkingCheck').checked = true;
-        if (document.getElementById('isScheduleCheck')) document.getElementById('isScheduleCheck').checked = true; // 👈 추가
+        if (document.getElementById('isScheduleCheck')) document.getElementById('isScheduleCheck').checked = true;
     }
 };
+
 
 
 
@@ -6856,8 +6864,15 @@ if (isExtraHikeCheck) {
 } else if (isSpecialTrackingCheck) {
     isTracking = true;
     isWalking = true;
-    isSchedule = true; // 인정 트레킹 시 일정 자동 체크
+    isSchedule = true;
 }
+
+// 🎯 좌표 OFF 체크 여부 확인 (번외산행인 경우 강제 true)
+let disableCoord = document.getElementById('disableCoordCheck')?.checked || false;
+if (isExtraHikeCheck) {
+    disableCoord = true;
+}
+
 
    const region = document.getElementById('adminManualRegionSelect')?.value || "";
     const isQuarterOnlyOne = document.getElementById('isQuarterCheck')?.checked || false;
