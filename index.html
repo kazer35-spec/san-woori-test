@@ -8370,7 +8370,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const elapsedMonths = getFullMonths(jDate, now);
     const totalMonths = Math.max(1, elapsedMonths + 1);
 
-    // 표시 개수 제한 및 오프셋 산출 (최근 최대 18개)
+    // 표시 개수 제한 (최근 최대 18개) 및 오프셋
     const MAX_VISIBLE_RINGS = 18;
     const displayRingCount = Math.min(totalMonths, MAX_VISIBLE_RINGS);
     const startMonthIdx = Math.max(0, totalMonths - MAX_VISIBLE_RINGS);
@@ -8452,14 +8452,48 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
     svg.appendChild(coreShape);
 
-    // [6] 나이테 및 위성 별 생성
+    // =========================================================
+    // [6] 회원별 고유 곡선 파라미터 산출 & 나이테(안쪽 채우기) 생성
+    // =========================================================
     const rings = [];
     const satellites = [];
     const seed = memberName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
+    // 🎲 회원 시드별 랜덤 형태 알고리즘 (5가지 유형)
+    const shapeType = seed % 5;
+    const freq1 = (seed % 5) + 3;      // 3 ~ 7 파동 주기
+    const freq2 = ((seed >> 2) % 4) + 2; // 2 ~ 5 보조 주기
+    const amp = 1.8 + (seed % 20) / 10;  // 1.8 ~ 3.8 파동 높이
+
+    function getWaveOffset(angle, month) {
+        if (shapeType === 0) {
+            // 타입 0: 유기적 이중 파동 (Organic Double Wave)
+            return Math.sin(angle * freq1 + month) * amp + Math.cos(angle * freq2) * (amp * 0.5);
+        } else if (shapeType === 1) {
+            // 타입 1: 꽃잎 형태 (Petal Pattern)
+            return Math.cos(angle * freq1 + month * 0.5) * amp;
+        } else if (shapeType === 2) {
+            // 타입 2: 비대칭 리플 (Asymmetric Ripple)
+            return Math.sin(angle * freq1 + month) * amp + Math.sin(angle * 2) * (amp * 0.7);
+        } else if (shapeType === 3) {
+            // 타입 3: 다각형 각진 파동 (Poly-Wave)
+            return (Math.sin(angle * freq1 + month) > 0 ? 1 : -1) * (amp * 0.6) + Math.sin(angle * freq2) * amp;
+        } else {
+            // 타입 4: 우주 펄스 파동 (Cosmic Pulse)
+            return Math.sin(angle * freq1) * Math.cos(angle * freq2 + month) * (amp * 1.2);
+        }
+    }
+
+    // 📐 반지름 범위: 가장 큰 외곽(102px)부터 시작하여 안쪽(22px)으로 채움
+    const R_MAX = 102;
+    const R_MIN = 22;
+    const stepRadius = (R_MAX - R_MIN) / MAX_VISIBLE_RINGS;
+
     for (let i = 0; i < displayRingCount; i++) {
         const actualMonth = startMonthIdx + i + 1;
-        const radius = 18 + (i * (87 / displayRingCount));
+        
+        // 💡 0번 인덱스 = 가장 외곽의 큰 원(R_MAX), 인덱스가 증가할수록 안쪽으로 좁혀짐
+        const radius = R_MAX - (i * stepRadius);
 
         const path = document.createElementNS(svgNS, "path");
         path.setAttribute("class", "tree-ring-path");
@@ -8468,7 +8502,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         let points = [];
         for (let a = 0; a <= 360; a += 6) {
             const angle = (a * Math.PI) / 180;
-            const wave = Math.sin(angle * (seed % 4 + 3) + actualMonth) * 2.2;
+            const wave = getWaveOffset(angle, actualMonth);
             const r = radius + wave;
             const x = 120 + r * Math.cos(angle);
             const y = 120 + r * Math.sin(angle);
@@ -8514,29 +8548,35 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     }
     container.appendChild(svg);
 
-    // [7] 애니메이션 실행
+    // =========================================================
+    // [7] 애니메이션 실행 (바깥쪽 ➔ 안쪽 순서로 등장)
+    // =========================================================
     const totalAnimTime = 1000; 
     const delayStep = Math.min(50, totalAnimTime / displayRingCount);
 
     rings.forEach((ringItem, index) => {
         setTimeout(() => {
             const { el, actualMonth, ringIndex } = ringItem;
-            const isLastRing = (ringIndex === rings.length - 1);
+            const isFirstOuterRing = (ringIndex === 0);
             const isYearRing = (actualMonth % 12 === 0);
-            const fadeRatio = (ringIndex + 1) / displayRingCount; 
+            
+            // 외곽(1.0) ➔ 안쪽 코어(0.15) 방향의 투명도 비율
+            const fadeRatio = 1 - (ringIndex / displayRingCount) * 0.85;
 
-            if (isLastRing) {
+            if (isFirstOuterRing) {
+                // 가장 외곽 선은 항상 가장 선명하게 강조
                 el.setAttribute("stroke-opacity", "1");
                 el.setAttribute("stroke-width", "2");
                 el.style.filter = `drop-shadow(0 0 5px ${ringColor})`;
             } else if (isYearRing) {
-                // 1년 주기는 안쪽에 들어서더라도 1.4px 두께와 글로우, 최소 0.7 투명도 유지
-                const yearOpacity = Math.max(0.7, fadeRatio).toFixed(2);
+                // 1년 주기는 안쪽에 들어서더라도 두껍고 선명하게 유지
+                const yearOpacity = Math.max(0.75, fadeRatio).toFixed(2);
                 el.setAttribute("stroke-opacity", yearOpacity);
                 el.setAttribute("stroke-width", "1.4");
                 el.style.filter = `drop-shadow(0 0 3px ${ringColor})`;
             } else {
-                const baseOpacity = Math.max(0.1, (fadeRatio * 0.35)).toFixed(2);
+                // 일반 나이테: 안쪽일수록 부드럽게 페이드아웃
+                const baseOpacity = Math.max(0.12, fadeRatio * 0.4).toFixed(2);
                 el.setAttribute("stroke-opacity", baseOpacity);
                 el.setAttribute("stroke-width", "0.35");
             }
@@ -8545,7 +8585,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
             satellites.forEach(sat => {
                 if (sat.ringIdx === ringIndex) {
-                    const satOpacity = isYearRing ? Math.max(0.8, fadeRatio) : fadeRatio;
+                    const satOpacity = isYearRing ? Math.max(0.85, fadeRatio) : fadeRatio;
                     sat.el.setAttribute("opacity", satOpacity.toFixed(2));
                 }
             });
