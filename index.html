@@ -13,34 +13,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-    /* 첫 번째 컬럼(회원명)의 CLICK 텍스트 위치 미세 보정 */
-tr td:first-child .click-neon-adjust {
-    top: 0px !important; /* 원래 top 값보다 3~4px 정도 위로 올림 */
-}
-
-
-    @keyframes rainbowMove {
-    0% { background-position: 0% center; }
-    100% { background-position: 200% center; }
-}
-
-    /* 💡 기록보기 강조용 반짝임(글로우 & 펄스) 애니메이션 */
-@keyframes recordBtnShine {
-    0%, 100% {
-        box-shadow: 0 0 0px rgba(59, 130, 246, 0);
-        border-color: rgba(203, 213, 225, 0.6);
-    }
-    50% {
-        box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
-        border-color: rgba(96, 165, 250, 0.9);
-        background-color: rgba(239, 246, 255, 1);
-    }
-}
-
-.record-glow-active {
-    animation: recordBtnShine 1.5s infinite ease-in-out;
-}
-
     /* 🌌 우주 다크 네온 획득자 모달 (기존 STAR GALLERY UI 핏) */
 .sg-modal-overlay {
     position: fixed;
@@ -327,16 +299,10 @@ tr td:first-child .click-neon-adjust {
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(0, 0, 0, 0.6);
     z-index: 9999;
-    display: none; /* 🎯 기본 상태를 hidden/none으로 안전하게 설정 */
+    display: flex;
     align-items: center;
     justify-content: center;
 }
-
-/* JS에서 열어줄 때 사용할 class 정의 */
-.scroll-overlay.active {
-    display: flex !important;
-}
-
 .fading-scroll {
     background: #ffffff;
     border-radius: 24px;
@@ -1525,28 +1491,31 @@ tr td:first-child .click-neon-adjust {
 .click-neon-adjust {
     position: absolute;
     
-    /* 👇 이 값을 수정하면 5개 CLICK 위치가 한 번에 다 같이 움직입니다 */
-    top: 2px; /* 화면 보시면서 -2px ~ 4px 사이로 맞춰보세요 */
+    /* 👇 이 값을 수정하여 click 위치를 위아래로 움직이세요 */
+    top: -18px; 
     
     left: 50%;
     transform: translateX(-50%);
     font-size: 7px;
     font-weight: 900;
-    color: #cbd5e1; /* 은은한 회색 원하시면 유지, 네온이면 #00ffcc */
-    letter-spacing: 1px;
-    pointer-events: none;
-    white-space: nowrap;
-    z-index: 10;
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc;
     animation: neon-blink 1.5s infinite;
+    z-index: 10;
 }
-
 
 @keyframes neon-blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
 
-
+/* 테이블 셀 높이 및 정렬 규격화 */
+table tbody tr td {
+    position: relative;
+    height: 60px; /* 셀 높이를 고정하여 click 텍스트 라인을 맞춤 */
+    vertical-align: middle;
+    padding-top: 12px !important; /* 위쪽 click 텍스트 공간 확보 */
+}
 
 /* 하단 정보 바 전체 설정 */
 .mountain-info-bar {
@@ -2303,87 +2272,43 @@ text-align: center;
 .del-only-btn-mini { font-size: 0.6rem; background: #64748b; color: white; padding: 5px; border-radius: 6px; font-weight: 800; }
 
 /* 테이블 간격 및 정렬 최적화 */
-/* 테이블 간격 및 정렬 최적화 */
-table { 
-  width: 100%; 
-  border-collapse: collapse; 
-  table-layout: fixed; 
-}
-
-/* sticky 고정을 위한 thead 레이아웃 설정 */
-thead {
-  position: sticky;
-  top: 0;
-  background-color: #ffffff; /* 스크롤 시 뒤 내용이 비치지 않도록 흰색 배경 지정 */
-  z-index: 10;
-}
-
-th { 
-  color: #94a3b8; 
-  font-size: 0.65rem; 
-  padding-bottom: 12px; 
-  border-bottom: 2px solid #f8fafc; 
-  text-align: center; 
-  font-weight: 900; 
-}
-
-td { 
-  padding: 12px 0; 
-  text-align: center; 
-  vertical-align: middle; 
-  position: relative; 
-  border-bottom: 1px solid #f8fafc; 
-}
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th { color: #94a3b8; font-size: 0.65rem; padding-bottom: 12px; border-bottom: 2px solid #f8fafc; text-align: center; font-weight: 900; }
+td { padding: 12px 0; text-align: center; vertical-align: middle; position: relative; border-bottom: 1px solid #f8fafc; }
 
 .rank-badge { font-size: 0.65rem; display: block; margin-bottom: -1px; font-weight: 900; }
-.rank-1 { color: #facc15 !important; } 
-.rank-2 { color: #94a3b8 !important; } 
-.rank-3 { color: #a36a00 !important; }
+.rank-1 { color: #facc15 !important; } .rank-2 { color: #94a3b8 !important; } .rank-3 { color: #a36a00 !important; }
 
 /* CLICK 네온 텍스트: 은은한 회색 숨쉬기 효과 */
 .click-neon {
-  font-size: 6px;
-  font-weight: 900;
-  color: #cbd5e1;
-  text-transform: uppercase;
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: neon-soft-glow 2s infinite ease-in-out;
-  letter-spacing: 1px;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 5;
+font-size: 6px; /* 가독성을 위해 살짝 키움 */
+font-weight: 900;
+color: #cbd5e1; /* 기본 회색 */
+text-transform: uppercase;
+position: absolute;
+top: -4px;
+left: 50%;
+transform: translateX(-50%);
+animation: neon-soft-glow 2s infinite ease-in-out; /* 부드러운 애니메이션 */
+letter-spacing: 1px;
+pointer-events: none;
+white-space: nowrap;
+z-index: 5;
 }
 
 @keyframes neon-soft-glow {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
-    color: #f8fafc;
-  }
-  50% {
-    opacity: 0.4;
-    text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
-    color: #64748b;
-  }
+0%, 100% {
+opacity: 1;
+/* 은색과 밝은 회색의 조화 */
+text-shadow: 0 0 4px #ffffff, 0 0 8px #94a3b8;
+color: #f8fafc;
 }
-
-/* 테이블 셀 높이 및 정렬 규격화 */
-table tbody tr td {
-  position: relative;
-  height: 60px;
-  vertical-align: middle;
-  padding-top: 12px !important;
+50% {
+opacity: 0.4;
+text-shadow: 0 0 2px rgba(148, 163, 184, 0.2);
+color: #64748b; /* 완전히 꺼지지 않고 은은하게 남음 */
 }
-
-/* 💡 스크롤 영역 지정을 위한 클래스 추가 */
-.table-scroll-container {
-  max-height: calc(100vh - 280px); /* 화면 높이에 맞춰 수직 스크롤 영역 제한 (필요시 높이 조정 가능) */
-  overflow-y: auto;
 }
-
 
 /* 2. 배지 스타일 수정 (은은한 글로우 추가) */
 .badge-level {
@@ -2693,367 +2618,355 @@ overflow: hidden;
 </div>
 </div>
 
+<div class="main-container flex flex-col">
+<div class="tab-menu">
+<button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
+<button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
+</div>
 
-<!-- 메인 컨테이너 시작 -->
-<div class="main-container flex flex-col h-screen">
-  
-  <!-- 상단 탭 메뉴 -->
-  <div class="tab-menu">
-    <button id="tabStatus" class="tab-btn active-tab" onclick="showView('status')">📡 실시간 현황</button>
-    <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
-  </div>
+<div id="viewStatus" class="view-content p-5 flex-1 overflow-y-auto">
+<div class="year-selector flex justify-between items-center mb-3">
+<h1 class="main-title">
+<img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+<span>산:우리</span>
+<span class="slogan-txt">같이 걷는 즐거움</span>
+</h1>
+<div class="flex items-center gap-2">
+<button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
 
-  <!-- 1. 실시간 현황 뷰 (viewStatus) -->
-  <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
+<button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
+<svg viewBox="0 0 36 36">
+<circle class="bg" cx="18" cy="18" r="16"></circle>
+<circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
+</svg>
+<span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+</button>
+<select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+<option value="2026">2026년</option>
+<option value="2027">2027년</option>
+</select>
+</div>
+</div>
+
+<div class="flex gap-2 mb-3 h-10 items-center">
+<input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
+<button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
+<select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
+<option value="qCount">점수순 ▼</option>
+<option value="level">레벨순 ▼</option>
+<option value="name">이름순 ▼</option>
+<option value="totalHeight">높이순 ▼</option>
+<option value="dday">날짜순 ▼</option>
+</select>
+</div>
+
+<div id="quarterTabs">
+<button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
+<button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
+<button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
+<button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+</div>
+
+<div class="min-h-[300px]">
+  <table>
+    <thead>
+      <tr>
+        <th class="w-[18%]">
+          회원명
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
+        </th>
+        <th class="w-[22%]">
+          레벨(Lv)
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
+        </th>
+        <th class="w-[18%]">
+          활동점수
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
+        </th>
+        <th class="w-[22%]">
+          누적고도
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
+        </th>
+        <th class="w-[16%]">
+        개인기록
+          <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(기록보기)</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="statusList"></tbody>
+  </table>
+</div>
+</div> <!-- 기존 코드의 닫는 div 태그 유지 -->
+
+
+<div id="viewLogin" class="view-content hidden p-6 overflow-y-auto">
+<div class="secret-login-container text-center">
+<div class="secret-icon">🔐</div>
+<h2 class="text-white text-lg font-black mb-1">관리자 구역</h2>
+<p class="text-blue-300 text-[9px] mb-4 font-medium opacity-80 uppercase tracking-widest">Authorized Personnel Only</p>
+
+<div class="px-4">
+<input type="password" id="adminPassword" placeholder="••••••" class="secret-input">
+<button onclick="loginAdmin()" class="btn-submit bg-blue-600 font-black">ACCESS GRANTED</button>
+</div>
+
+<div class="admin-subroom-dark-card text-left mt-6">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="text-xs font-black text-white">⛺️ 산:우리 서브방</span>
+</div>
+
+<button type="button" onclick="window.location.href='https://kazer35-spec.github.io/notice/'" class="cosmic-admin-btn btn-small">
+  <div class="btn-glow-line"></div>
+  <span style="font-size: 8px;">✦</span>
+  <span style="white-space: nowrap;">일정 양식 ↗</span>
+</button>
+</div>
+
+<div id="userSubRoomGrid" class="subroom-grid"></div>
+</div>
+
+<div class="admin-subroom-dark-card">
+<div class="stat-header">
+<div class="stat-title-fancy"><span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 🌲 멤버 구성 현황</div>
+<div class="stat-badge-total">TOTAL <span id="countTotal">0</span></div>
+</div>
+<div class="stat-grid-premium">
+<div class="stat-box-premium male">
+<span class="stat-label-premium">Gentlemen</span>
+<div class="stat-val-premium"><span id="countMale">0</span><span class="stat-unit-premium">명</span></div>
+<div class="stat-icon-bg">👦</div>
+</div>
+<div class="stat-box-premium female">
+<span class="stat-label-premium">Ladies</span>
+<div class="stat-val-premium"><span id="countFemale">0</span><span class="stat-unit-premium">명</span></div>
+<div class="stat-icon-bg">👧</div>
+</div>
+</div>
+</div>
+
+<div class="visitor-stat-card">
+<div class="sys-log-header"><span class="live-dot"></span> SYSTEM LOG: ENCRYPTED</div>
+<div class="v-stat-grid">
+<div class="v-stat-item"><div class="v-stat-label">Session Today</div><div id="todayHits" class="v-stat-value">0</div></div>
+<div class="v-stat-item"><div class="v-stat-label">System Total</div><div id="totalHits" class="v-stat-value v-stat-total">0</div></div>
+</div>
+</div>
+
+<p class="system-date-info text-[9px] text-gray-600 mt-6 leading-tight">
+Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
+</p>
+</div>
+</div>
+
+<div id="viewAdmin" class="view-content hidden p-5 overflow-y-auto max-h-[92vh]">
+<div class="card" style="border: 1.5px solid #e2e880;">
+<div class="card-title text-blue-600 font-black flex justify-between items-center">
+<span>🛠️ 서브방 관리</span>
+</div>
+<div id="adminSubRoomList" class="admin-subroom-grid"></div>
+</div>
+
+<div class="card">
+<div class="card-title text-green-600 font-bold">🆕 신규 회원 등록</div>
+<input type="text" id="newName" placeholder="회원 이름" class="input-gap">
+<div class="gender-select-group">
+<label><input type="radio" name="newGender" value="남" checked> 남성</label>
+<label><input type="radio" name="newGender" value="여"> 여성</label>
+</div>
+<input type="date" id="regDate" class="input-gap">
+<button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
+</div>
+
+<div class="card">
+<div class="card-title text-blue-600 font-bold flex justify-between">
+<span>📅 등산 기록 및 좌표 정복 관리</span>
+<button onclick="globalSyncMountainInfo()" class="text-[9px] bg-red-50 text-red-500 border border-red-200 px-2 rounded-lg font-black">⛰️ 산 정보 일괄수정</button>
+</div>
+<input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 px-4 rounded-xl w-full mb-2 text-xs bg-blue-50 border-blue-100 outline-none border">
+<div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
+
+<div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
+<div class="flex items-center justify-between mb-2">
+<p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+<div class="flex gap-2">
+<label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+<input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+<span class="text-[10px] font-black text-blue-600">100대명산</span>
+</label>
+<label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+<input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+<span class="text-[10px] font-black text-red-500">BAC인증지</span>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
+    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
+    </label>
+    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
+    </label>
+    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
+    </label>
+    <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
+    </label>
+</div>
+
+<div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
+    <div class="flex-1 flex items-center gap-1">
+        <span class="text-[9px] text-gray-400 shrink-0">🪨바위</span>
+        <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+    </div>
+    <div class="flex-1 flex items-center gap-1">
+        <span class="text-[9px] text-gray-400 shrink-0">🌿숲</span>
+        <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+    </div>
+    <div class="flex-1 flex items-center gap-1">
+        <span class="text-[9px] text-gray-400 shrink-0">🌊계곡</span>
+        <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
+    </div>
+</div>
+
+<input type="text" id="mountainName" 
+       onblur="autoFindCoords(); autoFindMountainStats();" 
+       placeholder="등산한 산 이름 (예: 관악산)" 
+       class="mb-2 h-9 text-xs w-full border rounded px-2">
+
+<div class="flex gap-2 mb-2">
+<select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
+<option value="기타">📍 수동 지역 선택 (선택 안함)</option>
+<option value="서울특별시">서울특별시</option>
+<option value="인천광역시">인천광역시</option>
+<option value="경기도">경기도</option>
+<option value="강원도">강원도</option>
+<option value="충청북도">충청북도</option>
+<option value="충청남도">충청남도</option>
+<option value="대전/세종">대전/세종</option>
+<option value="전라북도">전라북도</option>
+<option value="전라남도">전라남도</option>
+<option value="광주광역시">광주광역시</option>
+<option value="경상북도">경상북도</option>
+<option value="경상남도">경상남도</option>
+<option value="대구광역시">대구광역시</option>
+<option value="울산광역시">울산광역시</option>
+<option value="부산광역시">부산광역시</option>
+<option value="제주도">제주도</option>
+</select>
+</div>
+
+<div class="flex gap-2 mb-2">
+<input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
+<div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
+<span class="text-[9px] font-bold text-gray-400">UP:</span>
+<div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
+<label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
+<label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
+<label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
+
+<label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
+<input type="checkbox" id="isQuarterCheck">
+</label>
+</div>
+</div>
+</div>
+<div class="map-container" onclick="setAdminCoordinate(event)">
+<img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+<div id="adminMapMarker" class="map-point hidden"></div>
+</div>
+<div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
+</div>
+
+<input type="date" id="activityDate" class="input-gap">
+<button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
+</div>
+
+<div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
+<div class="card-title text-yellow-700 font-bold">✏️ 기록 수정 및 레벨 관리</div>
+
+<select id="memberSelectEdit" onchange="loadMemberLogs()" class="input-gap">
+<option value="">대상 회원 선택</option>
+</select>
+
+<div class="flex gap-2 mb-3">
+<input type="text" id="editMemberNameInput" placeholder="변경할 이름 입력" class="h-10 text-sm flex-1 border rounded-xl px-3 outline-none">
+<button onclick="updateMemberName()" class="bg-indigo-500 text-white px-3 rounded-xl text-xs font-bold whitespace-nowrap">이름 수정</button>
+</div>
+
+<div class="flex gap-2 mb-3">
+    <input type="number" id="manualLevelInput" placeholder="레벨(Lv) 입력" class="h-10 text-sm flex-1 border rounded-xl px-3 outline-none">
+    <button onclick="window.updateManualLevel()" class="bg-indigo-500 text-white px-3 rounded-xl text-xs font-bold whitespace-nowrap">레벨 적용</button>
+</div>
+
+<div class="flex gap-2 mb-3">
+    <input type="number" id="manualQCountInput" placeholder="분기 횟수 입력" class="h-10 text-sm flex-1 border rounded-xl px-3 outline-none">
+    <button onclick="window.updateManualQCount()" class="bg-indigo-500 text-white px-3 rounded-xl text-xs font-bold whitespace-nowrap">횟수 적용</button>
+</div>
+
+<div id="logListArea" class="log-grid"></div>
+
+</div>
+
+<div class="card" style="background-color: #fff5f5; border: 1px solid #ffe3e3;">
+    <div class="card-title text-red-600 font-bold mb-3">🗑️ 회원 상태 및 보너스 관리</div>
     
-    <!-- 상단 고정 헤더 영역 -->
-    <div class="year-selector flex justify-between items-center mb-3">
-      <h1 class="main-title">
-        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-        <span>산:우리</span>
-        <span class="slogan-txt">같이 걷는 즐거움</span>
-      </h1>
-      <div class="flex items-center gap-2">
-        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-        <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-          <svg viewBox="0 0 36 36">
-            <circle class="bg" cx="18" cy="18" r="16"></circle>
-            <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-          </svg>
-          <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
+    <select id="memberSelectManage" class="input-gap w-full mb-4 bg-white border border-gray-200 rounded px-3 py-2 text-sm">
+        <option value="">대상 회원 선택</option>
+    </select>
+
+    <div class="grid grid-cols-3 gap-2 mb-2">
+    <input type="number" id="buddyCountInput" placeholder="동행 횟수" 
+           class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" 
+           inputmode="numeric">
+    
+    <input type="text" id="friendshipPointInput" placeholder="우정 포인트" 
+           class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" 
+           inputmode="text" 
+           oninput="this.value = this.value.replace(/[^0-9-]/g, '')"> 
+    
+    <input type="text" id="bonusDaysInput" placeholder="보너스 날짜" 
+           class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" 
+           inputmode="text"
+           oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
+</div>
+
+
+    <div class="grid grid-cols-3 gap-2 mb-4">
+        <button onclick="updateBuddyCountManual()" 
+                class="bg-emerald-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">
+            동행 수정
         </button>
-        <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-          <option value="2026">2026년</option>
-          <option value="2027">2027년</option>
-        </select>
-      </div>
+        <button onclick="updateFriendshipPoint()" 
+                class="bg-blue-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">
+            포인트 적용
+        </button>
+        <button onclick="updateBonusDays()" 
+                class="bg-red-500 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">
+            날짜 적용
+        </button>
     </div>
 
-    <!-- 검색 및 필터 컨트롤 -->
-    <div class="flex gap-2 mb-3 h-10 items-center">
-      <input type="text" id="searchInput" onkeyup="renderStatusTable()" placeholder="🔍 회원 검색..." class="flex-[2] bg-gray-50 border-gray-200 outline-none rounded-xl px-4 text-sm h-full border">
-      <button onclick="toggleModal(true)" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full text-center flex items-center justify-center px-0">📊 레벨표</button>
-      <select id="statusSortOrder" onchange="renderStatusTable()" class="flex-1 bg-white border border-gray-200 rounded-xl font-extrabold text-[11px] h-full px-1 text-center">
-        <option value="qCount">점수순 ▼</option>
-        <option value="level">레벨순 ▼</option>
-        <option value="name">이름순 ▼</option>
-        <option value="totalHeight">높이순 ▼</option>
-        <option value="dday">날짜순 ▼</option>
-      </select>
+    <div class="flex gap-2">
+        <button onclick="toggleHideMember()" class="flex-1 bg-slate-600 text-white py-2 rounded text-xs font-bold">
+            숨기기/보이기
+        </button>
+        <button onclick="deleteMember()" class="flex-1 bg-red-600 text-white py-2 rounded text-xs font-bold">
+            영구 삭제
+        </button>
     </div>
-
-    <!-- 분기 탭 -->
-    <div id="quarterTabs" class="mb-3">
-      <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-      <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-      <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-      <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
-    </div>
-
-    <!-- 독립 스크롤 수행 영역 -->
-    <div class="flex-1 overflow-y-auto">
-      <table>
-        <thead>
-          <tr>
-            <th class="w-[18%]">
-              회원명
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(나이테)</span>
-            </th>
-            <th class="w-[22%]">
-              레벨(Lv)
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(은하수)</span>
-            </th>
-            <th class="w-[18%]">
-              활동점수
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
-            </th>
-            <th class="w-[22%]">
-              누적고도
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(정복지도)</span>
-            </th>
-            <th class="w-[16%]">
-              개인기록
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(D+Day)</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="statusList"></tbody>
-      </table>
-    </div>
-
-  </div> <!-- viewStatus 닫힘 -->
-
-  <!-- 2. 관리자 로그인 뷰 (viewLogin) -->
-  <div id="viewLogin" class="view-content hidden p-6 overflow-y-auto flex-1">
-    <div class="secret-login-container text-center">
-      <div class="secret-icon">🔐</div>
-      <h2 class="text-white text-lg font-black mb-1">관리자 구역</h2>
-      <p class="text-blue-300 text-[9px] mb-4 font-medium opacity-80 uppercase tracking-widest">Authorized Personnel Only</p>
-
-      <div class="px-4">
-        <input type="password" id="adminPassword" placeholder="••••••" class="secret-input">
-        <button onclick="loginAdmin()" class="btn-submit bg-blue-600 font-black">ACCESS GRANTED</button>
-      </div>
-
-      <div class="admin-subroom-dark-card text-left mt-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-black text-white">⛺️ 산:우리 서브방</span>
-          </div>
-
-          <button type="button" onclick="window.location.href='https://kazer35-spec.github.io/notice/'" class="cosmic-admin-btn btn-small">
-            <div class="btn-glow-line"></div>
-            <span style="font-size: 8px;">✦</span>
-            <span style="white-space: nowrap;">일정 양식 ↗</span>
-          </button>
-        </div>
-
-        <div id="userSubRoomGrid" class="subroom-grid"></div>
-      </div>
-
-      <div class="admin-subroom-dark-card">
-        <div class="stat-header">
-          <div class="stat-title-fancy"><span class="w-1.5 h-4 bg-blue-500 rounded-full"></span> 🌲 멤버 구성 현황</div>
-          <div class="stat-badge-total">TOTAL <span id="countTotal">0</span></div>
-        </div>
-        <div class="stat-grid-premium">
-          <div class="stat-box-premium male">
-            <span class="stat-label-premium">Gentlemen</span>
-            <div class="stat-val-premium"><span id="countMale">0</span><span class="stat-unit-premium">명</span></div>
-            <div class="stat-icon-bg">👦</div>
-          </div>
-          <div class="stat-box-premium female">
-            <span class="stat-label-premium">Ladies</span>
-            <div class="stat-val-premium"><span id="countFemale">0</span><span class="stat-unit-premium">명</span></div>
-            <div class="stat-icon-bg">👧</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="visitor-stat-card">
-        <div class="sys-log-header"><span class="live-dot"></span> SYSTEM LOG: ENCRYPTED</div>
-        <div class="v-stat-grid">
-          <div class="v-stat-item"><div class="v-stat-label">Session Today</div><div id="todayHits" class="v-stat-value">0</div></div>
-          <div class="v-stat-item"><div class="v-stat-label">System Total</div><div id="totalHits" class="v-stat-value v-stat-total">0</div></div>
-        </div>
-      </div>
-
-      <p class="system-date-info text-[9px] text-gray-600 mt-6 leading-tight">
-        Our journey begins at San: Woori.<br>Opened on Nov 24, 2025
-      </p>
-    </div>
-  </div> <!-- viewLogin 닫힘 -->
-
-  <!-- 3. 관리자 설정 뷰 (viewAdmin) -->
-  <div id="viewAdmin" class="view-content hidden p-5 overflow-y-auto max-h-[92vh] flex-1">
-    
-    <!-- 서브방 관리 -->
-    <div class="card" style="border: 1.5px solid #e2e880;">
-      <div class="card-title text-blue-600 font-black flex justify-between items-center">
-        <span>🛠️ 서브방 관리</span>
-      </div>
-      <div id="adminSubRoomList" class="admin-subroom-grid"></div>
-    </div>
-
-    <!-- 신규 회원 등록 -->
-    <div class="card">
-      <div class="card-title text-green-600 font-bold">🆕 신규 회원 등록</div>
-      <input type="text" id="newName" placeholder="회원 이름" class="input-gap">
-      <div class="gender-select-group">
-        <label><input type="radio" name="newGender" value="남" checked> 남성</label>
-        <label><input type="radio" name="newGender" value="여"> 여성</label>
-      </div>
-      <input type="date" id="regDate" class="input-gap">
-      <button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
-    </div>
-
-    <!-- 등산 기록 및 좌표 정복 관리 -->
-    <div class="card">
-      <div class="card-title text-blue-600 font-bold flex justify-between">
-        <span>📅 등산 기록 및 좌표 정복 관리</span>
-        <button onclick="globalSyncMountainInfo()" class="text-[9px] bg-red-50 text-red-500 border border-red-200 px-2 rounded-lg font-black">⛰️ 산 정보 일괄수정</button>
-      </div>
-      <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 px-4 rounded-xl w-full mb-2 text-xs bg-blue-50 border-blue-100 outline-none border">
-      <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
-
-      <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
-        <div class="flex items-center justify-between mb-2">
-          <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-          <div class="flex gap-2">
-            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-              <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-              <span class="text-[10px] font-black text-blue-600">100대명산</span>
-            </label>
-            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-              <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-              <span class="text-[10px] font-black text-red-500">BAC인증지</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
-          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-            <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
-          </label>
-          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-            <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
-          </label>
-          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-            <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
-          </label>
-          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-            <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
-          </label>
-          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-            <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
-          </label>
-        </div>
-
-        <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
-          <div class="flex-1 flex items-center gap-1">
-            <span class="text-[9px] text-gray-400 shrink-0">🪨바위</span>
-            <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
-          </div>
-          <div class="flex-1 flex items-center gap-1">
-            <span class="text-[9px] text-gray-400 shrink-0">🌿숲</span>
-            <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
-          </div>
-          <div class="flex-1 flex items-center gap-1">
-            <span class="text-[9px] text-gray-400 shrink-0">🌊계곡</span>
-            <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
-          </div>
-        </div>
-
-        <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름 (예: 관악산)" class="mb-2 h-9 text-xs w-full border rounded px-2">
-
-        <div class="flex gap-2 mb-2">
-          <select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
-            <option value="기타">📍 수동 지역 선택 (선택 안함)</option>
-            <option value="서울특별시">서울특별시</option>
-            <option value="인천광역시">인천광역시</option>
-            <option value="경기도">경기도</option>
-            <option value="강원도">강원도</option>
-            <option value="충청북도">충청북도</option>
-            <option value="충청남도">충청남도</option>
-            <option value="대전/세종">대전/세종</option>
-            <option value="전라북도">전라북도</option>
-            <option value="전라남도">전라남도</option>
-            <option value="광주광역시">광주광역시</option>
-            <option value="경상북도">경상북도</option>
-            <option value="경상남도">경상남도</option>
-            <option value="대구광역시">대구광역시</option>
-            <option value="울산광역시">울산광역시</option>
-            <option value="부산광역시">부산광역시</option>
-            <option value="제주도">제주도</option>
-          </select>
-        </div>
-
-        <div class="flex gap-2 mb-2">
-          <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
-          <div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
-            <span class="text-[9px] font-bold text-gray-400">UP:</span>
-            <div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
-              <label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
-              <label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
-              <label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
-              <label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
-                <input type="checkbox" id="isQuarterCheck">
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="map-container" onclick="setAdminCoordinate(event)">
-          <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
-          <div id="adminMapMarker" class="map-point hidden"></div>
-        </div>
-        <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
-      </div>
-
-      <input type="date" id="activityDate" class="input-gap">
-      <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-    </div>
-
-    <!-- 기록 수정 및 레벨 관리 -->
-    <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
-      <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
-      <select id="memberSelectEdit" onchange="loadMemberLogs()" class="input-gap mb-3 w-full border rounded-xl p-2 text-sm">
-        <option value="">대상 회원 선택</option>
-      </select>
-
-      <div class="grid grid-cols-3 gap-2 mb-2">
-        <input type="text" id="editMemberNameInput" placeholder="변경할 이름" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
-        <input type="number" id="manualLevelInput" placeholder="레벨(Lv)" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
-        <input type="number" id="manualQCountInput" placeholder="분기 횟수" class="h-10 text-xs border rounded-xl px-2 outline-none w-full text-center">
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 mb-3">
-        <button onclick="updateMemberName()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">이름 수정</button>
-        <button onclick="window.updateManualLevel()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">레벨 적용</button>
-        <button onclick="window.updateManualQCount()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">횟수 적용</button>
-      </div>
-
-          <!-- 기존 기록 수정 및 레벨 관리 카드 내 하단부 -->
-    <hr class="my-3 border-amber-200">
-    <div id="logListArea" class="log-grid"></div>
-
-    <!-- 🔽 추가된 20개 더보기 버튼 영역 -->
-    <div id="moreLogBtnArea" class="mt-2 text-center hidden">
-      <button onclick="loadMoreMemberLogs()" class="w-full py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold rounded-xl border border-amber-300 transition-colors">
-        ➕ 기록 20개 더보기
-      </button>
-    </div>
-  </div>
-
-
-    <!-- 회원 상태 및 보너스 관리 -->
-    <div class="card" style="background-color: #fff5f5; border: 1px solid #ffe3e3;">
-      <div class="card-title text-red-600 font-bold mb-3">🗑️ 회원 상태 및 보너스 관리</div>
-      <select id="memberSelectManage" class="input-gap w-full mb-4 bg-white border border-gray-200 rounded px-3 py-2 text-sm">
-        <option value="">대상 회원 선택</option>
-      </select>
-
-      <div class="grid grid-cols-3 gap-2 mb-2">
-        <input type="number" id="buddyCountInput" placeholder="동행 횟수" class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" inputmode="numeric">
-        <input type="text" id="friendshipPointInput" placeholder="우정 포인트" class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" inputmode="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '')"> 
-        <input type="text" id="bonusDaysInput" placeholder="보너스 날짜" class="w-full bg-white border border-gray-300 rounded px-2 py-2 text-xs text-black text-center" inputmode="text" oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 mb-4">
-        <button onclick="updateBuddyCountManual()" class="bg-emerald-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">동행 수정</button>
-        <button onclick="updateFriendshipPoint()" class="bg-blue-600 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">포인트 적용</button>
-        <button onclick="updateBonusDays()" class="bg-red-500 text-white py-2 rounded text-[11px] font-bold whitespace-nowrap shadow-sm">날짜 적용</button>
-      </div>
-
-      <div class="flex gap-2">
-        <button onclick="toggleHideMember()" class="flex-1 bg-slate-600 text-white py-2 rounded text-xs font-bold">숨기기/보이기</button>
-        <button onclick="deleteMember()" class="flex-1 bg-red-600 text-white py-2 rounded text-xs font-bold">영구 삭제</button>
-      </div>
-    </div>
-
-    <div class="p-4 text-center">
-      <button onclick="logoutAdmin()" class="text-gray-400 underline font-bold text-xs">로그아웃</button>
-    </div>
-
-    <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
-      <button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
-        💾 전체 데이터 원클릭 백업 (JSON 다운로드)
-      </button>
-      <p style="text-align: center; font-size: 11px; color: #888; margin-top: 8px;">
-        ※ 클릭 시 전체 멤버와 산행 기록이 파일로 저장됩니다.
-      </p>
-    </div>
-
-
-
-  </div> <!-- viewAdmin 닫힘 -->
-
-</div> <!-- main-container 닫힘 -->
-
-
-
-    
-
+</div>
+<div class="p-4 text-center"><button onclick="logoutAdmin()" class="text-gray-400 underline font-bold text-xs">로그아웃</button></div>
+<div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
+<button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+💾 전체 데이터 원클릭 백업 (JSON 다운로드)
+</button>
+<p style="text-align: center; font-size: 11px; color: #888; margin-top: 8px;">
+※ 클릭 시 전체 멤버와 산행 기록이 파일로 저장됩니다.
+</p>
+</div>
+</div>
 
 <div id="levelModal" class="modal-overlay" onclick="toggleModal(false)">
 <div class="modal-content" onclick="event.stopPropagation()">
@@ -3184,121 +3097,54 @@ overflow: hidden;
 
 
 <div id="mapModal" class="modal-overlay" onclick="toggleMapModal(false)">
-  <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-hidden" onclick="event.stopPropagation()">
-    
-    <!-- Header Zone + 에베레스트 정복 창 -->
-    <div class="flex justify-between items-center mb-4 gap-3">
-      <div class="flex-shrink-0">
-        <h2 class="text-lg font-black text-slate-900"><span id="mapMemberName" class="text-emerald-600"></span> 님</h2>
-        <p class="text-[10px] font-bold text-slate-400">Conquest Map</p>
-      </div>
+<div id="mapModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
+<div class="flex justify-between items-center mb-4 gap-3">
+<div class="flex-shrink-0">
+<h2 class="text-lg font-black text-slate-800"><span id="mapMemberName" class="text-emerald-600"></span> 님</h2>
+<p class="text-[10px] font-bold text-slate-400">Conquest Map</p>
+</div>
+<div class="everest-card-mini flex-1">
+<div id="everestTextLine" class="everest-count-mini">
+우리는 🏔️ 에베레스트를 <span id="everestCount" class="text-sky-600">0.0</span>회 정복하였습니다
+</div>
+<div class="everest-progress-bg-mini">
+<div id="everestProgressBar" class="everest-progress-bar-mini" style="width: 0%"></div>
+</div>
+</div>
+</div>
 
-      <!-- 🏔️ 에베레스트 정복 미니 카드 -->
-      <div class="everest-card-mini flex-1 bg-sky-50/80 p-2.5 rounded-2xl border border-sky-100/80">
-        <div id="everestTextLine" class="everest-count-mini text-[10px] font-bold text-sky-900 text-center mb-1.5">
-          우리는 🏔️ 에베레스트를 <span id="everestCount" class="text-sky-600 font-extrabold">0.0</span>회 정복하였습니다
-        </div>
-        <div class="everest-progress-bg-mini w-full bg-sky-200/50 rounded-full h-1.5 overflow-hidden">
-          <div id="everestProgressBar" class="everest-progress-bar-mini bg-sky-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-        </div>
-      </div>
-    </div>
+<div id="mapViewMain">
+<div class="map-container mb-4">
+<img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image">
+<div id="conquerMapPoints"></div>
+<div class="map-source-txt">출처: 산림청</div>
+</div>
 
-    <!-- Main Map View -->
-    <div id="mapViewMain">
-      <!-- 지도 컨테이너 -->
-      <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3">
-        <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl">
-        
-        <!-- 🌲 지도 우측 상단 미니 배지 -->
-        <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
-          <span class="text-[10px]">🌲</span>
-          <span id="miniTop100Badge" class="tracking-tight">0/100</span>
-        </div>
+<div class="conquer-dark-card cursor-pointer !py-2" onclick="toggleMapView()">
+<div class="conquer-header-box !mb-0">
+<div class="conquer-title">🎖 지역 점유율 및 정복 통계</div>
+<div class="text-[10px] font-black text-sky-600">지역별 상세 ></div>
+</div>
 
-        <div id="conquerMapPoints"></div>
-        <!-- 💡 출처 텍스트: 범례 아래 우측 위치 -->
-        <div class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
-      </div>
-
-      <!-- 상세 통계 전환 버튼 -->
-      <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
-        <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
-          <span>🎖️</span> 정복 통계 및 명산 목록
-        </span>
-        <span class="text-xs font-bold text-sky-600 flex items-center gap-0.5">
-          상세보기
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </span>
-      </button>
-
-      <div class="hidden">
-        <span id="mapTotalHeight">0</span>
-        <span id="mapGlobalTotalHeight">0</span>
-      </div>
-    </div>
-
-    <!-- Detailed Stats View (통계 3종 탭) -->
+<div style="display: none;">
+<span id="mapTotalHeight">0</span>
+<span id="mapGlobalTotalHeight">0</span>
+</div>
+</div>
+</div>
 <div id="mapViewStats" class="hidden-view">
-  <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 min-h-[400px]">
-    
-    <!-- Header & Tab Navigation -->
-    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1">
-      <div class="flex gap-1 overflow-x-auto no-scrollbar">
-        <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap">
-          지역 점유율
-        </button>
-        <!-- 💡 산림청 100대 탭 이름 앞에 🔵 파란점 추가 -->
-        <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span> 100대 명산
-        </button>
-        <!-- 🔴 정복한 산 탭 이름 앞에 빨간점 -->
-        <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 정복한 산
-        </button>
-      </div>
-      <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2 py-1 rounded-lg font-bold shadow-sm hover:bg-slate-50 flex-shrink-0">
-        ← 지도
-      </button>
-    </div>
-
-    <!-- Tab 1: 지역별 점유율 -->
-    <div id="regionStatsBox">
-      <div id="conquerRegionGrid" class="max-h-[330px] overflow-y-auto pr-1"></div>
-    </div>
-
-    <!-- Tab 2: 산림청 100대 명산 정복 목록 -->
-    <div id="top100ListBox" class="hidden">
-      <div id="top100MountainGrid" class="max-h-[280px] overflow-y-auto pr-1 space-y-1.5"></div>
-      <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 hidden">
-        더보기
-      </button>
-    </div>
-
-    <!-- Tab 3: 일반 정복한 산 목록 -->
-    <div id="normalListBox" class="hidden">
-      <div id="normalMountainGrid" class="max-h-[280px] overflow-y-auto pr-1 space-y-1.5"></div>
-      <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 hidden">
-        더보기
-      </button>
-    </div>
-
-  </div>
+<div class="conquer-dark-card !mt-0 !min-h-[400px]">
+<div class="conquer-header-box">
+<div class="conquer-title">🎖 상세 지역별 점유율</div>
+<button onclick="toggleMapView()" class="text-[9px] bg-sky-100 text-sky-600 px-2 py-1 rounded-md font-black border border-sky-200">뒤로가기</button>
 </div>
-
-
-    <button onclick="toggleMapModal(false)" class="w-full py-3.5 mt-3 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
-      닫기
-    </button>
-  </div>
+<div id="conquerRegionGrid" class="conquer-grid max-h-[380px] overflow-y-auto pr-1"></div>
 </div>
-
-
-
-
-
-          
-      
+</div>
+<button onclick="toggleMapModal(false)" class="w-full py-3 mt-5 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm transition-colors hover:bg-gray-200">닫기</button>
+</div>
+</div>
+</div>
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
 <div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
@@ -3317,7 +3163,6 @@ overflow: hidden;
 </div>
 </div>
 </div>
-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -3608,249 +3453,177 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
- 
-     
-           
+window.renderStatusTable = () => {
+    const list = document.getElementById('statusList');
+    const search = document.getElementById('searchInput').value.trim();
+    const sort = document.getElementById('statusSortOrder').value;
+    if(!list) return;
+    list.innerHTML = "";
 
-// ─── 1. 한글 초성 유틸리티 ───
-const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+    const today = new Date();
+    const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-function getChosung(str) {
-    if (!str) return '';
-    let result = '';
-    for (let i = 0; i < str.length; i++) {
-        const code = str.charCodeAt(i) - 44032;
-        if (code >= 0 && code <= 11172) {
-            result += CHOSUNG_LIST[Math.floor(code / 588)];
-        } else {
-            result += str[i];
+    let processedData = currentData.map(m => {
+        // [기존 코드 그대로] 창 열었을 때 보여줄 마지막 산행 기준 계산
+        const last = m.lastDate ? m.lastDate.toDate() : new Date();
+        const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
+        const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
+        const baseLimit = (m.level === 0 ? 30 : 122);
+        const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
+
+        // ⭐ [추가] 메인화면 겉에만 표시해줄 들어온 날짜(가입일) 기준 계산
+        let dPlusVal = 0;
+        if (m.regDate) {
+            const reg = m.regDate.toDate();
+            const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
+            dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1; // 당일 1일 기준
         }
-    }
-    return result;
-}
 
-// ─── 2. 첫 글자부터 접두사 방식 자음/완성형 매칭 ───
-function isMatchName(name, searchKeyword) {
-    if (!name || !searchKeyword) return false;
+        // 기존 껍데기에 ddayVal과 dPlusVal을 둘 다 안전하게 담아서 보냅니다.
+        return { 
+            ...m, 
+            ddayVal: ddayVal,   // 모달창에 넘겨줄 값
+            dPlusVal: dPlusVal  // 메인화면 글자로 보여줄 값
+        };
+    });
+
+    // [기존 코드 그대로] 정렬 로직
+    processedData.sort((a, b) => {
+        if (sort === 'qCount') return b.qCount - a.qCount || b.level - a.level;
+        if (sort === 'totalHeight') return b.totalHeight - a.totalHeight;
+        if (sort === 'level') return b.level - a.level || b.qCount - a.qCount;
+        if (sort === 'name') return a.name.localeCompare(b.name, 'ko');
+        if (sort === 'dday') return a.ddayVal - b.ddayVal;
+        return 0;
+    });
+
+    // [기존 코드 그대로] 탑 이름 추출
+    const topNames = [...processedData].filter(m => !m.isHidden && m.name !== "오즈").sort((a, b) => b.qCount - a.qCount || b.level - a.level).slice(0, 3).map(m => m.name);
+
+
+    // --------------------------------------------------------------------
     
-    const cleanName = String(name).trim().toLowerCase();
-    const cleanKeyword = String(searchKeyword).trim().toLowerCase();
+    
+    // 첫 번째 노출되는 행에만 CLICK 문구를 넣기 위한 플래그
+    let isFirstVisible = true;
 
-    if (!cleanKeyword) return true;
-    if (cleanKeyword.length > cleanName.length) return false;
+    processedData.forEach((m) => {
+        if (!isAdminLoggedIn && m.isHidden) return;
+        if (search && !m.name.includes(search)) return;
 
-    for (let i = 0; i < cleanKeyword.length; i++) {
-        const kChar = cleanKeyword[i];
-        const nChar = cleanName[i];
-
-        if (CHOSUNG_LIST.includes(kChar)) {
-            if (getChosung(nChar) !== kChar) return false;
-        } else {
-            if (nChar !== kChar) return false;
+        // ✨ [핵심 수정] 첫 번째 보이는 데이터 행인 경우 모든 열에 들어갈 네온 태그 생성
+        let clickTag = "";
+        if (isFirstVisible && !m.isHidden) {
+            clickTag = `<span class="click-neon">CLICK</span>`;
+            isFirstVisible = false; // 한 번 그렸으면 플래그 해제
         }
+
+        let rankT = ""; let rankC = "";
+if (m.name !== "오즈" && m.qCount > 0 && !m.isHidden) {
+    const idx = topNames.indexOf(m.name);
+    
+    // 1. 현재 HTML에서 활성화(active)된 분기 버튼을 찾거나, 버튼들의 클래스 상태를 통해 선택된 분기를 가져옵니다.
+    let activeQuarter = 1; // 기본값
+    
+    // qBtn1 ~ qBtn4 중 'active' 클래스를 가지고 있는 버튼을 찾습니다.
+    const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+    if (activeBtn) {
+        // active 상태인 버튼의 id나 onclick 텍스트에서 분기 숫자를 추출합니다.
+        const btnId = activeBtn.id; // 'qBtn1', 'qBtn2' 등
+        activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+    } else {
+        // 혹시 active 클래스가 아직 매핑 안 되었을 경우를 대비해, 
+        // 전역 변수(currentQuarter 또는 selectedQuarter)가 있는지 체크합니다.
+        activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
+                        ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
     }
-    return true;
+    
+    // 2. 현재 선택된 연도 가져오기 (기본값은 2026년으로 설정하되, 연도 선택 변수가 있다면 활용)
+    const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+    
+    // 3. 2026년도이면서 선택된 분기가 1분기 또는 2분기인지 판별
+    const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
+
+    if (idx === 0) { 
+        rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; 
+        rankC = "rank-1"; 
+    }
+    else if (idx === 1) { 
+        rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; 
+        rankC = "rank-2"; 
+    }
+    else if (idx === 2) { 
+        rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; 
+        rankC = "rank-3"; 
+    }
 }
 
-// ─── 3. 실시간 현황 테이블 랜더링 ───
-window.renderStatusTable = function() {
-    try {
-        const list = document.getElementById('statusList');
-        const searchInput = document.getElementById('searchInput');
-        const sortSelect = document.getElementById('statusSortOrder');
 
-        if (!list) return;
 
-        const search = searchInput ? searchInput.value.trim() : "";
-        const sort = sortSelect ? sortSelect.value : "qCount";
+const style = getLevelStyle(m.level);
+const ddayClass = getDDayStyle(m.ddayVal, m.level);
+const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
 
-        if (window.recordBtnToggleInterval) {
-            clearInterval(window.recordBtnToggleInterval);
-            window.recordBtnToggleInterval = null;
-        }
+        // =========================================================
+        // 🏔️ [메인 테이블 고도 축약 로직 추가]
+// =========================================================
+const rawHeight = m.totalHeight || 0;
+const displayHeight = rawHeight >= 10000 
+    ? (rawHeight / 1000).toFixed(1) + 'k' 
+    : rawHeight + 'm';
+// =========================================================
 
-        if (typeof currentData === 'undefined' || !Array.isArray(currentData)) {
-            console.warn("currentData 배열이 정의되지 않았습니다.");
-            return;
-        }
+list.innerHTML += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
+<td class="text-xs text-center" style="position: relative; vertical-align: middle; height: 65px; padding-top: 15px;">
 
-        const today = new Date();
-        const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    <div style="position: absolute; top: -2.8px; left: 50%; transform: translateX(-50%); width: 100%;">
+        ${clickTag}
+    </div>
 
-        let processedData = currentData.map(m => {
-            let last = new Date();
-            if (m.lastDate) {
-                last = (typeof m.lastDate.toDate === 'function') ? m.lastDate.toDate() : new Date(m.lastDate);
-            }
-            const lastZero = new Date(last.getFullYear(), last.getMonth(), last.getDate()).getTime();
-            const diffDays = Math.floor((todayZero - lastZero) / (1000 * 60 * 60 * 24));
-            const baseLimit = (m.level === 0 ? 30 : 122);
-            const ddayVal = (baseLimit + (m.bonusDays || 0)) - diffDays;
+    <div class="flex flex-col items-center justify-center">
+        ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
+        <!-- 💡 m.id -> m.name 변경 -->
+        <span class="font-bold ${nameColor} cursor-pointer hover:underline"
+              onclick="showMemberMountain('${m.name}', '${m.name}')">
+            ${m.name}
+        </span>
+    </div>
+</td>
+<td>
+    ${clickTag}
+    <div class="badge-level">
+        <!-- 💡 m.id -> m.name 변경 -->
+        <div class="badge-icon-box ${style.blink} cursor-pointer"
+             onclick="showMilkyWay('${m.name}', '${m.name}')"
+             style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
+            <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${getLevelBadge(m.level)}</span>
+        </div>
+        <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level}</span>
+    </div>
+</td>
+<td>
+    ${clickTag}
+    <!-- 💡 m.id -> m.name 변경 -->
+    <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount}점 📈</button>
+</td>
+<td>
+    ${clickTag}
+    <!-- 💡 m.id -> m.name 변경 -->
+    <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
+</td>
+<td>
+    ${clickTag}
+    <!-- 💡 m.id -> m.name 변경 (showFadingScroll 인자로 m.name 전달) -->
+    <span class="dday-box ${ddayClass} cursor-pointer"
+          onclick="window.showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level})">
+        D+${m.dPlusVal}
+    </span>
+</td>
+</tr>`;
 
-            let dPlusVal = 0;
-            if (m.regDate) {
-                const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
-                const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
-                dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
-            }
-
-            return { 
-                ...m, 
-                ddayVal: ddayVal,
-                dPlusVal: dPlusVal
-            };
-        });
-
-        // 정렬
-        processedData.sort((a, b) => {
-            if (sort === 'qCount') return (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0);
-            if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
-            if (sort === 'level') return (b.level || 0) - (a.level || 0) || (b.qCount || 0) - (a.qCount || 0);
-            if (sort === 'name') return String(a.name || '').localeCompare(String(b.name || ''), 'ko');
-            if (sort === 'dday') return a.ddayVal - b.ddayVal;
-            return 0;
-        });
-
-        const topNames = [...processedData]
-            .filter(m => !m.isHidden && m.name !== "오즈")
-            .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
-            .slice(0, 3)
-            .map(m => m.name);
-
-        let isFirstVisible = true;
-        let htmlBuilder = ""; 
-
-        processedData.forEach((m) => {
-            if (typeof isAdminLoggedIn !== 'undefined' && !isAdminLoggedIn && m.isHidden) return;
-            
-            // 🎯 초성/완성형 조합 매칭 체크
-            if (search && !isMatchName(m.name, search)) return;
-
-            let clickTag = "";
-            if (isFirstVisible && !m.isHidden) {
-                clickTag = `<span class="click-neon-adjust">CLICK</span>`;
-            }
-
-            let rankT = ""; 
-            let rankC = "";
-            if (m.name !== "오즈" && (m.qCount || 0) > 0 && !m.isHidden) {
-                const idx = topNames.indexOf(m.name);
-                
-                let activeQuarter = 1; 
-                const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
-                if (activeBtn) {
-                    const btnId = activeBtn.id; 
-                    activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
-                } else {
-                    activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
-                                    ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
-                }
-                
-                const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
-                const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
-
-                if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
-                else if (idx === 1) { rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
-                else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
-            }
-
-            const style = (typeof getLevelStyle === 'function') ? getLevelStyle(m.level) : { bg: '#fff', border: '#ccc', text: '#000', blink: '' };
-            const badgeTxt = (typeof getLevelBadge === 'function') ? getLevelBadge(m.level) : (m.level || 0);
-            const nameColor = m.gender === '여' ? 'text-pink-600' : (m.gender === '남' ? 'text-blue-600' : 'text-slate-800');
-
-            const rawHeight = m.totalHeight || 0;
-            const displayHeight = rawHeight >= 10000 
-                ? (rawHeight / 1000).toFixed(1) + 'k' 
-                : rawHeight + 'm';
-
-            htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
-            <td style="position: relative;" class="text-xs text-center">
-                ${clickTag}
-                <div class="flex flex-col items-center justify-center">
-                    ${rankT ? `<span class="rank-badge ${rankC}" style="margin-bottom: 2px;">${rankT}</span>` : ''}
-                    <span class="font-bold ${nameColor} cursor-pointer hover:underline"
-                          onclick="showMemberMountain('${m.name}', '${m.name}')">
-                        ${m.name}
-                    </span>
-                </div>
-            </td>
-            <td style="position: relative;">
-                ${clickTag}
-                <div class="badge-level">
-                    <div class="badge-icon-box ${style.blink || ''} cursor-pointer"
-                         onclick="showMilkyWay('${m.name}', '${m.name}')"
-                         style="background-color: ${style.bg}; border: 1.5px solid ${style.border} !important;">
-                        <span class="badge-icon-txt" style="color:${style.text}; font-weight: bold;">${badgeTxt}</span>
-                    </div>
-                    <span class="badge-lv-txt" style="color:${style.text}; font-weight: bold;">Lv ${m.level || 0}</span>
-                </div>
-            </td>
-            <td style="position: relative;">
-                ${clickTag}
-                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount || 0}점 📈</button>
-            </td>
-            <td style="position: relative;">
-                ${clickTag}
-                <button onclick="showMemberMap('${m.name}', '${m.name}')" class="height-badge hover:scale-105 active:scale-95 transition-all">🚩${displayHeight}</button>
-            </td>
-            <td style="position: relative;" class="text-center">
-                ${clickTag}
-                <button onclick="showFadingScroll('${m.name}', ${m.ddayVal}, ${m.level || 0})" 
-                        data-dplus="D+${m.dPlusVal}"
-                        class="record-auto-toggle-btn record-glow-active inline-flex items-center justify-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200/70 border border-slate-300/60 rounded-full shadow-2xs hover:from-slate-200 hover:to-slate-300 hover:text-slate-900 active:scale-95 transition-all whitespace-nowrap min-w-[52px]">
-                    <span class="record-btn-txt">기록보기</span>
-                </button>
-            </td>
-            </tr>`;
-
-            if (isFirstVisible && !m.isHidden) {
-                isFirstVisible = false;
-            }
-        });
-
-        list.innerHTML = htmlBuilder;
-
-        // 3초 간격 텍스트 교체 타이머
-        let showDPlus = false;
-        window.recordBtnToggleInterval = setInterval(() => {
-            showDPlus = !showDPlus;
-            const toggleBtns = document.querySelectorAll('.record-auto-toggle-btn');
-            
-            toggleBtns.forEach(btn => {
-                const txtSpan = btn.querySelector('.record-btn-txt');
-                const dplusTxt = btn.dataset.dplus;
-                if (!txtSpan) return;
-
-                if (showDPlus) {
-                    txtSpan.innerText = dplusTxt;
-                    btn.classList.remove('record-glow-active');
-                    btn.classList.add('text-sky-600', 'border-sky-300', 'bg-sky-50');
-                } else {
-                    txtSpan.innerText = "기록보기";
-                    btn.classList.remove('text-sky-600', 'border-sky-300', 'bg-sky-50');
-                    btn.classList.add('record-glow-active');
-                }
-            });
-        }, 3000);
-
-    } catch (err) {
-        console.error("renderStatusTable 실행 중 오류 발생:", err);
-    }
+    });
 };
 
-
-
-
-
-      
-        
-        
-            
-
-        
-            
-            
-            
 
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
@@ -4197,7 +3970,7 @@ window.renderStatusTable = function() {
             <div id="forestModal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 backdrop-blur-md" onclick="this.remove()">
                 <div class="bg-[#0f172a] border border-emerald-500/30 p-6 rounded-[2.5rem] w-[320px] text-center shadow-2xl" onclick="event.stopPropagation()">
                     <div class="text-emerald-400 text-[10px] font-black mb-2 tracking-[0.4em]">BONDING FOREST</div>
-                    <div class="text-6xl mb-1"></div>
+                    <div class="text-6xl mb-1">🌲</div>
                     <h3 class="text-white text-xl font-bold mb-1">${mName}님의 인연</h3>
                     <p class="text-[11px] text-slate-500 mb-4 leading-relaxed"></p>
                     
@@ -4268,51 +4041,11 @@ window.renderStatusTable = function() {
     }
 };
        
-       
-window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
-    try {
-        if (!mountainName || !dateStr) {
-            alert("산 이름과 날짜는 필수 정보입니다.");
-            return;
-        }
-
-        // 1. 공백 제거 및 문서 ID 포맷팅 (예: 관악산_2026-08-03)
-        const cleanMountain = mountainName.trim().replace(/\s+/g, "");
-        const cleanDate = dateStr.trim();
-        let customDocId = `${cleanMountain}_${cleanDate}`;
-
-        // 2. 혹시 같은 날, 같은 산을 2번 이상 저장할 경우를 대비한 중복 방어
-        let docRef = doc(db, "bondingForest", customDocId);
-        let checkDoc = await getDoc(docRef);
-        let dupIndex = 2;
-
-        while (checkDoc.exists()) {
-            customDocId = `${cleanMountain}_${cleanDate}_${dupIndex}`;
-            docRef = doc(db, "bondingForest", customDocId);
-            checkDoc = await getDoc(docRef);
-            dupIndex++;
-        }
-
-        // 3. addDoc 대신 setDoc을 사용하여 내가 지정한 ID(customDocId)로 저장!
-        await setDoc(docRef, {
-            mountain: cleanMountain,
-            date: cleanDate,
-            members: membersList || [],
-            memberCount: (membersList || []).length,
-            createdAt: serverTimestamp()
-        });
-
-        console.log(`✅ [bondingForest] 지정한 ID로 저장 완료: ${customDocId}`);
-        return customDocId;
-
-    } catch (error) {
-        console.error("❌ 저장 실패:", error);
-        alert("산행 기록 저장 중 오류가 발생했습니다.");
-    }
-};
-
             
-                       
+                    
+            
+                 
+        
 // 타이머 인터벌을 관리할 전역 변수 (중복 실행 방지 및 메모리 누수 차단)
 window.hallTimerInterval = null;
 
@@ -5061,49 +4794,45 @@ function setupTimelineTabs() {
 
 
             // 🎨 [수정] 범례 가이드 영역 조율 (도트 크기 8px, 텍스트 10px로 축소)
-const legendArea = document.getElementById('timelineLegend');
-if (legendArea) {
-    // 범례 조각 정의
-    const legends = {
-        regular: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5" style="background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);"></span>
-            <span>정기</span>
-        </div>`,
-        hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
-            <span>일정</span>
-        </div>`,
-        extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
-            <span>개인</span>
-        </div>`,
-        trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
-            <span>트레킹</span>
-        </div>`,
-        run: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFD1DC]"></span>
-            <span>런닝</span>
-        </div>`,
-        walk: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
-            <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFCC80]"></span>
-            <span>산책</span>
-        </div>`
-    };
+    const legendArea = document.getElementById('timelineLegend');
+    if (legendArea) {
+        // 범례 조각 정의 (w-2 h-2로 도트 크기 축소, text-[10px]로 폰트 축소, 간격 정밀 조정)
+        const legends = {
 
-    // 탭 종류에 따라 알맞은 범례 아이템 배치
-    if (category === 'hiking') {
-        legendArea.innerHTML = [legends.hike, legends.extraHike].join('');
-        legendArea.style.display = 'flex';
-    } else if (category === 'running') {
-        legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
-        legendArea.style.display = 'flex';
-    } else {
-        legendArea.innerHTML = Object.values(legends).join('');
-        legendArea.style.display = 'flex';
+            hike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#2ecc71]"></span>
+                <span>일정산행</span>
+            </div>`,
+            extraHike: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#5CE1D6]"></span>
+                <span>개인산행</span>
+            </div>`,
+            trek: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#E0B0FF]"></span>
+                <span>트레킹</span>
+            </div>`,
+            run: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFD1DC]"></span>
+                <span>런닝</span>
+            </div>`,
+            walk: `<div class="flex items-center gap-1 text-[10px] font-semibold text-slate-500">
+                <span class="inline-block w-2 h-2 rounded-full border border-black/5 bg-[#FFCC80]"></span>
+                <span>산책</span>
+            </div>`
+        };
+
+        // 탭 종류에 따라 알맞은 범례 아이템 배치
+        if (category === 'hiking') {
+            legendArea.innerHTML = [legends.regular, legends.hike, legends.extraHike].join('');
+            legendArea.style.display = 'flex';
+        } else if (category === 'running') {
+            legendArea.innerHTML = [legends.run, legends.trek, legends.walk].join('');
+            legendArea.style.display = 'flex';
+        } else {
+            legendArea.innerHTML = Object.values(legends).join('');
+            legendArea.style.display = 'flex';
+        }
     }
-}
-
 
 
     // 3. 필터링된 영역만 리렌더링
@@ -5298,20 +5027,15 @@ function renderGrowthChart(data) {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
+    if (window.growthChartInstance) window.growthChartInstance.destroy();
     
-    // 🎯 기존 차트 인스턴스가 존재하면 안전하게 파기 (메모리 누수 및 Canvas 충돌 방지)
-    if (window.growthChartInstance) {
-        window.growthChartInstance.destroy();
-    }
-    
-    // 🎯 새 차트를 생성하고 전역 변수에 저장
     window.growthChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.labels,
             datasets: [
                 { 
-                    label: '운동 횟수',
+                    label: '운동 횟수', // '산행 횟수'에서 변경
                     data: data.counts, 
                     backgroundColor: data.colors, 
                     borderRadius: 5, 
@@ -5332,58 +5056,61 @@ function renderGrowthChart(data) {
                 }
             ]
         },
+
         options: {
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    padding: 12,
-                    titleFont: { size: 14, weight: '900' }, 
-                    bodyFont: { size: 12, weight: '700' },
-                    footerFont: { size: 12, weight: '700' },
-                    
-                    // 범례 사각형 표시
-                    displayColors: true, 
-                    boxWidth: 10,
-                    boxHeight: 10,
-                    boxPadding: 6,
+    responsive: true, 
+    maintainAspectRatio: false,
+    plugins: {
+        legend: { display: false },
+        tooltip: {
+    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    padding: 12,
+    titleFont: { size: 14, weight: '900' }, 
+    bodyFont: { size: 12, weight: '700' },
+    footerFont: { size: 12, weight: '700' },
+    
+    // [수정] 범례 사각형 다시 표시
+    displayColors: true, 
+    boxWidth: 10,
+    boxHeight: 10,
+    boxPadding: 6,
 
-                    callbacks: {
-                        label: function(context) {
-                            return ` 운동 횟수: ${context.raw}회`;
-                        },
-                        afterLabel: function(context) {
-                            const i = context.dataIndex;
-                            
-                            const totalHeight = (data.heights[i] || 0).toLocaleString();
-                            const peakName = data.peaks[i] || "-";
-                            
-                            const runKm = data.runDistances ? data.runDistances[i] : "0.0";
-                            const trekKm = data.trekDistances ? data.trekDistances[i] : "0.0";
-                            const walkKm = data.walkDistances ? data.walkDistances[i] : "0.0";
+    callbacks: {
+        // [수정] 라벨 앞에 공백을 살짝 주어 사각형과 글자 간격 조정
+        label: function(context) {
+            return ` 운동 횟수: ${context.raw}회`;
+        },
+        afterLabel: function(context) {
+            const i = context.dataIndex;
+            
+            const totalHeight = (data.heights[i] || 0).toLocaleString();
+            const peakName = data.peaks[i] || "-";
+            
+            const runKm = data.runDistances ? data.runDistances[i] : "0.0";
+            const trekKm = data.trekDistances ? data.trekDistances[i] : "0.0";
+            const walkKm = data.walkDistances ? data.walkDistances[i] : "0.0";
 
-                            const rock = data.rockPercents[i] || 0;
-                            const forest = data.forestPercents[i] || 0;
-                            const valley = data.valleyPercents[i] || 0;
+            const rock = data.rockPercents[i] || 0;
+            const forest = data.forestPercents[i] || 0;
+            const valley = data.valleyPercents[i] || 0;
 
-                            return [
-                                `⛰️ 누적: ${totalHeight}m | 🏔️ 최고: ${peakName}`,
-                                `🏃‍♂️: ${runKm}km  🧑‍🦯: ${trekKm}km  🚶‍♀️: ${walkKm}km`,
-                                `────────────────`,
-                                `산 성분: 🪨 ${rock}% | 🌲 ${forest}% | 🌊 ${valley}%`
-                            ];
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: { grid: { display: false }, ticks: { font: { size: 11, weight: '800' } } },
-                y: { beginAtZero: true, position: 'left' },
-                y1: { beginAtZero: true, position: 'right', display: false }
-            }
+            return [
+                `⛰️ 누적: ${totalHeight}m | 🏔️ 최고: ${peakName}`,
+                `🏃‍♂️: ${runKm}km  🧑‍🦯: ${trekKm}km  🚶‍♀️: ${walkKm}km`,
+                `────────────────`,
+                `산 성분: 🪨 ${rock}% | 🌲 ${forest}% | 🌊 ${valley}%`
+            ];
         }
+    }
+        }
+    },
+    scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11, weight: '800' } } }, // X축 라벨도 굵게
+        y: { beginAtZero: true, position: 'left' },
+        y1: { beginAtZero: true, position: 'right', display: false }
+    }
+}
+
     });
 }
 
@@ -5576,323 +5303,70 @@ window.openMountainInfoModal = function(type, event) {
 };
 
 
-// 캐시 유효 시간 (5분)
-const MAP_CACHE_EXPIRY = 5 * 60 * 1000;
-
-// 글로벌 상태 변수 (100대 명산 / 일반 산)
-let top100FullList = [];
-let top100DisplayCount = 20;
-
-let normalFullList = [];
-let normalDisplayCount = 20;
-
-// [1] 모달 뷰 전환 및 탭 전환 함수
-window.toggleMapView = (viewType) => {
-    const main = document.getElementById('mapViewMain');
-    const stats = document.getElementById('mapViewStats');
-    if (!main || !stats) return;
-
-    if (viewType === 'stats') {
-        main.classList.add('hidden-view');
-        stats.classList.remove('hidden-view');
-    } else {
-        main.classList.remove('hidden-view');
-        stats.classList.add('hidden-view');
-    }
+    window.toggleMapView = () => {
+const main = document.getElementById('mapViewMain');
+const stats = document.getElementById('mapViewStats');
+if (main.classList.contains('hidden-view')) { main.classList.remove('hidden-view'); stats.classList.add('hidden-view'); }
+else { main.classList.add('hidden-view'); stats.classList.remove('hidden-view'); }
 };
 
-window.switchStatsTab = (tabName) => {
-    const regionBox = document.getElementById('regionStatsBox');
-    const top100Box = document.getElementById('top100ListBox');
-    const normalBox = document.getElementById('normalListBox');
-    
-    const tabRegion = document.getElementById('tabBtnRegion');
-    const tabTop100 = document.getElementById('tabBtnTop100');
-    const tabNormal = document.getElementById('tabBtnNormal');
-
-    regionBox.classList.add('hidden');
-    top100Box.classList.add('hidden');
-    normalBox.classList.add('hidden');
-
-    const activeBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap";
-    const inactiveBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap";
-
-    tabRegion.className = inactiveBase;
-    tabTop100.className = inactiveBase + " flex items-center gap-1";
-    tabNormal.className = inactiveBase + " flex items-center gap-1";
-
-    if (tabName === 'top100') {
-        top100Box.classList.remove('hidden');
-        tabTop100.className = activeBase + " flex items-center gap-1";
-    } else if (tabName === 'normal') {
-        normalBox.classList.remove('hidden');
-        tabNormal.className = activeBase + " flex items-center gap-1";
-    } else {
-        regionBox.classList.remove('hidden');
-        tabRegion.className = activeBase;
-    }
-};
-
-
-// [2-1] 100대 명산 20개씩 더보기 렌더링
-window.renderMoreTop100 = () => {
-    const listBoard = document.getElementById('top100MountainGrid');
-    const moreBtn = document.getElementById('top100MoreBtn');
-    
-    const targetSlice = top100FullList.slice(0, top100DisplayCount);
-    
-    if (targetSlice.length === 0) {
-        listBoard.innerHTML = "<p class='text-center text-xs py-8 text-slate-400'>좌표 등록된 100대 명산이 없습니다.</p>";
-        if(moreBtn) moreBtn.classList.add('hidden');
-        return;
-    }
-
-    listBoard.innerHTML = targetSlice.map((item, idx) => `
-        <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">${idx + 1}</span>
-                <span class="text-xs font-bold text-slate-800">${item.name}</span>
-            </div>
-            <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
-        </div>
-    `).join('');
-
-    if (top100DisplayCount >= top100FullList.length) {
-        if(moreBtn) moreBtn.classList.add('hidden');
-    } else {
-        if(moreBtn) {
-            moreBtn.classList.remove('hidden');
-            moreBtn.innerText = `더보기 (${top100DisplayCount}/${top100FullList.length})`;
-        }
-    }
-};
-
-window.loadNext20Top100 = () => {
-    top100DisplayCount += 20;
-    renderMoreTop100();
-};
-
-// [2-2] 정복한 산 (일반 산) 20개씩 더보기 렌더링
-window.renderMoreNormal = () => {
-    const listBoard = document.getElementById('normalMountainGrid');
-    const moreBtn = document.getElementById('normalMoreBtn');
-    
-    const targetSlice = normalFullList.slice(0, normalDisplayCount);
-    
-    if (targetSlice.length === 0) {
-        listBoard.innerHTML = "<p class='text-center text-xs py-8 text-slate-400'>좌표 등록된 일반 산이 없습니다.</p>";
-        if(moreBtn) moreBtn.classList.add('hidden');
-        return;
-    }
-
-    listBoard.innerHTML = targetSlice.map((item, idx) => `
-        <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] font-black text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${idx + 1}</span>
-                <span class="text-xs font-bold text-slate-800">${item.name}</span>
-            </div>
-            <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
-        </div>
-    `).join('');
-
-    if (normalDisplayCount >= normalFullList.length) {
-        if(moreBtn) moreBtn.classList.add('hidden');
-    } else {
-        if(moreBtn) {
-            moreBtn.classList.remove('hidden');
-            moreBtn.innerText = `더보기 (${normalDisplayCount}/${normalFullList.length})`;
-        }
-    }
-};
-
-window.loadNext20Normal = () => {
-    normalDisplayCount += 20;
-    renderMoreNormal();
-};
-
-// [3] 메인 지도 및 데이터 로드
 window.showMemberMap = async (mId, mName) => {
-    toggleMapModal(true);
-    document.getElementById('mapModalContent').scrollTop = 0;
-    toggleMapView('main');
-    switchStatsTab('region');
-    document.getElementById('mapMemberName').innerText = mName;
+toggleMapModal(true);
+document.getElementById('mapModalContent').scrollTop = 0;
+document.getElementById('mapViewMain').classList.remove('hidden-view');
+document.getElementById('mapViewStats').classList.add('hidden-view');
+document.getElementById('mapMemberName').innerText = mName;
+const pointsBoard = document.getElementById('conquerMapPoints');
+const regionBoard = document.getElementById('conquerRegionGrid');
+pointsBoard.innerHTML = regionBoard.innerHTML = "";
 
-    const pointsBoard = document.getElementById('conquerMapPoints');
-    const regionBoard = document.getElementById('conquerRegionGrid');
-    pointsBoard.innerHTML = regionBoard.innerHTML = "";
+const snapAll = await getDocs(collection(db, `sanwoori/${mId}/logs`));
+let totalH = 0; let mapHtml = ""; let regionCounts = {}; let validLogsCount = 0;
 
-    // ⚡ 캐시 확인 (Local Storage)
-    const cacheKey = `sanwoori_map_cache_${mId}`;
-    const cachedData = localStorage.getItem(cacheKey);
-    const nowTime = Date.now();
-    let logsData = [];
+snapAll.forEach(doc => {
+const log = doc.data(); totalH += (log.height || 0);
+if(log.coords) {
+validLogsCount++; mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
+const rName = log.region || getRegionFromCoord(log.coords); regionCounts[rName] = (regionCounts[rName] || 0) + 1;
+}
+});
+document.getElementById('mapTotalHeight').innerText = totalH.toLocaleString();
+pointsBoard.innerHTML = mapHtml;
+const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
+if(sortedRegions.length === 0) regionBoard.innerHTML = "<p class='text-center text-[10px] py-10 text-slate-400'>좌표 기록 없음</p>";
+else regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
+const percent = ((count / validLogsCount) * 100).toFixed(1);
+return `<div class="conquer-item-dark"><div class="flex justify-between items-center"><span class="conquer-region-name-dark">${name} <span class="opacity-40 ml-1 text-[8px]">${count}회</span></span><span class="conquer-region-percent-dark">${percent}%</span></div>
+<div class="conquer-bar-bg-dark"><div class="conquer-bar-fill-dark" style="width:${percent}%"></div></div></div>`;
+}).join('');
 
-    if (cachedData) {
-        const parsed = JSON.parse(cachedData);
-        if (nowTime - parsed.timestamp < MAP_CACHE_EXPIRY) {
-            logsData = parsed.logs;
-            console.log("⚡ [캐시 로드] 데이터 트래픽 절약 완료");
-        }
-    }
-
-    if (logsData.length === 0) {
-        const snapAll = await getDocs(collection(db, `sanwoori/${mId}/logs`));
-        snapAll.forEach(doc => logsData.push(doc.data()));
-        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: nowTime, logs: logsData }));
-        console.log("🔥 [DB 로드] 신규 데이터 저장 완료");
-    }
-
-    let totalH = 0;
-    let mapHtml = "";
-    let regionCounts = {};
-    let validLogsCount = 0;
-    
-    const top100Map = {};
-    const normalMap = {};
-
-    logsData.forEach(log => {
-        totalH += (log.height || 0);
-
-        if (log.coords) {
-            validLogsCount++;
-            mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
-            
-            const rName = log.region || getRegionFromCoord(log.coords);
-            regionCounts[rName] = (regionCounts[rName] || 0) + 1;
-
-            if (log.mountain) {
-                if (log.isTop100) {
-                    if (!top100Map[log.mountain]) {
-                        top100Map[log.mountain] = { count: 0, height: log.height || 0 };
-                    }
-                    top100Map[log.mountain].count += 1;
-                } else {
-                    if (!normalMap[log.mountain]) {
-                        normalMap[log.mountain] = { count: 0, height: log.height || 0 };
-                    }
-                    normalMap[log.mountain].count += 1;
-                }
-            }
-        }
-    });
-
-    // 💡 지역 점유율 전체 렌더링 (더보기 버튼 제거 & 스크롤로만 처리)
-    const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
-    if (sortedRegions.length === 0) {
-        regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
-    } else {
-        regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
-            const percent = ((count / validLogsCount) * 100).toFixed(1);
-            return `
-            <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 mb-2 shadow-sm">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-xs font-bold text-slate-800">${name} <span class="text-[10px] text-sky-600 font-normal ml-1">(${count}회)</span></span>
-                    <span class="text-xs font-black text-sky-600">${percent}%</span>
-                </div>
-                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                    <div class="bg-gradient-to-r from-sky-400 to-emerald-400 h-1.5 rounded-full" style="width:${percent}%"></div>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    // ㄱㄴㄷ 순 정렬 - 100대 명산
-    top100FullList = Object.keys(top100Map)
-        .sort((a, b) => a.localeCompare(b, 'ko'))
-        .map(mName => ({
-            name: mName,
-            count: top100Map[mName].count,
-            height: top100Map[mName].height
-        }));
-
-    // ㄱㄴㄷ 순 정렬 - 정복한 산
-    normalFullList = Object.keys(normalMap)
-        .sort((a, b) => a.localeCompare(b, 'ko'))
-        .map(mName => ({
-            name: mName,
-            count: normalMap[mName].count,
-            height: normalMap[mName].height
-        }));
-
-    top100DisplayCount = 20;
-    renderMoreTop100();
-
-    normalDisplayCount = 20;
-    renderMoreNormal();
-
-    // 지도 상단 미니 배지 수치 업데이트
-    const top100Count = top100FullList.length;
-    document.getElementById('miniTop100Badge').innerText = `${top100Count}/100`;
-
-    document.getElementById('mapTotalHeight').innerText = totalH.toLocaleString();
-    pointsBoard.innerHTML = mapHtml;
-
-    // 에베레스트 글로벌 통계
-    const globalTotalH = currentData.reduce((acc, m) => acc + (m.totalHeight || 0), 0);
-    document.getElementById('mapGlobalTotalHeight').innerText = globalTotalH.toLocaleString();
-    const conquestCount = (globalTotalH / 8848).toFixed(1);
-    document.getElementById('everestCount').innerText = conquestCount;
-    document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
+const globalTotalH = currentData.reduce((acc, m) => acc + (m.totalHeight || 0), 0);
+document.getElementById('mapGlobalTotalHeight').innerText = globalTotalH.toLocaleString();
+const conquestCount = (globalTotalH / 8848).toFixed(1);
+document.getElementById('everestCount').innerText = conquestCount;
+document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
 };
 
-window.toggleTimelineModal = (show) => {
-    const modal = document.getElementById('timelineModal');
-    if (!modal) return;
-    modal.style.display = show ? 'flex' : 'none';
-
-    if (!show && typeof growthChartInstance !== 'undefined' && growthChartInstance) {
-        growthChartInstance.destroy();
-        growthChartInstance = null;
-    }
-};
-
-window.toggleMapModal = (show) => {
-    const modal = document.getElementById('mapModal');
-    if (!modal) return;
-    modal.style.display = show ? 'flex' : 'none';
-    
-    if (!show) {
-        const statsView = document.getElementById('mapViewStats');
-        const mainView = document.getElementById('mapViewMain');
-        if (statsView && mainView) {
-            statsView.classList.add('hidden-view');
-            mainView.classList.remove('hidden-view');
-        }
-    }
-};
-
+window.toggleTimelineModal = (show) => { document.getElementById('timelineModal').style.display = show ? 'flex' : 'none'; };
+window.toggleMapModal = (show) => { document.getElementById('mapModal').style.display = show ? 'flex' : 'none'; };
 window.toggleLogPopup = (show) => {
-    const popup = document.getElementById('logPopup');
-    const scrollContainer = document.getElementById('timelineScrollContainer');
-    if (!popup) return;
-
-    if (show) {
-        popup.style.display = 'flex';
-        requestAnimationFrame(() => {
-            if (scrollContainer) scrollContainer.scrollTop = 0;
-        });
-    } else {
-        popup.style.display = 'none';
-        if (scrollContainer) scrollContainer.scrollTop = 0;
-    }
+const popup = document.getElementById('logPopup');
+const scrollContainer = document.getElementById('timelineScrollContainer');
+if (show) { popup.style.display = 'flex'; if (scrollContainer) scrollContainer.scrollTop = 0; }
+else { popup.style.display = 'none'; if (scrollContainer) scrollContainer.scrollTop = 0; }
 };
 
-window.setAdminCoordinate = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
-    tempCoord = { x: parseFloat(x.toFixed(2)), y: parseFloat(y.toFixed(2)) };
-    const marker = document.getElementById('adminMapMarker');
-    marker.style.left = x + "%"; marker.style.top = y + "%"; marker.classList.remove('hidden');
-    const detectedRegion = getRegionFromCoord(tempCoord);
-    document.getElementById('adminManualRegionSelect').value = detectedRegion;
-    document.getElementById('coordDisplay').innerText = `좌표: X ${tempCoord.x} / Y ${tempCoord.y} (${detectedRegion})`;
+    window.setAdminCoordinate = (event) => {
+const rect = event.currentTarget.getBoundingClientRect();
+const x = ((event.clientX - rect.left) / rect.width) * 100;
+const y = ((event.clientY - rect.top) / rect.height) * 100;
+tempCoord = { x: parseFloat(x.toFixed(2)), y: parseFloat(y.toFixed(2)) };
+const marker = document.getElementById('adminMapMarker');
+marker.style.left = x + "%"; marker.style.top = y + "%"; marker.classList.remove('hidden');
+const detectedRegion = getRegionFromCoord(tempCoord);
+document.getElementById('adminManualRegionSelect').value = detectedRegion;
+document.getElementById('coordDisplay').innerText = `좌표: X ${tempCoord.x} / Y ${tempCoord.y} (${detectedRegion})`;
 };
-
-    
-        
-
 
     window.toggleMarkerStyle = () => {
 const marker = document.getElementById('adminMapMarker');
@@ -5914,6 +5388,29 @@ toggleMarkerStyle();
 const marker = document.getElementById('adminMapMarker');
 marker.style.left = d.x + "%"; marker.style.top = d.y + "%"; marker.classList.remove('hidden');
 }
+};
+
+// [추가] 산 이름을 입력하면 기존에 저장된 바위/숲/계곡 데이터를 불러오는 함수
+window.autoFindMountainStats = async () => {
+    const mName = document.getElementById('mountainName').value.trim();
+    if(!mName) return;
+
+    try {
+        const docSnap = await getDoc(doc(db, "mountains", mName));
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            // 기존 값이 있으면 넣어주고 없으면 0
+            document.getElementById('pRock').value = data.pRock || 0;
+            document.getElementById('pForest').value = data.pForest || 0;
+            document.getElementById('pValley').value = data.pValley || 0;
+            
+            // 만약 높이 입력창(mountainHeight)이 있다면 그것도 자동 세팅
+            if(data.height && document.getElementById('mountainHeight')) {
+                document.getElementById('mountainHeight').value = data.height;
+            }
+            console.log(`${mName} 정보 로드 완료`);
+        }
+    } catch (e) { console.error("데이터 로드 실패:", e); }
 };
 
 // [1] 산 정보를 불러오는 함수 (이름 입력 시 자동 실행)
@@ -6239,11 +5736,7 @@ window.addMultiActivity = async () => {
     const height = parseInt(document.getElementById('mountainHeight')?.value) || 0;
     const isTop100 = document.getElementById('isTop100Check')?.checked || false;
     const isBAC = document.getElementById('isBACCheck')?.checked || false;
-    
-    // 🎯 정기산행 체크박스를 '일정 체크박스'로 적용
-    const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
-    const isSchedule = document.getElementById('isScheduleCheck')?.checked || false; 
-
+    const isRegular = document.getElementById('isRegularCheck')?.checked || false;
     const isRunning = document.getElementById('isRunningCheck')?.checked || false;
     const isTracking = document.getElementById('isTrackingCheck')?.checked || false;
     const isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
@@ -6258,10 +5751,6 @@ window.addMultiActivity = async () => {
     const isExtraHike = isRunning && isTracking; 
     const isSpecial = isRunning || isTracking || isWalking || isOnlyLog || isExtraHike;
     const isRealHike = !isSpecial; 
-
-    // 🔥 정기산행 방어 logic
-    const isRegular = isRegularRaw && isRealHike; 
-
     const isMultiHike = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.size >= 2;
     const isDdayTargetActivity = (isRunning || isTracking || isWalking) && !isExtraHike;
 
@@ -6293,7 +5782,6 @@ window.addMultiActivity = async () => {
             else await setDoc(mRef, mountainData);
         }
 
-        // 🎯 [선택된 회원별 반복 업데이트 시작]
         for (const id of selectedMemberIds) {
             const member = currentData.find(m => m.id === id);
             if (!member) continue;
@@ -6330,6 +5818,7 @@ window.addMultiActivity = async () => {
                 
                 updateData.bonusDays = 0;
                 
+                // ─── 🎯 업 수치(realUpAmount)에 따른 분기 점수 계산 ───
                 const groupSize = selectedMemberIds.size;
                 const baseQCount = groupSize >= 3 ? 3 : groupSize; 
                 const multiplier = realUpAmount > 0 ? realUpAmount : 1; 
@@ -6370,19 +5859,9 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // ─── 🎯 세부 로그 적재 ───
+            // 세부 로그 적재
             const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne) ? 1 : realUpAmount;
-
-            const rawMountainName = document.getElementById('mountainName')?.value.trim();
-            const baseDocId = rawMountainName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동")));
-
-            const existingLogsRef = collection(db, `sanwoori/${id}/logs`);
-            const existingSnap = await getDocs(existingLogsRef);
-
-            const existingDocIds = new Set();
-            existingSnap.forEach(d => existingDocIds.add(d.id));
-
-            for (let i = 0; i < finalLogLoopCount; i++) {
+            for(let i = 0; i < finalLogLoopCount; i++) {
                 let starType = null;
                 if (isRegular) {
                     const rand = Math.random() * 100;
@@ -6393,53 +5872,21 @@ window.addMultiActivity = async () => {
 
                 const logPayload = {
                     date: ts, 
-                    mountain: baseDocId, 
+                    mountain: mName || (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))), 
                     height, coords: safeCoords,
-                    isTop100, isBAC, 
-                    isRegular,   
-                    isSchedule,  
-                    isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
+                    isTop100, isBAC, isRegular, isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
                     isSpecial: isSpecial,
                     pRock, pForest, pValley
                 };
 
-                let customLogDocId = baseDocId;
-                let seq = 1;
-                while (existingDocIds.has(customLogDocId)) {
-                    customLogDocId = `${baseDocId}_${seq}`;
-                    seq++;
-                }
-                
-                existingDocIds.add(customLogDocId);
-
-                await setDoc(doc(db, `sanwoori/${id}/logs`, customLogDocId), logPayload);
+                await saveHikeLog(id, logPayload);
             }
         } 
 
-        // 🎯 [수정된 부분] bondingForest에 addDoc 대신 setDoc을 사용하여 [산이름_날짜] ID로 직접 저장!
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
-            const cleanMountain = (mName || "산행").trim().replace(/\s+/g, "");
-            const cleanDate = dateVal.trim();
-            let bondingDocId = `${cleanMountain}_${cleanDate}`;
-
-            // 동일 날짜, 동일 산 중복 저장 시 식별자 부여 (_2, _3...)
-            let bondingRef = doc(db, "bondingForest", bondingDocId);
-            let checkSnap = await getDoc(bondingRef);
-            let dupSeq = 2;
-            while (checkSnap.exists()) {
-                bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-                bondingRef = doc(db, "bondingForest", bondingDocId);
-                checkSnap = await getDoc(bondingRef);
-                dupSeq++;
-            }
-
-            await setDoc(bondingRef, {
-                mountain: cleanMountain, 
-                members: selectedNames, 
-                memberCount: selectedNames.length, 
-                date: cleanDate, 
-                createdAt: new Date()
+            await addDoc(collection(db, "bondingForest"), {
+                mountain: mName, members: selectedNames, memberCount: selectedNames.length, date: dateVal, createdAt: new Date()
             });
         }
 
@@ -6447,29 +5894,36 @@ window.addMultiActivity = async () => {
         
         alert((isRealHike && !isExtraHike) ? "순수산행 기록 완료! ✅" : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // 입력 폼 초기화
+        // ─── 🧹 [수정 핵심] 저장 후 입력 수치 및 폼 요소 전체 초기화 ───
+        
+        // 1. 선택된 회원 및 벙주 목록 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false); // UI 체크박스 해제
 
+        // 2. 텍스트/숫자 입력 폼 초기화
         const resetInputIds = ['mountainName', 'mountainHeight', 'pRock', 'pForest', 'pValley'];
         resetInputIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
 
+        // 3. 지역 선택 셀렉트 박스 초기화
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
-        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
+        // 4. 활동 특성 체크박스 초기화
+        const checkIds = ['isTop100Check', 'isBACCheck', 'isRegularCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck'];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
         });
 
+        // 5. 레벨업 선택 라디오 버튼 초기화
         document.querySelectorAll('input[name="upAmount"]').forEach(radio => radio.checked = false);
 
+        // 6. 좌표 및 날짜 초기화
         tempCoord = null; 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
@@ -6483,7 +5937,10 @@ window.addMultiActivity = async () => {
     }
 };
 
-// 📌 [신규 회원 등록 함수]
+                
+        
+                        
+   // 📌 [신규 회원 등록 함수] - 수정본
 window.addMember = async () => {
     const nameInput = document.getElementById('newName');
     const genderInput = document.querySelector('input[name="newGender"]:checked');
@@ -6493,9 +5950,10 @@ window.addMember = async () => {
         return alert("회원 이름을 입력해주세요.");
     }
 
-    const cleanName = nameInput.value.trim();
+    const cleanName = nameInput.value.trim(); // 한글 이름 공백 제거
     const gender = genderInput ? genderInput.value : "여";
     
+    // 날짜 선택이 안 되어있으면 오늘 날짜 적용
     const regDateVal = dateInput && dateInput.value ? new Date(dateInput.value) : new Date();
     const ts = (typeof Timestamp !== 'undefined') ? Timestamp.fromDate(regDateVal) : regDateVal;
 
@@ -6512,15 +5970,17 @@ window.addMember = async () => {
             friendshipPoint: 0,
             qCount: 0,
             isHidden: false,
-            regDate: ts,
-            createdAt: ts,
+            regDate: ts,    // 👈 🎯 핵심! 이 필드가 추가되어야 가입일 조회가 정상 작동합니다.
+            createdAt: ts,  // 기존 createdAt도 유지
             lastDate: ts
         }, { merge: true });
 
         alert(`신규 회원 [${cleanName}] 님이 정상 등록되었습니다! 🎉`);
 
+        // 입력 폼 초기화
         nameInput.value = "";
         
+        // 데이터 실시간 동기화 함수가 있다면 재실행
         if (typeof startRealtimeSync === 'function') {
             startRealtimeSync();
         }
@@ -6530,261 +5990,23 @@ window.addMember = async () => {
     }
 };
 
-            
-
-            
-// 📌 회원 이름 변경 및 데이터 완벽 이전 함수
-window.updateMemberName = async () => {
-    const selectEl = document.getElementById('memberSelectEdit');
-    const inputEl = document.getElementById('editMemberNameInput');
-
-    const oldId = selectEl?.value;
-    const newName = inputEl?.value.trim();
-
-    if (!oldId) return alert("대상 회원을 먼저 선택해주세요.");
-    if (!newName) return alert("새로운 이름을 입력해주세요.");
-    if (oldId === newName) return alert("기존 이름과 동일합니다.");
-
-    if (!confirm(`회원 이름을 [${oldId}] ➡️ [${newName}](으)로 변경하시겠습니까?\n모든 기록과 하위 데이터가 완벽히 이전됩니다.`)) return;
-
-    try {
-        console.log(`🚀 [${oldId}] ➡️ [${newName}] 데이터 이전 시작...`);
-
-        // 1. 기존 회원 메인 문서 읽기 (모듈 상단의 db, doc, getDoc 직접 사용)
-        const oldMemberRef = doc(db, "sanwoori", oldId);
-        const oldMemberSnap = await getDoc(oldMemberRef);
-
-        if (!oldMemberSnap.exists()) return alert("선택한 회원 정보를 찾을 수 없습니다.");
-
-        const memberData = oldMemberSnap.data();
-        memberData.name = newName; // 메인 문서 내부 name 필드 수정
-
-        // 2. 새 이름으로 메인 회원 문서 생성
-        const newMemberRef = doc(db, "sanwoori", newName);
-        await setDoc(newMemberRef, memberData);
-
-        // 3. 하위 logs 컬렉션 전체 가져오기 및 새 이름 밑으로 복사
-        const oldLogsRef = collection(db, `sanwoori/${oldId}/logs`);
-        const oldLogsSnap = await getDocs(oldLogsRef);
-
-        console.log(`총 ${oldLogsSnap.docs.length}개의 로그 문서를 이관합니다.`);
-
-        for (const logDoc of oldLogsSnap.docs) {
-            const logData = logDoc.data();
-            logData.author = newName; // 작성자 필드 수정
-
-            // 새 위치(sanwoori/새이름/logs/문서ID)에 생성
-            await setDoc(doc(db, `sanwoori/${newName}/logs`, logDoc.id), logData);
-            
-            // 기존 위치(sanwoori/옛이름/logs/문서ID) 삭제
-            await deleteDoc(doc(db, `sanwoori/${oldId}/logs`, logDoc.id));
-        }
-
-        // 4. bondingForest (우정의 숲) 내 members 배열 데이터 변경
-        const bondingSnap = await getDocs(collection(db, "bondingForest"));
-        for (const bDoc of bondingSnap.docs) {
-            const bData = bDoc.data();
-            if (bData.members && Array.isArray(bData.members) && bData.members.includes(oldId)) {
-                const updatedMembers = bData.members.map(m => m === oldId ? newName : m);
-                await updateDoc(doc(db, "bondingForest", bDoc.id), { members: updatedMembers });
-            }
-        }
-
-        // 5. 로컬 스토리지 캐시 키값 이전
-        const oldStorageKey = `forest_v5_final_${oldId}`;
-        const newStorageKey = `forest_v5_final_${newName}`;
-        const cachedData = localStorage.getItem(oldStorageKey);
-        if (cachedData) {
-            localStorage.setItem(newStorageKey, cachedData);
-            localStorage.removeItem(oldStorageKey);
-        }
-
-        // 6. 이전이 모두 완료되었으므로 기존 메인 '김산' 문서 삭제
-        await deleteDoc(oldMemberRef);
-
-        alert(`🎉 [${oldId}] 님의 이름이 [${newName}](으)로 완벽히 변경 및 이전되었습니다!`);
-
-        // UI 초기화
-        if (inputEl) inputEl.value = "";
-        if (selectEl) selectEl.value = "";
-
-        // 실시간 동기화 함수 실행 또는 새로고침
-        if (typeof startRealtimeSync === 'function') {
-            startRealtimeSync();
-        } else {
-            location.reload();
-        }
-
-    } catch (error) {
-        console.error("이름 변경 오류 상세:", error);
-        alert("이름 변경 실패: " + error.message);
-    }
-};
-
- // 📌 페이징 처리를 위한 전역 변수
-let lastLogDoc = null;    // 마지막으로 로드한 Firestore 문서 Snapshot
-let currentLogMemberId = ""; // 현재 조회 중인 회원 ID
-
-// 📌 [통합] 회원 로그 목록 첫 조회 (최초 20개)
-window.loadMemberLogs = async () => {
-    const id = document.getElementById('memberSelectEdit')?.value;
-    const area = document.getElementById('logListArea'); 
-    const moreBtnArea = document.getElementById('moreLogBtnArea');
-
-    if (!area) return;
-    area.innerHTML = ""; 
-    if (moreBtnArea) moreBtnArea.classList.add('hidden'); // 더보기 버튼 초기화
-
-    if (!id) return;
-
-    currentLogMemberId = id;
-    lastLogDoc = null; // 초기화
-
-    try {
-        // 최초 20개 조회 쿼리
-        const q = query(
-            collection(db, `sanwoori/${id}/logs`), 
-            orderBy("date", "desc"), 
-            limit(20)
-        );
-        const snap = await getDocs(q);
-
-        if (snap.empty) {
-            area.innerHTML = `<div class="text-center text-xs text-gray-400 py-4">등록된 산행 기록이 없습니다.</div>`;
-            return;
-        }
-
-        // 마지막 가져온 문서 커서 저장
-        lastLogDoc = snap.docs[snap.docs.length - 1];
-
-        // 카드 렌더링
-        renderLogItems(snap, area);
-
-        // 가져온 문서가 20개이면 '더보기' 버튼 표시
-        if (snap.docs.length === 20 && moreBtnArea) {
-            moreBtnArea.classList.remove('hidden');
-        }
-
-    } catch (e) {
-        console.error("로그 조회 실패:", e);
-    }
-};
-
-// 📌 [추가] 20개 더보기 함수
-window.loadMoreMemberLogs = async () => {
-    if (!currentLogMemberId || !lastLogDoc) return;
-
-    const area = document.getElementById('logListArea');
-    const moreBtnArea = document.getElementById('moreLogBtnArea');
-
-    try {
-        // lastLogDoc 다음 지점부터 20개 조회
-        const q = query(
-            collection(db, `sanwoori/${currentLogMemberId}/logs`), 
-            orderBy("date", "desc"), 
-            startAfter(lastLogDoc),
-            limit(20)
-        );
-        const snap = await getDocs(q);
-
-        if (snap.empty) {
-            alert("더 이상 불러올 기록이 없습니다.");
-            if (moreBtnArea) moreBtnArea.classList.add('hidden');
-            return;
-        }
-
-        // 마지막 커서 갱신
-        lastLogDoc = snap.docs[snap.docs.length - 1];
-
-        // 카드 추가 렌더링
-        renderLogItems(snap, area);
-
-        // 20개 미만으로 가져온 경우 (마지막 페이지) 더보기 버튼 숨김
-        if (snap.docs.length < 20 && moreBtnArea) {
-            moreBtnArea.classList.add('hidden');
-        }
-
-    } catch (e) {
-        console.error("추가 로그 조회 실패:", e);
-        alert("기록을 더 불러오는 중 오류가 발생했습니다.");
-    }
-};
-
-// 📌 로그 아이템 렌더링 공통 헬퍼 함수
-function renderLogItems(snap, container) {
-    snap.forEach(ld => {
-        const logData = ld.data(); 
-        const d = logData.date ? logData.date.toDate() : new Date(); 
-        const dateStr = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
-        const currentMtName = logData.mountain || '기록';
-
-        const logJson = JSON.stringify({ 
-            mountain: currentMtName, 
-            height: logData.height || 0, 
-            coords: logData.coords || null, 
-            isTop100: logData.isTop100 || false, 
-            isBAC: logData.isBAC || false, 
-            region: logData.region || '기타' 
-        }).replace(/"/g, '&quot;');
-
-        container.innerHTML += `
-        <div class="p-2 border rounded-xl mb-2 bg-white text-xs shadow-sm" onclick="selectLogToMap('${logJson}')">
-            
-            <!-- 📌 1라인: [날짜 + 산이름] ------- [높이(40px) + 높이수정 + 좌표수정] -->
-            <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 4px !important; margin-bottom: 6px !important; width: 100% !important;">
-                
-                <!-- 왼쪽: 날짜 & 산이름 -->
-                <div style="display: flex !important; align-items: center !important; gap: 4px !important; min-width: 0 !important; flex: 1 !important;">
-                    <span style="color: #64748b; font-size: 10px; font-weight: bold; white-space: nowrap;">${dateStr}</span>
-                    <span style="color: #4f46e5; font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        ${logData.isBAC ? '<span style="color: #ef4444; font-weight: 800; margin-right: 2px;">BAC</span>' : ''}${currentMtName}
-                    </span>
-                </div>
-
-                <!-- 오른쪽: 높이입력칸 (40px 고정) + 높이수정 + 좌표수정 -->
-                <div style="display: flex !important; align-items: center !important; gap: 3px !important; flex-shrink: 0 !important;" onclick="event.stopPropagation()">
-                    <input type="number" id="h-${ld.id}" value="${logData.height || 0}" style="width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 24px !important; text-align: center !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; font-size: 10px !important; outline: none !important; padding: 0 !important;" placeholder="m">
-                    <button onclick="updateLogHeight('${currentLogMemberId}', '${ld.id}')" style="background-color: #e2e8f0; color: #334155; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: 500; white-space: nowrap; border: none; flex-shrink: 0;">높이수정</button>
-                    <button onclick="updateLogCoord('${currentLogMemberId}', '${ld.id}')" style="background-color: #10b981; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: 500; white-space: nowrap; border: none; flex-shrink: 0;">좌표수정</button>
-                </div>
-            </div>
-
-            <!-- 📌 2라인: [레벨-1 삭제] [기록만 삭제] [산이름 입력칸] [산변경] -->
-            <div style="display: flex !important; align-items: center !important; gap: 3px !important; width: 100% !important;" onclick="event.stopPropagation()">
-                <button onclick="deleteLog('${currentLogMemberId}', '${ld.id}', true)" style="background-color: #f43f5e; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: bold; white-space: nowrap; border: none; flex-shrink: 0;">레벨-1 삭제</button>
-                <button onclick="deleteLog('${currentLogMemberId}', '${ld.id}', false)" style="background-color: #94a3b8; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: bold; white-space: nowrap; border: none; flex-shrink: 0;">기록만 삭제</button>
-                <input type="text" id="mt-${ld.id}" value="${currentMtName}" placeholder="산 이름" style="flex: 1 !important; min-width: 0 !important; height: 24px !important; border: 1px solid #cbd5e1 !important; border-radius: 4px !important; padding: 0 5px !important; font-size: 10px !important; outline: none !important;">
-                <button onclick="updateLogMountain('${currentLogMemberId}', '${ld.id}')" style="background-color: #f59e0b; color: white; padding: 0 5px; height: 24px; border-radius: 4px; font-size: 10px; font-weight: bold; white-space: nowrap; border: none; flex-shrink: 0;">산변경</button>
-            </div>
-
-        </div>`;
-    });
-}
-
-
  
-
-
-// 📌 [통합] 산 이름 수정 함수
-window.updateLogMountain = async (mId, logId) => {
-    const inputEl = document.getElementById(`mt-${logId}`);
-    const newMountainName = inputEl ? inputEl.value.trim() : "";
-    
-    if (!newMountainName) return alert("변경할 산 이름을 입력해주세요.");
-
-    try {
-        await updateDoc(doc(db, `sanwoori/${mId}/logs`, logId), { 
-            mountain: newMountainName 
-        });
-        alert("산 이름이 성공적으로 변경되었습니다! 🏔️");
-        loadMemberLogs(); // 목록 자동 갱신
-    } catch (e) {
-        console.error("산 이름 변경 실패:", e);
-        alert("산 이름 변경 실패: " + e.message);
-    }
+window.loadMemberLogs = async () => {
+    const id = document.getElementById('memberSelectEdit').value;
+    const area = document.getElementById('logListArea'); area.innerHTML = ""; if(!id) return;
+    const snap = await getDocs(query(collection(db, `sanwoori/${id}/logs`), orderBy("date", "desc"), limit(20)));
+    snap.forEach(ld => {
+        const logData = ld.data(); const d = logData.date.toDate(); const dateStr = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+        const logJson = JSON.stringify({ mountain: logData.mountain || '', height: logData.height || 0, coords: logData.coords || null, isTop100: logData.isTop100 || false, isBAC: logData.isBAC || false, region: logData.region || '기타' }).replace(/"/g, '&quot;');
+        area.innerHTML += `<div class="log-item-box" onclick="selectLogToMap('${logJson}')">
+        <div class="log-info-group"><span class="log-date-txt">${dateStr}</span><span class="log-mt-txt">${logData.isBAC ? '<span class="bac-txt">BAC</span>' : ''}${logData.mountain || '기록'}</span>
+        <div class="flex items-center gap-1"><input type="number" id="h-${ld.id}" value="${logData.height || 0}" class="log-height-input border rounded-md" onclick="event.stopPropagation()">
+        <button onclick="event.stopPropagation(); updateLogHeight('${id}', '${ld.id}')" class="text-[9px] bg-slate-200 px-1 py-1 rounded">높이수정</button>
+        <button onclick="event.stopPropagation(); updateLogCoord('${id}', '${ld.id}')" class="text-[9px] bg-emerald-500 text-white px-1 py-1 rounded">좌표수정</button></div></div>
+        <div class="log-btn-group" onclick="event.stopPropagation()"><button class="del-btn-mini" onclick="deleteLog('${id}', '${ld.id}', true)">레벨-1 삭제</button>
+        <button class="del-only-btn-mini" onclick="deleteLog('${id}', '${ld.id}', false)">기록만 삭제</button></div></div>`;
+    });
 };
-
-
 
 window.selectLogToMap = (logDataStr) => {
     const log = JSON.parse(logDataStr.replace(/&quot;/g, '"'));
@@ -6878,6 +6100,12 @@ window.deleteLog = async (mId, logId, shouldDownLevel) => {
     } catch (e) {
         alert("삭제 실패: " + e.message);
     }
+};
+
+window.updateMemberName = async () => {
+    const id = document.getElementById('memberSelectEdit').value;
+    const newName = document.getElementById('editMemberNameInput').value.trim();
+    if(id && newName) { await updateDoc(doc(db, "sanwoori", id), { name: newName }); alert("변경 완료"); }
 };
 
 window.changeQuarter = (q) => { selectedQuarter = q; document.querySelectorAll('.q-btn').forEach((btn, idx) => btn.classList.toggle('active-q', idx + 1 === q)); startRealtimeSync(); };
@@ -8366,8 +7594,17 @@ function createShootingStar(board, tx, ty) {
 }
 
              
+            
+                
+
+                    
+    
+
+        
+            // 필터링 및 페이징 처리를 위해 모달 전용 로그 목록을 임시 저장할 전역 변수 (캐시)
 window.currentScrollLogs = []; 
 
+// 페이징 처리를 위해 상태를 기억할 전역 객체
 window.scrollPagination = {
     currentCategory: 'all',
     mId: null,
@@ -8375,6 +7612,7 @@ window.scrollPagination = {
     currentPageSize: 6
 };
 
+// showFadingScroll 인자에 regDate를 전달받을 수 있도록 추가 (옵션)
 window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
     const modal = document.getElementById('scrollModal');
     const content = document.getElementById('scrollContent');
@@ -8406,6 +7644,7 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     let formattedRegDateKo = "--년 --월 --일";
 
     try {
+        // [A] 가입일 정보: 외부에서 전달받은 값이 있으면 getDoc 생략! (서버 읽기 1회 절약)
         let rDate = passedRegDate;
         
         if (!rDate) {
@@ -8429,6 +7668,7 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             }
         }
 
+        // [B] 🔥 유저 전체 일지 데이터 1회 통합 조회 (메모리 캐스)
         const logsRef = collection(db, `sanwoori/${safeMemberId}/logs`);
         const q = query(logsRef, orderBy("date", "desc"));
         const snap = await getDocs(q);
@@ -8442,31 +7682,33 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
             };
         });
 
-        // 🔥 순수산행(일반산행) + 정기산행 = 일정산행 횟수로 집계
-        const counts = window.currentScrollLogs.reduce((acc, log) => {
-            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
-            const isPureHike = !isKmActivity && !log.isExtraHike;
+        // 이하 기존 통계 계산 및 UI 렌더링 로직 동일...
 
-            if (isPureHike) {
-                acc.schedule++; // 순수산행(일반산행)이면 일정산행 +1
-                if (log.isRegular) {
-                    acc.regular++; // 그중 정기산행이면 정기산행 +1
-                }
+
+                // [C] 📊 전체 로그 데이터 기반 항목별 카운팅 계산 (정기 vs 일정 구분)
+        const counts = window.currentScrollLogs.reduce((acc, log) => {
+            if (log.isRegular) {
+                acc.regular++;  // 무지개 (정기산행)
+                acc.schedule++; // 🔥 정기산행 횟수를 일정산행에도 포함
+            } else if ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike) {
+                acc.schedule++; // 연두색 (일정산행)
             } else if (log.isExtraHike) {
-                acc.extra++;
-            } else if (log.isRunning) {
-                acc.running++;
+                acc.extra++;    // 개인산행
             } else if (log.isTracking) {
-                acc.trekking++;
+                acc.trekking++; // 트래킹
+            } else if (log.isRunning) {
+                acc.running++;  // 런닝
             } else if (log.isWalking) {
-                acc.walking++;
+                acc.walking++;  // 산책
             }
             return acc;
         }, { regular: 0, schedule: 0, extra: 0, trekking: 0, running: 0, walking: 0 });
 
+        // 2. 🎯 [개선] D-Day와 운동 횟수가 하나의 상자(카드)로 통합 렌더링
         content.innerHTML = `
             <div class="user-report-summary-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 14px; margin: 6px 0 12px 0;">
                 
+                <!-- [1구역] D-Day & 가입일 영역 -->
                 <div class="user-status-row-bar" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;">
                     <div class="dday-count-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px;">
                         D-Day ${dday !== undefined ? dday : 0}
@@ -8477,7 +7719,9 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                     </div>
                 </div>
 
+                <!-- [2구역] 운동 횟수 요약 영역 (3열 정렬 및 도트 라인 수직 맞춤) -->
                 <div class="activity-summary-grid" style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px; font-size: 11px; color: #475569; font-weight: 500;">
+                    <!-- 1줄: 산행 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0); display: inline-block; flex-shrink: 0;"></i>
@@ -8496,6 +7740,7 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                         </span>
                     </div>
 
+                    <!-- 2줄: 기타 운동 계열 -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: #FFD1DC; display: inline-block; flex-shrink: 0;"></i>
@@ -8504,7 +7749,7 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
                         </span>
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
                             <i style="width: 7px; height: 7px; border-radius: 50%; background: #E0B0FF; display: inline-block; flex-shrink: 0;"></i>
-                            <span>트레킹</span>
+                            <span>트래킹</span>
                             <strong style="color: #0f172a; margin-left: auto;">${counts.trekking}회</strong>
                         </span>
                         <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
@@ -8517,18 +7762,24 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
 
             </div>
 
+
+            </div>
+
             <div class="tab-scroll-container">
                 <div class="tab-header-buttons">
                     <button type="button" onclick="window.switchScrollTab('all')" id="sTab-all" class="tab-btn active">전체</button>
-                    <button type="button" onclick="window.switchScrollTab('hiking')" id="sTab-hiking" class="tab-btn">일정운동</button>
+                    <button type="button" onclick="window.switchScrollTab('hiking')" id="sTab-hiking" class="tab-btn">일정산행</button>
                     <button type="button" onclick="window.switchScrollTab('running')" id="sTab-running" class="tab-btn">개인/기타</button>
                 </div>
                 
+                <!-- 로그가 쌓일 박스 -->
                 <div id="scrollFilteredList" class="scroll-filtered-list-box"></div>
+                <!-- 더보기 버튼 영역 -->
                 <div id="scrollMoreBtnArea" style="text-align:center; margin-top:15px;"></div>
             </div>
         `;
 
+        // 첫 페이지 로드
         window.loadScrollLogsPage(true);
 
     } catch (e) {
@@ -8542,23 +7793,15 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     }
 
     modal.onclick = (e) => { 
-        if (e.target === modal) {
-            window.closeScrollModal();
-        }
+        if (e.target === modal) modal.style.display = 'none'; 
     };
     if(scrollWrap) {
         scrollWrap.onclick = (e) => e.stopPropagation();
     }
 };
 
-    // 🎯 4. 스크롤 모달 전용 통합 닫기 함수 신설
-window.closeScrollModal = function() {
-    const modal = document.getElementById('scrollModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-};
-    
+
+// [탭 전환 함수]
 window.switchScrollTab = (category) => {
     if (window.scrollPagination.currentCategory === category) return;
     
@@ -8584,6 +7827,7 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
+// [클라이언트 페이징 처리]
 window.loadScrollLogsPage = (isFirstPage = false) => {
     if (!window.scrollPagination) return;
     
@@ -8606,8 +7850,9 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
         if (currentCategory === 'all') {
             filtered = window.currentScrollLogs;
         } else if (currentCategory === 'hiking') {
+            // 정기산행(무지개)과 일정산행(연두색)을 모두 일정산행 탭에서 노출
             filtered = window.currentScrollLogs.filter(log => 
-                log.isSchedule || log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
+                log.isRegular || ((!log.isRunning && !log.isTracking && !log.isWalking) && !log.isExtraHike)
             );
         } else if (currentCategory === 'running') {
             filtered = window.currentScrollLogs.filter(log => 
@@ -8635,106 +7880,49 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 }
             }
 
-            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
-            const isPureRegularHike = log.isRegular && !isKmActivity; 
-
-            // 🎯 도트 색상
             let dotStyle = "";
-            const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
-            
-            if (isPureRegularHike) {
+            if (log.isRegular) {
+                // 정기산행: 무지개 그래디언트
                 dotStyle = "background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0);";
             } else {
-                let baseColor = colors.hike;
-                if (log.isExtraHike) baseColor = colors.extraHike;
-                else if (log.isRunning) baseColor = colors.run;
-                else if (log.isTracking) baseColor = colors.trek;
-                else if (log.isWalking) baseColor = colors.walk;
+                const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
+                let activeColors = [];
+                if (log.isExtraHike) activeColors.push(colors.extraHike);
+                else if (log.isRunning) activeColors.push(colors.run);
+                else if (log.isTracking) activeColors.push(colors.trek);
+                else if (log.isWalking) activeColors.push(colors.walk);
+                else activeColors.push(colors.hike); // 일정산행: 연두색 (#2ecc71)
 
-                dotStyle = `background: ${baseColor};`;
-            }
-
-            const heightVal = log.height || 0;
-            const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
-            const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
-            const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
-            
-            // 🎯 100대 명산 타입 안전 검사 (Boolean/String/Number 대응)
-            const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
-
-            // 🎯 아이콘 태그 (★ / ✔)
-            let starTag = '';
-            if (isTop100Log) {
-                starTag = '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>';
-            } else if (!isPureRegularHike) {
-                starTag = '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
-            }
-
-            const isScheduleGroupExercise = log.isSchedule && isKmActivity;
-            let badgeBg = '#ecfdf5', badgeColor = '#10b981', badgeBorder = '#a7f3d0';
-            
-            if (log.isRunning) {
-                badgeBg = '#fdf2f8'; badgeColor = '#db2777'; badgeBorder = '#fbcfe8';
-            } else if (log.isTracking) {
-                badgeBg = '#f5f3ff'; badgeColor = '#7c3aed'; badgeBorder = '#ddd6fe';
-            } else if (log.isWalking) {
-                badgeBg = '#fff7ed'; badgeColor = '#c2410c'; badgeBorder = '#ffedd5';
-            }
-
-            const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isScheduleGroupExercise;
-            
-            const scheduleBadge = showScheduleBadge 
-                ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
-                : '';
-
-            let seasonEmoji = '';
-            let textBody = rawMountain;
-
-            if (isPureRegularHike) {
-                const match = rawMountain.match(/^(🍀|🌸|🍁|❄️)/u);
-                if (match) {
-                    seasonEmoji = match[1];
-                    textBody = rawMountain.slice(seasonEmoji.length).trim();
+                if (activeColors.length >= 2) {
+                    dotStyle = activeColors.length === 2 
+                        ? `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`
+                        : `background: linear-gradient(135deg, ${activeColors[0]} 33.3%, ${activeColors[1]} 33.3%, ${activeColors[1]} 66.6%, ${activeColors[2]} 66.6%);`;
+                } else {
+                    dotStyle = `background: ${activeColors[0]};`;
                 }
             }
 
-            const rainbowTextStyle = isPureRegularHike 
-                ? 'background: linear-gradient(90deg, #ff007f, #8a2be2, #0055ff, #00d2ff, #ff007f); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; animation: rainbowMove 3s linear infinite;' 
-                : '';
-
-            const regularSparkle = isPureRegularHike 
-                ? '<span style="font-size: 11px; margin-left: 3px;">✨</span>' 
-                : '';
-
-            const regularBadge = isPureRegularHike
-                ? `<span style="margin-left: auto; background: linear-gradient(135deg, rgba(255, 105, 180, 0.15), rgba(160, 32, 240, 0.15)); color: #7e22ce; border: 1px solid rgba(160, 32, 240, 0.35); font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; display: inline-flex; align-items: center; line-height: 1; flex-shrink: 0;">정기산행</span>`
-                : '';
-
-            // 🎯 [핵심] 100대 명산 블루글씨 및 정기산행 무지개 글씨 렌더링 분기
-            let mountainHtml = '';
-            if (isPureRegularHike) {
-                mountainHtml = `${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`;
-            } else if (isTop100Log) {
-                // top100-blue 클래스 부여 + 인라인 스타일로 파란색(#2563eb) 확실하게 고정
-                mountainHtml = `<span class="top100-blue" style="color: #2563eb !important; font-weight: 700;">${rawMountain} (${heightVal}${unit})</span>`;
-            } else {
-                mountainHtml = `<span>${rawMountain} (${heightVal}${unit})</span>`;
-            }
+            const heightVal = log.height || 0;
+            const isKmActivity = (log.isRunning || log.isTracking || log.isWalking) && !log.isExtraHike;
+            const unit = (isKmActivity && heightVal < 50) ? 'km' : 'm';
+            
+            const displayMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
+            const bacTag = log.isBAC ? '<span class="bac-badge-mini">BAC</span>' : '';
+            
+            const starTag = log.isTop100 
+                ? '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>' 
+                : '<span style="color: #94a3b8; font-size: 11px; margin-left: 2px;">✔</span>';
+                
+            const blueClass = log.isTop100 ? "top100-blue" : "";
 
             return `
                 <div class="scroll-timeline-item">
                     <div class="scroll-item-date">${dateStr} (${dayName})</div>
-                    <div class="scroll-item-body" style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; gap: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                            <span class="scroll-item-dot" style="${dotStyle}"></span>
-                            ${bacTag}
-                            <span class="scroll-item-name" style="display: inline-flex; align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                ${mountainHtml}
-                            </span>
-                            ${starTag}
-                        </div>
-                        ${regularBadge}
-                        ${scheduleBadge}
+                    <div class="scroll-item-body">
+                        <span class="scroll-item-dot" style="${dotStyle}"></span>
+                        ${bacTag}
+                        <span class="scroll-item-name ${blueClass}">${displayMountain} (${heightVal}${unit})</span>
+                        ${starTag}
                     </div>
                 </div>
             `;
@@ -8764,14 +7952,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     }
 };
 
-   
-
-    
-            
-
-                                      
-                 
-    
 
             
 
@@ -8850,7 +8030,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
             <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
             <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
-            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
+            <span class="modal-close-btn" onclick="document.getElementById('scrollModal').style.display='none'">&times;</span>
         </div>
 
         <!-- 스크롤 컨텐츠 영역 -->
@@ -8858,7 +8038,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
         <!-- 하단 푸터 영역 -->
         <div class="scroll-footer">
-            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()"></button>
+            <button class="modal-bottom-close-btn" onclick="document.getElementById('scrollModal').style.display='none'"></button>
         </div>
         
     </div>
@@ -8948,165 +8128,10 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: true });
 
 
-
-    // ===================================================
-// [최종 수정] San:Woori 모든 모달/팝업 뒤로가기 연동 스크립트
-// ===================================================
-(function() {
-    const MODAL_IDS = [
-        'milkyWayModal',
-        'starGuideModal',
-        'sgCustomModal',
-        'scrollModal',
-        'timelineModal',
-        'levelModal',
-        'vibeModal',
-        'hallModal',
-        'mapModal',
-        'logPopup',
-        'mountainViewModal',
-        'mwInfoHelpModal',
-        'grassPopup'
-    ];
-
-    // 스택 관리: [{ id: 'modalId', pushed: true/false }]
-    let activeModalStack = [];
-
-    // 모달 감지 기준 완화 (opacity 및 flex/block 모두 감지)
-    function isModalOpen(id) {
-        const el = document.getElementById(id);
-        if (!el) return false;
-        if (el.classList.contains('hidden')) return false;
-        
-        const style = window.getComputedStyle(el);
-        const isDisplayed = style.display !== 'none' && style.visibility !== 'hidden';
-        const isOpaque = parseFloat(style.opacity || '1') > 0;
-        
-        return isDisplayed && isOpaque;
-    }
-
-    // 모달별 안전한 닫기 처리
-    function forceCloseModal(id) {
-        switch (id) {
-            case 'milkyWayModal':
-                if (typeof window.toggleMilkyWayModal === 'function') window.toggleMilkyWayModal(false);
-                else if (typeof window.closeMilkyWayModal === 'function') window.closeMilkyWayModal();
-                else hideEl(id);
-                break;
-            case 'starGuideModal':
-                if (typeof window.toggleStarGuide === 'function') window.toggleStarGuide(false);
-                else hideEl(id);
-                break;
-            case 'sgCustomModal':
-                if (typeof window.closeSgModal === 'function') window.closeSgModal();
-                else {
-                    const el = document.getElementById(id);
-                    if (el) el.remove();
-                }
-                break;
-            case 'timelineModal':
-                if (typeof window.toggleTimelineModal === 'function') window.toggleTimelineModal(false);
-                else hideEl(id);
-                break;
-            case 'scrollModal':
-                hideEl(id);
-                break;
-            case 'levelModal':
-                if (typeof window.toggleModal === 'function') window.toggleModal(false);
-                else hideEl(id);
-                break;
-            case 'vibeModal':
-                if (typeof window.toggleVibeModal === 'function') window.toggleVibeModal(false);
-                else hideEl(id);
-                break;
-            case 'hallModal':
-                if (typeof window.toggleHallModal === 'function') window.toggleHallModal(false);
-                else hideEl(id);
-                break;
-            case 'mapModal':
-                if (typeof window.toggleMapModal === 'function') window.toggleMapModal(false);
-                else hideEl(id);
-                break;
-            case 'logPopup':
-                if (typeof window.toggleLogPopup === 'function') window.toggleLogPopup(false);
-                else hideEl(id);
-                break;
-            case 'mwInfoHelpModal':
-                if (typeof window.closeMountainInfoModal === 'function') window.closeMountainInfoModal();
-                else hideEl(id);
-                break;
-            default:
-                hideEl(id);
-                break;
-        }
-    }
-
-    function hideEl(id) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.style.display = 'none';
-            el.classList.add('hidden');
-        }
-    }
-
-    // 상태 동기화 및 history.pushState 관리
-    function syncModalState() {
-        MODAL_IDS.forEach(id => {
-            const open = isModalOpen(id);
-            const inStack = activeModalStack.includes(id);
-
-            // 1. 모달이 열렸는데 스택에 없으면 추가 & History Push
-            if (open && !inStack) {
-                activeModalStack.push(id);
-                history.pushState({ modalId: id }, '', location.href);
-            } 
-            // 2. 사용자가 X버튼이나 배경 클릭으로 직접 닫은 경우
-            else if (!open && inStack) {
-                activeModalStack = activeModalStack.filter(item => item !== id);
-                // 브라우저 뒤로가기 상태와 갯수 동기화 (히스토리 정리)
-                if (history.state && history.state.modalId === id) {
-                    history.back();
-                }
-            }
-        });
-    }
-
-    // 뒤로가기 버턴(popstate) 눌렀을 때의 동작
-    window.addEventListener('popstate', (e) => {
-        if (activeModalStack.length > 0) {
-            const lastModalId = activeModalStack.pop();
-            forceCloseModal(lastModalId);
-        }
-    });
-
-    // 실시간 DOM 감지
-    const observer = new MutationObserver(() => {
-        syncModalState();
-    });
-
-    function initObserver() {
-        if (document.body) {
-            observer.observe(document.body, {
-                attributes: true,
-                childList: true,
-                subtree: true,
-                attributeFilter: ['style', 'class']
-            });
-            syncModalState();
-        }
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initObserver);
-    } else {
-        initObserver();
-    }
-})();
-
-
-
 </script>
 </body>
     </html>
+    
+    
     
     
