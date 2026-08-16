@@ -8336,24 +8336,48 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         container.appendChild(star);
     }
 
-    // =========================================================
-    // [3] 날짜 및 나이테 개수 계산 (최대 개수 캡핑 & 페이드아웃 적용)
-    // =========================================================
-    const elapsedMonths = getFullMonths(jDate, now);
-    const totalMonths = Math.max(1, elapsedMonths + 1); // 전체 경과 월수
+    // [3] 날짜 및 만 개월수 계산
+    const fixedList = ["오즈","나스","해수","용삼","지니","아랑","민이","몰랑","길치","등초","무니","식이","구름","뚜벅","윤윤","햄찌","이구","후후","튜브","피치","송돌","호프","애플","얌얌","태리","희야","멸치","성민","섭섭","하트"];
+    const now = new Date();
+    let jDate;
 
-    // 화면에 최대로 표시할 나이테 개수 (18개 초과 시 오래된 내부 나이테부터 생략)
+    if (fixedList.includes(memberName)) {
+        jDate = new Date('2025-11-24T00:00:00');
+    } else if (regDate?.toDate) {
+        jDate = regDate.toDate();
+    } else {
+        try {
+            const logsSnap = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "asc"), limit(1)));
+            if (!logsSnap.empty) {
+                jDate = logsSnap.docs[0].data().date.toDate();
+            } else {
+                jDate = new Date();
+            }
+        } catch (e) {
+            console.error("가입일 자동 산출 에러:", e);
+            jDate = new Date();
+        }
+    }
+
+    function getFullMonths(start, end) {
+        let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+        if (end.getDate() < start.getDate()) {
+            months--;
+        }
+        return Math.max(0, months);
+    }
+
+    const elapsedMonths = getFullMonths(jDate, now);
+    const totalMonths = Math.max(1, elapsedMonths + 1);
+
+    // 표시 개수 제한 및 오프셋 산출 (최근 최대 18개)
     const MAX_VISIBLE_RINGS = 18;
     const displayRingCount = Math.min(totalMonths, MAX_VISIBLE_RINGS);
-    
-    // 표시되는 나이테 중 가장 오프셋(시작점) 월 인덱스 계산
     const startMonthIdx = Math.max(0, totalMonths - MAX_VISIBLE_RINGS);
 
-    // 레벨별 스타일 및 색상 추출
     const style = getLevelStyle(memberLevel);
     const ringColor = style.border;
 
-    // 🪐 Launched 텍스트 세팅
     const ringLaunchedEl = document.getElementById('ringLaunchedDate');
     if (ringLaunchedEl && jDate) {
         const yyyy = jDate.getFullYear();
@@ -8368,9 +8392,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
     const regularStarColors = ["#00FFFF", "#FF8C00", "#D32F2F", "#7C4DFF", "#A020F0", "#00FF7F"]; 
 
-    // =========================================================
-    // [4] 정기산행 데이터 로드 (표시 범위 오프셋 반영)
-    // =========================================================
+    // [4] 정기산행 데이터 로드
     let regularHikesByMonth = {};
     try {
         const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
@@ -8379,8 +8401,6 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
             if (data.isRegular && data.date) {
                 const hikeDate = data.date.toDate();
                 const monthIdx = getFullMonths(jDate, hikeDate);
-
-                // 현재 화면에 그려질 나이테 인덱스로 변환 (startMonthIdx 차감)
                 const visibleRingIdx = monthIdx - startMonthIdx;
 
                 if (visibleRingIdx >= 0 && visibleRingIdx < displayRingCount) {
@@ -8396,7 +8416,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         });
     } catch (e) { console.error("나이테 로그 로드 에러:", e); }
 
-    // [5] SVG 및 중앙 코어 생성 부분은 기존 동일 ...
+    // [5] SVG 및 중앙 코어 생성
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", "0 0 240 240");
@@ -8432,17 +8452,14 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
     svg.appendChild(coreShape);
 
-    // =========================================================
-    // [6] 나이테 및 위성 별 생성 (거리별 페이드아웃 적용)
-    // =========================================================
+    // [6] 나이테 및 위성 별 생성
     const rings = [];
     const satellites = [];
     const seed = memberName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
     for (let i = 0; i < displayRingCount; i++) {
-        // 실제 개월수 계산 (1, 2, ..., N개월)
         const actualMonth = startMonthIdx + i + 1;
-        const radius = 18 + (i * (87 / displayRingCount)); // 중심 코어와 간격 확보
+        const radius = 18 + (i * (87 / displayRingCount));
 
         const path = document.createElementNS(svgNS, "path");
         path.setAttribute("class", "tree-ring-path");
@@ -8467,11 +8484,8 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         path.style.transition = "stroke-opacity 0.5s ease-in, stroke-width 0.5s ease";
 
         svg.appendChild(path);
-        
-        // 투명도/두께 계산용 메타데이터 함께 보관
         rings.push({ el: path, actualMonth: actualMonth, ringIndex: i });
 
-        // 정기 산행 위성 별 배치
         if (regularHikesByMonth[i]) {
             regularHikesByMonth[i].forEach(starType => {
                 const colorIdx = parseInt(starType.split('_')[1]) - 1;
@@ -8500,9 +8514,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     }
     container.appendChild(svg);
 
-    // =========================================================
-    // [7] 애니메이션 실행 및 페이드아웃 적용
-    // =========================================================
+    // [7] 애니메이션 실행
     const totalAnimTime = 1000; 
     const delayStep = Math.min(50, totalAnimTime / displayRingCount);
 
@@ -8510,23 +8522,21 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         setTimeout(() => {
             const { el, actualMonth, ringIndex } = ringItem;
             const isLastRing = (ringIndex === rings.length - 1);
-            const isYearRing = actualMonth % 12 === 0;
-
-            // 💡 [페이드아웃 로직] 안쪽(오래된 것)일수록 투명도를 옅게 설정
-            // 최근 나이테일수록 1.0에 가깝고, 안쪽 나이테는 0.12까지 연해짐
+            const isYearRing = (actualMonth % 12 === 0);
             const fadeRatio = (ringIndex + 1) / displayRingCount; 
-            
+
             if (isLastRing) {
                 el.setAttribute("stroke-opacity", "1");
                 el.setAttribute("stroke-width", "2");
                 el.style.filter = `drop-shadow(0 0 5px ${ringColor})`;
             } else if (isYearRing) {
-                // 1년 주기 나이테는 조금 더 선명하게 포인트
-                el.setAttribute("stroke-opacity", Math.max(0.35, (fadeRatio * 0.85)).toFixed(2));
-                el.setAttribute("stroke-width", "1.1");
+                // 1년 주기는 안쪽에 들어서더라도 1.4px 두께와 글로우, 최소 0.7 투명도 유지
+                const yearOpacity = Math.max(0.7, fadeRatio).toFixed(2);
+                el.setAttribute("stroke-opacity", yearOpacity);
+                el.setAttribute("stroke-width", "1.4");
+                el.style.filter = `drop-shadow(0 0 3px ${ringColor})`;
             } else {
-                // 일반 나이테: 안쪽일수록 부드럽게 페이드아웃
-                const baseOpacity = Math.max(0.12, (fadeRatio * 0.4)).toFixed(2);
+                const baseOpacity = Math.max(0.1, (fadeRatio * 0.35)).toFixed(2);
                 el.setAttribute("stroke-opacity", baseOpacity);
                 el.setAttribute("stroke-width", "0.35");
             }
@@ -8535,12 +8545,12 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
             satellites.forEach(sat => {
                 if (sat.ringIdx === ringIndex) {
-                    sat.el.setAttribute("opacity", fadeRatio.toFixed(2));
+                    const satOpacity = isYearRing ? Math.max(0.8, fadeRatio) : fadeRatio;
+                    sat.el.setAttribute("opacity", satOpacity.toFixed(2));
                 }
             });
         }, index * delayStep);
     });
-
 
     // [8] 내부 코어 추가 별빛
     setTimeout(() => {
