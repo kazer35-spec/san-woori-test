@@ -6846,39 +6846,35 @@ window.toggleDisableCoord = () => {
     
     const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
     
-// 기존 활동 체크박스 상태
-let isSchedule = document.getElementById('isScheduleCheck')?.checked || false; // ⭕ 6844번 줄 let으로 한 번만 선언
-let isRunning = document.getElementById('isRunningCheck')?.checked || false;
-let isTracking = document.getElementById('isTrackingCheck')?.checked || false;
-let isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
-const isOnlyLog = document.getElementById('isOnlyLog')?.checked || false; 
+    // 기존 활동 체크박스 상태
+    let isSchedule = document.getElementById('isScheduleCheck')?.checked || false;
+    let isRunning = document.getElementById('isRunningCheck')?.checked || false;
+    let isTracking = document.getElementById('isTrackingCheck')?.checked || false;
+    let isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
+    const isOnlyLog = document.getElementById('isOnlyLog')?.checked || false; 
 
-// 단축 체크박스 확인
-const isExtraHikeCheck = document.getElementById('isExtraHikeCheck')?.checked || false;
-const isSpecialTrackingCheck = document.getElementById('isSpecialTrackingCheck')?.checked || false;
+    // 단축 체크박스 확인
+    const isExtraHikeCheck = document.getElementById('isExtraHikeCheck')?.checked || false;
+    const isSpecialTrackingCheck = document.getElementById('isSpecialTrackingCheck')?.checked || false;
 
-// 단축 체크박스 선택 시 값 강제 적용
-if (isExtraHikeCheck) {
-    isRunning = true;
-    isTracking = true;
-} else if (isSpecialTrackingCheck) {
-    isTracking = true;
-    isWalking = true;
-    isSchedule = true;
-}
+    // 단축 체크박스 선택 시 값 강제 적용
+    if (isExtraHikeCheck) {
+        isRunning = true;
+        isTracking = true;
+    } else if (isSpecialTrackingCheck) {
+        isTracking = true;
+        isWalking = true;
+        isSchedule = true;
+    }
 
-// 🎯 좌표 OFF 체크 여부 확인 (번외산행인 경우 강제 true)
-let disableCoord = document.getElementById('disableCoordCheck')?.checked || false;
-if (isExtraHikeCheck) {
-    disableCoord = true;
-}
+    // 🎯 좌표 OFF 체크 여부 확인 (번외산행인 경우 강제 true)
+    let disableCoord = document.getElementById('disableCoordCheck')?.checked || false;
+    if (isExtraHikeCheck) {
+        disableCoord = true;
+    }
 
-
-   const region = document.getElementById('adminManualRegionSelect')?.value || "";
+    const region = document.getElementById('adminManualRegionSelect')?.value || "";
     const isQuarterOnlyOne = document.getElementById('isQuarterCheck')?.checked || false;
-    
-    // 좌표 OFF 체크 여부 확인
-    const disableCoord = document.getElementById('disableCoordCheck')?.checked || false;
     
     const pRock = parseInt(document.getElementById('pRock')?.value) || 0;
     const pForest = parseInt(document.getElementById('pForest')?.value) || 0;
