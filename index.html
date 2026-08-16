@@ -8305,39 +8305,7 @@ window.showMemberMountain = async (mId, mName) => {
 
 
 window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
-        // 나이테 위성별 연산 흐름 점검 진단 코드
-if (mName === "오즈" || mId === "오즈") {
-    getDocs(collection(db, `sanwoori/${mId}/logs`)).then(snap => {
-        const allLogs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        // 1. DB 전체 로그 중 정기산행 데이터 추출 검사
-        const regLogs = allLogs.filter(l => l.isRegular || (l.starType && String(l.starType).startsWith('regular')));
-
-        if (regLogs.length === 0) {
-            alert("❌ [진단 실패] regular 로그 추출 조건문 불일치");
-            return;
-        }
-
-        let diagnosticMsg = `[오즈 나이테 위성 연산 점검]\n- 총 정기산행 개수: ${regLogs.length}개\n\n`;
-
-        regLogs.forEach((log, i) => {
-            // 날짜 및 링 위치 연산 점검
-            const logDate = log.date?.toDate ? log.date.toDate() : new Date(log.date);
-            const yearMonth = `${logDate.getFullYear()}.${logDate.getMonth() + 1}`;
-            
-            // 나이테 반지름/링 인덱스 계산 테스트 (프로젝트 내 계산 함수 적용)
-            const calculatedRing = typeof getRingIndex === 'function' ? getRingIndex(log.date) : "함수미정의";
-            
-            diagnosticMsg += `${i + 1}. ${log.mountain}\n`;
-            diagnosticMsg += `   • starType: ${log.starType}\n`;
-            diagnosticMsg += `   • 날짜: ${yearMonth}\n`;
-            diagnosticMsg += `   • 계산된 링 인덱스: ${calculatedRing}\n`;
-            diagnosticMsg += `   • 좌표: (${log.coords?.x}, ${log.coords?.y})\n`;
-        });
-
-        alert(diagnosticMsg);
-    });
-}
+        
 
     const container = document.getElementById('treeRingContainer');
     const monthLabel = document.getElementById('activityMonths');
@@ -9552,19 +9520,124 @@ const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
 <div id="mountainViewModal" class="mountain-modal" onclick="this.style.display='none'">
     <div id="integratedCard" class="integrated-member-card" onclick="event.stopPropagation()">
 
-        <!-- [나이테 섹션] -->
-        <div class="tree-ring-section">
-            <div class="ring-header">
-                <!-- [나이테 섹션] 타이틀 그룹 부분 -->
-<div class="ring-title-group">
-    <span class="ring-label">ACTIVITY HISTORY</span>
-    
-    <!-- 💡 아래 h3 태그와 버튼에 position과 z-index를 추가하여 나이테 애니메이션 위로 버튼을 완전히 빼냅니다. -->
-    <h3 class="ring-main-title" style="position: relative; z-index: 100;">
-        활동 나이테 
-        <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
-    </h3>
+        <!-- [나이테 섹션 HTML] -->
+<div class="tree-ring-section">
+    <div class="ring-header">
+        <div class="ring-title-group">
+            <span class="ring-label">ACTIVITY HISTORY</span>
+            <h3 class="ring-main-title" style="position: relative; z-index: 100;">
+                활동 나이테 
+                <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
+            </h3>
+        </div>
+
+        <div class="ring-stats" style="text-align: right;">
+            <span id="activityMonths" class="ring-months-val">0</span>
+            <span class="ring-unit">Months</span>
+            <div id="ringLaunchedDate" style="font-size: 9px; color: #1ABC9C; font-family: monospace; font-weight: bold; margin-top: 4px; letter-spacing: 0.5px; opacity: 0.8;">LAUNCHED: ----.--.--</div>
+        </div>
+    </div>
+    <div id="treeRingContainer" class="ring-canvas"></div>
 </div>
+
+<!-- [나이테 렌더링 & 위성 진단 통합 스크립트] -->
+<script>
+async function renderTreeRings(mId, mName, memberLogs) {
+    const container = document.getElementById('treeRingContainer');
+    if (!container) return;
+    container.innerHTML = ''; // 기존 렌더링 초기화
+
+    // 1. 날짜 정제 함수 (Timestamp, Date, String 모두 호환)
+    const parseLogDate = (d) => {
+        if (!d) return new Date();
+        if (typeof d.toDate === 'function') return d.toDate();
+        if (d instanceof Date) return d;
+        return new Date(d);
+    };
+
+    // 2. 오즈 회원 데이터 진단 (모바일 alert 추적)
+    if (mName === "오즈" || mId === "오즈") {
+        const regLogs = memberLogs.filter(l => l.isRegular || (l.starType && String(l.starType).startsWith('regular')));
+        
+        let msg = `[오즈 나이테 위성 렌더링 진단]\n- 전체 로그: ${memberLogs.length}개\n- 정기산행 추출: ${regLogs.length}개\n\n`;
+        
+        if (regLogs.length === 0) {
+            msg += "⚠️ 정기산행 로그 조건(isRegular / starType)에 부합하는 데이터가 없습니다.";
+        } else {
+            regLogs.forEach((l, idx) => {
+                const dt = parseLogDate(l.date);
+                msg += `${idx + 1}. ${l.mountain}\n`;
+                msg += `   • starType: ${l.starType}\n`;
+                msg += `   • 날짜: ${dt.getFullYear()}.${dt.getMonth() + 1}\n`;
+                msg += `   • 좌표: (${l.coords?.x}, ${l.coords?.y})\n`;
+            });
+        }
+        alert(msg);
+    }
+
+    // 3. 나이테 원형 궤도 및 위성 별 그리기
+    if (!memberLogs || memberLogs.length === 0) return;
+
+    // 등록일/최초 활동일 기준 활동 개월 수 연산
+    const dates = memberLogs.map(l => parseLogDate(l.date).getTime());
+    const minDate = new Date(Math.min(...dates));
+    const now = new Date();
+    
+    const launchedStr = `${minDate.getFullYear()}.${String(minDate.getMonth() + 1).padStart(2, '0')}.${String(minDate.getDate()).padStart(2, '0')}`;
+    document.getElementById('ringLaunchedDate').innerText = `LAUNCHED: ${launchedStr}`;
+    
+    const totalMonths = Math.max(1, (now.getFullYear() - minDate.getFullYear()) * 12 + (now.getMonth() - minDate.getMonth()) + 1);
+    document.getElementById('activityMonths').innerText = totalMonths;
+
+    // 위성(정기산행) 로그만 필터링
+    const satelliteLogs = memberLogs.filter(log => log.isRegular || (log.starType && String(log.starType).startsWith('regular')));
+
+    // 위성 요소 생성 및 캔버스 추가
+    satelliteLogs.forEach((log) => {
+        const logDate = parseLogDate(log.date);
+        
+        // 가입/시작일 대비 해당 로그의 링 인덱스 연산 (최대 링 개수 넘지 않도록 안전 가드 적용)
+        const monthDiff = (logDate.getFullYear() - minDate.getFullYear()) * 12 + (logDate.getMonth() - minDate.getMonth());
+        const ringRadius = Math.min(20 + (monthDiff * 12), 140); // 캔버스 크기 대비 최대 반지름 제한
+
+        // starType별 위성 색상 매핑
+        let starColor = "#00FFFF";
+        const starTypeStr = String(log.starType || "");
+        if (starTypeStr.includes('_')) {
+            const colors = ["#00FFFF", "#D35400", "#D32F2F", "#7C4DFF"];
+            const idx = parseInt(starTypeStr.split('_')[1]) - 1;
+            starColor = colors[idx] || "#00FFFF";
+        }
+
+        // 위성 DOM 생성
+        const satellite = document.createElement('div');
+        satellite.className = 'tree-satellite-star';
+        
+        // 각도 무작위 또는 날짜 기반 분산 배치
+        const angle = (monthDiff * 137.5) % 360; 
+        const rad = (angle * Math.PI) / 180;
+        
+        // 중심점(50%, 50%) 기준 좌표 계산
+        const x = 50 + (ringRadius / 3) * Math.cos(rad);
+        const y = 50 + (ringRadius / 3) * Math.sin(rad);
+
+        satellite.style.cssText = `
+            position: absolute;
+            left: ${x}%;
+            top: ${y}%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: ${starColor};
+            box-shadow: 0 0 6px ${starColor}, 0 0 10px ${starColor};
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        `;
+        
+        container.appendChild(satellite);
+    });
+}
+</script>
 
                 <div class="ring-stats" style="text-align: right;">
                     <span id="activityMonths" class="ring-months-val">0</span>
@@ -9574,6 +9647,8 @@ const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
             </div>
             <div id="treeRingContainer" class="ring-canvas"></div>
         </div>
+
+            
 
         <!-- [산맥 비주얼 섹션] -->
         <div class="mountain-section">
