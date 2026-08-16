@@ -3238,15 +3238,16 @@ overflow: hidden;
           <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
           <div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
             <span class="text-[9px] font-bold text-gray-400">UP:</span>
-            <div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
-  <label class="!text-[9px]"><input type="radio" name="upAmount" value="0" checked>0</label>
-  <label class="!text-[9px]"><input type="radio" name="upAmount" value="1">1</label>
+            <!-- 변경 후 -->
+<div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
+  <label class="!text-[9px]"><input type="radio" name="upAmount" value="0">0</label>
+  <label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
   <label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
   <label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
   <label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
     <input type="checkbox" id="isQuarterCheck">
   </label>
-            </div>
+</div>
           </div>
         </div>
 
@@ -6960,23 +6961,26 @@ window.addMultiActivity = async () => {
 
             if (isRealHike && !isExtraHike) {
                 // 🎯 up > 0 일 때만 총 등산 횟수(count) 증가
-                if (realUpAmount > 0) {
-                    updateData.count = _increment(1); 
-                }
-                
-                updateData.lastDate = ts; 
+            if (isRealHike && !isExtraHike) {
+    // 🎯 0업일 때는 등산 횟수 증가 없음, 1업/2업/3업 수치만큼 count 증가
+    if (realUpAmount > 0) {
+        updateData.count = _increment(realUpAmount); 
+    }
+    
+    updateData.lastDate = ts; 
 
-                const logLoopCount = (isRegular || isQuarterOnlyOne || isOnlyLog || realUpAmount === 0) ? 1 : realUpAmount;
-                const finalHeightIncrement = height * logLoopCount; 
-                updateData.totalHeight = _increment(finalHeightIncrement); 
+    const logLoopCount = (isRegular || isQuarterOnlyOne || isOnlyLog || realUpAmount === 0) ? 1 : realUpAmount;
+    const finalHeightIncrement = height * logLoopCount; 
+    updateData.totalHeight = _increment(finalHeightIncrement); 
 
-                updateData[`quarterlyStats.${qKey}.hike`] = _increment(1);
-                updateData[`quarterlyStats.${qKey}.total`] = _increment(1);
-                
-                updateData.bonusDays = 0;
-                
-                const groupSize = selectedMemberIds.size;
-                const baseQCount = groupSize >= 3 ? 3 : groupSize; 
+    updateData[`quarterlyStats.${qKey}.hike`] = _increment(1);
+    updateData[`quarterlyStats.${qKey}.total`] = _increment(1);
+    
+    updateData.bonusDays = 0;
+    
+    const groupSize = selectedMemberIds.size;
+    const baseQCount = groupSize >= 3 ? 3 : groupSize; 
+ 
                 // 🎯 0업이어도 기본 분기 점수는 1배수로 획득
                 const multiplier = realUpAmount > 0 ? realUpAmount : 1; 
                 const qCountIncrement = baseQCount * multiplier; 
@@ -7117,9 +7121,10 @@ window.addMultiActivity = async () => {
             if (cb) cb.checked = false;
         });
 
-        // 🎯 0번 라디오 버튼 기본 재선택
-        const defaultRadio = document.querySelector('input[name="upAmount"][value="0"]');
-        if (defaultRadio) defaultRadio.checked = true;
+
+// 🎯 1번 라디오 버튼 기본 재선택
+const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
+if (defaultRadio) defaultRadio.checked = true;
 
         tempCoord = null; 
         const marker = document.getElementById('adminMapMarker');
