@@ -8305,6 +8305,40 @@ window.showMemberMountain = async (mId, mName) => {
 
 
 window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
+        // 나이테 위성별 연산 흐름 점검 진단 코드
+if (mName === "오즈" || mId === "오즈") {
+    getDocs(collection(db, `sanwoori/${mId}/logs`)).then(snap => {
+        const allLogs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // 1. DB 전체 로그 중 정기산행 데이터 추출 검사
+        const regLogs = allLogs.filter(l => l.isRegular || (l.starType && String(l.starType).startsWith('regular')));
+
+        if (regLogs.length === 0) {
+            alert("❌ [진단 실패] regular 로그 추출 조건문 불일치");
+            return;
+        }
+
+        let diagnosticMsg = `[오즈 나이테 위성 연산 점검]\n- 총 정기산행 개수: ${regLogs.length}개\n\n`;
+
+        regLogs.forEach((log, i) => {
+            // 날짜 및 링 위치 연산 점검
+            const logDate = log.date?.toDate ? log.date.toDate() : new Date(log.date);
+            const yearMonth = `${logDate.getFullYear()}.${logDate.getMonth() + 1}`;
+            
+            // 나이테 반지름/링 인덱스 계산 테스트 (프로젝트 내 계산 함수 적용)
+            const calculatedRing = typeof getRingIndex === 'function' ? getRingIndex(log.date) : "함수미정의";
+            
+            diagnosticMsg += `${i + 1}. ${log.mountain}\n`;
+            diagnosticMsg += `   • starType: ${log.starType}\n`;
+            diagnosticMsg += `   • 날짜: ${yearMonth}\n`;
+            diagnosticMsg += `   • 계산된 링 인덱스: ${calculatedRing}\n`;
+            diagnosticMsg += `   • 좌표: (${log.coords?.x}, ${log.coords?.y})\n`;
+        });
+
+        alert(diagnosticMsg);
+    });
+}
+
     const container = document.getElementById('treeRingContainer');
     const monthLabel = document.getElementById('activityMonths');
     const mainTitle = document.querySelector('.ring-main-title');
@@ -8659,30 +8693,7 @@ async function saveSpecialStarToMember(memberId, starType, quarterText, memberIn
 
 // 2. 은하수 메인 실행 함수
 window.showMilkyWay = async (mId, mName) => {
-        if (mName === "오즈" || mId === "오즈") {
-    getDocs(collection(db, `sanwoori/${mId}/logs`)).then(snap => {
-        const regularLogs = snap.docs
-            .map(d => ({ id: d.id, ...d.data() }))
-            .filter(l => l.isRegular || (l.starType && l.starType.startsWith('regular')));
-
-        if (regularLogs.length === 0) {
-            alert("⚠️ 오즈 경로에 정기산행 로그가 0개입니다!\n(mId 경로 불일치 가능성)");
-            return;
-        }
-
-        const sample = regularLogs[0];
-        const dateType = sample.date?.toDate ? "Timestamp(정상)" : typeof sample.date;
-        const coordsX = sample.coords ? sample.coords.x : "없음";
-
-        alert(
-            `[오즈 정기산행 데이터 점검]\n` +
-            `- 산 이름: ${sample.mountain}\n` +
-            `- starType: ${sample.starType}\n` +
-            `- coords.x: ${coordsX} (${typeof coordsX})\n` +
-            `- date 타입: ${dateType}`
-        );
-    });
-        }
+        
     const modal = document.getElementById('milkyWayModal');
     const board = document.getElementById('constellationBoard');
     const nameLabel = document.getElementById('mwMemberName');
