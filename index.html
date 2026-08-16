@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>산:우리 - 미니홈</title>
+        <!-- index.html 상단에 추가 -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script>
+
         <script>
 (function() {
   var userAgent = navigator.userAgent.toLowerCase();
@@ -8583,7 +8587,33 @@ container.appendChild(svg);
     }, 100);
 };
     
-                
+
+        // showMilkyWay(mId, mName) 함수 바로 아래에 추가
+if (mName === "오즈" || mId === "오즈") {
+    getDocs(collection(db, `sanwoori/${mId}/logs`)).then(snap => {
+        const regularLogs = snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(l => l.isRegular || (l.starType && l.starType.startsWith('regular')));
+
+        if (regularLogs.length === 0) {
+            alert("⚠️ 오즈 경로에 정기산행 로그가 0개입니다!\n(mId 경로 불일치 가능성)");
+            return;
+        }
+
+        const sample = regularLogs[0];
+        const dateType = sample.date?.toDate ? "Timestamp(정상)" : typeof sample.date;
+        const coordsX = sample.coords ? sample.coords.x : "없음";
+
+        alert(
+            `[오즈 정기산행 데이터 점검]\n` +
+            `- 산 이름: ${sample.mountain}\n` +
+            `- starType: ${sample.starType}\n` +
+            `- coords.x: ${coordsX} (${typeof coordsX})\n` +
+            `- date 타입: ${dateType}`
+        );
+    });
+}
+
   // ======================= [별 가이드 & 은하수 모듈 통합 - 연도 자동 저장 & 모달 최신화] =======================
 
 // 0. 최신 획득자(최신 왕좌) 판별 보조 함수
