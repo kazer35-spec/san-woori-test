@@ -3248,7 +3248,6 @@ overflow: hidden;
     <input type="checkbox" id="isQuarterCheck">
   </label>
 </div>
-          </div>
         </div>
 
         <div class="map-container" onclick="setAdminCoordinate(event)">
@@ -6959,8 +6958,7 @@ window.addMultiActivity = async () => {
             if (realUpAmount > 0) checkLevelUpgrade(member.name, oldLevel, newLevel);
             selectedNames.push(member.name);
 
-            if (isRealHike && !isExtraHike) {
-                // 🎯 up > 0 일 때만 총 등산 횟수(count) 증가
+        
             if (isRealHike && !isExtraHike) {
     // 🎯 0업일 때는 등산 횟수 증가 없음, 1업/2업/3업 수치만큼 count 증가
     if (realUpAmount > 0) {
