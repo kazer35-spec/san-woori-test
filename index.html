@@ -8301,7 +8301,9 @@ window.showMemberMountain = async (mId, mName) => {
 
 
 
-     window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
+     
+        
+        Window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const container = document.getElementById('treeRingContainer');
     const monthLabel = document.getElementById('activityMonths');
     const mainTitle = document.querySelector('.ring-main-title');
@@ -8309,10 +8311,12 @@ window.showMemberMountain = async (mId, mName) => {
 
     if (!container) return;
 
+    // [1] 초기화: 기존 내용 비우기 및 스타일 적용
     container.innerHTML = "";
     if (mainTitle) mainTitle.classList.add('cosmic-neon-text');
     if (mountainName) mountainName.classList.add('cosmic-neon-text');
 
+    // [2] 배경 별빛 생성
     const bgStarColors = ["#ffffff", "#facc15", "#3b82f6", "#ef4444"];
     for (let i = 0; i < 100; i++) {
         const star = document.createElement('div');
@@ -8335,104 +8339,84 @@ window.showMemberMountain = async (mId, mName) => {
         container.appendChild(star);
     }
 
+        // [3] 날짜 및 나이테 개수 계산 (만 개월수 로직 통합)
     const fixedList = ["오즈","나스","해수","용삼","지니","아랑","민이","몰랑","길치","등초","무니","식이","구름","뚜벅","윤윤","햄찌","이구","후후","튜브","피치","송돌","호프","애플","얌얌","태리","희야","멸치","성민","섭섭","하트"];
     const now = new Date();
     let jDate;
 
-    // 날짜 객체 안전 변환 헬퍼 함수
-    const parseDate = (dateVal) => {
-        if (!dateVal) return null;
-        if (typeof dateVal.toDate === 'function') return dateVal.toDate();
-        if (dateVal instanceof Date) return dateVal;
-        const parsed = new Date(dateVal);
-        return isNaN(parsed.getTime()) ? null : parsed;
-    };
-
     // A. 가입일 설정 로직
     if (fixedList.includes(memberName)) {
         jDate = new Date('2025-11-24T00:00:00');
-    } else if (regDate) {
-        jDate = parseDate(regDate) || new Date();
+    } else if (regDate?.toDate) {
+        // regDate가 있으면 사용
+        jDate = regDate.toDate();
     } else {
-        // B. regDate가 없을 경우: DB 조회 전 캐시 데이터를 우선 탐색
-        if (!window.mountainDataCache) window.mountainDataCache = {};
-        const cachedLogs = window.mountainDataCache[mId] || [];
-        if (cachedLogs.length > 0) {
-            const sortedDates = cachedLogs
-                .map(l => parseDate(l.date))
-                .filter(Boolean)
-                .sort((a, b) => a - b);
-            jDate = sortedDates[0] || new Date();
-        } else {
-            try {
-                const logsSnap = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "asc"), limit(1)));
-                if (!logsSnap.empty) {
-                    jDate = parseDate(logsSnap.docs[0].data().date) || new Date();
-                } else {
-                    jDate = new Date();
-                }
-            } catch (e) {
-                console.error("가입일 자동 산출 에러:", e);
-                jDate = new Date();
+        // B. regDate가 없으면? 첫 로그 날짜를 조회 (통합 로직)
+        try {
+            const logsSnap = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "asc"), limit(1)));
+            if (!logsSnap.empty) {
+                jDate = logsSnap.docs[0].data().date.toDate();
+            } else {
+                jDate = new Date(); // 로그도 없으면 오늘 날짜
             }
+        } catch (e) {
+            console.error("가입일 자동 산출 에러:", e);
+            jDate = new Date();
         }
     }
 
+    // 만 개월 수 계산 함수
     function getFullMonths(start, end) {
         let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+        // 오늘 일자가 가입일보다 작으면 한 달이 아직 안 찬 것이므로 -1
         if (end.getDate() < start.getDate()) {
             months--;
         }
-        return Math.max(0, months);
+        return Math.max(0, months); // 음수 방지
     }
 
     const elapsedMonths = getFullMonths(jDate, now);
+    // 나이테 개수: 가입 직후(0개월) 1개, 한 달 경과(1개월) 2개... 방식 적용
     const diffMonths = Math.max(1, elapsedMonths + 1);
 
+    // 레벨별 스타일 및 색상 추출
     const style = getLevelStyle(memberLevel);
-    const ringColor = style.border;
+    const ringColor = style.border; // 레벨 고유의 테두리 색상
 
+    // 🪐 [수정] 가입일 텍스트 매핑 및 반짝임(애니메이션) 없이 색상만 고정 적용
     const ringLaunchedEl = document.getElementById('ringLaunchedDate');
-    if (ringLaunchedEl && jDate) {
-        const yyyy = jDate.getFullYear();
-        const mm = String(jDate.getMonth() + 1).padStart(2, '0');
-        const dd = String(jDate.getDate()).padStart(2, '0');
-        
-        ringLaunchedEl.innerText = `LAUNCHED: ${yyyy}.${mm}.${dd}`;
-        ringLaunchedEl.style.color = ringColor;
-        ringLaunchedEl.style.textShadow = `0 0 5px ${ringColor}, 0 0 10px ${ringColor}`;
-        ringLaunchedEl.style.animation = "none"; 
-    }
+    // renderTreeRings 함수 내부 [3]번 영역 중 Launched 텍스트 세팅 부분 보정
+if (ringLaunchedEl && jDate) {
+    const yyyy = jDate.getFullYear();
+    const mm = String(jDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(jDate.getDate()).padStart(2, '0');
+    
+    ringLaunchedEl.innerText = `LAUNCHED: ${yyyy}.${mm}.${dd}`;
+    
+    ringLaunchedEl.style.color = ringColor;
+    ringLaunchedEl.style.textShadow = `0 0 5px ${ringColor}, 0 0 10px ${ringColor}`;
+    ringLaunchedEl.style.animation = "none"; 
+    // 💡 초기 선언 시 opacity를 건드리지 않고, 위의 showMemberMountain에서 
+    // glow-active 시점에 1로 켜주도록 열어둡니다.
+}
 
     const regularStarColors = ["#00FFFF", "#FF8C00", "#D32F2F", "#7C4DFF", "#A020F0", "#00FF7F"]; 
 
-    // 🎯 [수정된 캐시 & 데이터 수거 로직]
+
+    // [4] 정기산행 데이터 로드
     let regularHikesByMonth = {};
     try {
-        if (!window.mountainDataCache) window.mountainDataCache = {};
-        let rawLogs = window.mountainDataCache[mId];
-        
-        // 캐시가 없으면 Firestore에서 불러와 객체 배열 형태로 저장
-        if (!rawLogs) {
-            const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
-            rawLogs = snap.docs.map(doc => doc.data());
-            window.mountainDataCache[mId] = rawLogs;
-        }
-
-        rawLogs.forEach(data => {
-            // docSnapshot 객체가 바로 들어가 있을 경우를 대비한 안전 처리
-            const logData = typeof data.data === 'function' ? data.data() : data;
-
-            if (logData && logData.isRegular && logData.date) {
-                const hikeDate = parseDate(logData.date);
-                if (!hikeDate) return;
-
+        const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
+        snap.forEach(doc => {
+            const data = doc.data();
+            if (data.isRegular && data.date) {
+                const hikeDate = data.date.toDate();
+                // 해당 산행이 가입일로부터 몇 번째 '만 개월' 영역에 있는지 계산
                 const monthIdx = getFullMonths(jDate, hikeDate);
                 if (monthIdx >= 0 && monthIdx < diffMonths) {
                     if (!regularHikesByMonth[monthIdx]) regularHikesByMonth[monthIdx] = [];
-                    
-                    let starType = logData.starType;
-                    if (!starType || typeof starType !== 'string' || !starType.startsWith('regular')) {
+                    let starType = data.starType;
+                    if (!starType || !starType.startsWith('regular')) {
                         const randIdx = Math.floor(Math.random() * regularStarColors.length);
                         starType = `regular_${randIdx + 1}`;
                     }
@@ -8440,9 +8424,7 @@ window.showMemberMountain = async (mId, mName) => {
                 }
             }
         });
-    } catch (e) { 
-        console.error("나이테 로그 로드 에러:", e); 
-    }
+    } catch (e) { console.error("나이테 로그 로드 에러:", e); }
 
     // [5] SVG 및 중앙 코어 생성
     const svgNS = "http://www.w3.org/2000/svg";
@@ -8450,63 +8432,58 @@ window.showMemberMountain = async (mId, mName) => {
     svg.setAttribute("viewBox", "0 0 240 240");
     svg.style.cssText = "width:100%; height:100%; overflow:visible;";
 
-    let coreShape;
-    const cx = 120, cy = 120, r = 6;
+    // --- [중앙 코어 생성: 레벨별 모양 변경 로직] ---
+let coreShape;
+const cx = 120, cy = 120, r = 6; // 중심 좌표와 크기
 
-    if (memberLevel >= 80) {
-        coreShape = document.createElementNS(svgNS, "polygon");
-        let points = "";
-        for (let i = 0; i < 10; i++) {
-            let angle = (i * Math.PI) / 5 - Math.PI / 2;
-            let currR = (i % 2 === 0) ? r * 1.5 : r * 0.6;
-            points += `${cx + currR * Math.cos(angle)},${cy + currR * Math.sin(angle)} `;
-        }
-        coreShape.setAttribute("points", points);
-    } else if (memberLevel >= 50) {
-        coreShape = document.createElementNS(svgNS, "polygon");
-        coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy} ${cx},${cy+r*1.2} ${cx-r*1.2},${cy}`);
-    } else if (memberLevel >= 20) {
-        coreShape = document.createElementNS(svgNS, "polygon");
-        coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy+r} ${cx-r*1.2},${cy+r}`);
-    } else {
-        coreShape = document.createElementNS(svgNS, "circle");
-        coreShape.setAttribute("cx", cx);
-        coreShape.setAttribute("cy", cy);
-        coreShape.setAttribute("r", r);
-    }
+if (memberLevel >= 80) {
+// 80레벨 이상: 별 모양 (Polygon)
+coreShape = document.createElementNS(svgNS, "polygon");
+let points = "";
+for (let i = 0; i < 10; i++) {
+let angle = (i * Math.PI) / 5 - Math.PI / 2;
+let currR = (i % 2 === 0) ? r * 1.5 : r * 0.6;
+points += `${cx + currR * Math.cos(angle)},${cy + currR * Math.sin(angle)} `;
+}
+coreShape.setAttribute("points", points);
+} else if (memberLevel >= 50) {
+// 50~79레벨: 다이아몬드 (Polygon)
+coreShape = document.createElementNS(svgNS, "polygon");
+coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy} ${cx},${cy+r*1.2} ${cx-r*1.2},${cy}`);
+} else if (memberLevel >= 20) {
+// 20~49레벨: 삼각형 (Polygon)
+coreShape = document.createElementNS(svgNS, "polygon");
+coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy+r} ${cx-r*1.2},${cy+r}`);
+} else {
+// 1~19레벨: 원형 (Circle)
+coreShape = document.createElementNS(svgNS, "circle");
+coreShape.setAttribute("cx", cx);
+coreShape.setAttribute("cy", cy);
+coreShape.setAttribute("r", r);
+}
 
-    coreShape.setAttribute("fill", ringColor);
-    coreShape.classList.add('tree-ring-core-moving');
-    coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
-    svg.appendChild(coreShape);
+// 공통 스타일 및 애니메이션 적용
+coreShape.setAttribute("fill", ringColor);
+coreShape.classList.add('tree-ring-core-moving');
+coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
+svg.appendChild(coreShape);
+// --- [교체 완료] ---
 
-    // [6] 나이테 및 위성 별 생성 (로그 스케일 & 밀도 감쇄 적용)
+    // [6] 나이테 및 위성 별 생성
     const rings = [];
     const satellites = [];
     const seed = memberName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
-    const minRadius = 14;  
-    const maxRadius = 102; 
-
-    const waveAmp = Math.max(0.6, 2.5 - (diffMonths * 0.03)); 
-    const starRadius = diffMonths > 36 ? "1.3" : "1.8";
-
     for (let i = 0; i < diffMonths; i++) {
+        const radius = 10 + ((i + 1) * (95 / diffMonths));
         const path = document.createElementNS(svgNS, "path");
         path.setAttribute("class", "tree-ring-path");
-
-        const progress = Math.log10(1 + (i + 1)) / Math.log10(1 + diffMonths);
-        const radius = minRadius + progress * (maxRadius - minRadius);
-
-        const baseStrokeWidth = diffMonths > 48 ? "0.2" : (diffMonths > 24 ? "0.28" : "0.35");
-        const isYearRing = (i + 1) % 12 === 0;
-        const strokeWidth = isYearRing ? "1.0" : baseStrokeWidth;
 
         let d = "";
         let points = [];
         for (let a = 0; a <= 360; a += 6) {
             const angle = (a * Math.PI) / 180;
-            const wave = Math.sin(angle * (seed % 4 + 3) + (i + 1)) * waveAmp;
+            const wave = Math.sin(angle * (seed % 4 + 3) + (i + 1)) * 2.5;
             const r = radius + wave;
             const x = 120 + r * Math.cos(angle);
             const y = 120 + r * Math.sin(angle);
@@ -8518,18 +8495,16 @@ window.showMemberMountain = async (mId, mName) => {
         path.setAttribute("d", d);
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", ringColor);
-        path.setAttribute("stroke-width", strokeWidth); 
+        path.setAttribute("stroke-width", (i + 1) % 12 === 0 ? "1.2" : "0.35"); 
         path.setAttribute("stroke-opacity", "0");
         path.style.transition = "stroke-opacity 0.5s ease-in, stroke-width 0.5s ease";
 
         svg.appendChild(path);
         rings.push(path);
 
-        // 위성 별 생성
         if (regularHikesByMonth[i]) {
             regularHikesByMonth[i].forEach(starType => {
-                const parts = starType.split('_');
-                const colorIdx = parts.length > 1 ? parseInt(parts[1]) - 1 : 0;
+                const colorIdx = parseInt(starType.split('_')[1]) - 1;
                 const starColor = regularStarColors[colorIdx] || "#ffffff";
                 const pointIdx = Math.floor(Math.random() * (points.length - 1));
                 const pos = points[pointIdx];
@@ -8537,7 +8512,7 @@ window.showMemberMountain = async (mId, mName) => {
                 const satellite = document.createElementNS(svgNS, "circle");
                 satellite.setAttribute("cx", pos.x);
                 satellite.setAttribute("cy", pos.y);
-                satellite.setAttribute("r", starRadius);
+                satellite.setAttribute("r", "1.8");
                 satellite.setAttribute("fill", starColor);
                 satellite.setAttribute("opacity", "0");
                 satellite.style.filter = `drop-shadow(0 0 3px ${starColor}) brightness(1.2)`;
@@ -8596,6 +8571,9 @@ window.showMemberMountain = async (mId, mName) => {
         }
     }, 100);
 };
+
+
+이코드에선 정상작동 하거든? 확인해줘
 
     
                 
