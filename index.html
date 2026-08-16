@@ -5985,6 +5985,9 @@ window.openGrassInfoModal = function(event) {
         <div>
 <strong>분기 선택:</strong> 메인화면 1분기 2분기 3분기 4분기 선택시 해당 분기로 이동
   </div>
+  <div>
+         <strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong>3단계로 색상</strong>이 변화합니다.
+            </div>
         <div>
     <strong>잔디 생성:</strong> 일정, 정기산행을 제외 한 <strong>모든 개인 운동 및 산행</strong>은 단톡방에 <strong>인증 사진(정상, 기록 등)</strong>만 공유해도 자동 기록·생성됩니다.
 </div>
@@ -5998,9 +6001,7 @@ window.openGrassInfoModal = function(event) {
             <div>
                 <strong>잔디 나비:</strong> 분기 <strong>4주 연속 일정 산행 시</strong> 1~2마리의 나비가 랜덤으로 생성됩니다.
             </div>
-            <div>
-                <strong>운동 잔디:</strong> 분기 동안의 나의 산행 및 운동 빈도를 시각화하며, 하루 활동 횟수에 따라 <strong>3단계로 색상</strong>이 변화합니다.
-            </div>
+        
             <div>
                 <strong>특별한 잔디:</strong> 정기 산행 시 계절 마크가 포함된 <strong>무지개 엠보싱 프리미엄 잔디</strong>가 생성됩니다.
             </div>
@@ -6058,7 +6059,8 @@ window.openMountainInfoModal = function(type, event) {
         title = "🌀 활동 나이테 안내";
         body = `
             <ul>
-                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>경과한 만 개월 수</strong>마다 동심원이 추가되며 1년마다 하나씩 굵어집니다.</li>
+                <li><strong>나이테:</strong> 10가지 알고리즘 패턴 중 랜덤으로 하나의<strong> 고유한 형태의 나이테</strong>가 그려집니다.</li>
+                <li><strong>나이테 선(Ring):</strong> 가입월부터 현재까지 <strong>만 개월 수</strong>마다 동심원이 추가되며 1년마다 하나씩 굵어집니다.</li>
                 <li><strong>중심 코어 모양:</strong> 회원 레벨에 따라 다채롭게 변경됩니다.
                     <br>• 1~19 레벨: <strong>○ (원)</strong>
                     <br>• 20~49 레벨: <strong>△ (삼각형)</strong>
@@ -8299,7 +8301,7 @@ window.showMemberMountain = async (mId, mName) => {
     }
 };
 
-
+ 
 window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const container = document.getElementById('treeRingContainer');
     const monthLabel = document.getElementById('activityMonths');
@@ -8313,7 +8315,25 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     if (mainTitle) mainTitle.classList.add('cosmic-neon-text');
     if (mountainName) mountainName.classList.add('cosmic-neon-text');
 
-    // [2] 배경 별빛 생성
+    // [2] 캐시 키 및 유효시간 설정 (6시간)
+    const CACHE_KEY = `tree_ring_cache_${mId}_${memberName}`;
+    const CACHE_EXPIRE_TIME = 6 * 60 * 60 * 1000;
+    
+    let cachedData = null;
+    try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Date.now() - parsed.timestamp < CACHE_EXPIRE_TIME) {
+                cachedData = parsed;
+            }
+        }
+    } catch (e) {
+        console.warn("캐시 로드 실패:", e);
+    }
+
+    // [3] 배경 별빛 생성 (DOM Reflow 절약 optimization)
+    const fragment = document.createDocumentFragment();
     const bgStarColors = ["#ffffff", "#facc15", "#3b82f6", "#ef4444"];
     for (let i = 0; i < 100; i++) {
         const star = document.createElement('div');
@@ -8333,15 +8353,18 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
             pointer-events: none;
             box-shadow: 0 0 3px ${starColor};
         `;
-        container.appendChild(star);
+        fragment.appendChild(star);
     }
+    container.appendChild(fragment);
 
-    // [3] 날짜 및 만 개월수 계산
+    // [4] 날짜 및 만 개월수 계산 (캐시 활용)
     const fixedList = ["오즈","나스","해수","용삼","지니","아랑","민이","몰랑","길치","등초","무니","식이","구름","뚜벅","윤윤","햄찌","이구","후후","튜브","피치","송돌","호프","애플","얌얌","태리","희야","멸치","성민","섭섭","하트"];
     const now = new Date();
     let jDate;
 
-    if (fixedList.includes(memberName)) {
+    if (cachedData?.joinDateStr) {
+        jDate = new Date(cachedData.joinDateStr);
+    } else if (fixedList.includes(memberName)) {
         jDate = new Date('2025-11-24T00:00:00');
     } else if (regDate?.toDate) {
         jDate = regDate.toDate();
@@ -8370,7 +8393,6 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const elapsedMonths = getFullMonths(jDate, now);
     const totalMonths = Math.max(1, elapsedMonths + 1);
 
-    // 표시 개수 제한 (최근 최대 18개) 및 오프셋
     const MAX_VISIBLE_RINGS = 18;
     const displayRingCount = Math.min(totalMonths, MAX_VISIBLE_RINGS);
     const startMonthIdx = Math.max(0, totalMonths - MAX_VISIBLE_RINGS);
@@ -8392,31 +8414,33 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
     const regularStarColors = ["#00FFFF", "#FF8C00", "#D32F2F", "#7C4DFF", "#A020F0", "#00FF7F"]; 
 
-    // [4] 정기산행 데이터 로드
-    let regularHikesByMonth = {};
-    try {
-        const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
-        snap.forEach(doc => {
-            const data = doc.data();
-            if (data.isRegular && data.date) {
-                const hikeDate = data.date.toDate();
-                const monthIdx = getFullMonths(jDate, hikeDate);
-                const visibleRingIdx = monthIdx - startMonthIdx;
+    // [5] 정기산행 데이터 로드 (캐시 우선 절약 로직)
+    let regularHikesByMonth = cachedData?.regularHikesByMonth || {};
+    if (!cachedData) {
+        try {
+            const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (data.isRegular && data.date) {
+                    const hikeDate = data.date.toDate();
+                    const monthIdx = getFullMonths(jDate, hikeDate);
+                    const visibleRingIdx = monthIdx - startMonthIdx;
 
-                if (visibleRingIdx >= 0 && visibleRingIdx < displayRingCount) {
-                    if (!regularHikesByMonth[visibleRingIdx]) regularHikesByMonth[visibleRingIdx] = [];
-                    let starType = data.starType;
-                    if (!starType || !starType.startsWith('regular')) {
-                        const randIdx = Math.floor(Math.random() * regularStarColors.length);
-                        starType = `regular_${randIdx + 1}`;
+                    if (visibleRingIdx >= 0 && visibleRingIdx < displayRingCount) {
+                        if (!regularHikesByMonth[visibleRingIdx]) regularHikesByMonth[visibleRingIdx] = [];
+                        let starType = data.starType;
+                        if (!starType || !starType.startsWith('regular')) {
+                            const randIdx = Math.floor(Math.random() * regularStarColors.length);
+                            starType = `regular_${randIdx + 1}`;
+                        }
+                        regularHikesByMonth[visibleRingIdx].push(starType);
                     }
-                    regularHikesByMonth[visibleRingIdx].push(starType);
                 }
-            }
-        });
-    } catch (e) { console.error("나이테 로그 로드 에러:", e); }
+            });
+        } catch (e) { console.error("나이테 로그 로드 에러:", e); }
+    }
 
-    // [5] SVG 및 중앙 코어 생성
+    // [6] SVG 및 코어 생성
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", "0 0 240 240");
@@ -8452,59 +8476,40 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
     svg.appendChild(coreShape);
 
-    // =========================================================
-    // [6] 10가지 알고리즘 패턴 적용 나이테 생성
-    // =========================================================
+    // [7] 나이테 알고리즘 연산
     const rings = [];
     const satellites = [];
     const seed = memberName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
-    // 🎲 10가지 알고리즘 변수 계산
-    const shapeType = seed % 10;           // 0 ~ 9 (총 10가지 모양)
-    const freq1 = (seed % 6) + 3;         // 3 ~ 8 주름 주기
-    const freq2 = ((seed >> 2) % 5) + 2;  // 2 ~ 6 보조 주기
-    const amp = 1.8 + (seed % 20) / 10;   // 1.8 ~ 3.8 파동 높이
+    const shapeType = seed % 10;
+    const freq1 = (seed % 6) + 3;
+    const freq2 = ((seed >> 2) % 5) + 2;
+    const amp = 1.8 + (seed % 20) / 10;
 
     function getWaveOffset(angle, month) {
         switch (shapeType) {
-            case 0: // 복합 정현파 (Sin + Cos 조합)
-                return Math.sin(angle * freq1 + month) * amp + Math.cos(angle * freq2) * (amp * 0.5);
-            case 1: // 단일 여현파
-                return Math.cos(angle * freq1 + month * 0.5) * amp;
-            case 2: // 이중 정현파
-                return Math.sin(angle * freq1 + month) * amp + Math.sin(angle * 2) * (amp * 0.7);
-            case 3: // 스텝형 각진 파동
-                return (Math.sin(angle * freq1 + month) > 0 ? 1 : -1) * (amp * 0.6) + Math.sin(angle * freq2) * amp;
-            case 4: // 교차 정현파 (Sin * Cos)
-                return Math.sin(angle * freq1) * Math.cos(angle * freq2 + month) * (amp * 1.2);
-            case 5: // 3엽 꽃잎형 웨이브
-                return Math.sin(angle * 3) * Math.sin(angle * freq1 + month) * amp + Math.cos(angle * freq2) * (amp * 0.5);
-            case 6: // 4축 유기체 둥근 웨이브
-                return Math.cos(angle * 4 + month) * (amp * 0.9) + Math.sin(angle * freq1) * (amp * 0.5);
-            case 7: // 5각 스타형 오프셋
-                return Math.sin(angle * 5 + month * 0.8) * (amp * 0.7) + Math.cos(angle * freq1) * (amp * 0.6);
-            case 8: // 맥박형 절곡 리플 (절대값 파동)
-                return Math.abs(Math.sin(angle * (freq1 / 2) + month)) * (amp * 1.4) - (amp * 0.7);
-            case 9: // 고차 조화파 (Dual-harmonic)
+            case 0: return Math.sin(angle * freq1 + month) * amp + Math.cos(angle * freq2) * (amp * 0.5);
+            case 1: return Math.cos(angle * freq1 + month * 0.5) * amp;
+            case 2: return Math.sin(angle * freq1 + month) * amp + Math.sin(angle * 2) * (amp * 0.7);
+            case 3: return (Math.sin(angle * freq1 + month) > 0 ? 1 : -1) * (amp * 0.6) + Math.sin(angle * freq2) * amp;
+            case 4: return Math.sin(angle * freq1) * Math.cos(angle * freq2 + month) * (amp * 1.2);
+            case 5: return Math.sin(angle * 3) * Math.sin(angle * freq1 + month) * amp + Math.cos(angle * freq2) * (amp * 0.5);
+            case 6: return Math.cos(angle * 4 + month) * (amp * 0.9) + Math.sin(angle * freq1) * (amp * 0.5);
+            case 7: return Math.sin(angle * 5 + month * 0.8) * (amp * 0.7) + Math.cos(angle * freq1) * (amp * 0.6);
+            case 8: return Math.abs(Math.sin(angle * (freq1 / 2) + month)) * (amp * 1.4) - (amp * 0.7);
+            case 9:
             default:
                 return Math.sin(angle * freq1) * Math.sin(angle * freq2 + month * 1.2) * amp + Math.cos(angle * 2) * (amp * 0.8);
         }
     }
 
-    // 📐 반지름 고정 범위: 최소(22px) ~ 최대 고정(102px)
     const R_MIN = 22;
     const R_MAX = 102;
 
     for (let i = 0; i < displayRingCount; i++) {
         const actualMonth = startMonthIdx + i + 1;
         
-        let radius;
-        if (displayRingCount === 1) {
-            radius = R_MAX;
-        } else {
-            const stepRadius = (R_MAX - R_MIN) / (displayRingCount - 1);
-            radius = R_MIN + (i * stepRadius);
-        }
+        let radius = (displayRingCount === 1) ? R_MAX : R_MIN + (i * ((R_MAX - R_MIN) / (displayRingCount - 1)));
 
         const path = document.createElementNS(svgNS, "path");
         path.setAttribute("class", "tree-ring-path");
@@ -8559,9 +8564,21 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     }
     container.appendChild(svg);
 
-    // =========================================================
-    // [7] 애니메이션 실행 (중앙 ➔ 외곽 순차 확장)
-    // =========================================================
+    // [8] 새로 조회한 연산 결과 localStorage에 저장 (절약 데이터 갱신)
+    if (!cachedData) {
+        try {
+            const cacheToSave = {
+                timestamp: Date.now(),
+                joinDateStr: jDate.toISOString(),
+                regularHikesByMonth: regularHikesByMonth
+            };
+            localStorage.setItem(CACHE_KEY, JSON.stringify(cacheToSave));
+        } catch (e) {
+            console.warn("캐시 저장 실패:", e);
+        }
+    }
+
+    // [9] 애니메이션 순차 실행
     const totalAnimTime = 1000; 
     const delayStep = Math.min(50, totalAnimTime / displayRingCount);
 
@@ -8599,8 +8616,9 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         }, index * delayStep);
     });
 
-    // [8] 내부 코어 추가 별빛
+    // [10] 내부 코어 추가 별빛
     setTimeout(() => {
+        const starFragment = document.createDocumentFragment();
         for (let i = 0; i < 20; i++) {
             const starInner = document.createElement('div');
             starInner.style.cssText = `
@@ -8610,13 +8628,13 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
                 background: white; border-radius: 50%; opacity: 0;
                 animation: twinkle ${Math.random() * 2 + 1}s infinite;
             `;
-            container.appendChild(starInner);
+            starFragment.appendChild(starInner);
             setTimeout(() => starInner.style.opacity = Math.random(), 500);
         }
+        container.appendChild(starFragment);
     }, 100);
 };
-
-                            
+             
                 
                     
                 
