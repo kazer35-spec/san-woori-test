@@ -9517,31 +9517,99 @@ const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
 
                              </script>
 
-<div id="mountainViewModal" class="mountain-modal" onclick="this.style.display='none'">
+            
+        <div id="mountainViewModal" class="mountain-modal" onclick="this.style.display='none'">
     <div id="integratedCard" class="integrated-member-card" onclick="event.stopPropagation()">
 
         <!-- [나이테 섹션 HTML] -->
-<div class="tree-ring-section">
-    <div class="ring-header">
-        <div class="ring-title-group">
-            <span class="ring-label">ACTIVITY HISTORY</span>
-            <h3 class="ring-main-title" style="position: relative; z-index: 100;">
-                활동 나이테 
-                <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
-            </h3>
+        <div class="tree-ring-section">
+            <div class="ring-header">
+                <div class="ring-title-group">
+                    <span class="ring-label">ACTIVITY HISTORY</span>
+                    <h3 class="ring-main-title" style="position: relative; z-index: 100;">
+                        활동 나이테 
+                        <button class="info-help-btn" onclick="event.stopPropagation(); openMountainInfoModal('ring');" title="활동 나이테 안내" style="position: relative; z-index: 101; pointer-events: auto; cursor: pointer;">ⓘ</button>
+                    </h3>
+                </div>
+
+                <div class="ring-stats" style="text-align: right;">
+                    <span id="activityMonths" class="ring-months-val">0</span>
+                    <span class="ring-unit">Months</span>
+                    <div id="ringLaunchedDate" style="font-size: 9px; color: #1ABC9C; font-family: monospace; font-weight: bold; margin-top: 4px; letter-spacing: 0.5px; opacity: 0.8;">LAUNCHED: ----.--.--</div>
+                </div>
+            </div>
+            <div id="treeRingContainer" class="ring-canvas"></div>
         </div>
 
-        <div class="ring-stats" style="text-align: right;">
-            <span id="activityMonths" class="ring-months-val">0</span>
-            <span class="ring-unit">Months</span>
-            <div id="ringLaunchedDate" style="font-size: 9px; color: #1ABC9C; font-family: monospace; font-weight: bold; margin-top: 4px; letter-spacing: 0.5px; opacity: 0.8;">LAUNCHED: ----.--.--</div>
+        <!-- [산맥 비주얼 섹션] -->
+        <div class="mountain-section">
+            <div id="starrySky"></div>
+            <div id="bgLayersContainer"></div>
+            <div id="lightBeam" class="light-beam"></div>
+            <div id="peakLayer" class="mountain-layer"></div>
+
+            <div class="mountain-header">
+                <h2 id="mwMountainName" style="font-size: 16px; margin: 0; font-weight: 900; color: white;"></h2>
+                <p style="font-size: 15px; color: #94a3b8; margin: 0;"></p>
+            </div>
+
+            <div id="highestPeakLabel" class="highest-peak-label"></div>
+
+            <div class="mountain-info-bar">
+                <div class="info-item">개인 누적 <span id="myTotalH" class="info-val">0</span>m</div>
+                <div class="info-item">산우리 합산 <span id="globalTotalH" class="info-val">0</span>m</div>
+            </div>
         </div>
+
+        <!-- ➕ 도움말 안내 팝업 모달 -->
+        <div id="mwInfoHelpModal" class="mw-info-modal" onclick="closeMountainInfoModal(event)">
+            <div class="mw-info-card" onclick="event.stopPropagation()">
+                <div class="mw-info-header">
+                    <span id="mwInfoModalTitle" class="mw-info-title">도움말</span>
+                    <button class="mw-info-close-btn" onclick="closeMountainInfoModal()">&times;</button>
+                </div>
+                <div id="mwInfoModalBody" class="mw-info-body">
+                    <!-- 자바스크립트로 동적 동기화 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 닫기 버튼 -->
+        <button onclick="document.getElementById('mountainViewModal').style.display='none'" style="position:absolute; top:15px; right:15px; color:white; background:none; border:none; font-size:24px; cursor:pointer; z-index:201;">&times;</button>
     </div>
-    <div id="treeRingContainer" class="ring-canvas"></div>
 </div>
 
-<!-- [나이테 렌더링 & 위성 진단 통합 스크립트] -->
-    <script>
+
+<!-- [모던 산우리 운동 리포트 모달 레이어] -->
+<div id="scrollModal" class="scroll-overlay" style="display: none;">
+    <div class="fading-scroll">
+
+        <!-- 헤더 영역 -->
+        <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center;">
+            <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
+            <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
+            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
+        </div>
+
+        <!-- 스크롤 컨텐츠 영역 -->
+        <div id="scrollContent" class="scroll-body"></div>
+
+        <!-- 하단 푸터 영역 -->
+        <div class="scroll-footer">
+            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()"></button>
+        </div>
+        
+    </div>
+</div>
+
+<!-- 잔디 팝업 -->
+<div id="grassPopup" class="hidden" style="position: absolute; z-index: 9999; background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; min-width: 140px; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+    <div id="popupDate" style="font-size: 10px; font-weight: bold; color: #94a3b8; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; margin-bottom: 8px;"></div>
+    <div id="popupContent" style="display: flex; flex-direction: column; gap: 4px;"></div>
+</div>
+
+<!-- [나이테 렌더링 & 위성 진단 전용 스크립트] -->
+<script>
 async function renderTreeRings(mId, mName, memberLogs) {
     const container = document.getElementById('treeRingContainer');
     if (!container) return;
@@ -9557,16 +9625,16 @@ async function renderTreeRings(mId, mName, memberLogs) {
 
     // 2. 오즈 회원 데이터 진단 (모바일 alert 추적)
     if (mName === "오즈" || mId === "오즈") {
-        const regLogs = memberLogs.filter(l => l.isRegular || (l.starType && String(l.starType).startsWith('regular')));
+        const regLogs = (memberLogs || []).filter(l => l.isRegular || (l.starType && String(l.starType).startsWith('regular')));
         
-        let msg = `[오즈 나이테 위성 렌더링 진단]\n- 전체 로그: ${memberLogs.length}개\n- 정기산행 추출: ${regLogs.length}개\n\n`;
+        let msg = `[오즈 나이테 위성 렌더링 진단]\n- 전체 로그: ${memberLogs ? memberLogs.length : 0}개\n- 정기산행 추출: ${regLogs.length}개\n\n`;
         
         if (regLogs.length === 0) {
             msg += "⚠️ 정기산행 로그 조건(isRegular / starType)에 부합하는 데이터가 없습니다.";
         } else {
             regLogs.forEach((l, idx) => {
                 const dt = parseLogDate(l.date);
-                msg += `${idx + 1}. ${l.mountain}\n`;
+                msg += `${idx + 1}. ${l.mountain || '산 이름 없음'}\n`;
                 msg += `   • starType: ${l.starType}\n`;
                 msg += `   • 날짜: ${dt.getFullYear()}.${dt.getMonth() + 1}\n`;
                 msg += `   • 좌표: (${l.coords?.x}, ${l.coords?.y})\n`;
@@ -9584,10 +9652,12 @@ async function renderTreeRings(mId, mName, memberLogs) {
     const now = new Date();
     
     const launchedStr = `${minDate.getFullYear()}.${String(minDate.getMonth() + 1).padStart(2, '0')}.${String(minDate.getDate()).padStart(2, '0')}`;
-    document.getElementById('ringLaunchedDate').innerText = `LAUNCHED: ${launchedStr}`;
+    const elLaunched = document.getElementById('ringLaunchedDate');
+    if (elLaunched) elLaunched.innerText = `LAUNCHED: ${launchedStr}`;
     
     const totalMonths = Math.max(1, (now.getFullYear() - minDate.getFullYear()) * 12 + (now.getMonth() - minDate.getMonth()) + 1);
-    document.getElementById('activityMonths').innerText = totalMonths;
+    const elMonths = document.getElementById('activityMonths');
+    if (elMonths) elMonths.innerText = totalMonths;
 
     // 위성(정기산행) 로그만 필터링
     const satelliteLogs = memberLogs.filter(log => log.isRegular || (log.starType && String(log.starType).startsWith('regular')));
@@ -9596,7 +9666,7 @@ async function renderTreeRings(mId, mName, memberLogs) {
     satelliteLogs.forEach((log) => {
         const logDate = parseLogDate(log.date);
         
-        // 가입/시작일 대비 해당 로그의 링 인덱스 연산 (최대 링 개수 넘지 않도록 안전 가드 적용)
+        // 가입/시작일 대비 해당 로그의 링 인덱스 연산
         const monthDiff = (logDate.getFullYear() - minDate.getFullYear()) * 12 + (logDate.getMonth() - minDate.getMonth());
         const ringRadius = Math.min(20 + (monthDiff * 12), 140); // 캔버스 크기 대비 최대 반지름 제한
 
@@ -9612,7 +9682,7 @@ async function renderTreeRings(mId, mName, memberLogs) {
         // 위성 DOM 생성
         const satellite = document.createElement('div');
         satellite.className = 'tree-satellite-star';
-        
+
         // 각도 무작위 또는 날짜 기반 분산 배치
         const angle = (monthDiff * 137.5) % 360; 
         const rad = (angle * Math.PI) / 180;
@@ -9637,91 +9707,8 @@ async function renderTreeRings(mId, mName, memberLogs) {
         container.appendChild(satellite);
     });
 }
-
-
-                <div class="ring-stats" style="text-align: right;">
-                    <span id="activityMonths" class="ring-months-val">0</span>
-                    <span class="ring-unit">Months</span>
-                    <div id="ringLaunchedDate" style="font-size: 9px; color: #1ABC9C; font-family: monospace; font-weight: bold; margin-top: 4px; letter-spacing: 0.5px; opacity: 0.8;">LAUNCHED: ----.--.--</div>
-                </div>
-            </div>
-            <div id="treeRingContainer" class="ring-canvas"></div>
-        </div>
-
-            
-
-        <!-- [산맥 비주얼 섹션] -->
-        <div class="mountain-section">
-            <div id="starrySky"></div>
-            <div id="bgLayersContainer"></div>
-            <div id="lightBeam" class="light-beam"></div>
-            <div id="peakLayer" class="mountain-layer"></div>
-
-            <div class="mountain-header">
-                <h2 id="mwMountainName" style="font-size: 16px; margin: 0; font-weight: 900; color: white;"></h2>
-                <p style="font-size: 15px; color: #94a3b8; margin: 0;"></p>
-            </div>
-
-            <div id="highestPeakLabel" class="highest-peak-label"></div>
-
-            <div class="mountain-info-bar">
-                <div class="info-item">개인 누적 <span id="myTotalH" class="info-val">0</span>m</div>
-                <div class="info-item">산우리 합산 <span id="globalTotalH" class="info-val">0</span>m</div>
-            </div>
-        </div>
-
-        <!-- ➕ [신규 추가] 도움말 안내 팝업 모달 -->
-        <div id="mwInfoHelpModal" class="mw-info-modal" onclick="closeMountainInfoModal(event)">
-            <div class="mw-info-card" onclick="event.stopPropagation()">
-                <div class="mw-info-header">
-                    <span id="mwInfoModalTitle" class="mw-info-title">도움말</span>
-                    <button class="mw-info-close-btn" onclick="closeMountainInfoModal()">&times;</button>
-                </div>
-                <div id="mwInfoModalBody" class="mw-info-body">
-                    <!-- 자바스크립트로 동적 동기화 -->
-                </div>
-            </div>
-        </div>
-
-        <button onclick="document.getElementById('mountainViewModal').style.display='none'" style="position:absolute; top:15px; right:15px; color:white; background:none; border:none; font-size:24px; cursor:pointer; z-index:201;">&times;</button>
-    </div>
-</div>
-
-
-<!-- [모던 산우리 운동 리포트 모달 레이어] -->
-<div id="scrollModal" class="scroll-overlay" style="display: none;">
-    <div class="fading-scroll">
-
-        <!-- 헤더 영역 -->
-        <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center;">
-            <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
-            <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
-            <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
-            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
-        </div>
-
-        <!-- 스크롤 컨텐츠 영역 -->
-        <div id="scrollContent" class="scroll-body"></div>
-
-        <!-- 하단 푸터 영역 -->
-        <div class="scroll-footer">
-            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()"></button>
-        </div>
-        
-    </div>
-</div>
-
-
-
-
-<div id="grassPopup" class="hidden" style="position: absolute; z-index: 9999; background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; shadow: 0 10px 15px -3px rgba(0,0,0,0.1); min-width: 140px; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-    <div id="popupDate" style="font-size: 10px; font-weight: bold; color: #94a3b8; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; margin-bottom: 8px;"></div>
-    <div id="popupContent" style="display: flex; flex-direction: column; gap: 4px;"></div>
-</div>
-
+</script>
 <script>
-   // --- 잔디 상세 팝업 및 이벤트 제어 (통합본) ---
-
 window.showGrassPopup = (event, date, encodedAct) => {
     // [중요] 클릭 이벤트가 body까지 퍼져서 바로 닫히는 것을 방지
     if (event.stopPropagation) event.stopPropagation();
