@@ -8299,8 +8299,7 @@ window.showMemberMountain = async (mId, mName) => {
     }
 };
 
-
-window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
+Window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const container = document.getElementById('treeRingContainer');
     const monthLabel = document.getElementById('activityMonths');
     const mainTitle = document.querySelector('.ring-main-title');
@@ -8308,7 +8307,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
     if (!container) return;
 
-    // [1] 초기화
+    // [1] 초기화: 기존 내용 비우기 및 스타일 적용
     container.innerHTML = "";
     if (mainTitle) mainTitle.classList.add('cosmic-neon-text');
     if (mountainName) mountainName.classList.add('cosmic-neon-text');
@@ -8341,6 +8340,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const now = new Date();
     let jDate;
 
+    // A. 가입일 설정 로직
     if (fixedList.includes(memberName)) {
         jDate = new Date('2025-11-24T00:00:00');
     } else if (regDate?.toDate) {
@@ -8359,9 +8359,10 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         }
     }
 
-    // 💡 시/분/초 오차 방지를 위해 자정 기준 통일
+    // 💡 [수정] 날짜 오차 방지를 위해 자정으로 통일
     jDate.setHours(0, 0, 0, 0);
 
+    // 만 개월 수 계산 함수
     function getFullMonths(start, end) {
         let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
         if (end.getDate() < start.getDate()) {
@@ -8373,6 +8374,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const elapsedMonths = getFullMonths(jDate, now);
     const diffMonths = Math.max(1, elapsedMonths + 1);
 
+    // 레벨별 스타일 및 색상 추출
     const style = getLevelStyle(memberLevel);
     const ringColor = style.border;
 
@@ -8390,7 +8392,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
     const regularStarColors = ["#00FFFF", "#FF8C00", "#D32F2F", "#7C4DFF", "#A020F0", "#00FF7F"]; 
 
-    // [4] 정기산행 데이터 로드 (보정 적용)
+    // [4] 정기산행 데이터 로드
     let regularHikesByMonth = {};
     try {
         const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
@@ -8398,14 +8400,15 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
             const data = doc.data();
             if (data.isRegular && data.date) {
                 const hikeDate = data.date.toDate ? data.date.toDate() : new Date(data.date);
-                hikeDate.setHours(0, 0, 0, 0); // 💡 자정 보정
+                // 💡 [수정] 산행 날짜도 자정으로 통일하여 비교
+                hikeDate.setHours(0, 0, 0, 0);
 
                 const monthIdx = getFullMonths(jDate, hikeDate);
                 if (monthIdx >= 0 && monthIdx < diffMonths) {
                     if (!regularHikesByMonth[monthIdx]) regularHikesByMonth[monthIdx] = [];
                     
                     let starType = data.starType;
-                    // 💡 starType 예외 처리 안전화
+                    // 💡 [수정] starType 예외 처리 보강 (regular_1~6 추출 실패 방지)
                     if (!starType || typeof starType !== 'string' || !starType.startsWith('regular_')) {
                         const randIdx = Math.floor(Math.random() * regularStarColors.length);
                         starType = `regular_${randIdx + 1}`;
@@ -8487,6 +8490,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
         if (regularHikesByMonth[i]) {
             regularHikesByMonth[i].forEach(starType => {
+                // 💡 [수정] starType에서 안전하게 색상 인덱스 파싱
                 const parts = starType.split('_');
                 const rawIdx = parts.length > 1 ? parseInt(parts[1]) - 1 : 0;
                 const colorIdx = isNaN(rawIdx) ? 0 : Math.max(0, rawIdx);
@@ -8558,9 +8562,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     }, 100);
 };
 
-     
         
-     
             
 
     
