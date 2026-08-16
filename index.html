@@ -8299,10 +8299,9 @@ window.showMemberMountain = async (mId, mName) => {
     }
 };
 
-window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
-    // 🛡️ 캐시 객체가 없더라도 오류나지 않도록 가드 초기화
-    window.mountainDataCache = window.mountainDataCache || {};
 
+
+     window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const container = document.getElementById('treeRingContainer');
     const monthLabel = document.getElementById('activityMonths');
     const mainTitle = document.querySelector('.ring-main-title');
@@ -8314,7 +8313,6 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     if (mainTitle) mainTitle.classList.add('cosmic-neon-text');
     if (mountainName) mountainName.classList.add('cosmic-neon-text');
 
-    // [2] 배경 별빛 생성
     const bgStarColors = ["#ffffff", "#facc15", "#3b82f6", "#ef4444"];
     for (let i = 0; i < 100; i++) {
         const star = document.createElement('div');
@@ -8341,25 +8339,35 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     const now = new Date();
     let jDate;
 
+    // 날짜 객체 안전 변환 헬퍼 함수
+    const parseDate = (dateVal) => {
+        if (!dateVal) return null;
+        if (typeof dateVal.toDate === 'function') return dateVal.toDate();
+        if (dateVal instanceof Date) return dateVal;
+        const parsed = new Date(dateVal);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    };
+
     // A. 가입일 설정 로직
     if (fixedList.includes(memberName)) {
         jDate = new Date('2025-11-24T00:00:00');
-    } else if (regDate?.toDate) {
-        jDate = regDate.toDate();
+    } else if (regDate) {
+        jDate = parseDate(regDate) || new Date();
     } else {
-        // B. regDate가 없을 경우: 캐시 데이터 우선 탐색
+        // B. regDate가 없을 경우: DB 조회 전 캐시 데이터를 우선 탐색
+        if (!window.mountainDataCache) window.mountainDataCache = {};
         const cachedLogs = window.mountainDataCache[mId] || [];
         if (cachedLogs.length > 0) {
             const sortedDates = cachedLogs
-                .filter(l => l.date)
-                .map(l => l.date.toDate ? l.date.toDate() : new Date(l.date))
+                .map(l => parseDate(l.date))
+                .filter(Boolean)
                 .sort((a, b) => a - b);
             jDate = sortedDates[0] || new Date();
         } else {
             try {
                 const logsSnap = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "asc"), limit(1)));
                 if (!logsSnap.empty) {
-                    jDate = logsSnap.docs[0].data().date.toDate();
+                    jDate = parseDate(logsSnap.docs[0].data().date) || new Date();
                 } else {
                     jDate = new Date();
                 }
@@ -8398,11 +8406,13 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
     const regularStarColors = ["#00FFFF", "#FF8C00", "#D32F2F", "#7C4DFF", "#A020F0", "#00FF7F"]; 
 
-    // [4] 캐시 로직 적용 정기산행 데이터 수거
+    // 🎯 [수정된 캐시 & 데이터 수거 로직]
     let regularHikesByMonth = {};
     try {
+        if (!window.mountainDataCache) window.mountainDataCache = {};
         let rawLogs = window.mountainDataCache[mId];
         
+        // 캐시가 없으면 Firestore에서 불러와 객체 배열 형태로 저장
         if (!rawLogs) {
             const snap = await getDocs(collection(db, `sanwoori/${mId}/logs`));
             rawLogs = snap.docs.map(doc => doc.data());
@@ -8410,13 +8420,19 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         }
 
         rawLogs.forEach(data => {
-            if (data.isRegular && data.date) {
-                const hikeDate = data.date.toDate ? data.date.toDate() : new Date(data.date);
+            // docSnapshot 객체가 바로 들어가 있을 경우를 대비한 안전 처리
+            const logData = typeof data.data === 'function' ? data.data() : data;
+
+            if (logData && logData.isRegular && logData.date) {
+                const hikeDate = parseDate(logData.date);
+                if (!hikeDate) return;
+
                 const monthIdx = getFullMonths(jDate, hikeDate);
                 if (monthIdx >= 0 && monthIdx < diffMonths) {
                     if (!regularHikesByMonth[monthIdx]) regularHikesByMonth[monthIdx] = [];
-                    let starType = data.starType;
-                    if (!starType || !starType.startsWith('regular')) {
+                    
+                    let starType = logData.starType;
+                    if (!starType || typeof starType !== 'string' || !starType.startsWith('regular')) {
                         const randIdx = Math.floor(Math.random() * regularStarColors.length);
                         starType = `regular_${randIdx + 1}`;
                     }
@@ -8424,7 +8440,9 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
                 }
             }
         });
-    } catch (e) { console.error("나이테 로그 로드 에러:", e); }
+    } catch (e) { 
+        console.error("나이테 로그 로드 에러:", e); 
+    }
 
     // [5] SVG 및 중앙 코어 생성
     const svgNS = "http://www.w3.org/2000/svg";
@@ -8507,9 +8525,11 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         svg.appendChild(path);
         rings.push(path);
 
+        // 위성 별 생성
         if (regularHikesByMonth[i]) {
             regularHikesByMonth[i].forEach(starType => {
-                const colorIdx = parseInt(starType.split('_')[1]) - 1;
+                const parts = starType.split('_');
+                const colorIdx = parts.length > 1 ? parseInt(parts[1]) - 1 : 0;
                 const starColor = regularStarColors[colorIdx] || "#ffffff";
                 const pointIdx = Math.floor(Math.random() * (points.length - 1));
                 const pos = points[pointIdx];
@@ -8535,7 +8555,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     }
     container.appendChild(svg);
 
-    // [7] 순차 애니메이션 실행
+    // [7] 애니메이션 실행
     const totalAnimTime = 1200; 
     const delayStep = Math.min(60, totalAnimTime / diffMonths);
 
@@ -8560,7 +8580,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         }, index * delayStep);
     });
 
-    // [8] 코어 반짝임 별빛
+    // [8] 내부 코어 추가 별빛
     setTimeout(() => {
         for (let i = 0; i < 20; i++) {
             const starInner = document.createElement('div');
@@ -8576,7 +8596,6 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         }
     }, 100);
 };
-
 
     
                 
