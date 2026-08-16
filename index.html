@@ -3171,6 +3171,24 @@ overflow: hidden;
           </label>
         </div>
 
+              <!-- 등산한 산 이름 및 개별 단축 체크박스 영역 -->
+<div class="flex gap-2 mb-2 items-center">
+  <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름 (예: 관악산)" class="h-9 text-xs flex-1 border rounded px-2 outline-none">
+  
+  <!-- 단축 체크박스 그룹 -->
+  <div class="flex gap-2 shrink-0 bg-white px-2 h-9 items-center border rounded-lg">
+    <!-- 1. 번외산행 (런닝 + 트레킹 동시 적용) -->
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-amber-600">
+      <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲 번외산행
+    </label>
+    
+    <!-- 2. 인정 트레킹 (트레킹 + 산책 동시 적용 -> 순수산행 적용) -->
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-teal-600">
+      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾 인정 트레킹
+    </label>
+  </div>
+</div>
+
         <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
           <div class="flex-1 flex items-center gap-1">
             <span class="text-[9px] text-gray-400 shrink-0">🪨바위</span>
@@ -3185,8 +3203,6 @@ overflow: hidden;
             <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
           </div>
         </div>
-
-        <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름 (예: 관악산)" class="mb-2 h-9 text-xs w-full border rounded px-2">
 
         <div class="flex gap-2 mb-2">
           <select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
@@ -6764,7 +6780,27 @@ window.toggleDisableCoord = () => {
     }
 };
 
-window.addMultiActivity = async () => {
+ window.syncActivityCheckboxes = (type) => {
+    const isExtra = document.getElementById('isExtraHikeCheck')?.checked || false;
+    const isSpecial = document.getElementById('isSpecialTrackingCheck')?.checked || false;
+
+    if (type === 'extra' && isExtra) {
+        // 인정 트레킹 해제 및 런닝+트레킹 자동 체크
+        if (document.getElementById('isSpecialTrackingCheck')) document.getElementById('isSpecialTrackingCheck').checked = false;
+        if (document.getElementById('isRunningCheck')) document.getElementById('isRunningCheck').checked = true;
+        if (document.getElementById('isTrackingCheck')) document.getElementById('isTrackingCheck').checked = true;
+        if (document.getElementById('isWalkingCheck')) document.getElementById('isWalkingCheck').checked = false;
+    } else if (type === 'special' && isSpecial) {
+        // 번외산행 해제 및 트레킹+산책 자동 체크
+        if (document.getElementById('isExtraHikeCheck')) document.getElementById('isExtraHikeCheck').checked = false;
+        if (document.getElementById('isRunningCheck')) document.getElementById('isRunningCheck').checked = false;
+        if (document.getElementById('isTrackingCheck')) document.getElementById('isTrackingCheck').checked = true;
+        if (document.getElementById('isWalkingCheck')) document.getElementById('isWalkingCheck').checked = true;
+    }
+};
+
+
+  window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -6799,22 +6835,38 @@ window.addMultiActivity = async () => {
     const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
     const isSchedule = document.getElementById('isScheduleCheck')?.checked || false; 
 
-    const isRunning = document.getElementById('isRunningCheck')?.checked || false;
-    const isTracking = document.getElementById('isTrackingCheck')?.checked || false;
-    const isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
+    // 기존 활동 체크박스 상태
+    let isRunning = document.getElementById('isRunningCheck')?.checked || false;
+    let isTracking = document.getElementById('isTrackingCheck')?.checked || false;
+    let isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
     const isOnlyLog = document.getElementById('isOnlyLog')?.checked || false; 
+
+    // 🎯 단축 체크박스 (우측 새로 추가)
+    const isExtraHikeCheck = document.getElementById('isExtraHikeCheck')?.checked || false;
+    const isSpecialTrackingCheck = document.getElementById('isSpecialTrackingCheck')?.checked || false;
+
+    // 단축 체크박스 선택 시 기존 조건 판별값 강제 지정
+    if (isExtraHikeCheck) {
+        isRunning = true;
+        isTracking = true;
+    } else if (isSpecialTrackingCheck) {
+        isTracking = true;
+        isWalking = true;
+    }
+
     const region = document.getElementById('adminManualRegionSelect')?.value || "";
     const isQuarterOnlyOne = document.getElementById('isQuarterCheck')?.checked || false;
     
-    // 🎯 좌표 OFF 체크 여부 확인
+    // 좌표 OFF 체크 여부 확인
     const disableCoord = document.getElementById('disableCoordCheck')?.checked || false;
     
     const pRock = parseInt(document.getElementById('pRock')?.value) || 0;
     const pForest = parseInt(document.getElementById('pForest')?.value) || 0;
     const pValley = parseInt(document.getElementById('pValley')?.value) || 0;
     
-    const isExtraHike = isRunning && isTracking; 
-    const isSpecialTracking = isTracking && isWalking;
+    // 산행 조건 판별
+    const isExtraHike = isExtraHikeCheck || (isRunning && isTracking); 
+    const isSpecialTracking = isSpecialTrackingCheck || (isTracking && isWalking);
 
     const isSpecial = (isRunning || isOnlyLog || isExtraHike || (isTracking && !isSpecialTracking) || (isWalking && !isSpecialTracking));
     const isRealHike = !isSpecial || isSpecialTracking; 
@@ -6831,7 +6883,7 @@ window.addMultiActivity = async () => {
 
     const selectedNames = [];
     
-    // 🎯 좌표 OFF가 켜져있으면 tempCoord 무시하고 unconditional null 처리
+    // 좌표 OFF가 켜져있으면 tempCoord 무시하고 unconditional null 처리
     const safeCoords = (!disableCoord && typeof tempCoord !== 'undefined' && tempCoord && tempCoord.x !== undefined) ? tempCoord : null;
 
     try {
@@ -6853,7 +6905,6 @@ window.addMultiActivity = async () => {
                 pValley: pValley
             };
 
-            // 🎯 핵심 수정: 좌표 OFF면 기존 DB의 x, y 좌표를 null로 강제 삭제/초기화합니다.
             if (disableCoord) {
                 mountainData.x = null;
                 mountainData.y = null;
@@ -6962,7 +7013,7 @@ window.addMultiActivity = async () => {
                     createdAt: new Date(), 
                     mountain: baseDocId, 
                     height, 
-                    coords: safeCoords, // 🎯 disableCoord가 true일 경우 null로 저장됨
+                    coords: safeCoords,
                     isNationalPark,
                     isTop100, isBAC, 
                     isRegular,   
@@ -7014,6 +7065,7 @@ window.addMultiActivity = async () => {
         
         alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
+        // 폼 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
@@ -7028,7 +7080,13 @@ window.addMultiActivity = async () => {
         const regionSelect = document.getElementById('adminManualRegionSelect');
         if (regionSelect) regionSelect.selectedIndex = 0;
 
-        const checkIds = ['isNationalParkCheck', 'isTop100Check', 'isBACCheck', 'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 'isQuarterCheck', 'disableCoordCheck'];
+        const checkIds = [
+            'isNationalParkCheck', 'isTop100Check', 'isBACCheck', 
+            'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 
+            'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 
+            'isQuarterCheck', 'disableCoordCheck',
+            'isExtraHikeCheck', 'isSpecialTrackingCheck' // 단축 체크박스 초기화 추가
+        ];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
             if (cb) cb.checked = false;
@@ -7054,7 +7112,8 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
-
+              
+                    
 
                      
 
