@@ -6787,19 +6787,21 @@ window.toggleDisableCoord = () => {
     const isSpecial = document.getElementById('isSpecialTrackingCheck')?.checked || false;
 
     if (type === 'extra' && isExtra) {
-        // 인정 트레킹 해제 및 런닝+트레킹 자동 체크
+        // 번외산행: 런닝 + 트레킹 체크
         if (document.getElementById('isSpecialTrackingCheck')) document.getElementById('isSpecialTrackingCheck').checked = false;
         if (document.getElementById('isRunningCheck')) document.getElementById('isRunningCheck').checked = true;
         if (document.getElementById('isTrackingCheck')) document.getElementById('isTrackingCheck').checked = true;
         if (document.getElementById('isWalkingCheck')) document.getElementById('isWalkingCheck').checked = false;
     } else if (type === 'special' && isSpecial) {
-        // 번외산행 해제 및 트레킹+산책 자동 체크
+        // 🎯 인정 트레킹: 트레킹 + 산책 + 일정(🗓️) 자동 체크
         if (document.getElementById('isExtraHikeCheck')) document.getElementById('isExtraHikeCheck').checked = false;
         if (document.getElementById('isRunningCheck')) document.getElementById('isRunningCheck').checked = false;
         if (document.getElementById('isTrackingCheck')) document.getElementById('isTrackingCheck').checked = true;
         if (document.getElementById('isWalkingCheck')) document.getElementById('isWalkingCheck').checked = true;
+        if (document.getElementById('isScheduleCheck')) document.getElementById('isScheduleCheck').checked = true; // 👈 추가
     }
 };
+
 
 
   window.addMultiActivity = async () => {
@@ -6843,19 +6845,24 @@ window.toggleDisableCoord = () => {
     let isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
     const isOnlyLog = document.getElementById('isOnlyLog')?.checked || false; 
 
-    // 🎯 단축 체크박스 (우측 새로 추가)
-    const isExtraHikeCheck = document.getElementById('isExtraHikeCheck')?.checked || false;
-    const isSpecialTrackingCheck = document.getElementById('isSpecialTrackingCheck')?.checked || false;
+// 🎯 단축 체크박스 (우측)
+const isExtraHikeCheck = document.getElementById('isExtraHikeCheck')?.checked || false;
+const isSpecialTrackingCheck = document.getElementById('isSpecialTrackingCheck')?.checked || false;
 
-    // 단축 체크박스 선택 시 기존 조건 판별값 강제 지정
-    if (isExtraHikeCheck) {
-        isRunning = true;
-        isTracking = true;
-    } else if (isSpecialTrackingCheck) {
-        isTracking = true;
-        isWalking = true;
-    }
+// 단축 체크박스 선택 시 기존 조건 판별값 강제 지정
+if (isExtraHikeCheck) {
+    isRunning = true;
+    isTracking = true;
+} else if (isSpecialTrackingCheck) {
+    isTracking = true;
+    isWalking = true;
+}
 
+// 🎯 인정 트레킹일 경우 일정(isSchedule)도 true로 동기화
+let isSchedule = document.getElementById('isScheduleCheck')?.checked || false;
+if (isSpecialTrackingCheck) {
+    isSchedule = true;
+        }
     const region = document.getElementById('adminManualRegionSelect')?.value || "";
     const isQuarterOnlyOne = document.getElementById('isQuarterCheck')?.checked || false;
     
