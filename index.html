@@ -8335,7 +8335,7 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         container.appendChild(star);
     }
 
-    // [3] 날짜 및 나이테 개수 계산
+        // [3] 날짜 및 나이테 개수 계산 (만 개월수 로직 통합)
     const fixedList = ["오즈","나스","해수","용삼","지니","아랑","민이","몰랑","길치","등초","무니","식이","구름","뚜벅","윤윤","햄찌","이구","후후","튜브","피치","송돌","호프","애플","얌얌","태리","희야","멸치","성민","섭섭","하트"];
     const now = new Date();
     let jDate;
@@ -8344,14 +8344,16 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     if (fixedList.includes(memberName)) {
         jDate = new Date('2025-11-24T00:00:00');
     } else if (regDate?.toDate) {
+        // regDate가 있으면 사용
         jDate = regDate.toDate();
     } else {
+        // B. regDate가 없으면? 첫 로그 날짜를 조회 (통합 로직)
         try {
             const logsSnap = await getDocs(query(collection(db, `sanwoori/${mId}/logs`), orderBy("date", "asc"), limit(1)));
             if (!logsSnap.empty) {
                 jDate = logsSnap.docs[0].data().date.toDate();
             } else {
-                jDate = new Date();
+                jDate = new Date(); // 로그도 없으면 오늘 날짜
             }
         } catch (e) {
             console.error("가입일 자동 산출 에러:", e);
@@ -8359,38 +8361,43 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         }
     }
 
-    // 💡 [수정] 날짜 오차 방지를 위해 자정으로 통일
-    jDate.setHours(0, 0, 0, 0);
-
     // 만 개월 수 계산 함수
     function getFullMonths(start, end) {
         let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+        // 오늘 일자가 가입일보다 작으면 한 달이 아직 안 찬 것이므로 -1
         if (end.getDate() < start.getDate()) {
             months--;
         }
-        return Math.max(0, months);
+        return Math.max(0, months); // 음수 방지
     }
 
     const elapsedMonths = getFullMonths(jDate, now);
+    // 나이테 개수: 가입 직후(0개월) 1개, 한 달 경과(1개월) 2개... 방식 적용
     const diffMonths = Math.max(1, elapsedMonths + 1);
 
     // 레벨별 스타일 및 색상 추출
     const style = getLevelStyle(memberLevel);
-    const ringColor = style.border;
+    const ringColor = style.border; // 레벨 고유의 테두리 색상
 
+    // 🪐 [수정] 가입일 텍스트 매핑 및 반짝임(애니메이션) 없이 색상만 고정 적용
     const ringLaunchedEl = document.getElementById('ringLaunchedDate');
-    if (ringLaunchedEl && jDate) {
-        const yyyy = jDate.getFullYear();
-        const mm = String(jDate.getMonth() + 1).padStart(2, '0');
-        const dd = String(jDate.getDate()).padStart(2, '0');
-        
-        ringLaunchedEl.innerText = `LAUNCHED: ${yyyy}.${mm}.${dd}`;
-        ringLaunchedEl.style.color = ringColor;
-        ringLaunchedEl.style.textShadow = `0 0 5px ${ringColor}, 0 0 10px ${ringColor}`;
-        ringLaunchedEl.style.animation = "none"; 
-    }
+    // renderTreeRings 함수 내부 [3]번 영역 중 Launched 텍스트 세팅 부분 보정
+if (ringLaunchedEl && jDate) {
+    const yyyy = jDate.getFullYear();
+    const mm = String(jDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(jDate.getDate()).padStart(2, '0');
+    
+    ringLaunchedEl.innerText = `LAUNCHED: ${yyyy}.${mm}.${dd}`;
+    
+    ringLaunchedEl.style.color = ringColor;
+    ringLaunchedEl.style.textShadow = `0 0 5px ${ringColor}, 0 0 10px ${ringColor}`;
+    ringLaunchedEl.style.animation = "none"; 
+    // 💡 초기 선언 시 opacity를 건드리지 않고, 위의 showMemberMountain에서 
+    // glow-active 시점에 1로 켜주도록 열어둡니다.
+}
 
     const regularStarColors = ["#00FFFF", "#FF8C00", "#D32F2F", "#7C4DFF", "#A020F0", "#00FF7F"]; 
+
 
     // [4] 정기산행 데이터 로드
     let regularHikesByMonth = {};
@@ -8399,17 +8406,13 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
         snap.forEach(doc => {
             const data = doc.data();
             if (data.isRegular && data.date) {
-                const hikeDate = data.date.toDate ? data.date.toDate() : new Date(data.date);
-                // 💡 [수정] 산행 날짜도 자정으로 통일하여 비교
-                hikeDate.setHours(0, 0, 0, 0);
-
+                const hikeDate = data.date.toDate();
+                // 해당 산행이 가입일로부터 몇 번째 '만 개월' 영역에 있는지 계산
                 const monthIdx = getFullMonths(jDate, hikeDate);
                 if (monthIdx >= 0 && monthIdx < diffMonths) {
                     if (!regularHikesByMonth[monthIdx]) regularHikesByMonth[monthIdx] = [];
-                    
                     let starType = data.starType;
-                    // 💡 [수정] starType 예외 처리 보강 (regular_1~6 추출 실패 방지)
-                    if (!starType || typeof starType !== 'string' || !starType.startsWith('regular_')) {
+                    if (!starType || !starType.startsWith('regular')) {
                         const randIdx = Math.floor(Math.random() * regularStarColors.length);
                         starType = `regular_${randIdx + 1}`;
                     }
@@ -8425,35 +8428,42 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     svg.setAttribute("viewBox", "0 0 240 240");
     svg.style.cssText = "width:100%; height:100%; overflow:visible;";
 
-    let coreShape;
-    const cx = 120, cy = 120, r = 6;
+    // --- [중앙 코어 생성: 레벨별 모양 변경 로직] ---
+let coreShape;
+const cx = 120, cy = 120, r = 6; // 중심 좌표와 크기
 
-    if (memberLevel >= 80) {
-        coreShape = document.createElementNS(svgNS, "polygon");
-        let points = "";
-        for (let i = 0; i < 10; i++) {
-            let angle = (i * Math.PI) / 5 - Math.PI / 2;
-            let currR = (i % 2 === 0) ? r * 1.5 : r * 0.6;
-            points += `${cx + currR * Math.cos(angle)},${cy + currR * Math.sin(angle)} `;
-        }
-        coreShape.setAttribute("points", points);
-    } else if (memberLevel >= 50) {
-        coreShape = document.createElementNS(svgNS, "polygon");
-        coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy} ${cx},${cy+r*1.2} ${cx-r*1.2},${cy}`);
-    } else if (memberLevel >= 20) {
-        coreShape = document.createElementNS(svgNS, "polygon");
-        coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy+r} ${cx-r*1.2},${cy+r}`);
-    } else {
-        coreShape = document.createElementNS(svgNS, "circle");
-        coreShape.setAttribute("cx", cx);
-        coreShape.setAttribute("cy", cy);
-        coreShape.setAttribute("r", r);
-    }
+if (memberLevel >= 80) {
+// 80레벨 이상: 별 모양 (Polygon)
+coreShape = document.createElementNS(svgNS, "polygon");
+let points = "";
+for (let i = 0; i < 10; i++) {
+let angle = (i * Math.PI) / 5 - Math.PI / 2;
+let currR = (i % 2 === 0) ? r * 1.5 : r * 0.6;
+points += `${cx + currR * Math.cos(angle)},${cy + currR * Math.sin(angle)} `;
+}
+coreShape.setAttribute("points", points);
+} else if (memberLevel >= 50) {
+// 50~79레벨: 다이아몬드 (Polygon)
+coreShape = document.createElementNS(svgNS, "polygon");
+coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy} ${cx},${cy+r*1.2} ${cx-r*1.2},${cy}`);
+} else if (memberLevel >= 20) {
+// 20~49레벨: 삼각형 (Polygon)
+coreShape = document.createElementNS(svgNS, "polygon");
+coreShape.setAttribute("points", `${cx},${cy-r*1.2} ${cx+r*1.2},${cy+r} ${cx-r*1.2},${cy+r}`);
+} else {
+// 1~19레벨: 원형 (Circle)
+coreShape = document.createElementNS(svgNS, "circle");
+coreShape.setAttribute("cx", cx);
+coreShape.setAttribute("cy", cy);
+coreShape.setAttribute("r", r);
+}
 
-    coreShape.setAttribute("fill", ringColor);
-    coreShape.classList.add('tree-ring-core-moving');
-    coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
-    svg.appendChild(coreShape);
+// 공통 스타일 및 애니메이션 적용
+coreShape.setAttribute("fill", ringColor);
+coreShape.classList.add('tree-ring-core-moving');
+coreShape.style.filter = `drop-shadow(0 0 15px ${ringColor})`;
+svg.appendChild(coreShape);
+// --- [교체 완료] ---
 
     // [6] 나이테 및 위성 별 생성
     const rings = [];
@@ -8490,12 +8500,8 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
 
         if (regularHikesByMonth[i]) {
             regularHikesByMonth[i].forEach(starType => {
-                // 💡 [수정] starType에서 안전하게 색상 인덱스 파싱
-                const parts = starType.split('_');
-                const rawIdx = parts.length > 1 ? parseInt(parts[1]) - 1 : 0;
-                const colorIdx = isNaN(rawIdx) ? 0 : Math.max(0, rawIdx);
+                const colorIdx = parseInt(starType.split('_')[1]) - 1;
                 const starColor = regularStarColors[colorIdx] || "#ffffff";
-                
                 const pointIdx = Math.floor(Math.random() * (points.length - 1));
                 const pos = points[pointIdx];
 
@@ -8562,8 +8568,8 @@ window.renderTreeRings = async (mId, memberName, regDate, memberLevel) => {
     }, 100);
 };
 
-        
-            
+
+
 
     
                 
