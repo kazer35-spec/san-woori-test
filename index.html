@@ -3171,23 +3171,6 @@ overflow: hidden;
           </label>
         </div>
 
-              <!-- 등산한 산 이름 및 개별 단축 체크박스 영역 -->
-<div class="flex gap-2 mb-2 items-center">
-  <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름 (예: 관악산)" class="h-9 text-xs flex-1 border rounded px-2 outline-none">
-  
-  <!-- 단축 체크박스 그룹 -->
-  <div class="flex gap-2 shrink-0 bg-white px-2 h-9 items-center border rounded-lg">
-    <!-- 1. 번외산행 (런닝 + 트레킹 동시 적용) -->
-    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-amber-600">
-      <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲 번외산행
-    </label>
-    
-    <!-- 2. 인정 트레킹 (트레킹 + 산책 동시 적용 -> 순수산행 적용) -->
-    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-teal-600">
-      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾 인정 트레킹
-    </label>
-  </div>
-</div>
 
         <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
           <div class="flex-1 flex items-center gap-1">
@@ -3204,6 +3187,25 @@ overflow: hidden;
           </div>
         </div>
 
+              
+              <!-- 등산한 산 이름 및 개별 단축 체크박스 영역 -->
+<div class="flex gap-2 mb-2 items-center">
+  <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름" class="h-9 text-xs flex-1 border rounded px-2 outline-none">
+  
+  <!-- 단축 체크박스 그룹 -->
+  <div class="flex gap-2 shrink-0 bg-white px-2 h-9 items-center border rounded-lg">
+    <!-- 1. 번외 (런닝 + 트레킹 동시 적용) -->
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-amber-600">
+      <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲 번외산행
+    </label>
+    
+    <!-- 2. 인트레킹 (트레킹 + 산책 동시 적용 -> 순수산행 적용) -->
+    <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-teal-600">
+      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾 인정 트레킹
+    </label>
+  </div>
+</div>
+              
         <div class="flex gap-2 mb-2">
           <select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
             <option value="기타">📍 수동 지역 선택 (선택 안함)</option>
