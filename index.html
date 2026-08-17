@@ -3354,44 +3354,41 @@ overflow: hidden;
 
 
 <!-- 🔥 활동지수 & 히스토리 통합 모달 -->
+<!-- 🔥 활동지수 & 히스토리 통합 모달 -->
 <div id="vibeModal" class="modal-overlay" style="display:none;" onclick="toggleVibeModal(false)">
   <div class="modal-content !p-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
     
-    <!-- 헤더 영역 -->
-<div class="flex items-center justify-between mb-2">
-  <!-- text-lg 대신 text-[15px] 적용 -->
-  <h2 class="text-[15px] font-black text-slate-800 flex items-center gap-1.5">
-    <span id="vibeModalIcon">🔥</span> Community Passion
-  </h2>
-  <!-- 🌟 산정 방식 버튼 -->
-  <button onclick="toggleVibeCalcInfoModal(true)" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-100">
-    💡 산정 방식
-  </button>
-</div>
+    <!-- 헤더 영역 (글자 크기 15px) -->
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-[15px] font-black text-slate-800 flex items-center gap-1.5">
+        <span id="vibeModalIcon">🔥</span> Community Passion
+      </h2>
+      <button onclick="toggleVibeCalcInfoModal(true)" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-100">
+        💡 산정 방식
+      </button>
+    </div>
 
+    <!-- 🌟 1. 히스토리 컨테이너 (상단으로 이동) -->
+    <div id="vibeHallOfFame" class="mb-4"></div>
 
+    <!-- 2. 게이지 영역 (하단으로 이동) -->
+    <div class="vibe-temp-card-modal p-4 mb-2 bg-rose-50/40 rounded-2xl border border-rose-100/60" id="vibeCard">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-[10px] font-black text-rose-500 tracking-tight" id="vibeStatusTxt">EXPLOSIVE PASSION</span>
+        <span class="text-[10px] font-bold text-slate-400" id="vibeScoreTxt">100%</span>
+      </div>
+      <div class="temp-gauge-bg h-2.5 bg-rose-100/60 rounded-full overflow-hidden">
+        <div id="vibeGauge" class="temp-gauge-fill h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
+      </div>
+      <div id="vibeDesc" class="text-xs font-bold text-slate-600 mt-3 leading-relaxed">
+        현재 활동지수 최고조! 산행의 열기가 가득합니다.
+      </div>
+    </div>
 
-    <!-- 게이지 영역 (원본 레이아웃 정확히 복원) -->
-<div class="vibe-temp-card-modal p-4 mb-4 bg-rose-50/40 rounded-2xl border border-rose-100/60" id="vibeCard">
-  <div class="flex justify-between items-center mb-2">
-    <span class="text-[10px] font-black text-rose-500 tracking-tight" id="vibeStatusTxt">EXPLOSIVE PASSION</span>
-    <span class="text-[10px] font-bold text-slate-400" id="vibeScoreTxt">100%</span>
-  </div>
-  <div class="temp-gauge-bg h-2.5 bg-rose-100/60 rounded-full overflow-hidden">
-    <div id="vibeGauge" class="temp-gauge-fill h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
-  </div>
-  <div id="vibeDesc" class="text-xs font-bold text-slate-600 mt-3 leading-relaxed">
-    현재 활동지수 최고조! 산행의 열기가 가득합니다.
-  </div>
-</div>
-
-<!-- 🌟 히스토리 컨테이너 (Legend Star 4개 / Lv.100 5개 제한) -->
-<div id="vibeHallOfFame"></div>
-
-<!-- 하단 확인 버튼 -->
-<button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg.slate-800 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
-  확인
-</button>
+    <!-- 하단 확인 버튼 -->
+    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
+      확인
+    </button>
   </div>
 </div>
 
