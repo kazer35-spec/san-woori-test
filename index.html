@@ -3369,30 +3369,29 @@ overflow: hidden;
     </div>
 
 
-    <!-- 게이지 영역 (세로 크기 축소) -->
-<div class="vibe-temp-card-modal p-2.5 mb-2 bg-slate-50/50 rounded-xl border border-slate-100" id="vibeCard">
-  <div class="flex justify-between items-center mb-1.5">
-    <span class="text-[9px] font-black text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded-full" id="vibeStatusTxt">EXPLOSIVE PASSION</span>
-    <span class="text-[9px] font-bold text-slate-400" id="vibeScoreTxt">100%</span>
+    <!-- 게이지 영역 (원본 레이아웃 정확히 복원) -->
+<div class="vibe-temp-card-modal p-4 mb-4 bg-rose-50/40 rounded-2xl border border-rose-100/60" id="vibeCard">
+  <div class="flex justify-between items-center mb-2">
+    <span class="text-[10px] font-black text-rose-500 tracking-tight" id="vibeStatusTxt">EXPLOSIVE PASSION</span>
+    <span class="text-[10px] font-bold text-slate-400" id="vibeScoreTxt">100%</span>
   </div>
-  <div class="temp-gauge-bg h-2 bg-slate-100 rounded-full overflow-hidden">
-    <div id="vibeGauge" class="temp-gauge-fill h-full bg-gradient-to-r from-rose-400 to-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
+  <div class="temp-gauge-bg h-2.5 bg-rose-100/60 rounded-full overflow-hidden">
+    <div id="vibeGauge" class="temp-gauge-fill h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
   </div>
-  <div id="vibeDesc" class="text-[11px] font-bold text-slate-500 mt-1.5 leading-tight">
+  <div id="vibeDesc" class="text-xs font-bold text-slate-600 mt-3 leading-relaxed">
     현재 활동지수 최고조! 산행의 열기가 가득합니다.
   </div>
 </div>
 
-    <!-- 🌟 히스토리 컨테이너 -->
-    <div id="vibeHallOfFame"></div>
+<!-- 🌟 히스토리 컨테이너 (Legend Star 4개 / Lv.100 5개 제한) -->
+<div id="vibeHallOfFame"></div>
 
-    <!-- 하단 확인 버튼 (세로 크기 줄임) -->
-    <button onclick="toggleVibeModal(false)" class="w-full mt-3 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs">
-      확인
-    </button>
+<!-- 하단 확인 버튼 -->
+<button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg.slate-800 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
+  확인
+</button>
   </div>
 </div>
-
 
 
 <!-- 💡 별도 팝업: 지수 산정 방식 모달 -->
@@ -7923,7 +7922,9 @@ window.toggleVibeCalcInfoModal = function(show) {
 };
 
 /**
- * 🏆 SanWoori History 렌더링 함수 (순번 표시 & Top 5 + More 적용)
+ * 🏆 SanWoori History 렌더링 함수 (고급 모던 디자인 버전)
+ * - Legend Star (슈퍼별, 스페셜별): 최대 4명 노출 후 +more
+ * - Lv.100 Club: 최대 5명 노출 후 +more
  */
 function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
@@ -7932,7 +7933,7 @@ function renderVibeHallOfFame() {
   // 숨김 회원 제외
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
 
-  // 1. 슈퍼별 & 스페셜별 획득자 추출 (중복 제거 및 순서 유지)
+  // 1. 슈퍼별 & 스페셜별 추출 (No.1, No.2 순번 적용)
   const superNames = [];
   const specialNames = [];
 
@@ -7949,47 +7950,45 @@ function renderVibeHallOfFame() {
     }
   });
 
-  // No.1, No.2 형식으로 순번 붙이기
   const superHolders = superNames.map((name, idx) => `No.${idx + 1} ${name}`);
   const specialHolders = specialNames.map((name, idx) => `No.${idx + 1} ${name}`);
 
-  // 2. 100레벨 달성자 추출 및 순번 붙이기
+  // 2. 100레벨 달성자 추출
   const level100Holders = activeMembers
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-  // 5개 제한 및 더보기(+more) 처리 템플릿 함수
-  const formatBadgeListWithMore = (list, isGold = false, categoryId = '') => {
+  // 고급 배지 디자인 및 +more 처리 포맷 함수
+  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 5) => {
     if (!list || list.length === 0) {
-      return `<span class="text-slate-400 font-medium text-[10px]">아직 달성자가 없습니다</span>`;
+      return `<span class="text-slate-400 font-medium text-[10px] pl-1">아직 달성자가 없습니다</span>`;
     }
 
-    const limit = 5;
     const visibleList = list.slice(0, limit);
     const hiddenList = list.slice(limit);
 
+    // 골드(100레벨) vs 일반(레전드스타) 스타일 세분화
     const bgStyle = isGold 
-      ? "bg-amber-500 text-white border-amber-400" 
-      : "bg-white text-slate-700 border-slate-200/80";
+      ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs shadow-amber-200 border border-amber-400/40" 
+      : "bg-white/90 text-slate-700 shadow-2xs border border-slate-200/70 hover:border-slate-300";
 
     let html = visibleList.map(item => `
-      <span class="inline-flex items-center ${bgStyle} px-2 py-0.5 rounded-md border shadow-2xs font-bold text-[10px] mr-1 mb-1">
+      <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg font-extrabold text-[10px] mr-1 mb-1 transition-all">
         ${item}
       </span>
     `).join('');
 
-    // 5명이 넘는 경우 +more 버튼 및 숨김 영역 생성
     if (hiddenList.length > 0) {
       const hiddenHtml = hiddenList.map(item => `
-        <span class="inline-flex items-center ${bgStyle} px-2 py-0.5 rounded-md border shadow-2xs font-bold text-[10px] mr-1 mb-1">
+        <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg font-extrabold text-[10px] mr-1 mb-1 transition-all">
           ${item}
         </span>
       `).join('');
 
       html += `
         <button type="button" id="more-btn-${categoryId}" 
-          onclick="document.getElementById('more-list-${categoryId}').classList.remove('hidden'); this.classList.add('hidden');" 
-          class="inline-flex items-center bg-slate-200/80 text-slate-600 px-2 py-0.5 rounded-md border border-slate-300 font-extrabold text-[10px] mr-1 mb-1 cursor-pointer hover:bg-slate-300 transition-all">
+          onclick="document.getElementById('more-list-${categoryId}').classList.remove('hidden'); document.getElementById('more-list-${categoryId}').classList.add('inline-flex'); this.classList.add('hidden');" 
+          class="inline-flex items-center bg-slate-100 hover:bg-slate-200 text-slate-500 px-2 py-0.5 rounded-lg border border-slate-200 font-black text-[10px] mr-1 mb-1 cursor-pointer transition-all active:scale-95">
           +${hiddenList.length} more
         </button>
         <span id="more-list-${categoryId}" class="hidden flex-wrap items-center">
@@ -8003,56 +8002,58 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <!-- 구분선 및 제목 -->
-    <div class="pt-2 border-t border-slate-100 mt-2">
-      <div class="text-lg font-black text-slate-800 mb-2 flex items-center gap-1.5">
-        <span>📜</span> San:Woori History
+    <div class="pt-3 border-t border-slate-100 mt-3">
+      <div class="flex items-center justify-between mb-2.5">
+        <div class="text-[13px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
+          <span class="text-base">📜</span> San:Woori History
+        </div>
+        <span class="text-[9px] font-extrabold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">HONOR HALL</span>
       </div>
 
-      <div class="space-y-2">
-        <!-- 파트 1: Legend Star -->
-        <div class="p-2.5 bg-slate-50/80 rounded-xl border border-slate-200/60">
-          <div class="text-[11px] font-black text-slate-700 mb-1.5 flex items-center gap-1">
-            <span>🌟</span> Legend Star
+      <div class="space-y-2.5">
+        <!-- Legend Star 카드 -->
+        <div class="p-3 bg-gradient-to-b from-slate-50/90 to-slate-100/50 rounded-2xl border border-slate-200/60 shadow-2xs">
+          <div class="text-[11px] font-black text-slate-700 mb-2 flex items-center gap-1">
+            <span class="text-amber-400">🌟</span> Legend Star
           </div>
           <div class="space-y-1.5">
             <!-- 슈퍼별 -->
-            <div class="flex items-center gap-1.5 bg-white/70 p-1 rounded-lg border border-slate-100">
-              <span class="text-[9px] font-black text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 shrink-0">
+            <div class="flex items-center gap-2 bg-white/80 p-1.5 rounded-xl border border-slate-100/80 shadow-2xs">
+              <span class="text-[9px] font-black text-rose-500 bg-rose-50/80 px-2 py-0.5 rounded-md border border-rose-100/60 shrink-0">
                 ★ 슈퍼별
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(superHolders, false, 'super')}
+                ${formatBadgeListWithMore(superHolders, false, 'super', 4)}
               </div>
             </div>
             <!-- 스페셜별 -->
-            <div class="flex items-center gap-1.5 bg-white/70 p-1 rounded-lg border border-slate-100">
-              <span class="text-[9px] font-black text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-100 shrink-0">
+            <div class="flex items-center gap-2 bg-white/80 p-1.5 rounded-xl border border-slate-100/80 shadow-2xs">
+              <span class="text-[9px] font-black text-purple-600 bg-purple-50/80 px-2 py-0.5 rounded-md border border-purple-100/60 shrink-0">
                 ✦ 스페셜
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(specialHolders, false, 'special')}
+                ${formatBadgeListWithMore(specialHolders, false, 'special', 4)}
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 파트 2: Lv.100 Club -->
-        <div class="p-2.5 bg-amber-50/60 rounded-xl border border-amber-200/70">
-          <div class="text-[11px] font-black text-amber-900 mb-1 flex items-center justify-between">
+        <!-- Lv.100 Club 카드 -->
+        <div class="p-3 bg-gradient-to-br from-amber-50/80 via-amber-50/40 to-orange-50/30 rounded-2xl border border-amber-200/60 shadow-2xs">
+          <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
               <span>👑</span> Lv.100 Club
             </span>
-            <span class="text-[8px] font-extrabold text-amber-600 bg-amber-100 px-1 py-0.2 rounded">MAX</span>
+            <span class="text-[8px] font-black tracking-wider text-amber-600 bg-amber-100/80 border border-amber-200 px-1.5 py-0.2 rounded-full uppercase">MAX LEVEL</span>
           </div>
-          <div class="flex flex-wrap items-center pt-0.5">
-            ${formatBadgeListWithMore(level100Holders, true, 'lv100')}
+          <div class="flex flex-wrap items-center pt-1">
+            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 5)}
           </div>
         </div>
       </div>
     </div>
   `;
 }
-
 
 
 // [내부 전용] 지정된 정산 타임 목록 (시 0~23 기준)
