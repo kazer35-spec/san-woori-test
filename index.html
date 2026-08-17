@@ -3358,15 +3358,17 @@ overflow: hidden;
   <div class="modal-content !p-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
     
     <!-- 헤더 영역 -->
-    <div class="flex items-center justify-between mb-2">
-      <h2 class="text-lg font-black text-slate-800 flex items-center gap-1.5">
-        <span id="vibeModalIcon">🔥</span> Community Passion
-      </h2>
-      <!-- 🌟 산정 방식 버튼 크기 줄임 -->
-      <button onclick="toggleVibeCalcInfoModal(true)" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-100">
-        💡 산정 방식
-      </button>
-    </div>
+<div class="flex items-center justify-between mb-2">
+  <!-- text-lg 대신 text-[15px] 적용 -->
+  <h2 class="text-[15px] font-black text-slate-800 flex items-center gap-1.5">
+    <span id="vibeModalIcon">🔥</span> Community Passion
+  </h2>
+  <!-- 🌟 산정 방식 버튼 -->
+  <button onclick="toggleVibeCalcInfoModal(true)" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-100">
+    💡 산정 방식
+  </button>
+</div>
+
 
 
     <!-- 게이지 영역 (원본 레이아웃 정확히 복원) -->
