@@ -5256,7 +5256,17 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
             
 
     
-window.toggleVibeModal = (show) => { document.getElementById('vibeModal').style.display = show ? 'flex' : 'none'; };
+window.toggleVibeModal = (show) => {
+  const modal = document.getElementById('vibeModal');
+  if (!modal) return;
+  
+  modal.style.display = show ? 'flex' : 'none';
+  
+  // 🌟 모달이 열릴 때 4개 명예의 전당 파트를 최신 데이터로 렌더링
+  if (show) {
+    renderVibeHallOfFame();
+  }
+};
 
 // 필터링 처리를 위해 현재 조회 중인 멤버의 로그 목록을 임시 저장할 전역 변수
 let currentMemberLogs = []; 
@@ -8000,6 +8010,7 @@ function renderVibeHallOfFame() {
     </div>
   `;
 }
+
 
 
 // [내부 전용] 지정된 정산 타임 목록 (시 0~23 기준)
