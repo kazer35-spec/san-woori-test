@@ -3353,38 +3353,46 @@ overflow: hidden;
 </div>
 
 
-<div id="vibeModal" class="modal-overlay" onclick="toggleVibeModal(false)">
+<!-- 현재 vibeModal 구조 -->
+<div id="vibeModal" class="modal-overlay" style="display:none;" onclick="toggleVibeModal(false)">
   <div class="modal-content !p-6 max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
-    <!-- 상단 헤더: 제목 및 지수 산정 방식 팝업 버튼 -->
+    
+    <!-- 헤더 영역 -->
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-        <span id="vibeModalIcon">🍀</span> Community Passion
+        <span id="vibeModalIcon">🔥</span> Community Passion
       </h2>
-      <button onclick="toggleVibeCalcInfoModal(true)" class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors flex items-center gap-1">
+      <button onclick="toggleVibeCalcInfoModal(true)" class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
         💡 산정 방식
       </button>
     </div>
 
-    <!-- 카드 게이지 메인 -->
+    <!-- 게이지 영역 -->
     <div class="vibe-temp-card-modal mb-4" id="vibeCard">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100" id="vibeStatusTxt">WARMING UP</span>
-        <span class="text-[10px] font-bold text-slate-400" id="vibeScoreTxt">0%</span>
+        <span class="text-[10px] font-black text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full" id="vibeStatusTxt">EXPLOSIVE PASSION</span>
+        <span class="text-[10px] font-bold text-slate-400" id="vibeScoreTxt">100%</span>
       </div>
       <div class="temp-gauge-bg">
-        <div id="vibeGauge" class="temp-gauge-fill"></div>
+        <div id="vibeGauge" class="temp-gauge-fill" style="width: 100%;"></div>
       </div>
-      <div id="vibeDesc" class="text-xs font-bold text-slate-500 mt-4 leading-relaxed">최근 24시간 활동량을 분석 중입니다.</div>
+      <div id="vibeDesc" class="text-xs font-bold text-slate-500 mt-4 leading-relaxed">
+        현재 활동지수 최고조! 산행의 열기가 가득합니다.
+      </div>
     </div>
 
-    <!-- 🌟 새로 신설된 4가지 파트 명예의 전당 컨테이너 -->
-    <div id="vibeHallOfFame" class="space-y-3">
-      <!-- 동적 로딩 영역 -->
+    <!-- 🌟 [필수 추가] 명예의 전당이 들어갈 빈 컨테이너 🌟 -->
+    <div id="vibeHallOfFame" class="space-y-3 mt-4">
+      <!-- renderVibeHallOfFame() 함수가 실행되면 이 자리에 4개 파트가 그려집니다 -->
     </div>
 
-    <button onclick="toggleVibeModal(false)" class="w-full mt-6 py-4 bg-slate-800 text-white rounded-2xl font-black text-sm">확인</button>
+    <!-- 하단 확인 버튼 -->
+    <button onclick="toggleVibeModal(false)" class="w-full mt-6 py-4 bg-slate-800 text-white rounded-2xl font-black text-sm">
+      확인
+    </button>
   </div>
 </div>
+
 
 <!-- 💡 별도 팝업: 지수 산정 방식 모달 -->
 <div id="vibeCalcInfoModal" class="modal-overlay hidden" style="z-index: 10060; background: rgba(0,0,0,0.6);" onclick="toggleVibeCalcInfoModal(false)">
@@ -8168,6 +8176,9 @@ async function updateVibeTemp() {
     if (modalIcon) modalIcon.innerText = currentEmoji;
 
     console.log("🎯 최종 활동지수 UI 반영 완료:", tempPercent + "%");
+
+    // 🌟 [필수 추가] 활동지수 갱신 완료 후 4가지 명예의 전당 파트 그려주기
+    renderVibeHallOfFame();
 
   } catch (e) {
     console.error("온도 갱신 중 오류 발생:", e);
