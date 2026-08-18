@@ -8007,7 +8007,6 @@ window.toggleVibeCalcInfoModal = function(show) {
 };
 
 
-
 /**
  * 🏆 SanWoori History 렌더링 함수
  */
@@ -8040,8 +8039,7 @@ function renderVibeHallOfFame() {
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-  // 획득자 태그 반짝임(latest-holder-tag) 완전히 제외한 깔끔한 바인딩
-  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 5) => {
+  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 3) => {
     if (!list || list.length === 0) {
       const emptyTextStyle = isGold ? "text-amber-600/80 font-bold" : "text-slate-400";
       return `<span class="${emptyTextStyle} text-[10px] pl-1">아직 달성자가 없습니다</span>`;
@@ -8088,7 +8086,7 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
-      <!-- 📜 메인 타이틀 -->
+      <!-- 📜 타이틀 -->
       <div class="flex items-center justify-between mb-2.5">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
@@ -8108,25 +8106,25 @@ function renderVibeHallOfFame() {
           </div>
           
           <div class="space-y-1.5">
-            <!-- 🔥 슈퍼별 배지 영역 -->
-<div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-super-subtle-glow">
-  <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-    🔥 슈퍼별
-  </span>
-  <div class="flex flex-wrap items-center pt-0.5">
-    ${formatBadgeListWithMore(superHolders, false, 'super', 4)}
-  </div>
-</div>
+            <!-- 🔥 슈퍼별 영역 (3명 표시 후 +more) -->
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-super-subtle-glow">
+              <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                🔥 슈퍼별
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(superHolders, false, 'super', 3)}
+              </div>
+            </div>
 
-<!-- ✨ 스페셜 배지 영역 -->
-<div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-special-subtle-glow">
-  <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-    ✨ 스페셜
-  </span>
-  <div class="flex flex-wrap items-center pt-0.5">
-    ${formatBadgeListWithMore(specialHolders, false, 'special', 4)}
-  </div>
-</div>
+            <!-- ✨ 스페셜 영역 (3명 표시 후 +more) -->
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-special-subtle-glow">
+              <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                ✨ 스페셜
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(specialHolders, false, 'special', 3)}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -8140,15 +8138,16 @@ function renderVibeHallOfFame() {
               EMPEROR
             </span>
           </div>
-          <!-- 내부 노란 창 (gold-inner-glow 은은한 미세 빛 적용) -->
+          <!-- 100레벨 영역 (4명 표시 후 +more) -->
           <div class="flex flex-wrap items-center p-2.5 bg-amber-50/40 rounded-xl border shadow-2xs gold-inner-glow">
-            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 5)}
+            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 4)}
           </div>
         </div>
       </div>
     </div>
   `;
 }
+
         
             
 
