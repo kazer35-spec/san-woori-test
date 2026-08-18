@@ -3567,7 +3567,8 @@ margin: 0 2px !important;
 </div>
 
         <!-- 📢 전광판 전체 보기 모달 -->
-<div id="bannerListModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeBannerListModal()">
+<div id="bannerListModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+
   <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
     
     <!-- 모달 헤더 -->
@@ -8299,6 +8300,32 @@ function renderVibeHallOfFame() {
 
     return html;
   };
+
+        // 📢 야구장 전광판 배너 HTML 생성 함수
+function buildTickerBannerHtml() {
+  const banners = window.bannerCache || [];
+  let bannerText = "등록된 전광판 메시지가 없습니다.";
+
+  if (banners.length > 0) {
+    bannerText = banners.map(b => b.text).join(' &nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp; ');
+  }
+
+  return `
+    <div class="mb-3 p-2 bg-slate-900 rounded-xl border border-slate-700 shadow-inner flex items-center justify-between gap-2 overflow-hidden">
+      <div class="flex items-center gap-1.5 shrink-0 bg-amber-400 text-slate-900 font-black text-[10px] px-2 py-0.5 rounded-md">
+        <span>📢</span>전광판
+      </div>
+      <div class="flex-1 overflow-hidden whitespace-nowrap text-xs font-bold text-amber-300">
+        <marquee behavior="scroll" direction="left" scrollamount="4" class="align-middle">
+          ${bannerText}
+        </marquee>
+      </div>
+      <button onclick="openBannerListModal()" class="text-[10px] font-bold text-slate-400 hover:text-white bg-slate-800 px-2 py-0.5 rounded-md shrink-0 border border-slate-700 transition-all cursor-pointer">
+        전체보기
+      </button>
+    </div>
+  `;
+}
 
   container.innerHTML = `
     <div>
