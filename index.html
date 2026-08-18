@@ -8658,15 +8658,13 @@ window.openHeightDetailModal = function() {
 };
 
        
-// -------------------------------------------------------------
-// 📢 전광판 배너 (sanwoori/oz 문서의 Banner 필드 직접 사용)
-// -------------------------------------------------------------
+// 📢 전광판 배너 (sanwoori/오즈 문서의 Banner 필드 연동)
 window.bannerCache = [];
 
-// 1. 배너 불러오기 (oz 문서 내 Banner 필드 읽기)
+// 1. 배너 불러오기 (한글 '오즈' 문서 내 Banner 필드)
 async function loadBannerMessages() {
   try {
-    const ozRef = doc(db, "sanwoori", "oz");
+    const ozRef = doc(db, "sanwoori", "오즈");
     const ozSnap = await getDoc(ozRef);
 
     if (ozSnap.exists() && ozSnap.data().Banner) {
@@ -8679,11 +8677,11 @@ async function loadBannerMessages() {
       renderVibeHallOfFame();
     }
   } catch (error) {
-    console.error("전광판 불러오기 실패:", error);
+    console.error("전광판 로드 실패:", error);
   }
 }
 
-// 2. 배너 저장하기 (oz 문서의 Banner 필드 업데이트 / 없으면 생성)
+// 2. 배너 저장하기
 async function saveBannerMessage() {
   const input = document.getElementById('bannerTextInputModal') || document.getElementById('bannerTextInput');
   if (!input) return alert("입력창을 찾을 수 없습니다.");
@@ -8699,19 +8697,12 @@ async function saveBannerMessage() {
       createdAt: Date.now()
     };
 
-    // 최신글 상단 추가 및 최대 5개 유지
     currentList.unshift(newBanner);
     if (currentList.length > 5) currentList = currentList.slice(0, 5);
 
-    const ozRef = doc(db, "sanwoori", "oz");
-    const ozSnap = await getDoc(ozRef);
-
-    // oz 문수가 이미 존재하는 경우 updateDoc, 없을 경우 setDoc
-    if (ozSnap.exists()) {
-      await updateDoc(ozRef, { Banner: currentList });
-    } else {
-      await setDoc(ozRef, { Banner: currentList }, { merge: true });
-    }
+    // 문서 ID를 한글 '오즈'로 지정하여 Banner 필드 저장
+    const ozRef = doc(db, "sanwoori", "오즈");
+    await setDoc(ozRef, { Banner: currentList }, { merge: true });
 
     window.bannerCache = currentList;
     input.value = '';
@@ -8722,7 +8713,7 @@ async function saveBannerMessage() {
 
   } catch (error) {
     console.error("전광판 저장 실패:", error);
-    alert("저장 실패: " + error.message);
+    alert("저장 실패 원인: " + error.message);
   }
 }
 
@@ -8733,14 +8724,14 @@ async function deleteBannerMessage(id) {
   try {
     let currentList = (window.bannerCache || []).filter(b => b.id !== id);
 
-    const ozRef = doc(db, "sanwoori", "oz");
-    await updateDoc(ozRef, { Banner: currentList });
+    const ozRef = doc(db, "sanwoori", "오즈");
+    await setDoc(ozRef, { Banner: currentList }, { merge: true });
 
     window.bannerCache = currentList;
     if (typeof openBannerListModal === 'function') openBannerListModal();
     if (typeof renderVibeHallOfFame === 'function') renderVibeHallOfFame();
   } catch (error) {
-    console.error("배너 삭제 실패:", error);
+    console.error("삭제 실패:", error);
     alert("삭제 실패: " + error.message);
   }
 }
@@ -8792,11 +8783,10 @@ window.closeBannerListModal = function() {
   }
 };
 
-// 초기화 시 데이터 조회
+// 초기 로드
 document.addEventListener('DOMContentLoaded', () => {
   loadBannerMessages();
 });
-
 
 
 
