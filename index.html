@@ -8140,69 +8140,6 @@ window.historyCache = {
 };
 
 
-        
-  // -------------------------------------------------------------
-// 📢 마크 승급 시 전광판 자동 등록 함수 (window 객체에 등록)
-// -------------------------------------------------------------
-window.triggerAutoBanner = async function(type, data) {
-  if (type !== 'BADGE') return;
-  const text = `🎖️ [마크승급] ${data.memberName}님이 [${data.badgeName}] 마크를 획득하셨습니다! (Lv.${data.level})`;
-  
-  let currentList = [...(window.bannerCache || [])];
-  currentList.unshift({ id: 'banner_' + Date.now(), text, createdAt: Date.now() });
-  if (currentList.length > 10) currentList = currentList.slice(0, 10); // 최대 10개 유지
-
-  window.bannerCache = currentList;
-  
-  try {
-    const ozRef = doc(db, "sanwoori", "오즈");
-    await setDoc(ozRef, { Banner: currentList }, { merge: true });
-
-    // 💡 전광판 영역 화면 즉시 갱신 (선택사항)
-    const bannerContainer = document.getElementById('tickerBannerArea');
-    if (bannerContainer && typeof buildTickerBannerHtml === 'function') {
-      bannerContainer.innerHTML = buildTickerBannerHtml();
-    }
-  } catch (e) {
-    console.error("마크 승급 전광판 저장 실패:", e);
-  }
-};
-
-
-// -------------------------------------------------------------
-// 🏆 레벨업 및 마크 변동 체크 함수 (기존 코드)
-// -------------------------------------------------------------
-window.checkLevelUpgrade = (name, oldLevel, newLevel) => {
-    const thresholds = (typeof levelThresholds !== 'undefined') ? levelThresholds : (typeof LevelThresholds !== 'undefined' ? LevelThresholds : []);
-    if (thresholds.length === 0) return;
-
-    const oldBadge = getLevelBadge(oldLevel);
-    const newBadge = getLevelBadge(newLevel);
-
-    if (oldBadge !== newBadge) {
-        const style = getLevelStyle(newLevel);
-        
-        pendingLevelUpCards.push({ 
-            name: name, 
-            level: newLevel,
-            badgeText: newBadge,
-            color: style.border || "#ffffff" 
-        });
-        
-        // 📢 여기서 위에서 만든 triggerAutoBanner가 실행됩니다!
-        if (typeof triggerAutoBanner === 'function') {
-            triggerAutoBanner('BADGE', { 
-                memberName: name, 
-                badgeName: newBadge,
-                level: newLevel 
-            });
-        }
-        
-        console.log(`🎉 [전광판 발송] ${name}님 ${oldBadge} ➔ ${newBadge} 등급 승급!`);
-    }
-};
-
-        
    /**
  * 💾 1. 별(슈퍼/스페셜) 획득 시 DB 저장 함수
  */
@@ -8382,15 +8319,10 @@ function renderVibeHallOfFame() {
 
         
 // 📢 야구장 전광판 배너 HTML 생성 함수 (좌측 스크롤 전광판 방식)
-// 📢 히스토리 데이터 및 등록 메시지 기반 통합 전광판 생성 함수
 function buildTickerBannerHtml() {
-  const manualBanners = window.bannerCache || []; // 직접 입력한 전광판 메시지
-  const autoBanners = generateAutoBannersFromHistory(); // 🏆 히스토리 기반 자동 메시지
+  const banners = window.bannerCache || [];
   
-  // 수동 메시지 + 자동 메시지 합치기
-  const allBanners = [...autoBanners, ...manualBanners];
-
-  if (!allBanners || allBanners.length === 0) {
+  if (!banners || banners.length === 0) {
     return `
       <div class="mb-3 p-2.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 shadow-[0_0_12px_rgba(245,158,11,0.2)] flex items-center justify-between gap-2 text-xs">
         <div class="flex items-center gap-1.5 shrink-0 font-extrabold text-amber-600">
@@ -8409,9 +8341,9 @@ function buildTickerBannerHtml() {
   const now = Date.now();
   const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
-  // 전체 메시지를 하나의 흐름으로 연결
-  const bannerTextHtml = allBanners.map(b => {
-    const isNew = b.createdAt ? ((now - b.createdAt) < THREE_DAYS_MS) : true;
+  // 전체 메시지를 하나의 흐름으로 연결 (NEW 뱃지 포함)
+  const bannerTextHtml = banners.map(b => {
+    const isNew = (now - b.createdAt) < THREE_DAYS_MS;
     return `
       <span class="inline-flex items-center gap-1.5">
         ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full animate-pulse shrink-0 shadow-xs">NEW</span>' : ''}
@@ -8426,6 +8358,7 @@ function buildTickerBannerHtml() {
         <span class="text-sm">📢</span>전광판
       </div>
       
+      <!-- 좌측으로 계속 흘러가는 스크롤 구역 -->
       <div class="flex-1 overflow-hidden whitespace-nowrap text-slate-800 font-bold">
         <marquee behavior="scroll" direction="left" scrollamount="4">
           ${bannerTextHtml}
@@ -8437,35 +8370,6 @@ function buildTickerBannerHtml() {
       </button>
     </div>
   `;
-}
-
-// 🏆 현재 히스토리 상태를 읽어 자동으로 전광판 멘트 만드는 함수
-function generateAutoBannersFromHistory() {
-  const autoList = [];
-
-  // 1. 🔥 전설의 별 (슈퍼별/스페셜별 No.1)
-  if (window.superStarOwner) {
-    autoList.push({ text: `🔥 [슈퍼별] 현재 No.1 슈퍼별 주인공: ${window.superStarOwner}님!`, isAuto: true });
-  }
-  if (window.specialStarOwner) {
-    autoList.push({ text: `✨ [스페셜별] 현재 No.1 스페셜별 주인공: ${window.specialStarOwner}님!`, isAuto: true });
-  }
-
-  // 2. 👑 천상계 (Lv.100)
-  if (window.heavenMembers && window.heavenMembers.length > 0) {
-    const names = window.heavenMembers.join(', ');
-    autoList.push({ text: `👑 [천상계] 명예의 Lv.100 Club: ${names}님`, isAuto: true });
-  }
-
-  // 3. 🏔️ 누적 고도 달성자 (10만m+, 5만m+ 등)
-  if (window.altitude100kMembers && window.altitude100kMembers.length > 0) {
-    autoList.push({ text: `💎 [누적고도] 10만m+ 전설: ${window.altitude100kMembers.join(', ')}님`, isAuto: true });
-  }
-  if (window.altitude50kMembers && window.altitude50kMembers.length > 0) {
-    autoList.push({ text: `🪴 [누적고도] 5만m+ 달성: ${window.altitude50kMembers.join(', ')}님`, isAuto: true });
-  }
-
-  return autoList;
 }
 
 
