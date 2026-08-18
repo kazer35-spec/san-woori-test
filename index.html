@@ -8658,50 +8658,24 @@ window.openHeightDetailModal = function() {
 };
 
        
-
 // -------------------------------------------------------------
-// 📢 전광판 배너 데이터베이스 & 모달 제어 (만능 호환 수정본)
+// 📢 전광판 배너 (sanwoori/oz 내 필드 저장 방식)
 // -------------------------------------------------------------
 window.bannerCache = [];
-
-// [내부 헬퍼] Firestore 문서 참조 객체 가져오기
-function getBannerDocRef() {
-  const collectionName = 'settings';
-  const docId = 'hallOfFameBanners';
-
-  // 1. Firebase v9 Modular (doc 함수 이용)
-  if (typeof doc === 'function' && window.db) {
-    return doc(window.db, collectionName, docId);
-  } 
-  // 2. Firebase v8 Compat (db.collection 이용)
-  if (window.db && typeof window.db.collection === 'function') {
-    return window.db.collection(collectionName).doc(docId);
-  }
-  // 3. firebase 글로벌 객체 이용
-  if (typeof firebase !== 'undefined' && firebase.firestore) {
-    return firebase.firestore().collection(collectionName).doc(docId);
-  }
-  return null;
-}
 
 // 1. 배너 데이터 불러오기
 async function loadBannerMessages() {
   try {
-    const docRef = getBannerDocRef();
-    if (!docRef) return;
+    // sanwoori 컬렉션의 oz 문서 참조
+    const ozRef = doc(db, "sanwoori", "oz");
+    const ozSnap = await getDoc(ozRef);
 
-    let data = null;
-
-    if (typeof getDoc === 'function') {
-      const snap = await getDoc(docRef);
-      if (snap.exists()) data = snap.data();
-    } else if (typeof docRef.get === 'function') {
-      const snap = await docRef.get();
-      if (snap.exists) data = snap.data();
+    if (ozSnap.exists() && ozSnap.data().tickerBanners) {
+      window.bannerCache = ozSnap.data().tickerBanners;
+    } else {
+      window.bannerCache = [];
     }
 
-    window.bannerCache = (data && data.list) ? data.list : [];
-    
     if (typeof renderVibeHallOfFame === 'function') {
       renderVibeHallOfFame();
     }
@@ -8710,22 +8684,15 @@ async function loadBannerMessages() {
   }
 }
 
-// 📢 전광판 배너 저장 (최종 호환용)
+// 2. 배너 메시지 저장
 async function saveBannerMessage() {
-  const input = document.getElementById('bannerTextInput');
-  if (!input) return alert("입력창(bannerTextInput)을 찾을 수 없습니다.");
+  const input = document.getElementById('bannerTextInputModal') || document.getElementById('bannerTextInput');
+  if (!input) return alert("입력창을 찾을 수 없습니다.");
 
   const text = input.value.trim();
   if (!text) return alert("메시지를 입력해 주세요.");
 
   try {
-    // 1. Firebase DB 객체 찾기
-    const firestore = window.db || (typeof db !== 'undefined' ? db : null);
-    if (!firestore) {
-      alert("데이터베이스(db) 객체를 찾을 수 없습니다.");
-      return;
-    }
-
     let currentList = [...(window.bannerCache || [])];
     const newBanner = {
       id: 'banner_' + Date.now(),
@@ -8736,47 +8703,36 @@ async function saveBannerMessage() {
     currentList.unshift(newBanner);
     if (currentList.length > 5) currentList = currentList.slice(0, 5);
 
-    // 2. Firebase v9 setDoc / v8 set 호환 처리
-    if (typeof setDoc === 'function' && typeof doc === 'function') {
-      const docRef = doc(firestore, 'settings', 'hallOfFameBanners');
-      await setDoc(docRef, { list: currentList }, { merge: true });
-    } else if (firestore.collection) {
-      const docRef = firestore.collection('settings').doc('hallOfFameBanners');
-      await docRef.set({ list: currentList }, { merge: true });
-    } else {
-      throw new Error("Firestore 저장 함수를 실행시킬 수 없습니다.");
-    }
+    // sanwoori/oz 문서의 tickerBanners 필드 업데이트
+    const ozRef = doc(db, "sanwoori", "oz");
+    await updateDoc(ozRef, {
+      tickerBanners: currentList
+    });
 
     window.bannerCache = currentList;
     input.value = '';
-    alert("📢 전광판 배너에 등록되었습니다.");
+    alert("📢 전광판 배너에 등록되었습니다!");
 
-    // 화면 갱신
     if (typeof openBannerListModal === 'function') openBannerListModal();
     if (typeof renderVibeHallOfFame === 'function') renderVibeHallOfFame();
 
   } catch (error) {
-    console.error("전광판 저장 실패 상세:", error);
-    alert("저장 실패: " + (error.message || error));
+    console.error("전광판 저장 실패:", error);
+    alert("저장 실패: " + error.message);
   }
 }
-
 
 // 3. 배너 메시지 삭제
 async function deleteBannerMessage(id) {
   if (!confirm("이 배너 메시지를 삭제하시겠습니까?")) return;
 
   try {
-    const docRef = getBannerDocRef();
-    if (!docRef) return;
-
     let currentList = (window.bannerCache || []).filter(b => b.id !== id);
 
-    if (typeof setDoc === 'function') {
-      await setDoc(docRef, { list: currentList }, { merge: true });
-    } else if (typeof docRef.set === 'function') {
-      await docRef.set({ list: currentList }, { merge: true });
-    }
+    const ozRef = doc(db, "sanwoori", "oz");
+    await updateDoc(ozRef, {
+      tickerBanners: currentList
+    });
 
     window.bannerCache = currentList;
     if (typeof openBannerListModal === 'function') openBannerListModal();
@@ -8786,7 +8742,7 @@ async function deleteBannerMessage(id) {
   }
 }
 
-// 4. 전광판 히스토리 모달 열기
+// 4. 모달 열기
 window.openBannerListModal = function() {
   const modal = document.getElementById('bannerListModal');
   const body = document.getElementById('bannerListModalBody');
@@ -8824,7 +8780,7 @@ window.openBannerListModal = function() {
   modal.style.display = 'flex';
 };
 
-// 5. 전광판 히스토리 모달 닫기
+// 5. 모달 닫기
 window.closeBannerListModal = function() {
   const modal = document.getElementById('bannerListModal');
   if (modal) {
@@ -8833,11 +8789,10 @@ window.closeBannerListModal = function() {
   }
 };
 
-// 페이지 로드 시 실행
+// 페이지 로드 시 오즈 데이터에서 전광판 불러오기
 document.addEventListener('DOMContentLoaded', () => {
   loadBannerMessages();
 });
-
 
 
 
