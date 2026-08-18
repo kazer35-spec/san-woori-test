@@ -8158,6 +8158,7 @@ window.toggleVibeCalcInfoModal = function(show) {
   }
 };
 
+
 /**
  * 🏆 SanWoori History 메인 영역 렌더링
  */
@@ -8306,23 +8307,7 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  // 달성 순서대로 정렬 (타임스탬프 기준)
-  superItems.sort((a, b) => a.createdAt - b.createdAt);
-  specialItems.sort((a, b) => a.createdAt - b.createdAt);
-  lv100Items.sort((a, b) => a.createdAt - b.createdAt);
-
-  window.historyCache = {
-    superStars: superItems,
-    specialStars: specialItems,
-    lv100List: lv100Items,
-    lastUpdated: Date.now()
-  };
-
-  return window.historyCache;
-}
-
-
-// -------------------------------------------------------------
+  // -------------------------------------------------------------
 // 🌟 1. 전설의 별 상세보기 모달
 // -------------------------------------------------------------
 window.openLegendDetailModal = function() {
@@ -8449,7 +8434,7 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-
+    
 
   // 모달 닫기
 window.closeHistoryDetailModal = function() {
