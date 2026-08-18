@@ -8262,6 +8262,21 @@ window.toggleVibeModal = function(show) {
 
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
 
+           // 백틱(` `) 내부 HTML 구성 시작
+  container.innerHTML = `
+    <!-- 📢 레전드스타 상단 야구장 전광판 배너 -->
+    <div class="mb-3 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-xl border border-amber-200/80 p-2 flex items-center justify-between shadow-2xs overflow-hidden">
+      <span class="text-sm mr-2 shrink-0">📢</span>
+      <div class="vibe-ticker-wrapper flex-1">
+        <div id="vibeBannerTicker" class="flex items-center">
+          <!-- JS에서 동적 로드 -->
+        </div>
+      </div>
+      <button onclick="openVibeBannerModal()" class="ml-2 px-2 py-0.5 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 text-amber-900 text-[9.5px] font-black rounded-lg shrink-0 transition-all active:scale-95 cursor-pointer">
+        보기
+      </button>
+    </div>
+           
   // 1. 전설의 별 데이터
   const superNames = [];
   const specialNames = [];
@@ -8676,84 +8691,94 @@ window.closeHistoryDetailModal = function() {
   }
 };
    
-// ⚾ 관리자 화면에서 배너 등록 버튼 클릭 시 실행
+
+
+    // 야구장 A-Board 연속 롤링용 복제
+    // ⚾ 관리자 화면 배너 등록 실행 함수
 async function handleBannerSubmit() {
   const input = document.getElementById('vibeBannerInput');
-  if (!input) return;
+  if (!input) return alert("입력창을 찾을 수 없습니다.");
   
   const text = input.value;
-  await saveVibeBannerMessage(text);
-  input.value = ''; // 입력창 초기화
+  if (!text || !text.trim()) return alert("문구를 입력해주세요.");
+
+  try {
+    const bannerRef = firebase.database().ref('vibeBannerHistory');
+    
+    // 1. 전체 배너 가져오기 (에러 방지용 일반 once)
+    const snapshot = await bannerRef.once('value');
+    let bannerList = [];
+    
+    if (snapshot.exists()) {
+      snapshot.forEach(child => {
+        bannerList.push({ id: child.key, ...child.val() });
+      });
+    }
+
+    // 타임스탬프 기준 오름차순 정렬
+    bannerList.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+    // 2. 5개 이상이면 가장 오래된 데이터 삭제
+    if (bannerList.length >= 5) {
+      const oldestId = bannerList[0].id;
+      await firebase.database().ref(`vibeBannerHistory/${oldestId}`).remove();
+    }
+
+    // 3. 새 배너 저장
+    await bannerRef.push({
+      text: text.trim(),
+      timestamp: Date.now(),
+      createdAt: new Date().toISOString()
+    });
+
+    alert("배너가 정상적으로 등록되었습니다!");
+    input.value = ''; // 입력창 초기화
+  } catch (error) {
+    console.error("배너 저장 오류:", error);
+    alert("저장 중 오류가 발생했습니다: " + error.message);
+  }
 }
 
-// ⚾ 배너 등록 함수 (Firebase DB 저장 & 5개 초과 시 자동 삭제)
-async function saveVibeBannerMessage(messageText) {
-  if (!messageText || !messageText.trim()) return alert("문구를 입력해주세요.");
-  
+// ⚾ 배너 데이터 실시간 불러오기
+function loadVibeBanners() {
   const bannerRef = firebase.database().ref('vibeBannerHistory');
   
-  // 1. 기존 배너 가져오기 (최근 5개만 조회 - 데이터 절약)
-  const snapshot = await bannerRef.orderByChild('timestamp').limitToLast(5).once('value');
-  let bannerList = [];
-  
-  if (snapshot.exists()) {
-    snapshot.forEach(child => {
-      bannerList.push({ id: child.key, ...child.val() });
-    });
-  }
-
-  // 2. 5개 이상이면 가장 오래된 항목 자동 삭제
-  if (bannerList.length >= 5) {
-    const oldestId = bannerList[0].id;
-    await firebase.database().ref(`vibeBannerHistory/${oldestId}`).remove();
-  }
-
-  // 3. 새 배너 추가
-  const newBanner = {
-    text: messageText.trim(),
-    timestamp: Date.now(),
-    createdAt: new Date().toISOString()
-  };
-
-  await bannerRef.push(newBanner);
-  alert("배너가 정상적으로 등록되었습니다.");
-}
-
-// ⚾ 배너 데이터 실시간 불러오기 및 롤링 렌더링
-function loadVibeBanners() {
-  firebase.database().ref('vibeBannerHistory').limitToLast(5).on('value', (snapshot) => {
+  bannerRef.on('value', (snapshot) => {
     const bannerContainer = document.getElementById('vibeBannerTicker');
     const modalListContainer = document.getElementById('vibeBannerModalList');
     if (!bannerContainer) return;
 
     if (!snapshot.exists()) {
-      bannerContainer.innerHTML = `<div class="text-xs text-slate-400">등록된 배너가 없습니다.</div>`;
+      bannerContainer.innerHTML = `<div class="text-xs text-slate-400 font-bold">등록된 배너 소식이 없습니다.</div>`;
       if (modalListContainer) modalListContainer.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">등록된 메시지가 없습니다.</div>`;
       return;
     }
 
-    const banners = [];
+    let banners = [];
     snapshot.forEach(child => {
       banners.push({ id: child.key, ...child.val() });
     });
 
-    // 최신순 정렬
-    banners.reverse();
+    // 최신순 정렬 (최신글이 먼저)
+    banners.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    
+    // 최대 5개까지만 유지
+    banners = banners.slice(0, 5);
 
     const NOW = Date.now();
     const THREE_DAYS = 3 * 24 * 60 * 60 * 1000; // 3일
 
-    // 메인 롤링 배너 HTML 생성
+    // 롤링 배너 HTML 생성
     const bannerItemsHTML = banners.map(b => {
       const isNew = (NOW - b.timestamp) < THREE_DAYS;
       const newBadge = isNew ? `<span class="vibe-new-sparkle bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full mr-1 shrink-0">NEW</span>` : '';
       return `<div class="vibe-ticker-item flex items-center shrink-0 mr-8 text-xs font-bold text-slate-700">${newBadge}<span>${b.text}</span></div>`;
     }).join('');
 
-    // 야구장 A-Board 연속 롤링용 복제
+    // 무한 롤링 트랙 연동
     bannerContainer.innerHTML = `<div class="vibe-ticker-track flex items-center">${bannerItemsHTML}${bannerItemsHTML}</div>`;
 
-    // 전체 보기 모달 내 목록 업데이트
+    // 전체 보기 모달 내 목록 갱신
     if (modalListContainer) {
       modalListContainer.innerHTML = banners.map((b, idx) => {
         const isNew = (NOW - b.timestamp) < THREE_DAYS;
@@ -8773,10 +8798,11 @@ function loadVibeBanners() {
   });
 }
 
-// 페이지 초기화 시 배너 리스너 실행
+// 모달이 열릴 때 실시간 감지 함수 구동
 document.addEventListener('DOMContentLoaded', () => {
   loadVibeBanners();
 });
+
 
                 
  window.openVibeBannerModal = function() {
