@@ -8626,7 +8626,75 @@ window.openHeightDetailModal = function() {
   modal.style.display = 'flex';
 };
 
-       // 🗑️ 배너 메시지 삭제 함수
+       
+// -------------------------------------------------------------
+// 📢 전광판 배너 데이터베이스 & 모달 제어 (최종 수정본)
+// -------------------------------------------------------------
+window.bannerCache = [];
+
+// 1. 배너 데이터 불러오기
+async function loadBannerMessages() {
+  try {
+    const docRef = db.collection('settings').doc('hallOfFameBanners');
+    const doc = await docRef.get();
+    
+    if (doc.exists) {
+      window.bannerCache = doc.data().list || [];
+    } else {
+      window.bannerCache = [];
+    }
+    
+    if (typeof renderVibeHallOfFame === 'function') {
+      renderVibeHallOfFame();
+    }
+  } catch (error) {
+    console.error("배너 로드 실패:", error);
+  }
+}
+
+// 2. 배너 메시지 저장
+async function saveBannerMessage() {
+  const input = document.getElementById('bannerTextInput');
+  if (!input) return;
+
+  const text = input.value.trim();
+  if (!text) {
+    alert("메시지를 입력해 주세요.");
+    return;
+  }
+
+  try {
+    const docRef = db.collection('settings').doc('hallOfFameBanners');
+    let currentList = [...(window.bannerCache || [])];
+
+    const newBanner = {
+      id: 'banner_' + Date.now(),
+      text: text,
+      createdAt: Date.now()
+    };
+
+    currentList.unshift(newBanner);
+
+    if (currentList.length > 5) {
+      currentList = currentList.slice(0, 5);
+    }
+
+    await docRef.set({ list: currentList }, { merge: true });
+
+    window.bannerCache = currentList;
+    input.value = '';
+    alert("📢 전광판 배너에 등록되었습니다.");
+
+    if (typeof renderVibeHallOfFame === 'function') {
+      renderVibeHallOfFame();
+    }
+  } catch (error) {
+    console.error("배너 저장 실패:", error);
+    alert("저장 중 오류가 발생했습니다.");
+  }
+}
+
+// 3. 배너 메시지 삭제
 async function deleteBannerMessage(id) {
   if (!confirm("이 배너 메시지를 삭제하시겠습니까?")) return;
 
@@ -8637,14 +8705,16 @@ async function deleteBannerMessage(id) {
     await docRef.set({ list: currentList }, { merge: true });
 
     window.bannerCache = currentList;
-    openBannerListModal(); // 모달 재갱신
-    renderVibeHallOfFame(); // 메인 화면 재갱신
+    openBannerListModal(); // 모달 내부 리스트 재갱신
+    if (typeof renderVibeHallOfFame === 'function') {
+      renderVibeHallOfFame(); // 전광판 메인 재갱신
+    }
   } catch (error) {
     console.error("배너 삭제 실패:", error);
   }
 }
 
-// 📢 openBannerListModal() 수정본 (삭제 버튼 추가)
+// 4. 전광판 히스토리 모달 열기
 window.openBannerListModal = function() {
   const modal = document.getElementById('bannerListModal');
   const body = document.getElementById('bannerListModalBody');
@@ -8670,7 +8740,7 @@ window.openBannerListModal = function() {
             </div>
             <div class="text-[9px] text-slate-400 font-medium">📅 ${dateStr}</div>
           </div>
-          <button onclick="deleteBannerMessage('${b.id}')" class="text-xs text-slate-300 hover:text-rose-500 font-bold p-1 transition-all">
+          <button onclick="deleteBannerMessage('${b.id}')" class="text-xs text-slate-300 hover:text-rose-500 font-bold p-1 transition-all cursor-pointer">
             ✕
           </button>
         </div>
@@ -8681,127 +8751,8 @@ window.openBannerListModal = function() {
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
- 
- 
-// 모달 닫기
-window.closeHistoryDetailModal = function() {
-  const modal = document.getElementById('historyDetailModal');
-  if (modal) {
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
-  }
-};
-   
 
-// -------------------------------------------------------------
-// 📢 전광판 배너 데이터베이스 관리 (데이터 절약 구조)
-// -------------------------------------------------------------
-window.bannerCache = [];
-
-// 1. 배너 데이터 불러오기 (초기 실행 또는 리프레시)
-async function loadBannerMessages() {
-  try {
-    const docRef = db.collection('settings').doc('hallOfFameBanners');
-    const doc = await docRef.get();
-    
-    if (doc.exists) {
-      window.bannerCache = doc.data().list || [];
-    } else {
-      window.bannerCache = [];
-    }
-    
-    // Hall of Fame 다시 렌더링
-    if (typeof renderVibeHallOfFame === 'function') {
-      renderVibeHallOfFame();
-    }
-  } catch (error) {
-    console.error("배너 로드 실패:", error);
-  }
-}
-
-// 2. 신규 배너 메시지 저장 (최대 5개 제한 및 자동 삭제)
-async function saveBannerMessage() {
-  const input = document.getElementById('bannerTextInput');
-  if (!input) return;
-
-  const text = input.value.trim();
-  if (!text) {
-    alert("메시지를 입력해 주세요.");
-    return;
-  }
-
-  try {
-    const docRef = db.collection('settings').doc('hallOfFameBanners');
-    
-    // 최신 배너 리스트 가져오기
-    let currentList = [...(window.bannerCache || [])];
-
-    // 새 배너 객체
-    const newBanner = {
-      id: 'banner_' + Date.now(),
-      text: text,
-      createdAt: Date.now()
-    };
-
-    // 맨 앞에 추가
-    currentList.unshift(newBanner);
-
-    // 5개 초과 시 오래된 데이터 자동 삭제
-    if (currentList.length > 5) {
-      currentList = currentList.slice(0, 5);
-    }
-
-    // DB 업데이트 (1회 쓰기 트랜잭션으로 네트워크 절약)
-    await docRef.set({ list: currentList }, { merge: true });
-
-    window.bannerCache = currentList;
-    input.value = '';
-    alert("전광판 배너에 등록되었습니다.");
-
-    if (typeof renderVibeHallOfFame === 'function') {
-      renderVibeHallOfFame();
-    }
-  } catch (error) {
-    console.error("배너 저장 실패:", error);
-    alert("저장 중 오류가 발생했습니다.");
-  }
-}
-
-// 3. 전체보기 모달 열기
-window.openBannerListModal = function() {
-  const modal = document.getElementById('bannerListModal');
-  const body = document.getElementById('bannerListModalBody');
-  if (!modal || !body) return;
-
-  const banners = window.bannerCache || [];
-  const now = Date.now();
-  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-
-  if (banners.length === 0) {
-    body.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">등록된 메시지가 없습니다.</div>`;
-  } else {
-    body.innerHTML = banners.map((b, idx) => {
-      const isNew = (now - b.createdAt) < THREE_DAYS_MS;
-      const dateStr = new Date(b.createdAt).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-
-      return `
-        <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-start justify-between gap-2 text-xs">
-          <div class="space-y-1">
-            <div class="font-bold text-slate-800 flex items-center gap-1.5 flex-wrap">
-              ${isNew ? `<span class="bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full animate-pulse">NEW</span>` : ''}
-              <span>${b.text}</span>
-            </div>
-            <div class="text-[9px] text-slate-400 font-medium">📅 ${dateStr}</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
-};
-
+// 5. 전광판 히스토리 모달 닫기
 window.closeBannerListModal = function() {
   const modal = document.getElementById('bannerListModal');
   if (modal) {
@@ -8810,10 +8761,12 @@ window.closeBannerListModal = function() {
   }
 };
 
-// 앱 초기화 구역에 호출 추가
+// 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', () => {
   loadBannerMessages();
 });
+
+
 
 
 
