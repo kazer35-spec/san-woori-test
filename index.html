@@ -28,6 +28,19 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* 텍스트 그라데이션 스타일 */
+.text-gradient-legend {
+  background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF007F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-lv100 {
+  background: linear-gradient(135deg, #FFB703 0%, #FB8500 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
         /* ================= 🏷️ 슈퍼별 / 스페셜 배지 고유 그라데이션 ================= */
 
 /* 🔥 슈퍼별 배지: 로즈 → 주황 → 골드 그라데이션 & 미세 입체 그림자 */
@@ -8350,7 +8363,7 @@ function getOrBuildHistoryCache() {
 }
 
 // -------------------------------------------------------------
-// 🌟 1. 전설의 별 상세보기 모달 (캐시 및 DB 데이터 참조)
+// 🌟 1. 전설의 별 상세보기 모달
 // -------------------------------------------------------------
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
@@ -8358,7 +8371,8 @@ window.openLegendDetailModal = function() {
   const body = document.getElementById('historyDetailBody');
   if (!modal || !body) return;
 
-  title.innerHTML = `🌟 전설의 별 (Legend Star) 획득 기록`;
+  // 타이틀 그라데이션 적용
+  title.innerHTML = `🌟 <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span> 획득 기록`;
 
   const cache = getOrBuildHistoryCache();
 
@@ -8370,19 +8384,14 @@ window.openLegendDetailModal = function() {
       const isSuper = type === 'super';
       
       return `
-        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between">
-          <div class="flex items-center gap-2">
+        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+          <!-- 최초달성, 이름, 분기, 산행지, 날짜 한줄 배치 -->
+          <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
             ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-slate-400 w-4">#${idx+1}</span>`}
-            <div>
-              <div class="text-xs font-black text-slate-800 flex items-center gap-1">
-                ${item.name}
-                <span class="text-[9.5px] font-bold text-slate-400">(${item.quarter})</span>
-              </div>
-              <div class="text-[10px] text-slate-500 font-medium mt-0.5">📍 ${item.mountain}</div>
-            </div>
-          </div>
-          <div class="text-[10px] font-bold text-slate-500 shrink-0 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-            📅 ${item.date}
+            <span class="font-black text-slate-800">${item.name}</span>
+            <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
+            <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+            <span class="text-[10px] text-slate-400 font-medium ml-1">📅 ${item.date}</span>
           </div>
         </div>
       `;
@@ -8395,11 +8404,12 @@ window.openLegendDetailModal = function() {
       <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
         🔥 슈퍼별 획득 명단
       </div>
-      <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
         ${renderList(cache.superStars, 'super')}
       </div>
     </div>
 
+    <!-- 구분선 -->
     <div class="my-2.5 border-t border-dashed border-slate-200"></div>
 
     <!-- ✨ 하단: 스페셜별 -->
@@ -8407,7 +8417,7 @@ window.openLegendDetailModal = function() {
       <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
         ✨ 스페셜별 획득 명단
       </div>
-      <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
         ${renderList(cache.specialStars, 'special')}
       </div>
     </div>
@@ -8418,7 +8428,7 @@ window.openLegendDetailModal = function() {
 };
 
 // -------------------------------------------------------------
-// 👑 2. Lv.100 Club 상세보기 모달 (캐시 및 DB 데이터 참조)
+// 👑 2. Lv.100 Club 상세보기 모달
 // -------------------------------------------------------------
 window.openLv100DetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
@@ -8426,7 +8436,8 @@ window.openLv100DetailModal = function() {
   const body = document.getElementById('historyDetailBody');
   if (!modal || !body) return;
 
-  title.innerHTML = `👑 천상계 (Lv.100 Club) 달성 기록`;
+  // 타이틀 그라데이션 적용
+  title.innerHTML = `👑 <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span> 달성 기록`;
 
   const cache = getOrBuildHistoryCache();
   const lv100Items = cache.lv100List;
@@ -8439,19 +8450,14 @@ window.openLv100DetailModal = function() {
         ${lv100Items.map((item, idx) => {
           const isFirst = idx === 0;
           return `
-            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                ${isFirst ? `<span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 달성</span>` : `<span class="text-[10px] font-bold text-amber-700/60 w-4">#${idx+1}</span>`}
-                <div>
-                  <div class="text-xs font-black text-slate-800 flex items-center gap-1">
-                    ${item.name}
-                    <span class="text-[9.5px] font-bold text-amber-800/60">(${item.quarter})</span>
-                  </div>
-                  <div class="text-[10px] text-slate-600 font-medium mt-0.5">📍 ${item.mountain}</div>
-                </div>
-              </div>
-              <div class="text-[10px] font-bold text-amber-900/80 shrink-0 bg-amber-100/50 px-2 py-1 rounded-lg border border-amber-200/60">
-                📅 ${item.date}
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+              <!-- 최초달성, 이름, 분기, 산행지, 날짜 한줄 배치 -->
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-amber-700/60 w-4">#${idx+1}</span>`}
+                <span class="font-black text-slate-800">${item.name}</span>
+                <span class="text-[10px] text-amber-800/60 font-bold">(${item.quarter})</span>
+                <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+                <span class="text-[10px] text-slate-400 font-medium ml-1">📅 ${item.date}</span>
               </div>
             </div>
           `;
@@ -8463,6 +8469,7 @@ window.openLv100DetailModal = function() {
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
+
 
   // 모달 닫기
 window.closeHistoryDetailModal = function() {
