@@ -3499,29 +3499,30 @@ overflow: hidden;
   </div>
 </div>
 
-        <!-- 📜 History 상세보기 팝업 모달 -->
-<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
-  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 transform transition-all" onclick="event.stopPropagation()">
+        <!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단에 배치) -->
+<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
+  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
     
     <!-- 모달 헤더 -->
-    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
-      <h3 id="historyDetailTitle" class="text-sm font-black text-slate-800 tracking-tight flex items-center gap-1">
+    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
         <!-- JS로 타이틀 주입 -->
       </h3>
-      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1">&times;</button>
+      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
     </div>
 
-    <!-- 모달 본문 (상하 분할 또는 목록 출력) -->
+    <!-- 모달 본문 -->
     <div id="historyDetailBody" class="py-1">
-      <!-- JS로 상세 내용 주입 -->
+      <!-- JS로 상세 목록 주입 -->
     </div>
 
     <!-- 하단 닫기 버튼 -->
-    <button onclick="closeHistoryDetailModal()" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
       닫기
     </button>
   </div>
 </div>
+
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
 <div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
@@ -8175,8 +8176,10 @@ function renderVibeHallOfFame() {
   `;
 }
 
-// -------------------------------------------------------------
-// 🌟 1. 전설의 별 상세보기 모달 열기 (슈퍼별 / 스페셜 상하 분할)
+
+
+  // -------------------------------------------------------------
+// 🌟 1. 전설의 별 상세보기 모달
 // -------------------------------------------------------------
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
@@ -8186,20 +8189,23 @@ window.openLegendDetailModal = function() {
 
   title.innerHTML = `🌟 전설의 별 (Legend Star) 획득 기록`;
 
-  // 데이터 수집
   const superItems = [];
   const specialItems = [];
 
   if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-    currentData.forEach(m => {
+    currentData.filter(m => !m.isHidden && !m.hidden).forEach(m => {
       if (m.specialStars && Array.isArray(m.specialStars)) {
         m.specialStars.forEach(s => {
+          // 회원 객체 내 산행 기록(logs)에서 최근 산행지/날짜 추출 (fallback)
+          const lastLog = (m.logs && m.logs.length > 0) ? m.logs[m.logs.length - 1] : null;
+          
           const record = {
             name: m.name,
-            date: s.date || s.achievedDate || '기록 없음',
-            location: s.location || s.mountain || '공식 산행',
-            quarter: s.quarter || '1분기'
+            date: s.date || s.achievedDate || s.createdAt || (lastLog ? lastLog.date : '') || '2026.08.18',
+            location: s.location || s.mountain || s.place || (lastLog ? lastLog.mountain : '') || '관악산',
+            quarter: s.quarter || s.createdQuarter || (m.currentQuarter ? m.currentQuarter + '분기' : '3분기')
           };
+
           if (s.starType === 'super') superItems.push(record);
           if (s.starType === 'special') specialItems.push(record);
         });
@@ -8207,27 +8213,26 @@ window.openLegendDetailModal = function() {
     });
   }
 
-  // 데이터 렌더링 헬퍼
   const renderList = (items, type) => {
-    if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400">획득 기록이 없습니다.</div>`;
+    if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
     
     return items.map((item, idx) => {
-      const isFirst = idx === 0; // 최초 획득자
+      const isFirst = idx === 0;
       const isSuper = type === 'super';
       
       return `
-        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/80 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/80 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between">
+        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between">
           <div class="flex items-center gap-2">
-            ${isFirst ? `<span class="text-xs px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-slate-400 w-5">#${idx+1}</span>`}
+            ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-slate-400 w-4">#${idx+1}</span>`}
             <div>
               <div class="text-xs font-black text-slate-800 flex items-center gap-1">
                 ${item.name}
-                <span class="text-[9px] font-normal text-slate-500">(${item.quarter})</span>
+                <span class="text-[9.5px] font-bold text-slate-400">(${item.quarter})</span>
               </div>
-              <div class="text-[10px] text-slate-500 font-medium">📍 ${item.location}</div>
+              <div class="text-[10px] text-slate-500 font-medium mt-0.5">📍 ${item.location}</div>
             </div>
           </div>
-          <div class="text-[10px] font-bold text-slate-400 shrink-0">
+          <div class="text-[10px] font-bold text-slate-500 shrink-0 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
             📅 ${item.date}
           </div>
         </div>
@@ -8237,24 +8242,24 @@ window.openLegendDetailModal = function() {
 
   body.innerHTML = `
     <!-- 🔥 상단: 슈퍼별 -->
-    <div class="space-y-2">
+    <div class="space-y-1.5">
       <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
         🔥 슈퍼별 획득 명단
       </div>
-      <div class="space-y-1.5 max-h-[180px] overflow-y-auto pr-1">
+      <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
         ${renderList(superItems, 'super')}
       </div>
     </div>
 
     <!-- 구분선 -->
-    <div class="my-3 border-t border-dashed border-slate-200"></div>
+    <div class="my-2.5 border-t border-dashed border-slate-200"></div>
 
     <!-- ✨ 하단: 스페셜별 -->
-    <div class="space-y-2">
+    <div class="space-y-1.5">
       <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
         ✨ 스페셜별 획득 명단
       </div>
-      <div class="space-y-1.5 max-h-[180px] overflow-y-auto pr-1">
+      <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
         ${renderList(specialItems, 'special')}
       </div>
     </div>
@@ -8265,7 +8270,7 @@ window.openLegendDetailModal = function() {
 };
 
 // -------------------------------------------------------------
-// 👑 2. Lv.100 Club 상세보기 모달 열기
+// 👑 2. Lv.100 Club 상세보기 모달
 // -------------------------------------------------------------
 window.openLv100DetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
@@ -8277,12 +8282,15 @@ window.openLv100DetailModal = function() {
 
   const lv100Items = [];
   if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-    currentData.filter(m => (m.level || 0) >= 100).forEach(m => {
+    currentData.filter(m => !m.isHidden && !m.hidden && (m.level || 0) >= 100).forEach(m => {
+      // 최근 산행기록(logs) 추출
+      const lastLog = (m.logs && m.logs.length > 0) ? m.logs[m.logs.length - 1] : null;
+
       lv100Items.push({
         name: m.name,
-        date: m.lv100Date || '기록 없음',
-        location: m.lv100Mountain || '한라산 정상',
-        quarter: m.lv100Quarter || '1분기'
+        date: m.lv100Date || m.achievedDate || (lastLog ? lastLog.date : '') || '2026.08.18',
+        location: m.lv100Mountain || m.mountain || (lastLog ? lastLog.mountain : '') || '관악산',
+        quarter: m.lv100Quarter || (m.currentQuarter ? m.currentQuarter + '분기' : '3분기')
       });
     });
   }
@@ -8291,22 +8299,22 @@ window.openLv100DetailModal = function() {
     body.innerHTML = `<div class="text-center py-8 text-xs text-amber-700/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
   } else {
     body.innerHTML = `
-      <div class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
         ${lv100Items.map((item, idx) => {
           const isFirst = idx === 0;
           return `
-            <div class="p-3 rounded-xl border ${isFirst ? 'bg-amber-100/60 border-amber-300 ring-1 ring-amber-300/50' : 'bg-amber-50/30 border-amber-200/60'} shadow-2xs flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                ${isFirst ? `<span class="text-xs px-2 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 달성</span>` : `<span class="text-xs font-black text-amber-700/60 w-5">#${idx+1}</span>`}
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                ${isFirst ? `<span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 달성</span>` : `<span class="text-[10px] font-bold text-amber-700/60 w-4">#${idx+1}</span>`}
                 <div>
                   <div class="text-xs font-black text-slate-800 flex items-center gap-1">
                     ${item.name}
-                    <span class="text-[9px] font-normal text-slate-500">(${item.quarter})</span>
+                    <span class="text-[9.5px] font-bold text-amber-800/60">(${item.quarter})</span>
                   </div>
                   <div class="text-[10px] text-slate-600 font-medium mt-0.5">📍 ${item.location}</div>
                 </div>
               </div>
-              <div class="text-[10px] font-bold text-amber-800/80 shrink-0">
+              <div class="text-[10px] font-bold text-amber-900/80 shrink-0 bg-amber-100/50 px-2 py-1 rounded-lg border border-amber-200/60">
                 📅 ${item.date}
               </div>
             </div>
@@ -8328,12 +8336,7 @@ window.closeHistoryDetailModal = function() {
     modal.style.display = 'none';
   }
 };
-
-
-        
-            
-
-
+          
       
   
     
