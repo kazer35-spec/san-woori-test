@@ -8310,41 +8310,79 @@ function renderVibeHallOfFame() {
     return html;
   };
 
-        // 📢 야구장 전광판 배너 HTML 생성 함수
+        // 📢 야구장 전광판 배너 HTML 생성 함수 (위아래 슬라이드 애니메이션 적용)
 function buildTickerBannerHtml() {
   const banners = window.bannerCache || [];
-  let bannerText = "등록된 전광판 메시지가 없습니다.";
-
-  if (banners.length > 0) {
-    const now = Date.now();
-    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-
-    bannerText = banners.map(b => {
-      const isNew = (now - b.createdAt) < THREE_DAYS_MS;
-      return `
-        <span class="inline-flex items-center gap-1.5">
-          ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full animate-pulse">NEW</span>' : ''}
-          <span>${b.text}</span>
-        </span>
-      `;
-    }).join('<span class="mx-3 text-slate-500">|</span>');
+  
+  if (!banners || banners.length === 0) {
+    return `
+      <div class="mb-3 p-2 bg-slate-900 rounded-xl flex items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-1 shrink-0 font-bold text-amber-400">
+          <span>📢</span>전광판
+        </div>
+        <div class="flex-1 overflow-hidden h-6 flex items-center text-slate-400 font-medium">
+          등록된 전광판 메시지가 없습니다.
+        </div>
+        <button onclick="openBannerListModal(false)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg shrink-0 cursor-pointer">
+          전체보기
+        </button>
+      </div>
+    `;
   }
+
+  const now = Date.now();
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+  // 배너 목록 아이템 생성
+  const bannerItemsHtml = banners.map(b => {
+    const isNew = (now - b.createdAt) < THREE_DAYS_MS;
+    return `
+      <div class="h-6 flex items-center gap-1.5 text-white font-medium truncate shrink-0">
+        ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full animate-pulse shrink-0">NEW</span>' : ''}
+        <span class="truncate">${b.text}</span>
+      </div>
+    `;
+  }).join('');
+
+  // 롤링 시작 타이머 호출
+  setTimeout(() => startBannerRolling(), 100);
 
   return `
     <div class="mb-3 p-2 bg-slate-900 rounded-xl flex items-center justify-between gap-2 text-xs">
       <div class="flex items-center gap-1 shrink-0 font-bold text-amber-400">
-        <span>📢</span>
+        <span>📢</span>전광판
       </div>
-      <div class="flex-1 overflow-hidden whitespace-nowrap text-white font-medium">
-        <marquee behavior="scroll" direction="left" scrollamount="4">
-          ${bannerText}
-        </marquee>
+      <!-- 위아래 슬라이드 컨테이너 (높이h-6, overflow-hidden) -->
+      <div class="flex-1 overflow-hidden h-6 relative">
+        <div id="tickerBannerWrapper" class="transition-transform duration-500 ease-in-out flex flex-col">
+          ${bannerItemsHtml}
+        </div>
       </div>
       <button onclick="openBannerListModal(false)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg shrink-0 cursor-pointer">
         전체보기
       </button>
     </div>
   `;
+}
+
+// 📢 전광판 위아래 롤링 타이머 함수
+window.bannerRollingTimer = null;
+function startBannerRolling() {
+  if (window.bannerRollingTimer) clearInterval(window.bannerRollingTimer);
+
+  const wrapper = document.getElementById('tickerBannerWrapper');
+  if (!wrapper) return;
+
+  const totalItems = wrapper.children.length;
+  if (totalItems <= 1) return; // 메시지가 1개 이하면 롤링하지 않음
+
+  let currentIndex = 0;
+  const itemHeight = 24; // h-6 (24px) 기준
+
+  window.bannerRollingTimer = setInterval(() => {
+    currentIndex = (currentIndex + 1) % totalItems;
+    wrapper.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
+  }, 3000); // 3초 간격
 }
 
 
