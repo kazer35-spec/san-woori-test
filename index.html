@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"> 
 <head>
-        <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>산:우리 - 미니홈</title>
@@ -8391,7 +8388,7 @@ window.openLegendDetailModal = function() {
           <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
             <!-- 배지 (최초 획득 / No.X) -->
             ${isFirst 
-              ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초 획득</span>` 
+              ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
               : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
             }
             <!-- 회원 이름 -->
@@ -8399,7 +8396,7 @@ window.openLegendDetailModal = function() {
             <!-- 분기 -->
             <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
             <!-- 산행지 -->
-            <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+            <span class="text-[11px] text-slate-600 font-medium"> ${item.mountain}</span>
             <!-- 날짜 사각 박스 -->
             <span class="text-[10px] text-slate-500 font-bold bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
               📅 ${item.date}
