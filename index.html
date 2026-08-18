@@ -8060,9 +8060,10 @@ window.toggleVibeCalcInfoModal = function(show) {
 };
 
 
- /**
- * 🏆 SanWoori History 렌더링 함수
- */
+ 
+// =============================================================
+// 🏆 SanWoori History 렌더링 함수
+// =============================================================
 function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
@@ -8204,167 +8205,238 @@ function renderVibeHallOfFame() {
   `;
 }
 
+// =============================================================
+// 🏆 1. 레전드 별(슈퍼/스페셜) DB 저장 함수 (산행지 & 날짜 포함)
+// =============================================================
+async function saveSpecialStarToMember(memberId, starType, quarterText, memberInfo, mountainName, activityDate) {
+    if (starType === "super" || starType === "special") {
+        try {
+            const currentSpecialStars = memberInfo?.specialStars || [];
+            const isAlreadySaved = currentSpecialStars.some(item => item.starType === starType);
 
+            if (isAlreadySaved) return;
 
-  // -------------------------------------------------------------
-// 🌟 1. 전설의 별 상세보기 모달
-// -------------------------------------------------------------
+            const targetDate = activityDate ? new Date(activityDate) : new Date();
+            const currentYear = targetDate.getFullYear();
+            const dateStr = `${currentYear}.${String(targetDate.getMonth() + 1).padStart(2, '0')}.${String(targetDate.getDate()).padStart(2, '0')}`;
+            const targetMountain = mountainName || "관악산";
+
+            const newRecord = {
+                starType: starType,
+                quarter: quarterText || "3Q",
+                year: currentYear,
+                date: dateStr,
+                mountain: targetMountain,
+                timestamp: targetDate.getTime()
+            };
+
+            const memberRef = doc(db, "sanwoori", memberId);
+            await updateDoc(memberRef, {
+                specialStars: arrayUnion(newRecord)
+            });
+            
+            // 로컬 메모리 캐시 즉시 반영
+            if (!memberInfo.specialStars) memberInfo.specialStars = [];
+            memberInfo.specialStars.push(newRecord);
+
+            if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+                const target = currentData.find(m => m.id === memberId);
+                if (target) {
+                    if (!target.specialStars) target.specialStars = [];
+                    target.specialStars.push(newRecord);
+                }
+            }
+        } catch (err) {
+            console.error("레전드 별 기록 최초 업데이트 실패:", err);
+        }
+    }
+}
+
+// =============================================================
+// 👑 2. Lv.100 최초 달성 DB 저장 함수
+// =============================================================
+async function checkAndSaveLv100ToMember(memberId, newLevel, mountainName, activityDate, quarterText, memberInfo) {
+    if (newLevel >= 100) {
+        try {
+            if (memberInfo?.lv100Info) return;
+
+            const targetDate = activityDate ? new Date(activityDate) : new Date();
+            const dateStr = `${targetDate.getFullYear()}.${String(targetDate.getMonth() + 1).padStart(2, '0')}.${String(targetDate.getDate()).padStart(2, '0')}`;
+            
+            const lv100Record = {
+                date: dateStr,
+                mountain: mountainName || "관악산",
+                quarter: quarterText || "3분기",
+                timestamp: targetDate.getTime()
+            };
+
+            const memberRef = doc(db, "sanwoori", memberId);
+            await updateDoc(memberRef, {
+                lv100Info: lv100Record
+            });
+
+            // 로컬 메모리 캐시 반영
+            memberInfo.lv100Info = lv100Record;
+            if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+                const target = currentData.find(m => m.id === memberId);
+                if (target) target.lv100Info = lv100Record;
+            }
+        } catch (err) {
+            console.error("Lv.100 달성 기록 저장 실패:", err);
+        }
+    }
+}
+
+// =============================================================
+// 🌟 3. 전설의 별 상세보기 모달
+// =============================================================
 window.openLegendDetailModal = function() {
-  const modal = document.getElementById('historyDetailModal');
-  const title = document.getElementById('historyDetailTitle');
-  const body = document.getElementById('historyDetailBody');
-  if (!modal || !body) return;
+    const modal = document.getElementById('historyDetailModal');
+    const title = document.getElementById('historyDetailTitle');
+    const body = document.getElementById('historyDetailBody');
+    if (!modal || !body) return;
 
-  title.innerHTML = `🌟 전설의 별 (Legend Star) 획득 기록`;
+    title.innerHTML = `🌟 전설의 별 (Legend Star) 획득 기록`;
 
-  const superItems = [];
-  const specialItems = [];
+    const superItems = [];
+    const specialItems = [];
 
-  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-    currentData.filter(m => !m.isHidden && !m.hidden).forEach(m => {
-      if (m.specialStars && Array.isArray(m.specialStars)) {
-        m.specialStars.forEach(s => {
-          // 회원 객체 내 산행 기록(logs)에서 최근 산행지/날짜 추출 (fallback)
-          const lastLog = (m.logs && m.logs.length > 0) ? m.logs[m.logs.length - 1] : null;
-          
-          const record = {
-            name: m.name,
-            date: s.date || s.achievedDate || s.createdAt || (lastLog ? lastLog.date : '') || '2026.08.18',
-            location: s.location || s.mountain || s.place || (lastLog ? lastLog.mountain : '') || '관악산',
-            quarter: s.quarter || s.createdQuarter || (m.currentQuarter ? m.currentQuarter + '분기' : '3분기')
-          };
-
-          if (s.starType === 'super') superItems.push(record);
-          if (s.starType === 'special') specialItems.push(record);
+    if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+        currentData.filter(m => !m.isHidden && !m.hidden).forEach(m => {
+            if (m.specialStars && Array.isArray(m.specialStars)) {
+                m.specialStars.forEach(s => {
+                    const record = {
+                        name: m.name,
+                        date: s.date || (s.timestamp ? new Date(s.timestamp).toISOString().split('T')[0].replace(/-/g, '.') : '2026.08.18'),
+                        location: s.mountain || s.location || '관악산',
+                        quarter: s.quarter || '3Q',
+                        timestamp: s.timestamp || 0
+                    };
+                    if (s.starType === 'super') superItems.push(record);
+                    if (s.starType === 'special') specialItems.push(record);
+                });
+            }
         });
-      }
-    });
-  }
+    }
 
-  const renderList = (items, type) => {
-    if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
-    
-    return items.map((item, idx) => {
-      const isFirst = idx === 0;
-      const isSuper = type === 'super';
-      
-      return `
-        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-slate-400 w-4">#${idx+1}</span>`}
-            <div>
-              <div class="text-xs font-black text-slate-800 flex items-center gap-1">
-                ${item.name}
-                <span class="text-[9.5px] font-bold text-slate-400">(${item.quarter})</span>
-              </div>
-              <div class="text-[10px] text-slate-500 font-medium mt-0.5">📍 ${item.location}</div>
-            </div>
-          </div>
-          <div class="text-[10px] font-bold text-slate-500 shrink-0 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
-            📅 ${item.date}
-          </div>
-        </div>
-      `;
-    }).join('');
-  };
+    superItems.sort((a, b) => a.timestamp - b.timestamp);
+    specialItems.sort((a, b) => a.timestamp - b.timestamp);
 
-  body.innerHTML = `
-    <!-- 🔥 상단: 슈퍼별 -->
-    <div class="space-y-1.5">
-      <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
-        🔥 슈퍼별 획득 명단
-      </div>
-      <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
-        ${renderList(superItems, 'super')}
-      </div>
-    </div>
-
-    <!-- 구분선 -->
-    <div class="my-2.5 border-t border-dashed border-slate-200"></div>
-
-    <!-- ✨ 하단: 스페셜별 -->
-    <div class="space-y-1.5">
-      <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
-        ✨ 스페셜별 획득 명단
-      </div>
-      <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
-        ${renderList(specialItems, 'special')}
-      </div>
-    </div>
-  `;
-
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
-};
-
-// -------------------------------------------------------------
-// 👑 2. Lv.100 Club 상세보기 모달
-// -------------------------------------------------------------
-window.openLv100DetailModal = function() {
-  const modal = document.getElementById('historyDetailModal');
-  const title = document.getElementById('historyDetailTitle');
-  const body = document.getElementById('historyDetailBody');
-  if (!modal || !body) return;
-
-  title.innerHTML = `👑 천상계 (Lv.100 Club) 달성 기록`;
-
-  const lv100Items = [];
-  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-    currentData.filter(m => !m.isHidden && !m.hidden && (m.level || 0) >= 100).forEach(m => {
-      // 최근 산행기록(logs) 추출
-      const lastLog = (m.logs && m.logs.length > 0) ? m.logs[m.logs.length - 1] : null;
-
-      lv100Items.push({
-        name: m.name,
-        date: m.lv100Date || m.achievedDate || (lastLog ? lastLog.date : '') || '2026.08.18',
-        location: m.lv100Mountain || m.mountain || (lastLog ? lastLog.mountain : '') || '관악산',
-        quarter: m.lv100Quarter || (m.currentQuarter ? m.currentQuarter + '분기' : '3분기')
-      });
-    });
-  }
-
-  if (lv100Items.length === 0) {
-    body.innerHTML = `<div class="text-center py-8 text-xs text-amber-700/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
-  } else {
-    body.innerHTML = `
-      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-        ${lv100Items.map((item, idx) => {
-          const isFirst = idx === 0;
-          return `
-            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                ${isFirst ? `<span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 달성</span>` : `<span class="text-[10px] font-bold text-amber-700/60 w-4">#${idx+1}</span>`}
-                <div>
-                  <div class="text-xs font-black text-slate-800 flex items-center gap-1">
-                    ${item.name}
-                    <span class="text-[9.5px] font-bold text-amber-800/60">(${item.quarter})</span>
-                  </div>
-                  <div class="text-[10px] text-slate-600 font-medium mt-0.5">📍 ${item.location}</div>
+    const renderList = (items, type) => {
+        if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
+        
+        return items.map((item, idx) => {
+            const isFirst = idx === 0;
+            const isSuper = type === 'super';
+            
+            return `
+                <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-slate-400 w-4">#${idx+1}</span>`}
+                        <div>
+                            <div class="text-xs font-black text-slate-800 flex items-center gap-1">
+                                ${item.name}
+                                <span class="text-[9.5px] font-bold text-slate-400">(${item.quarter})</span>
+                            </div>
+                            <div class="text-[10px] text-slate-500 font-medium mt-0.5">📍 ${item.location}</div>
+                        </div>
+                    </div>
+                    <div class="text-[10px] font-bold text-slate-500 shrink-0 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                        📅 ${item.date}
+                    </div>
                 </div>
-              </div>
-              <div class="text-[10px] font-bold text-amber-900/80 shrink-0 bg-amber-100/50 px-2 py-1 rounded-lg border border-amber-200/60">
-                📅 ${item.date}
-              </div>
+            `;
+        }).join('');
+    };
+
+    body.innerHTML = `
+        <div class="space-y-1.5">
+            <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
+                🔥 슈퍼별 획득 명단
             </div>
-          `;
-        }).join('')}
-      </div>
+            <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+                ${renderList(superItems, 'super')}
+            </div>
+        </div>
+        <div class="my-2.5 border-t border-dashed border-slate-200"></div>
+        <div class="space-y-1.5">
+            <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
+                ✨ 스페셜별 획득 명단
+            </div>
+            <div class="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+                ${renderList(specialItems, 'special')}
+            </div>
+        </div>
     `;
-  }
 
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
 };
 
-// 모달 닫기
-window.closeHistoryDetailModal = function() {
-  const modal = document.getElementById('historyDetailModal');
-  if (modal) {
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
-  }
+// =============================================================
+// 👑 4. Lv.100 Club 상세보기 모달
+// =============================================================
+window.openLv100DetailModal = function() {
+    const modal = document.getElementById('historyDetailModal');
+    const title = document.getElementById('historyDetailTitle');
+    const body = document.getElementById('historyDetailBody');
+    if (!modal || !body) return;
+
+    title.innerHTML = `👑 천상계 (Lv.100 Club) 달성 기록`;
+
+    const lv100Items = [];
+    if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+        currentData.filter(m => !m.isHidden && !m.hidden && (m.level || 0) >= 100).forEach(m => {
+            const info = m.lv100Info || {};
+            const lastLog = (m.logs && m.logs.length > 0) ? m.logs[m.logs.length - 1] : null;
+
+            lv100Items.push({
+                name: m.name,
+                date: info.date || (lastLog ? lastLog.date : '') || '2026.08.18',
+                location: info.mountain || (lastLog ? lastLog.mountain : '') || '관악산',
+                quarter: info.quarter || '3분기',
+                timestamp: info.timestamp || 0
+            });
+        });
+    }
+
+    lv100Items.sort((a, b) => a.timestamp - b.timestamp);
+
+    if (lv100Items.length === 0) {
+        body.innerHTML = `<div class="text-center py-8 text-xs text-amber-700/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
+    } else {
+        body.innerHTML = `
+            <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+                ${lv100Items.map((item, idx) => {
+                    const isFirst = idx === 0;
+                    return `
+                        <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                ${isFirst ? `<span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 달성</span>` : `<span class="text-[10px] font-bold text-amber-700/60 w-4">#${idx+1}</span>`}
+                                <div>
+                                    <div class="text-xs font-black text-slate-800 flex items-center gap-1">
+                                        ${item.name}
+                                        <span class="text-[9.5px] font-bold text-amber-800/60">(${item.quarter})</span>
+                                    </div>
+                                    <div class="text-[10px] text-slate-600 font-medium mt-0.5">📍 ${item.location}</div>
+                                </div>
+                            </div>
+                            <div class="text-[10px] font-bold text-amber-900/80 shrink-0 bg-amber-100/50 px-2 py-1 rounded-lg border border-amber-200/60">
+                                📅 ${item.date}
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
 };
-          
+
+      
+    
       
   
     
