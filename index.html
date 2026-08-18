@@ -8158,10 +8158,9 @@ window.toggleVibeCalcInfoModal = function(show) {
   }
 };
 
-
- /**
- * 🏆 SanWoori History 렌더링 함수
- */
+// -------------------------------------------------------------
+// 🏆 SanWoori History 메인 렌더링 함수
+// -------------------------------------------------------------
 function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
@@ -8247,20 +8246,20 @@ function renderVibeHallOfFame() {
       </div>
 
       <div class="space-y-2.5">
-        <!-- 🌟 Legend Star 카드 -->
+        <!-- 🌟 Legend Star 카드 (메인 카드 제목에도 그라데이션 적용) -->
         <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
           <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span class="text-amber-400">🌟</span> 전설의 별 (Legend Star)
+              <span>🌟</span> <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span>
             </span>
-            <!-- 🔍 상세보기 버튼 (상세 모달 호출) -->
+            <!-- 🔍 상세보기 버튼 -->
             <button onclick="openLegendDetailModal()" class="text-[9px] font-black tracking-tight text-indigo-600 bg-indigo-100/80 hover:bg-indigo-200/80 border border-indigo-200 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5">
               🔍 상세보기
             </button>
           </div>
           
           <div class="space-y-1.5">
-            <!-- 🔥 슈퍼별 영역 (3개 표시 후 +more) -->
+            <!-- 🔥 슈퍼별 영역 -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-super-subtle-glow">
               <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 🔥 슈퍼별
@@ -8270,7 +8269,7 @@ function renderVibeHallOfFame() {
               </div>
             </div>
 
-            <!-- ✨ 스페셜 영역 (3개 표시 후 +more) -->
+            <!-- ✨ 스페셜 영역 -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-special-subtle-glow">
               <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 ✨ 스페셜
@@ -8282,18 +8281,18 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
-        <!-- 👑 Lv.100 Club 카드 -->
+        <!-- 👑 Lv.100 Club 카드 (메인 카드 제목에도 그라데이션 적용) -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span>👑</span> 천상계 (Lv.100 Club)
+              <span>👑</span> <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span>
             </span>
-            <!-- 🔍 상세보기 버튼 (상세 모달 호출) -->
+            <!-- 🔍 상세보기 버튼 -->
             <button onclick="openLv100DetailModal()" class="text-[9px] font-black tracking-tight text-amber-800 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5">
               🔍 상세보기
             </button>
           </div>
-          <!-- 100레벨 영역 (4개 표시 후 +more) -->
+          <!-- 100레벨 영역 -->
           <div class="flex flex-wrap items-center p-2.5 bg-amber-50/40 rounded-xl border shadow-2xs gold-inner-glow">
             ${formatBadgeListWithMore(level100Holders, true, 'lv100', 4)}
           </div>
@@ -8304,49 +8303,8 @@ function renderVibeHallOfFame() {
 }
 
 
-
-// 캐시 빌드 함수
-function getOrBuildHistoryCache() {
-  if (window.historyCache.superStars && window.historyCache.specialStars && window.historyCache.lv100List) {
-    return window.historyCache; // 캐시 반환 (데이터 절약)
-  }
-
-  const superItems = [];
-  const specialItems = [];
-  const lv100Items = [];
-
-  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-    const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
-
-    activeMembers.forEach(m => {
-      // 🌟 전설의 별 추출 (DB 데이터 직접 참조)
-      if (m.specialStars && Array.isArray(m.specialStars)) {
-        m.specialStars.forEach(s => {
-          const item = {
-            name: m.name,
-            mountain: s.mountain || '관악산',
-            date: s.date || '2026.08.18',
-            quarter: s.quarter || '3분기',
-            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : 0
-          };
-          if (s.starType === 'super') superItems.push(item);
-          if (s.starType === 'special') specialItems.push(item);
-        });
-      }
-
-      // 👑 Lv.100 Club 추출 (DB 데이터 직접 참조)
-      if ((m.level || 0) >= 100 || m.lv100Achieved) {
-        lv100Items.push({
-          name: m.name,
-          mountain: m.lv100Mountain || '관악산',
-          date: m.lv100Date || '2026.08.18',
-          quarter: m.lv100Quarter || '3분기',
-          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : 0
-        });
-      }
-    });
-  }
-
+          
+          
   // 달성 순서대로 정렬 (타임스탬프 기준)
   superItems.sort((a, b) => a.createdAt - b.createdAt);
   specialItems.sort((a, b) => a.createdAt - b.createdAt);
@@ -8362,6 +8320,7 @@ function getOrBuildHistoryCache() {
   return window.historyCache;
 }
 
+
 // -------------------------------------------------------------
 // 🌟 1. 전설의 별 상세보기 모달
 // -------------------------------------------------------------
@@ -8371,7 +8330,6 @@ window.openLegendDetailModal = function() {
   const body = document.getElementById('historyDetailBody');
   if (!modal || !body) return;
 
-  // 타이틀 그라데이션 적용
   title.innerHTML = `🌟 <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span> 획득 기록`;
 
   const cache = getOrBuildHistoryCache();
@@ -8385,13 +8343,22 @@ window.openLegendDetailModal = function() {
       
       return `
         <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
-          <!-- 최초달성, 이름, 분기, 산행지, 날짜 한줄 배치 -->
-          <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-            ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-slate-400 w-4">#${idx+1}</span>`}
-            <span class="font-black text-slate-800">${item.name}</span>
+          <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+            <!-- 배지 (최초 획득 / No.X) -->
+            ${isFirst 
+              ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초 획득</span>` 
+              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+            }
+            <!-- 회원 이름 -->
+            <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+            <!-- 분기 -->
             <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
+            <!-- 산행지 -->
             <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
-            <span class="text-[10px] text-slate-400 font-medium ml-1">📅 ${item.date}</span>
+            <!-- 날짜 사각 박스 -->
+            <span class="text-[10px] text-slate-500 font-bold bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+              📅 ${item.date}
+            </span>
           </div>
         </div>
       `;
@@ -8436,7 +8403,6 @@ window.openLv100DetailModal = function() {
   const body = document.getElementById('historyDetailBody');
   if (!modal || !body) return;
 
-  // 타이틀 그라데이션 적용
   title.innerHTML = `👑 <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span> 달성 기록`;
 
   const cache = getOrBuildHistoryCache();
@@ -8451,13 +8417,22 @@ window.openLv100DetailModal = function() {
           const isFirst = idx === 0;
           return `
             <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
-              <!-- 최초달성, 이름, 분기, 산행지, 날짜 한줄 배치 -->
-              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-                ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-amber-700/60 w-4">#${idx+1}</span>`}
-                <span class="font-black text-slate-800">${item.name}</span>
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+                <!-- 배지 (최초 획득 / No.X) -->
+                ${isFirst 
+                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 획득</span>` 
+                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                }
+                <!-- 회원 이름 -->
+                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+                <!-- 분기 -->
                 <span class="text-[10px] text-amber-800/60 font-bold">(${item.quarter})</span>
+                <!-- 산행지 -->
                 <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
-                <span class="text-[10px] text-slate-400 font-medium ml-1">📅 ${item.date}</span>
+                <!-- 날짜 사각 박스 -->
+                <span class="text-[10px] text-slate-500 font-bold bg-amber-50/80 border border-amber-200/60 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+                  📅 ${item.date}
+                </span>
               </div>
             </div>
           `;
