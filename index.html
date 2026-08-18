@@ -3516,74 +3516,33 @@ margin: 0 2px !important;
   </div>
 </div>
 
-
-<!-- 📜 San:Woori History 통합 모달 -->
+<!-- 1. 📜 San:Woori History 통합 모달 (vibeModal) -->
 <div id="vibeModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[9990] flex items-center justify-center p-4" onclick="toggleVibeModal(false)">
   <div class="modal-content bg-white w-full max-w-sm rounded-3xl !p-4 max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    
-    <!-- San:Woori History 영역 (레전드 스타 / 누적고도 / 100레벨) -->
     <div id="vibeHallOfFame"></div>
-
-    <!-- 하단 확인 버튼 -->
     <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
       확인
     </button>
   </div>
 </div>
 
-<!-- 📜 History 상세보기 팝업 모달 -->
+<!-- 2. 📜 History 상세보기 팝업 모달 (historyDetailModal) -->
 <div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
   <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    <!-- 모달 헤더 -->
     <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
-      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        <!-- JS로 타이틀 주입 -->
-      </h3>
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1"></h3>
       <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
     </div>
-
-    <!-- 모달 본문 -->
-    <div id="historyDetailBody" class="py-1">
-      <!-- JS로 상세 목록 주입 -->
-    </div>
-
-    <!-- 하단 닫기 버튼 -->
+    <div id="historyDetailBody" class="py-1"></div>
     <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
       닫기
     </button>
   </div>
 </div>
 
-
-        <!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단에 배치) -->
-<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
-  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    
-    <!-- 모달 헤더 -->
-    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
-      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        <!-- JS로 타이틀 주입 -->
-      </h3>
-      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
-    </div>
-
-    <!-- 모달 본문 -->
-    <div id="historyDetailBody" class="py-1">
-      <!-- JS로 상세 목록 주입 -->
-    </div>
-
-    <!-- 하단 닫기 버튼 -->
-    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
-      닫기
-    </button>
-  </div>
-</div>
-
-        <!-- 📢 전광판 히스토리 모달 (일반 회원 조회용) -->
+<!-- 3. 📢 전광판 히스토리 모달 (bannerListModal) -->
 <div id="bannerListModal" class="hidden fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
   <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-slate-100 overflow-hidden flex flex-col max-h-[80vh] relative z-[10000]">
-    
-    <!-- 모달 헤더 -->
     <div class="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
       <div class="text-xs font-black text-slate-800 flex items-center gap-1.5">
         <span>📢</span> 전광판 메시지 히스토리
@@ -3592,19 +3551,12 @@ margin: 0 2px !important;
         ✕
       </button>
     </div>
-
-    <!-- 모달 바디 (목록만 표시) -->
-    <div id="bannerListModalBody" class="p-3 space-y-2 overflow-y-auto flex-1">
-      <!-- 동적 생성 데이터 -->
-    </div>
-
-    <!-- 모달 푸터 (닫기 전용 / 입력창 삭제) -->
+    <div id="bannerListModalBody" class="p-3 space-y-2 overflow-y-auto flex-1"></div>
     <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-end">
       <button type="button" onclick="closeBannerListModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer">
         닫기
       </button>
     </div>
-
   </div>
 </div>
 
