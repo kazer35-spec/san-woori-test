@@ -28,6 +28,13 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* 📢 전광판 상단 카드 톤앤매너 전용 (골드/앰버 빛 번짐) */
+.is-banner-subtle-glow {
+    background: linear-gradient(135deg, #fffbe0 0%, #fff7ed 100%) !important;
+    border: 1.5px solid #fde68a !important; /* amber-200 */
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.22), inset 0 0 8px rgba(245, 158, 11, 0.08) !important;
+}
+
         /* 야구장 입간판 흐르는 애니메이션 CSS (스타일 시트에 추가) */
 @keyframes ticker {
   0% { transform: translate3d(100%, 0, 0); }
