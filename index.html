@@ -3440,34 +3440,8 @@ overflow: hidden;
 <div id="vibeModal" class="modal-overlay" style="display:none;" onclick="toggleVibeModal(false)">
   <div class="modal-content !p-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
     
-    <!-- 1. San:Woori History 영역 -->
-    <div id="vibeHallOfFame" class="mb-4 space-y-3">
-      <!-- 👑 LEGEND SECTION (3명) -->
-      <div class="p-3 bg-gradient-to-r from-amber-500/10 via-amber-100/30 to-amber-500/10 rounded-2xl border border-amber-200">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-[11px] font-black text-amber-700 tracking-wider">👑 LEGEND STAR</span>
-          <button onclick="openLegendDetailModal()" class="px-2 py-0.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg shadow-sm transition-all">
-            상세보기 🔍
-          </button>
-        </div>
-        <div id="legendUserList" class="grid grid-cols-3 gap-2">
-          <!-- JS dynamic insertion (최대 3개) -->
-        </div>
-      </div>
-
-      <!-- 👑 EMPEROR SECTION (LV.100 / 4명) -->
-      <div class="p-3 bg-gradient-to-r from-purple-500/10 via-purple-100/30 to-purple-500/10 rounded-2xl border border-purple-200">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-[11px] font-black text-purple-700 tracking-wider">⚡ EMPEROR (LV.100)</span>
-          <button onclick="openEmperorDetailModal()" class="px-2 py-0.5 bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold rounded-lg shadow-sm transition-all">
-            상세보기 🔍
-          </button>
-        </div>
-        <div id="emperorUserList" class="grid grid-cols-4 gap-1.5">
-          <!-- JS dynamic insertion (최대 4개) -->
-        </div>
-      </div>
-    </div>
+    <!-- 1. San:Woori History 영역 (JS로 동적 렌더링됨) -->
+    <div id="vibeHallOfFame" class="mb-4"></div>
 
     <!-- 2. Community Passion 영역 -->
     <div class="space-y-2 pt-3 border-t border-slate-100">
@@ -3518,21 +3492,22 @@ overflow: hidden;
     <button onclick="toggleVibeCalcInfoModal(false)" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-extrabold text-xs">닫기</button>
   </div>
 </div>
-        
-<div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
-<div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
-<div class="text-center mb-2">
-<h2 class="text-xl font-black text-slate-800 flex items-center justify-center gap-2">
-🏆 명예의 전당
-</h2>
-<p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Hall of Fame - San:Woori</p>
-</div>
-<div id="hallListArea" class="hall-scroll-area"></div>
-<button onclick="toggleHallModal(false)" class="w-full mt-4 py-3 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm">닫기</button>
-</div>
+
+<!-- 🏆 명예의 전당 모달 -->
+<div id="hallModal" class="modal-overlay hidden" onclick="toggleHallModal(false)">
+  <div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
+    <div class="text-center mb-2">
+      <h2 class="text-xl font-black text-slate-800 flex items-center justify-center gap-2">
+        🏆 명예의 전당
+      </h2>
+      <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Hall of Fame - San:Woori</p>
+    </div>
+    <div id="hallListArea" class="hall-scroll-area"></div>
+    <button onclick="toggleHallModal(false)" class="w-full mt-4 py-3 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm">닫기</button>
+  </div>
 </div>
 
-     <!-- 🌟 [신규] LEGEND STAR 상세 모달 -->
+<!-- 🌟 LEGEND STAR 상세 모달 -->
 <div id="legendDetailModal" class="modal-overlay hidden" style="z-index: 10070; background: rgba(0,0,0,0.6);" onclick="toggleLegendDetailModal(false)">
   <div class="modal-content !p-5 max-w-sm bg-white rounded-3xl border border-amber-200 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
     <div class="text-center mb-4">
@@ -3547,24 +3522,10 @@ overflow: hidden;
       <div class="p-3 bg-amber-50/60 rounded-2xl border border-amber-200/80">
         <div class="flex items-center justify-between mb-2">
           <span class="font-black text-amber-800 flex items-center gap-1">
-            <span>⭐</span> 슈퍼별 (Super Star)
+            <span>🔥</span> 슈퍼별 (Super Star)
           </span>
         </div>
-        <div id="superStarHistoryList" class="space-y-2">
-          <!-- 최초 획득자 카드 예시 -->
-          <div class="p-2.5 bg-gradient-to-r from-amber-100 to-yellow-50 rounded-xl border-2 border-amber-400 shadow-sm relative overflow-hidden">
-            <span class="absolute -right-3 -top-3 bg-amber-500 text-white text-[8px] font-black px-4 py-1 rotate-12 shadow-sm">1ST PIONEER</span>
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-xs ring-2 ring-amber-300">1st</div>
-              <div>
-                <div class="font-extrabold text-slate-800 text-[11px] flex items-center gap-1">
-                  홍길동 <span class="text-[9px] bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded font-black">최초 획득</span>
-                </div>
-                <div class="text-[10px] text-slate-500 mt-0.5">2026.1분기 | 지리산 천왕봉 (2026.03.15)</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div id="superStarHistoryList" class="space-y-2"></div>
       </div>
 
       <!-- 2. 하단: 스페셜별 히스토리 -->
@@ -3574,18 +3535,7 @@ overflow: hidden;
             <span>✨</span> 스페셜별 (Special Star)
           </span>
         </div>
-        <div id="specialStarHistoryList" class="space-y-2">
-          <!-- 일반 목록 예시 -->
-          <div class="p-2 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-[10px]">2nd</div>
-              <div>
-                <div class="font-bold text-slate-800 text-[11px]">김산악</div>
-                <div class="text-[9px] text-slate-400">2026.2분기 | 설악산 대청봉 (2026.05.20)</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div id="specialStarHistoryList" class="space-y-2"></div>
       </div>
     </div>
 
@@ -3593,7 +3543,7 @@ overflow: hidden;
   </div>
 </div>
 
-<!-- ⚡ [신규] EMPEROR (LV.100) 상세 모달 -->
+<!-- ⚡ EMPEROR (LV.100) 상세 모달 -->
 <div id="emperorDetailModal" class="modal-overlay hidden" style="z-index: 10070; background: rgba(0,0,0,0.6);" onclick="toggleEmperorDetailModal(false)">
   <div class="modal-content !p-5 max-w-sm bg-white rounded-3xl border border-purple-200 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
     <div class="text-center mb-4">
@@ -3603,26 +3553,12 @@ overflow: hidden;
       <p class="text-[10px] text-slate-400 font-bold mt-0.5">최고 레벨 달성자 달성 이력</p>
     </div>
 
-    <div id="emperorHistoryList" class="space-y-2 overflow-y-auto pr-1 flex-1 text-xs">
-      <!-- 최초 달성자 예시 -->
-      <div class="p-3 bg-gradient-to-r from-purple-100 via-indigo-50 to-purple-50 rounded-2xl border-2 border-purple-400 shadow-sm relative overflow-hidden">
-        <span class="absolute -right-3 -top-3 bg-purple-600 text-white text-[8px] font-black px-4 py-1 rotate-12 shadow-sm">1ST EMPEROR</span>
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-full bg-purple-600 text-white flex items-center justify-center font-black text-xs ring-2 ring-purple-300">1st</div>
-          <div>
-            <div class="font-extrabold text-slate-800 text-[12px] flex items-center gap-1">
-              강호산 <span class="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded font-black">최초 달성</span>
-            </div>
-            <div class="text-[10px] text-purple-700 font-semibold mt-0.5">2026.04.10 달성</div>
-            <div class="text-[9px] text-slate-500">최종 달성지: 한라산 백록담</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div id="emperorHistoryList" class="space-y-2 overflow-y-auto pr-1 flex-1 text-xs"></div>
 
     <button onclick="toggleEmperorDetailModal(false)" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-extrabold text-xs">닫기</button>
   </div>
 </div>
+
         
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
@@ -8104,7 +8040,6 @@ window.filterAdminMemberList = () => {
 };
 
 
-
 // 💡 지수 산정 방식 팝업 토글 함수
 window.toggleVibeCalcInfoModal = function(show) {
   const modal = document.getElementById('vibeCalcInfoModal');
@@ -8118,9 +8053,128 @@ window.toggleVibeCalcInfoModal = function(show) {
   }
 };
 
+// 팝업 토글 함수들
+function toggleLegendDetailModal(show) {
+  const modal = document.getElementById('legendDetailModal');
+  if (modal) modal.classList.toggle('hidden', !show);
+}
+
+function toggleEmperorDetailModal(show) {
+  const modal = document.getElementById('emperorDetailModal');
+  if (modal) modal.classList.toggle('hidden', !show);
+}
 
 /**
- * 🏆 SanWoori History 렌더링 함수
+ * 👑 LEGEND 상세보기 버튼 클릭 시 실행 (데이터 바인딩)
+ */
+function openLegendDetailModal() {
+  if (typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
+
+  const superListEl = document.getElementById('superStarHistoryList');
+  const specialListEl = document.getElementById('specialStarHistoryList');
+
+  const superItems = [];
+  const specialItems = [];
+
+  currentData.filter(m => !m.isHidden && !m.hidden).forEach(m => {
+    if (m.specialStars && Array.isArray(m.specialStars)) {
+      m.specialStars.forEach(s => {
+        const itemData = {
+          name: m.name,
+          starType: s.starType,
+          quarter: s.quarter || s.season || '기록',
+          location: s.mountainName || s.location || '산행지 미지정',
+          date: s.date || '날짜 미상'
+        };
+        if (s.starType === 'super') superItems.push(itemData);
+        if (s.starType === 'special') specialItems.push(itemData);
+      });
+    }
+  });
+
+  // 슈퍼별 렌더링
+  if (superListEl) {
+    if (superItems.length === 0) {
+      superListEl.innerHTML = `<div class="text-center py-3 text-amber-600/70 font-bold text-[11px]">획득자가 없습니다.</div>`;
+    } else {
+      superListEl.innerHTML = superItems.map((item, idx) => `
+        <div class="p-2.5 ${idx === 0 ? 'bg-gradient-to-r from-amber-100 to-yellow-50 border-2 border-amber-400' : 'bg-white border border-slate-200'} rounded-xl shadow-xs relative overflow-hidden">
+          ${idx === 0 ? '<span class="absolute -right-3 -top-3 bg-amber-500 text-white text-[8px] font-black px-4 py-1 rotate-12 shadow-xs">1ST PIONEER</span>' : ''}
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full ${idx === 0 ? 'bg-amber-400 text-white ring-2 ring-amber-300' : 'bg-slate-100 text-slate-600'} flex items-center justify-center font-black text-xs shrink-0">${idx + 1}st</div>
+            <div>
+              <div class="font-extrabold text-slate-800 text-[11px] flex items-center gap-1">
+                ${item.name} ${idx === 0 ? '<span class="text-[9px] bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded font-black">최초 획득</span>' : ''}
+              </div>
+              <div class="text-[10px] text-slate-500 mt-0.5">${item.quarter} | ${item.location} (${item.date})</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // 스페셜별 렌더링
+  if (specialListEl) {
+    if (specialItems.length === 0) {
+      specialListEl.innerHTML = `<div class="text-center py-3 text-slate-400 font-bold text-[11px]">획득자가 없습니다.</div>`;
+    } else {
+      specialListEl.innerHTML = specialItems.map((item, idx) => `
+        <div class="p-2 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-[10px] shrink-0">${idx + 1}</div>
+            <div>
+              <div class="font-bold text-slate-800 text-[11px]">${item.name}</div>
+              <div class="text-[9px] text-slate-400">${item.quarter} | ${item.location} (${item.date})</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  toggleLegendDetailModal(true);
+}
+
+/**
+ * ⚡ EMPEROR 상세보기 버튼 클릭 시 실행 (데이터 바인딩)
+ */
+function openEmperorDetailModal() {
+  if (typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
+
+  const listEl = document.getElementById('emperorHistoryList');
+  if (!listEl) return;
+
+  const emperorMembers = currentData
+    .filter(m => !m.isHidden && !m.hidden && (m.level || 0) >= 100)
+    .sort((a, b) => (a.lv100Date || 0) - (b.lv100Date || 0)); // 달성일순 정렬
+
+  if (emperorMembers.length === 0) {
+    listEl.innerHTML = `<div class="text-center py-6 text-purple-400 font-bold text-[11px]">Lv.100 달성자가 아직 없습니다.</div>`;
+  } else {
+    listEl.innerHTML = emperorMembers.map((m, idx) => `
+      <div class="p-3 ${idx === 0 ? 'bg-gradient-to-r from-purple-100 via-indigo-50 to-purple-50 border-2 border-purple-400' : 'bg-white border border-slate-200'} rounded-2xl shadow-xs relative overflow-hidden">
+        ${idx === 0 ? '<span class="absolute -right-3 -top-3 bg-purple-600 text-white text-[8px] font-black px-4 py-1 rotate-12 shadow-xs">1ST EMPEROR</span>' : ''}
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full ${idx === 0 ? 'bg-purple-600 text-white ring-2 ring-purple-300' : 'bg-slate-100 text-slate-600'} flex items-center justify-center font-black text-xs shrink-0">${idx + 1}st</div>
+          <div>
+            <div class="font-extrabold text-slate-800 text-[12px] flex items-center gap-1">
+              ${m.name} ${idx === 0 ? '<span class="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded font-black">최초 달성</span>' : ''}
+            </div>
+            <div class="text-[10px] text-purple-700 font-semibold mt-0.5">${m.lv100AchievedDate || 'Lv.100 달성 완료'}</div>
+            <div class="text-[9px] text-slate-500">최종 달성지: ${m.lv100Mountain || '기록 없음'}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  toggleEmperorDetailModal(true);
+}
+
+/**
+ * 🏆 SanWoori History 메인 영역 렌더링 함수
+ * (상세보기 버튼 및 3명/4명 유저 슬롯 표시 반영)
  */
 function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
@@ -8128,161 +8182,82 @@ function renderVibeHallOfFame() {
 
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
 
-  const superNames = [];
-  const specialNames = [];
+  // 1. LEGEND 사용자 수집 (최대 3명)
+  const legendMembers = activeMembers.filter(m => 
+    m.specialStars && Array.isArray(m.specialStars) && m.specialStars.length > 0
+  ).slice(0, 3);
 
-  activeMembers.forEach(m => {
-    if (m.specialStars && Array.isArray(m.specialStars)) {
-      m.specialStars.forEach(s => {
-        if (s.starType === 'super' && !superNames.includes(m.name)) {
-          superNames.push(m.name);
-        }
-        if (s.starType === 'special' && !specialNames.includes(m.name)) {
-          specialNames.push(m.name);
-        }
-      });
+  // 2. EMPEROR 사용자 수집 (Lv.100 이상, 최대 4명)
+  const emperorMembers = activeMembers.filter(m => 
+    (m.level || 0) >= 100
+  ).slice(0, 4);
+
+  const renderSlots = (list, maxSlots, badgeBgClass) => {
+    let html = '';
+    for (let i = 0; i < maxSlots; i++) {
+      if (list[i]) {
+        html += `
+          <div class="p-1.5 ${badgeBgClass} rounded-xl border flex flex-col items-center justify-center shadow-2xs">
+            <span class="text-[11px] font-extrabold text-slate-800 truncate w-full text-center">${list[i].name}</span>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="p-1.5 bg-black/5 rounded-xl border border-dashed border-slate-300 flex flex-col items-center justify-center">
+            <span class="text-[9px] font-bold text-slate-400">EMPTY</span>
+          </div>
+        `;
+      }
     }
-  });
-
-  const superHolders = superNames.map((name, idx) => `No.${idx + 1} ${name}`);
-  const specialHolders = specialNames.map((name, idx) => `No.${idx + 1} ${name}`);
-
-  const level100Holders = activeMembers
-    .filter(m => (m.level || 0) >= 100)
-    .map((m, idx) => `No.${idx + 1} ${m.name}`);
-
-  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 3) => {
-    if (!list || list.length === 0) {
-      const emptyTextStyle = isGold ? "text-amber-600/80 font-bold" : "text-slate-400";
-      return `<span class="${emptyTextStyle} text-[10px] pl-1">아직 달성자가 없습니다</span>`;
-    }
-
-    const visibleList = list.slice(0, limit);
-    const hiddenList = list.slice(limit);
-
-    const bgStyle = isGold 
-      ? "bg-white/90 text-amber-950 border border-amber-300/80 shadow-2xs font-extrabold" 
-      : "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
-
-    let html = visibleList.map(item => `
-      <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
-        ${item}
-      </span>
-    `).join('');
-
-    if (hiddenList.length > 0) {
-      const hiddenHtml = hiddenList.map(item => `
-        <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
-          ${item}
-        </span>
-      `).join('');
-
-      const btnStyle = isGold 
-        ? "bg-amber-100/60 text-amber-800 border-amber-300/50 hover:bg-amber-200/50" 
-        : "bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200";
-
-      html += `
-        <button type="button" id="more-btn-${categoryId}" 
-          onclick="document.getElementById('more-list-${categoryId}').classList.remove('hidden'); document.getElementById('more-list-${categoryId}').classList.add('inline-flex'); this.classList.add('hidden');" 
-          class="inline-flex items-center ${btnStyle} px-2 py-0.5 rounded-lg border font-black text-[10px] mr-1 mb-1 cursor-pointer transition-all active:scale-95">
-          +${hiddenList.length} more
-        </button>
-        <span id="more-list-${categoryId}" class="hidden flex-wrap items-center">
-          ${hiddenHtml}
-        </span>
-      `;
-    }
-
     return html;
   };
 
   container.innerHTML = `
-    <div>
+    <div class="space-y-3">
       <!-- 📜 타이틀 -->
-      <div class="flex items-center justify-between mb-2.5">
+      <div class="flex items-center justify-between mb-1">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
         </div>
       </div>
 
-      <div class="space-y-2.5">
-        <!-- 🌟 Legend Star 카드 -->
-        <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
-          <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
-            <span class="flex items-center gap-1">
-              <span class="text-amber-400">🌟</span> 전설의 별 (Legend Star)
-            </span>
-            <span class="text-[8px] font-black tracking-widest text-indigo-700 bg-indigo-100/80 border border-indigo-200 px-2 py-0.3 rounded-full uppercase shrink-0">
-              LEGEND
-            </span>
-          </div>
-          
-          <div class="space-y-1.5">
-            <!-- 🔥 슈퍼별 영역 (3명 표시 후 +more) -->
-            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-super-subtle-glow">
-              <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-                🔥 슈퍼별
-              </span>
-              <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(superHolders, false, 'super', 3)}
-              </div>
-            </div>
-
-            <!-- ✨ 스페셜 영역 (3명 표시 후 +more) -->
-            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-special-subtle-glow">
-              <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-                ✨ 스페셜
-              </span>
-              <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(specialHolders, false, 'special', 3)}
-              </div>
-            </div>
-          </div>
+      <!-- 👑 LEGEND SECTION (3명 슬롯) -->
+      <div class="p-3 bg-gradient-to-r from-amber-500/10 via-amber-100/30 to-amber-500/10 rounded-2xl border border-amber-200/80">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-[11px] font-black text-amber-800 tracking-wider flex items-center gap-1">
+            <span>👑</span> LEGEND STAR
+          </span>
+          <button type="button" onclick="openLegendDetailModal()" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-[10px] font-bold rounded-lg shadow-2xs transition-all cursor-pointer">
+            상세보기 🔍
+          </button>
         </div>
+        <div class="grid grid-cols-3 gap-2">
+          ${renderSlots(legendMembers, 3, 'bg-amber-100/80 border-amber-300/80')}
+        </div>
+      </div>
 
-        <!-- 👑 Lv.100 Club 카드 -->
-        <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
-          <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
-            <span class="flex items-center gap-1">
-              <span>👑</span> 천상계 (Lv.100 Club)
-            </span>
-            <span class="text-[8px] font-black tracking-widest text-amber-700 bg-amber-100/80 border border-amber-200 px-2 py-0.3 rounded-full uppercase shrink-0">
-              EMPEROR
-            </span>
-          </div>
-          <!-- 100레벨 영역 (4명 표시 후 +more) -->
-          <div class="flex flex-wrap items-center p-2.5 bg-amber-50/40 rounded-xl border shadow-2xs gold-inner-glow">
-            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 4)}
-          </div>
+      <!-- ⚡ EMPEROR SECTION (LV.100 / 4명 슬롯) -->
+      <div class="p-3 bg-gradient-to-r from-purple-500/10 via-purple-100/30 to-purple-500/10 rounded-2xl border border-purple-200/80">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-[11px] font-black text-purple-800 tracking-wider flex items-center gap-1">
+            <span>⚡</span> EMPEROR (LV.100)
+          </span>
+          <button type="button" onclick="openEmperorDetailModal()" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-[10px] font-bold rounded-lg shadow-2xs transition-all cursor-pointer">
+            상세보기 🔍
+          </button>
+        </div>
+        <div class="grid grid-cols-4 gap-1.5">
+          ${renderSlots(emperorMembers, 4, 'bg-purple-100/80 border-purple-300/80')}
         </div>
       </div>
     </div>
   `;
 }
 
+
+    
         
             
-function toggleLegendDetailModal(show) {
-  const modal = document.getElementById('legendDetailModal');
-  if (show) modal.classList.remove('hidden');
-  else modal.classList.add('hidden');
-}
-
-function openLegendDetailModal() {
-  // 모달 데이터 동적 로드 로직 구현 후 호출
-  toggleLegendDetailModal(true);
-}
-
-function toggleEmperorDetailModal(show) {
-  const modal = document.getElementById('emperorDetailModal');
-  if (show) modal.classList.remove('hidden');
-  else modal.classList.add('hidden');
-}
-
-function openEmperorDetailModal() {
-  // 모달 데이터 동적 로드 로직 구현 후 호출
-  toggleEmperorDetailModal(true);
-}
 
 
       
