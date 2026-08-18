@@ -28,46 +28,28 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* ================= 🏷️ 뱃지 자체 그라데이션 후광(Glow) 효과 ================= */
+        /* ================= 🏷️ 슈퍼별 / 스페셜 배지 고유 그라데이션 ================= */
 
-/* 🔥 슈퍼별 뱃지: 로즈-오렌지-골드 입체 후광 */
+/* 🔥 슈퍼별 배지: 로즈 → 주황 → 골드 그라데이션 & 미세 입체 그림자 */
 .badge-super-gradient {
     background: linear-gradient(135deg, #ff2a5f 0%, #ff6b4a 50%, #ffa800 100%) !important;
     color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    /* 뱃지 형태를 그대로 따라 바깥으로 퍼지는 선명한 글로우 */
-    filter: drop-shadow(0 0 6px rgba(255, 42, 95, 0.7)) drop-shadow(0 0 12px rgba(255, 107, 74, 0.5));
-    animation: superBadgeGlow 2.5s infinite ease-in-out alternate;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 2px 6px rgba(255, 42, 95, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
-/* ✨ 스페셜 뱃지: 바이올렛-퍼플-청록 입체 후광 */
+/* ✨ 스페셜별 배지: 딥퍼플 → 바이올렛 → 청록 그라데이션 & 미세 입체 그림자 */
 .badge-special-gradient {
     background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #06b6d4 100%) !important;
     color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    /* 뱃지 형태를 그대로 따라 바깥으로 퍼지는 선명한 글로우 */
-    filter: drop-shadow(0 0 6px rgba(124, 58, 237, 0.7)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.5));
-    animation: specialBadgeGlow 2.5s infinite ease-in-out alternate;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
-/* 🎬 뱃지 글로우 애니메이션 키프레임 */
-@keyframes superBadgeGlow {
-    0% {
-        filter: drop-shadow(0 0 4px rgba(255, 42, 95, 0.5)) drop-shadow(0 0 8px rgba(255, 107, 74, 0.3));
-    }
-    100% {
-        filter: drop-shadow(0 0 8px rgba(255, 42, 95, 0.9)) drop-shadow(0 0 16px rgba(255, 168, 0, 0.7));
-    }
-}
-
-@keyframes specialBadgeGlow {
-    0% {
-        filter: drop-shadow(0 0 4px rgba(124, 58, 237, 0.5)) drop-shadow(0 0 8px rgba(6, 182, 212, 0.3));
-    }
-    100% {
-        filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.9)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.7));
-    }
-}
 
 
 /* ================= 🌟 Legend Star 카드 박스 외곽 후광(Glow) ================= */
@@ -8023,8 +8005,6 @@ window.toggleVibeCalcInfoModal = function(show) {
 };
 
 
-
-      
 /**
  * 🏆 SanWoori History 렌더링 함수
  */
@@ -8057,36 +8037,35 @@ function renderVibeHallOfFame() {
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-  // 명단 포맷팅 함수 (기본 limit 지정)
-  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 2) => {
+  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 3) => {
     if (!list || list.length === 0) {
-      const emptyTextStyle = isGold ? "text-amber-600/70 font-semibold" : "text-slate-400 font-medium";
-      return `<span class="${emptyTextStyle} text-[11px] pl-1">아직 달성자가 없습니다</span>`;
+      const emptyTextStyle = isGold ? "text-amber-600/80 font-bold" : "text-slate-400";
+      return `<span class="${emptyTextStyle} text-[10px] pl-1">아직 달성자가 없습니다</span>`;
     }
 
     const visibleList = list.slice(0, limit);
     const hiddenList = list.slice(limit);
 
     const bgStyle = isGold 
-      ? "bg-amber-100/40 text-amber-900 border border-amber-300/60 font-bold" 
-      : "bg-slate-100/80 text-slate-700 border border-slate-200/80 font-bold";
+      ? "bg-white/90 text-amber-950 border border-amber-300/80 shadow-2xs font-extrabold" 
+      : "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
 
     let html = visibleList.map(item => `
-      <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1.5 mb-1 transition-all">
+      <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
         ${item}
       </span>
     `).join('');
 
     if (hiddenList.length > 0) {
       const hiddenHtml = hiddenList.map(item => `
-        <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1.5 mb-1 transition-all">
+        <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
           ${item}
         </span>
       `).join('');
 
       const btnStyle = isGold 
-        ? "bg-amber-200/50 text-amber-800 border-amber-300/80 hover:bg-amber-200" 
-        : "bg-slate-200/60 text-slate-600 border-slate-300/60 hover:bg-slate-200";
+        ? "bg-amber-100/60 text-amber-800 border-amber-300/50 hover:bg-amber-200/50" 
+        : "bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200";
 
       html += `
         <button type="button" id="more-btn-${categoryId}" 
@@ -8105,61 +8084,60 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
-      <!-- 📜 헤더 타이틀 -->
-      <div class="flex items-center justify-between mb-3">
-        <div class="text-[14px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
+      <!-- 📜 타이틀 -->
+      <div class="flex items-center justify-between mb-2.5">
+        <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
         </div>
       </div>
 
-      <div class="space-y-3">
+      <div class="space-y-2.5">
         <!-- 🌟 Legend Star 카드 -->
-        <div class="p-3.5 bg-slate-50/60 rounded-2xl border border-slate-200/80 shadow-xs backdrop-blur-xs">
-          <div class="text-[11px] font-black text-slate-800 mb-2.5 flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
+        <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
+          <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
+            <span class="flex items-center gap-1">
               <span class="text-amber-400">🌟</span> 전설의 별 (Legend Star)
             </span>
-            <span class="text-[8px] font-black tracking-widest text-indigo-600 bg-indigo-50 border border-indigo-200/80 px-2 py-0.5 rounded-full uppercase shrink-0">
+            <span class="text-[8px] font-black tracking-widest text-indigo-700 bg-indigo-100/80 border border-indigo-200 px-2 py-0.3 rounded-full uppercase shrink-0">
               LEGEND
             </span>
           </div>
           
-          <div class="space-y-2">
-            <!-- 🔥 슈퍼별 (2명 표시 후 +more) -->
-            <div class="flex items-center gap-2.5 bg-white p-2 rounded-xl border border-slate-100 shadow-2xs is-super-subtle-glow">
-              <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-1 rounded-lg shrink-0 tracking-tight">
-                🔥 슈퍼별
-              </span>
-              <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(superHolders, false, 'super', 2)}
-              </div>
-            </div>
+          <div class="space-y-1.5">
+            <!-- 🔥 슈퍼별 카드 박스 -->
+<div class="flex items-center gap-2.5 bg-white p-2 rounded-xl border shadow-2xs is-super-subtle-glow">
+  <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-1 rounded-lg shrink-0 tracking-tight">
+    🔥 슈퍼별
+  </span>
+  <div class="flex flex-wrap items-center pt-0.5">
+    ${formatBadgeListWithMore(superHolders, false, 'super', 3)}
+  </div>
+</div>
 
-            <!-- ✨ 스페셜별 (2명 표시 후 +more) -->
-            <div class="flex items-center gap-2.5 bg-white p-2 rounded-xl border border-slate-100 shadow-2xs is-special-subtle-glow">
-              <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-1 rounded-lg shrink-0 tracking-tight">
-                ✨ 스페셜
-              </span>
-              <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(specialHolders, false, 'special', 2)}
-              </div>
-            </div>
-          </div>
-        </div>
+<!-- ✨ 스페셜별 카드 박스 -->
+<div class="flex items-center gap-2.5 bg-white p-2 rounded-xl border shadow-2xs is-special-subtle-glow">
+  <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-1 rounded-lg shrink-0 tracking-tight">
+    ✨ 스페셜
+  </span>
+  <div class="flex flex-wrap items-center pt-0.5">
+    ${formatBadgeListWithMore(specialHolders, false, 'special', 3)}
+  </div>
+</div>
+
 
         <!-- 👑 Lv.100 Club 카드 -->
-        <div class="p-3.5 bg-amber-50/30 rounded-2xl border border-amber-200/50 shadow-xs backdrop-blur-xs">
-          <div class="text-[11px] font-black text-amber-950 mb-2 flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
+        <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
+          <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
+            <span class="flex items-center gap-1">
               <span>👑</span> 천상계 (Lv.100 Club)
             </span>
-            <span class="text-[8px] font-black tracking-widest text-amber-700 bg-amber-100/80 border border-amber-200 px-2 py-0.5 rounded-full uppercase shrink-0">
+            <span class="text-[8px] font-black tracking-widest text-amber-700 bg-amber-100/80 border border-amber-200 px-2 py-0.3 rounded-full uppercase shrink-0">
               EMPEROR
             </span>
           </div>
-          <!-- 100레벨 영역 (3명 표시 후 +more) -->
-          <div class="flex flex-wrap items-center p-2.5 bg-white/80 rounded-xl border border-amber-200/60 shadow-2xs gold-inner-glow min-h-[38px]">
-            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 3)}
+          <!-- 100레벨 영역 (4명 표시 후 +more) -->
+          <div class="flex flex-wrap items-center p-2.5 bg-amber-50/40 rounded-xl border shadow-2xs gold-inner-glow">
+            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 4)}
           </div>
         </div>
       </div>
@@ -8167,6 +8145,8 @@ function renderVibeHallOfFame() {
   `;
 }
 
+        
+            
 
 
       
