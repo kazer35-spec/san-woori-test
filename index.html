@@ -3566,23 +3566,30 @@ margin: 0 2px !important;
   </div>
 </div>
 
-        <!-- 📜 전광판 전체 보기 모달 -->
+        <!-- 📢 전광판 전체 보기 모달 -->
 <div id="bannerListModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeBannerListModal()">
   <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    
+    <!-- 모달 헤더 -->
     <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
       <h3 class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        📢 전광판 전체 메시지 히스토리
+        📢 전광판 메시지 히스토리
       </h3>
       <button onclick="closeBannerListModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
     </div>
+
+    <!-- 모달 본문 (JS로 목록 동적 주입) -->
     <div id="bannerListModalBody" class="py-1 space-y-2 max-h-[300px] overflow-y-auto">
-      <!-- JS로 동적 주입 -->
+      <!-- 동적 생성 구역 -->
     </div>
+
+    <!-- 하단 닫기 버튼 -->
     <button onclick="closeBannerListModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
       닫기
     </button>
   </div>
 </div>
+
 
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
