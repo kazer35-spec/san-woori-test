@@ -3411,6 +3411,21 @@ margin: 0 2px !important;
     </button>
   </div>
 </div>
+<!-- ⚙️ 관리자 전용 전광판 관리 구역 -->
+<div class="p-4 bg-white rounded-2xl border border-slate-100 space-y-3">
+  <div class="text-xs font-bold text-slate-800">📢 전광판 관리 (관리자 전용)</div>
+  
+  <div class="flex items-center gap-2">
+    <input type="text" id="bannerTextInput" placeholder="새 메시지 입력..." class="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-white" onkeydown="if(event.key==='Enter') saveBannerMessage()">
+    <button type="button" onclick="saveBannerMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shrink-0 cursor-pointer">
+      등록
+    </button>
+  </div>
+
+  <button type="button" onclick="openBannerListModal(true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-xl transition-all cursor-pointer">
+    🗑️ 메시지 삭제 및 관리 목록 보기
+  </button>
+</div>
 
     <!-- 기록 수정 및 레벨 관리 -->
     <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
@@ -3566,7 +3581,7 @@ margin: 0 2px !important;
   </div>
 </div>
 
-        <!-- 📢 전광판 히스토리 모달 (index.html 최하단 </body> 바로 위로 이동) -->
+        <!-- 📢 전광판 히스토리 모달 (일반 회원 조회용) -->
 <div id="bannerListModal" class="hidden fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
   <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-slate-100 overflow-hidden flex flex-col max-h-[80vh] relative z-[10000]">
     
@@ -3575,21 +3590,20 @@ margin: 0 2px !important;
       <div class="text-xs font-black text-slate-800 flex items-center gap-1.5">
         <span>📢</span> 전광판 메시지 히스토리
       </div>
-      <button onclick="closeBannerListModal()" class="text-slate-400 hover:text-slate-600 font-bold text-sm p-1 cursor-pointer">
+      <button type="button" onclick="closeBannerListModal()" class="text-slate-400 hover:text-slate-600 font-bold text-sm p-1 cursor-pointer">
         ✕
       </button>
     </div>
 
-    <!-- 모달 바디 -->
+    <!-- 모달 바디 (목록만 표시) -->
     <div id="bannerListModalBody" class="p-3 space-y-2 overflow-y-auto flex-1">
       <!-- 동적 생성 데이터 -->
     </div>
 
-    <!-- 모달 푸터 (입력창) -->
-    <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center gap-2">
-      <input type="text" id="bannerTextInput" placeholder="새 메시지 입력..." class="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-white" onkeydown="if(event.key==='Enter') saveBannerMessage()">
-      <button onclick="saveBannerMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shrink-0 cursor-pointer">
-        등록
+    <!-- 모달 푸터 (닫기 전용 / 입력창 삭제) -->
+    <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-end">
+      <button type="button" onclick="closeBannerListModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer">
+        닫기
       </button>
     </div>
 
@@ -8311,25 +8325,37 @@ function buildTickerBannerHtml() {
   let bannerText = "등록된 전광판 메시지가 없습니다.";
 
   if (banners.length > 0) {
-    bannerText = banners.map(b => b.text).join(' &nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp; ');
+    const now = Date.now();
+    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+    bannerText = banners.map(b => {
+      const isNew = (now - b.createdAt) < THREE_DAYS_MS;
+      return `
+        <span class="inline-flex items-center gap-1.5">
+          ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full animate-pulse">NEW</span>' : ''}
+          <span>${b.text}</span>
+        </span>
+      `;
+    }).join('<span class="mx-3 text-slate-500">|</span>');
   }
 
   return `
-    <div class="mb-3 p-2 bg-slate-900 rounded-xl border border-slate-700 shadow-inner flex items-center justify-between gap-2 overflow-hidden">
-      <div class="flex items-center gap-1.5 shrink-0 bg-amber-400 text-slate-900 font-black text-[10px] px-2 py-0.5 rounded-md">
+    <div class="mb-3 p-2 bg-slate-900 rounded-xl flex items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-1 shrink-0 font-bold text-amber-400">
         <span>📢</span>전광판
       </div>
-      <div class="flex-1 overflow-hidden whitespace-nowrap text-xs font-bold text-amber-300">
-        <marquee behavior="scroll" direction="left" scrollamount="4" class="align-middle">
+      <div class="flex-1 overflow-hidden whitespace-nowrap text-white font-medium">
+        <marquee behavior="scroll" direction="left" scrollamount="4">
           ${bannerText}
         </marquee>
       </div>
-      <button onclick="openBannerListModal()" class="text-[10px] font-bold text-slate-400 hover:text-white bg-slate-800 px-2 py-0.5 rounded-md shrink-0 border border-slate-700 transition-all cursor-pointer">
+      <button onclick="openBannerListModal(false)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg shrink-0 cursor-pointer">
         전체보기
       </button>
     </div>
   `;
 }
+
 
   container.innerHTML = `
     <div>
@@ -8748,8 +8774,8 @@ window.deleteBannerMessage = async function(id) {
   }
 };
 
-// 4. 모달 열기
-window.openBannerListModal = function() {
+// 4. 모달 열기 (isAdmin 파라미터로 관리자 구분)
+window.openBannerListModal = function(isAdmin = false) {
   const modal = document.getElementById('bannerListModal');
   const body = document.getElementById('bannerListModalBody');
   if (!modal || !body) return;
@@ -8774,9 +8800,11 @@ window.openBannerListModal = function() {
             </div>
             <div class="text-[9px] text-slate-400 font-medium">📅 ${dateStr}</div>
           </div>
-          <button type="button" onclick="deleteBannerMessage('${b.id}')" class="text-xs text-slate-300 hover:text-rose-500 font-bold p-1 transition-all cursor-pointer">
-            ✕
-          </button>
+          ${isAdmin ? `
+            <button type="button" onclick="deleteBannerMessage('${b.id}')" class="text-xs text-slate-300 hover:text-rose-500 font-bold p-1 transition-all cursor-pointer">
+              ✕
+            </button>
+          ` : ''}
         </div>
       `;
     }).join('');
