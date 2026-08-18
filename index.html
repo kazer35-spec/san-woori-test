@@ -8206,51 +8206,15 @@ window.toggleVibeModal = function(show) {
   }
 };
 
+
 // -------------------------------------------------------------
 // 🏆 SanWoori History 메인 렌더링 함수
 // -------------------------------------------------------------
-   function renderVibeHallOfFame() {
+function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
 
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
-
-           // 전광판 HTML 렌더링 생성 함수
-function buildTickerBannerHtml() {
-  const banners = window.bannerCache || [];
-  if (banners.length === 0) return '';
-
-  const now = Date.now();
-  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-
-  // 야구장 전광판처럼 이어지도록 텍스트 결합
-  const tickerItemsHtml = banners.map(b => {
-    const isNew = (now - b.createdAt) < THREE_DAYS_MS;
-    const newBadge = isNew 
-      ? `<span class="bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full animate-pulse ml-1 mr-0.5">NEW</span>` 
-      : '';
-    return `<span class="inline-flex items-center gap-1 mx-4">${newBadge}<span class="text-amber-200 font-bold">${b.text}</span></span>`;
-  }).join('<span class="text-amber-500/50">⚡</span>');
-
-  return `
-    <!-- ⚾ 야구장 전광판 전광판 배너 -->
-    <div class="mb-2.5 bg-slate-900 rounded-xl p-1.5 border border-slate-700/80 shadow-inner flex items-center overflow-hidden relative">
-      <div class="bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-md shrink-0 z-10 flex items-center gap-0.5 shadow-sm">
-        <span>📢</span> Notice
-      </div>
-      
-      <div class="flex-1 overflow-hidden whitespace-nowrap relative ml-2">
-        <div class="inline-block animate-ticker text-[11px]">
-          ${tickerItemsHtml}
-        </div>
-      </div>
-
-      <button onclick="openBannerListModal()" class="ml-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 text-[9px] font-bold px-2 py-0.5 rounded-md shrink-0 z-10 transition-all active:scale-95">
-        보기
-      </button>
-    </div>
-  `;
-}
 
   // 1. 전설의 별 데이터
   const superNames = [];
@@ -8273,7 +8237,7 @@ function buildTickerBannerHtml() {
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-    // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
+  // 3. 누적고도 데이터 산출
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
   const h100kHolders = sortedHeightMembers
@@ -8338,8 +8302,11 @@ function buildTickerBannerHtml() {
         </div>
       </div>
 
+      <!-- 📢 1. 야구장 전광판 배너 삽입 -->
+      ${buildTickerBannerHtml()}
+
       <div class="space-y-2.5">
-        <!-- 🌟 1. Legend Star 카드 -->
+        <!-- 🌟 2. Legend Star 카드 -->
         <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
           <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8371,7 +8338,7 @@ function buildTickerBannerHtml() {
           </div>
         </div>
 
-        <!-- 👑 2. Lv.100 Club 카드 (위치 이동) -->
+        <!-- 👑 3. Lv.100 Club 카드 -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8386,60 +8353,56 @@ function buildTickerBannerHtml() {
           </div>
         </div>
 
-        <!-- 🚩 3. 누적 고도 카드 (10만m+ / 5만m+ / 3만m+ 기준 적용) -->
-<div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
-  
-  <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
-    <span class="flex items-center gap-1">
-      <span>🚩</span> 
-      <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">
-        누적 고도 (Accumulated Altitude)
-      </span>
-    </span>
-    <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
-      상세보기
-    </button>
-  </div>
+        <!-- 🚩 4. 누적 고도 카드 -->
+        <div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
+          <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
+            <span class="flex items-center gap-1">
+              <span>🚩</span> 
+              <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">
+                누적 고도 (Accumulated Altitude)
+              </span>
+            </span>
+            <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
+              상세보기
+            </button>
+          </div>
 
-  <div class="space-y-1.5">
-    <!-- 💎 10만m+ -->
-    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-100 shadow-2xs">
-      <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-        💎 10만m+
-      </span>
-      <div class="flex flex-wrap items-center pt-0.5">
-        ${formatBadgeListWithMore(h100kHolders, 'emerald', 'h100k', 3)}
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-100 shadow-2xs">
+              <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                💎 10만m+
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(h100kHolders, 'emerald', 'h100k', 3)}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-100 shadow-2xs">
+              <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                🥇 5만m+
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(h50kHolders, 'default', 'h50k', 3)}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
+              <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                🥈 3만m+
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(h30kHolders, 'default', 'h30k', 3)}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- 🥇 5만m+ -->
-    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-100 shadow-2xs">
-      <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-        🥇 5만m+
-      </span>
-      <div class="flex flex-wrap items-center pt-0.5">
-        ${formatBadgeListWithMore(h50kHolders, 'default', 'h50k', 3)}
-      </div>
-    </div>
-
-    <!-- 🥈 3만m+ -->
-    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
-      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-        🥈 3만m+
-      </span>
-      <div class="flex flex-wrap items-center pt-0.5">
-        ${formatBadgeListWithMore(h30kHolders, 'default', 'h30k', 3)}
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-    </div>
     </div>
   `;
-   }
+}
+
+
+
 
 // -------------------------------------------------------------
 // 📦 히스토리 데이터 캐싱/빌드 함수
@@ -8656,6 +8619,62 @@ window.openHeightDetailModal = function() {
   modal.style.display = 'flex';
 };
 
+       // 🗑️ 배너 메시지 삭제 함수
+async function deleteBannerMessage(id) {
+  if (!confirm("이 배너 메시지를 삭제하시겠습니까?")) return;
+
+  try {
+    const docRef = db.collection('settings').doc('hallOfFameBanners');
+    let currentList = (window.bannerCache || []).filter(b => b.id !== id);
+
+    await docRef.set({ list: currentList }, { merge: true });
+
+    window.bannerCache = currentList;
+    openBannerListModal(); // 모달 재갱신
+    renderVibeHallOfFame(); // 메인 화면 재갱신
+  } catch (error) {
+    console.error("배너 삭제 실패:", error);
+  }
+}
+
+// 📢 openBannerListModal() 수정본 (삭제 버튼 추가)
+window.openBannerListModal = function() {
+  const modal = document.getElementById('bannerListModal');
+  const body = document.getElementById('bannerListModalBody');
+  if (!modal || !body) return;
+
+  const banners = window.bannerCache || [];
+  const now = Date.now();
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+  if (banners.length === 0) {
+    body.innerHTML = `<div class="text-center py-6 text-xs text-slate-400">등록된 메시지가 없습니다.</div>`;
+  } else {
+    body.innerHTML = banners.map((b) => {
+      const isNew = (now - b.createdAt) < THREE_DAYS_MS;
+      const dateStr = new Date(b.createdAt).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+
+      return `
+        <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between gap-2 text-xs">
+          <div class="space-y-0.5 flex-1 pr-2">
+            <div class="font-bold text-slate-800 flex items-center gap-1.5 flex-wrap">
+              ${isNew ? `<span class="bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full animate-pulse">NEW</span>` : ''}
+              <span>${b.text}</span>
+            </div>
+            <div class="text-[9px] text-slate-400 font-medium">📅 ${dateStr}</div>
+          </div>
+          <button onclick="deleteBannerMessage('${b.id}')" class="text-xs text-slate-300 hover:text-rose-500 font-bold p-1 transition-all">
+            ✕
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+ 
  
 // 모달 닫기
 window.closeHistoryDetailModal = function() {
