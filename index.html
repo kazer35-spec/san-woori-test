@@ -8318,17 +8318,17 @@ function renderVibeHallOfFame() {
   };
 
         
-// 📢 야구장 전광판 배너 HTML 생성 함수 (톤앤매너 일치 디자인)
+// 📢 야구장 전광판 배너 HTML 생성 함수 (좌측 스크롤 전광판 방식)
 function buildTickerBannerHtml() {
   const banners = window.bannerCache || [];
   
   if (!banners || banners.length === 0) {
     return `
-      <div class="mb-3 p-2.5 rounded-2xl bg-amber-50/50 border border-amber-200/60 shadow-[0_0_12px_rgba(245,158,11,0.15)] flex items-center justify-between gap-2 text-xs">
+      <div class="mb-3 p-2.5 rounded-2xl bg-amber-50/80 border border-amber-200/80 shadow-[0_0_12px_rgba(245,158,11,0.2)] flex items-center justify-between gap-2 text-xs">
         <div class="flex items-center gap-1.5 shrink-0 font-extrabold text-amber-600">
           <span class="text-sm">📢</span>전광판
         </div>
-        <div class="flex-1 overflow-hidden h-6 flex items-center text-slate-400 font-medium">
+        <div class="flex-1 overflow-hidden text-slate-400 font-medium">
           등록된 전광판 메시지가 없습니다.
         </div>
         <button type="button" onclick="openBannerListModal(false)" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2.5 py-1 rounded-xl shrink-0 transition-all cursor-pointer">
@@ -8341,32 +8341,28 @@ function buildTickerBannerHtml() {
   const now = Date.now();
   const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
-  // 배너 아이템 생성
-  const bannerItemsHtml = banners.map(b => {
+  // 전체 메시지를 하나의 흐름으로 연결 (NEW 뱃지 포함)
+  const bannerTextHtml = banners.map(b => {
     const isNew = (now - b.createdAt) < THREE_DAYS_MS;
     return `
-      <div class="banner-item h-6 flex items-center gap-1.5 text-slate-800 font-bold shrink-0 overflow-hidden relative">
-        ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full animate-pulse shrink-0 z-10 shadow-xs">NEW</span>' : ''}
-        <div class="banner-text-container flex-1 overflow-hidden relative h-full flex items-center">
-          <span class="banner-text whitespace-nowrap inline-block transition-transform duration-300">${b.text}</span>
-        </div>
-      </div>
+      <span class="inline-flex items-center gap-1.5">
+        ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full animate-pulse shrink-0 shadow-xs">NEW</span>' : ''}
+        <span>${b.text}</span>
+      </span>
     `;
-  }).join('');
-
-  setTimeout(() => startBannerRolling(), 100);
+  }).join('<span class="mx-3 text-amber-300 font-normal">|</span>');
 
   return `
-    <!-- 전설/천상계/누적고도와 톤을 맞춘 전광판 외곽 박스 -->
-    <div class="mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-amber-50/80 border border-amber-200/80 shadow-[0_0_12px_rgba(245,158,11,0.2)] flex items-center justify-between gap-2 text-xs">
+    <div class="mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-amber-50/90 via-orange-50/60 to-amber-50/90 border border-amber-200/80 shadow-[0_0_12px_rgba(245,158,11,0.2)] flex items-center justify-between gap-2 text-xs">
       <div class="flex items-center gap-1.5 shrink-0 font-extrabold text-amber-600">
         <span class="text-sm">📢</span>전광판
       </div>
       
-      <div id="tickerBannerContainer" class="flex-1 overflow-hidden h-6 relative">
-        <div id="tickerBannerWrapper" class="transition-transform duration-500 ease-in-out flex flex-col">
-          ${bannerItemsHtml}
-        </div>
+      <!-- 좌측으로 계속 흘러가는 스크롤 구역 -->
+      <div class="flex-1 overflow-hidden whitespace-nowrap text-slate-800 font-bold">
+        <marquee behavior="scroll" direction="left" scrollamount="4">
+          ${bannerTextHtml}
+        </marquee>
       </div>
 
       <button type="button" onclick="openBannerListModal(false)" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2.5 py-1 rounded-xl shrink-0 transition-all cursor-pointer">
@@ -8377,78 +8373,6 @@ function buildTickerBannerHtml() {
 }
 
 
-// 📢 위로 롤링 + 긴 메시지 좌측 스크롤 통합 제어 함수
-window.bannerRollingTimer = null;
-window.bannerScrollTimer = null;
-
-function startBannerRolling() {
-  if (window.bannerRollingTimer) clearInterval(window.bannerRollingTimer);
-  if (window.bannerScrollTimer) clearInterval(window.bannerScrollTimer);
-
-  const wrapper = document.getElementById('tickerBannerWrapper');
-  if (!wrapper) return;
-
-  const items = wrapper.querySelectorAll('.banner-item');
-  if (items.length === 0) return;
-
-  let currentIndex = 0;
-  const itemHeight = 24; // h-6 (24px)
-
-  // 현재 활성화된 아이템의 텍스트가 긴 경우 좌측으로 스크롤하는 함수
-  function handleLongText(item) {
-    if (window.bannerScrollTimer) clearInterval(window.bannerScrollTimer);
-
-    const container = item.querySelector('.banner-text-container');
-    const textSpan = item.querySelector('.banner-text');
-    if (!container || !textSpan) return;
-
-    // 스크롤 위치 초기화
-    textSpan.style.transition = 'none';
-    textSpan.style.transform = 'translateX(0px)';
-
-    const containerWidth = container.clientWidth;
-    const textWidth = textSpan.scrollWidth;
-
-    // 텍스트가 영역보다 길 경우 좌측 스크롤 실행
-    if (textWidth > containerWidth) {
-      const overflowDistance = textWidth - containerWidth + 12; // 여유 여백 12px
-      let scrollPos = 0;
-      
-      // 0.8초 대기 후 부드럽게 좌측으로 움직임
-      setTimeout(() => {
-        window.bannerScrollTimer = setInterval(() => {
-          scrollPos += 1;
-          if (scrollPos > overflowDistance) {
-            scrollPos = 0; // 끝까지 가면 다시 처음으로
-          }
-          textSpan.style.transition = 'transform 0.1s linear';
-          textSpan.style.transform = `translateX(-${scrollPos}px)`;
-        }, 50);
-      }, 800);
-    }
-  }
-
-  // 첫 번째 메시지 긴 글 검사 실행
-  handleLongText(items[0]);
-
-  // 메시지가 2개 이상일 때만 위로 롤링 진행 (4초 간격)
-  if (items.length > 1) {
-    window.bannerRollingTimer = setInterval(() => {
-      // 이전에 스크롤되던 텍스트 제자리로 복구
-      const prevText = items[currentIndex].querySelector('.banner-text');
-      if (prevText) {
-        prevText.style.transition = 'none';
-        prevText.style.transform = 'translateX(0px)';
-      }
-
-      currentIndex = (currentIndex + 1) % items.length;
-      wrapper.style.transform = `translateY(-${currentIndex * itemHeight}px)`;
-
-      // 위로 올라온 후 긴 글 체크 및 좌측 스크롤 적용
-      handleLongText(items[currentIndex]);
-    }, 4000); // 4초마다 다음 메시지로 위로 슬라이드
-  }
-}
 
 
 
