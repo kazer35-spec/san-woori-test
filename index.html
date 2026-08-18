@@ -8486,7 +8486,7 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-       // 🏔️ 3. 누적 고도 상세보기 모달 (5만m 이상 달성자만 출력)
+       // 🏔️ 3. 누적 고도 상세보기 모달 (3만m 이상 달성자 출력)
 window.openHeightDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -8499,13 +8499,13 @@ window.openHeightDetailModal = function() {
     ? currentData.filter(m => !m.isHidden && !m.hidden) 
     : [];
 
-  // 🎯 5만m (50,000m) 이상 달성한 멤버만 필터링 후 내림차순 정렬
+  // 🎯 3만m (30,000m) 이상 달성자 필터링
   const heightQualifiedMembers = activeMembers
-    .filter(m => (m.totalHeight || 0) >= 50000)
+    .filter(m => (m.totalHeight || 0) >= 30000)
     .sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
   if (heightQualifiedMembers.length === 0) {
-    body.innerHTML = `<div class="text-center py-8 text-xs text-emerald-700/70 font-bold">아직 5만m 이상 달성자가 없습니다.</div>`;
+    body.innerHTML = `<div class="text-center py-8 text-xs text-emerald-700/70 font-bold">아직 3만m 이상 달성자가 없습니다.</div>`;
   } else {
     body.innerHTML = `
       <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
@@ -8535,6 +8535,7 @@ window.openHeightDetailModal = function() {
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
+
  
 // 모달 닫기
 window.closeHistoryDetailModal = function() {
