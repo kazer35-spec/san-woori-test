@@ -8710,24 +8710,19 @@ async function loadBannerMessages() {
   }
 }
 
-// 2. 배너 메시지 저장
+// 📢 전광판 배너 저장 (최종 호환용)
 async function saveBannerMessage() {
   const input = document.getElementById('bannerTextInput');
-  if (!input) {
-    alert("입력창을 찾을 수 없습니다.");
-    return;
-  }
+  if (!input) return alert("입력창(bannerTextInput)을 찾을 수 없습니다.");
 
   const text = input.value.trim();
-  if (!text) {
-    alert("메시지를 입력해 주세요.");
-    return;
-  }
+  if (!text) return alert("메시지를 입력해 주세요.");
 
   try {
-    const docRef = getBannerDocRef();
-    if (!docRef) {
-      alert("데이터베이스 연결 실패: DB 객체를 찾을 수 없습니다.");
+    // 1. Firebase DB 객체 찾기
+    const firestore = window.db || (typeof db !== 'undefined' ? db : null);
+    if (!firestore) {
+      alert("데이터베이스(db) 객체를 찾을 수 없습니다.");
       return;
     }
 
@@ -8739,31 +8734,33 @@ async function saveBannerMessage() {
     };
 
     currentList.unshift(newBanner);
-    if (currentList.length > 5) {
-      currentList = currentList.slice(0, 5);
-    }
+    if (currentList.length > 5) currentList = currentList.slice(0, 5);
 
-    // v9 setDoc 함수 우선 시도, 없으면 docRef.set 시도
-    if (typeof setDoc === 'function') {
+    // 2. Firebase v9 setDoc / v8 set 호환 처리
+    if (typeof setDoc === 'function' && typeof doc === 'function') {
+      const docRef = doc(firestore, 'settings', 'hallOfFameBanners');
       await setDoc(docRef, { list: currentList }, { merge: true });
-    } else if (typeof docRef.set === 'function') {
+    } else if (firestore.collection) {
+      const docRef = firestore.collection('settings').doc('hallOfFameBanners');
       await docRef.set({ list: currentList }, { merge: true });
     } else {
-      throw new Error("저장 함수를 찾을 수 없습니다.");
+      throw new Error("Firestore 저장 함수를 실행시킬 수 없습니다.");
     }
 
     window.bannerCache = currentList;
     input.value = '';
     alert("📢 전광판 배너에 등록되었습니다.");
 
+    // 화면 갱신
     if (typeof openBannerListModal === 'function') openBannerListModal();
     if (typeof renderVibeHallOfFame === 'function') renderVibeHallOfFame();
 
   } catch (error) {
-    console.error("배너 저장 실패 상세:", error);
+    console.error("전광판 저장 실패 상세:", error);
     alert("저장 실패: " + (error.message || error));
   }
 }
+
 
 // 3. 배너 메시지 삭제
 async function deleteBannerMessage(id) {
