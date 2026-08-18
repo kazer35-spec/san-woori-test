@@ -8159,8 +8159,8 @@ window.toggleVibeCalcInfoModal = function(show) {
 };
 
 
-/**
- * 🏆 SanWoori History 메인 영역 렌더링
+ /**
+ * 🏆 SanWoori History 렌더링 함수
  */
 function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
@@ -8188,8 +8188,54 @@ function renderVibeHallOfFame() {
   const specialHolders = specialNames.map((name, idx) => `No.${idx + 1} ${name}`);
 
   const level100Holders = activeMembers
-    .filter(m => (m.level || 0) >= 100 || m.lv100Achieved)
+    .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
+
+  // 명단 포맷팅 함수
+  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 3) => {
+    if (!list || list.length === 0) {
+      const emptyTextStyle = isGold ? "text-amber-600/80 font-bold" : "text-slate-400";
+      return `<span class="${emptyTextStyle} text-[10px] pl-1">아직 달성자가 없습니다</span>`;
+    }
+
+    const visibleList = list.slice(0, limit);
+    const hiddenList = list.slice(limit);
+
+    const bgStyle = isGold 
+      ? "bg-white/90 text-amber-950 border border-amber-300/80 shadow-2xs font-extrabold" 
+      : "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
+
+    let html = visibleList.map(item => `
+      <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
+        ${item}
+      </span>
+    `).join('');
+
+    if (hiddenList.length > 0) {
+      const hiddenHtml = hiddenList.map(item => `
+        <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
+          ${item}
+        </span>
+      `).join('');
+
+      const btnStyle = isGold 
+        ? "bg-amber-100/60 text-amber-800 border-amber-300/50 hover:bg-amber-200/50" 
+        : "bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200";
+
+      html += `
+        <button type="button" id="more-btn-${categoryId}" 
+          onclick="document.getElementById('more-list-${categoryId}').classList.remove('hidden'); document.getElementById('more-list-${categoryId}').classList.add('inline-flex'); this.classList.add('hidden');" 
+          class="inline-flex items-center ${btnStyle} px-2 py-0.5 rounded-lg border font-black text-[10px] mr-1 mb-1 cursor-pointer transition-all active:scale-95">
+          +${hiddenList.length} more
+        </button>
+        <span id="more-list-${categoryId}" class="hidden flex-wrap items-center">
+          ${hiddenHtml}
+        </span>
+      `;
+    }
+
+    return html;
+  };
 
   container.innerHTML = `
     <div>
@@ -8203,21 +8249,18 @@ function renderVibeHallOfFame() {
       <div class="space-y-2.5">
         <!-- 🌟 Legend Star 카드 -->
         <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
-          <div class="text-[11px] font-black mb-2 flex items-center justify-between">
+          <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span class="text-amber-400">🌟</span> 
-              <!-- 그라데이션 적용 -->
-              <span class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent font-black">
-                전설의 별 (Legend Star)
-              </span>
+              <span class="text-amber-400">🌟</span> 전설의 별 (Legend Star)
             </span>
+            <!-- 🔍 상세보기 버튼 (상세 모달 호출) -->
             <button onclick="openLegendDetailModal()" class="text-[9px] font-black tracking-tight text-indigo-600 bg-indigo-100/80 hover:bg-indigo-200/80 border border-indigo-200 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5">
               🔍 상세보기
             </button>
           </div>
           
           <div class="space-y-1.5">
-            <!-- 🔥 슈퍼별 영역 -->
+            <!-- 🔥 슈퍼별 영역 (3개 표시 후 +more) -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-super-subtle-glow">
               <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 🔥 슈퍼별
@@ -8227,7 +8270,7 @@ function renderVibeHallOfFame() {
               </div>
             </div>
 
-            <!-- ✨ 스페셜 영역 -->
+            <!-- ✨ 스페셜 영역 (3개 표시 후 +more) -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-special-subtle-glow">
               <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 ✨ 스페셜
@@ -8241,18 +8284,16 @@ function renderVibeHallOfFame() {
 
         <!-- 👑 Lv.100 Club 카드 -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
-          <div class="text-[11px] font-black mb-1.5 flex items-center justify-between">
+          <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span>👑</span> 
-              <!-- 그라데이션 적용 -->
-              <span class="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent font-black">
-                천상계 (Lv.100 Club)
-              </span>
+              <span>👑</span> 천상계 (Lv.100 Club)
             </span>
+            <!-- 🔍 상세보기 버튼 (상세 모달 호출) -->
             <button onclick="openLv100DetailModal()" class="text-[9px] font-black tracking-tight text-amber-800 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5">
               🔍 상세보기
             </button>
           </div>
+          <!-- 100레벨 영역 (4개 표시 후 +more) -->
           <div class="flex flex-wrap items-center p-2.5 bg-amber-50/40 rounded-xl border shadow-2xs gold-inner-glow">
             ${formatBadgeListWithMore(level100Holders, true, 'lv100', 4)}
           </div>
@@ -8261,7 +8302,6 @@ function renderVibeHallOfFame() {
     </div>
   `;
 }
-
 
 
 
@@ -8307,7 +8347,22 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  // -------------------------------------------------------------
+  // 달성 순서대로 정렬 (타임스탬프 기준)
+  superItems.sort((a, b) => a.createdAt - b.createdAt);
+  specialItems.sort((a, b) => a.createdAt - b.createdAt);
+  lv100Items.sort((a, b) => a.createdAt - b.createdAt);
+
+  window.historyCache = {
+    superStars: superItems,
+    specialStars: specialItems,
+    lv100List: lv100Items,
+    lastUpdated: Date.now()
+  };
+
+  return window.historyCache;
+}
+
+// -------------------------------------------------------------
 // 🌟 1. 전설의 별 상세보기 모달
 // -------------------------------------------------------------
 window.openLegendDetailModal = function() {
@@ -8316,7 +8371,8 @@ window.openLegendDetailModal = function() {
   const body = document.getElementById('historyDetailBody');
   if (!modal || !body) return;
 
-  title.innerHTML = `🌟 <span class="bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 bg-clip-text text-transparent font-black">전설의 별 (Legend Star)</span> 획득 기록`;
+  // 타이틀 그라데이션 적용
+  title.innerHTML = `🌟 <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span> 획득 기록`;
 
   const cache = getOrBuildHistoryCache();
 
@@ -8326,27 +8382,17 @@ window.openLegendDetailModal = function() {
     return items.map((item, idx) => {
       const isFirst = idx === 0;
       const isSuper = type === 'super';
-      const shortDate = formatShortDate(item.date);
       
       return `
-        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-200' : 'bg-purple-50/90 border-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between gap-2">
-          
-          <!-- 좌측: [최초 획득/순번] [이름] (분기) 📍 [산행지] -->
-          <div class="flex items-center gap-1.5 min-w-0">
-            ${isFirst ? 
-              `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초 획득</span>` : 
-              `<span class="text-[10px] font-bold text-slate-400 w-4 shrink-0">#${idx+1}</span>`
-            }
-            <span class="text-xs font-black text-slate-800 shrink-0">${item.name}</span>
-            <span class="text-[10px] font-bold text-slate-400 shrink-0">(${item.quarter})</span>
-            <span class="text-[10.5px] font-bold text-slate-600 truncate">📍 ${item.mountain}</span>
+        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+          <!-- 최초달성, 이름, 분기, 산행지, 날짜 한줄 배치 -->
+          <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+            ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-slate-400 w-4">#${idx+1}</span>`}
+            <span class="font-black text-slate-800">${item.name}</span>
+            <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
+            <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+            <span class="text-[10px] text-slate-400 font-medium ml-1">📅 ${item.date}</span>
           </div>
-
-          <!-- 우측: 날짜 박스 고정 -->
-          <div class="text-[10px] font-bold text-slate-500 shrink-0 bg-white/80 px-2 py-0.5 rounded-lg border border-slate-200/80 flex items-center gap-1 shadow-2xs">
-            📅 ${shortDate}
-          </div>
-
         </div>
       `;
     }).join('');
@@ -8390,7 +8436,8 @@ window.openLv100DetailModal = function() {
   const body = document.getElementById('historyDetailBody');
   if (!modal || !body) return;
 
-  title.innerHTML = `👑 <span class="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent font-black">천상계 (Lv.100 Club)</span> 달성 기록`;
+  // 타이틀 그라데이션 적용
+  title.innerHTML = `👑 <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span> 달성 기록`;
 
   const cache = getOrBuildHistoryCache();
   const lv100Items = cache.lv100List;
@@ -8402,27 +8449,16 @@ window.openLv100DetailModal = function() {
       <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
         ${lv100Items.map((item, idx) => {
           const isFirst = idx === 0;
-          const shortDate = formatShortDate(item.date);
-
           return `
-            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between gap-2">
-              
-              <!-- 좌측: [최초 획득/순번] [이름] (분기) 📍 [산행지] -->
-              <div class="flex items-center gap-1.5 min-w-0">
-                ${isFirst ? 
-                  `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 획득</span>` : 
-                  `<span class="text-[10px] font-bold text-amber-700/60 w-4 shrink-0">#${idx+1}</span>`
-                }
-                <span class="text-xs font-black text-slate-800 shrink-0">${item.name}</span>
-                <span class="text-[10px] font-bold text-amber-800/60 shrink-0">(${item.quarter})</span>
-                <span class="text-[10.5px] font-bold text-slate-600 truncate">📍 ${item.mountain}</span>
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+              <!-- 최초달성, 이름, 분기, 산행지, 날짜 한줄 배치 -->
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                ${isFirst ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` : `<span class="text-[10px] font-bold text-amber-700/60 w-4">#${idx+1}</span>`}
+                <span class="font-black text-slate-800">${item.name}</span>
+                <span class="text-[10px] text-amber-800/60 font-bold">(${item.quarter})</span>
+                <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+                <span class="text-[10px] text-slate-400 font-medium ml-1">📅 ${item.date}</span>
               </div>
-
-              <!-- 우측: 날짜 박스 고정 -->
-              <div class="text-[10px] font-bold text-amber-900/80 shrink-0 bg-amber-100/60 px-2 py-0.5 rounded-lg border border-amber-200/80 flex items-center gap-1 shadow-2xs">
-                📅 ${shortDate}
-              </div>
-
             </div>
           `;
         }).join('')}
@@ -8434,7 +8470,6 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-    
 
   // 모달 닫기
 window.closeHistoryDetailModal = function() {
