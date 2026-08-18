@@ -8464,7 +8464,15 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-  
+  // 모달 닫기
+window.closeHistoryDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+};
+          
     
 
 
