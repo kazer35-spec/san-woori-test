@@ -8307,7 +8307,11 @@ function renderVibeHallOfFame() {
       `;
     }
 
-    // 📢 야구장 전광판 배너 HTML 생성 함수 (톤앤매너 일치 디자인)
+    return html;
+  };
+
+        
+// 📢 야구장 전광판 배너 HTML 생성 함수 (톤앤매너 일치 디자인)
 function buildTickerBannerHtml() {
   const banners = window.bannerCache || [];
   
@@ -8364,8 +8368,6 @@ function buildTickerBannerHtml() {
     </div>
   `;
 }
-
-        
 
 
 // 📢 위로 롤링 + 긴 메시지 좌측 스크롤 통합 제어 함수
