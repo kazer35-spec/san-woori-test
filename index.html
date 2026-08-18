@@ -8307,24 +8307,20 @@ function renderVibeHallOfFame() {
       `;
     }
 
-    return html;
-  };
-
-        
-// 📢 야구장 전광판 배너 HTML 생성 함수 (위로 전환 + 긴 글 좌측 스크롤)
+    // 📢 야구장 전광판 배너 HTML 생성 함수 (톤앤매너 일치 디자인)
 function buildTickerBannerHtml() {
   const banners = window.bannerCache || [];
   
   if (!banners || banners.length === 0) {
     return `
-      <div class="mb-3 p-2 bg-slate-900 rounded-xl flex items-center justify-between gap-2 text-xs">
-        <div class="flex items-center gap-1 shrink-0 font-bold text-amber-400">
-          <span>📢</span>
+      <div class="mb-3 p-2.5 rounded-2xl bg-amber-50/50 border border-amber-200/60 shadow-[0_0_12px_rgba(245,158,11,0.15)] flex items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-1.5 shrink-0 font-extrabold text-amber-600">
+          <span class="text-sm">📢</span>전광판
         </div>
         <div class="flex-1 overflow-hidden h-6 flex items-center text-slate-400 font-medium">
           등록된 전광판 메시지가 없습니다.
         </div>
-        <button type="button" onclick="openBannerListModal(false)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg shrink-0 cursor-pointer">
+        <button type="button" onclick="openBannerListModal(false)" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2.5 py-1 rounded-xl shrink-0 transition-all cursor-pointer">
           전체보기
         </button>
       </div>
@@ -8334,12 +8330,12 @@ function buildTickerBannerHtml() {
   const now = Date.now();
   const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
-  // 각 배너 아이템 생성 (긴 글 스크롤 지원 구조)
+  // 배너 아이템 생성
   const bannerItemsHtml = banners.map(b => {
     const isNew = (now - b.createdAt) < THREE_DAYS_MS;
     return `
-      <div class="banner-item h-6 flex items-center gap-1.5 text-white font-medium shrink-0 overflow-hidden relative">
-        ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full animate-pulse shrink-0 z-10">NEW</span>' : ''}
+      <div class="banner-item h-6 flex items-center gap-1.5 text-slate-800 font-bold shrink-0 overflow-hidden relative">
+        ${isNew ? '<span class="bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full animate-pulse shrink-0 z-10 shadow-xs">NEW</span>' : ''}
         <div class="banner-text-container flex-1 overflow-hidden relative h-full flex items-center">
           <span class="banner-text whitespace-nowrap inline-block transition-transform duration-300">${b.text}</span>
         </div>
@@ -8347,26 +8343,30 @@ function buildTickerBannerHtml() {
     `;
   }).join('');
 
-  // DOM 생성 후 롤링 및 긴 글 스크롤 타이머 동작
   setTimeout(() => startBannerRolling(), 100);
 
   return `
-    <div class="mb-3 p-2 bg-slate-900 rounded-xl flex items-center justify-between gap-2 text-xs">
-      <div class="flex items-center gap-1 shrink-0 font-bold text-amber-400">
-        <span>📢</span>전광판
+    <!-- 전설/천상계/누적고도와 톤을 맞춘 전광판 외곽 박스 -->
+    <div class="mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-amber-50/80 border border-amber-200/80 shadow-[0_0_12px_rgba(245,158,11,0.2)] flex items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-1.5 shrink-0 font-extrabold text-amber-600">
+        <span class="text-sm">📢</span>전광판
       </div>
-      <!-- 위로 롤링되는 슬라이더 구역 -->
+      
       <div id="tickerBannerContainer" class="flex-1 overflow-hidden h-6 relative">
         <div id="tickerBannerWrapper" class="transition-transform duration-500 ease-in-out flex flex-col">
           ${bannerItemsHtml}
         </div>
       </div>
-      <button type="button" onclick="openBannerListModal(false)" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg shrink-0 cursor-pointer">
+
+      <button type="button" onclick="openBannerListModal(false)" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-2.5 py-1 rounded-xl shrink-0 transition-all cursor-pointer">
         전체보기
       </button>
     </div>
   `;
 }
+
+        
+
 
 // 📢 위로 롤링 + 긴 메시지 좌측 스크롤 통합 제어 함수
 window.bannerRollingTimer = null;
