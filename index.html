@@ -79,32 +79,42 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     transition: all 0.3s ease;
 }
 
-/* ================= 🌟 슈퍼별 / 스페셜별 / 천상계 / 누적고도 전체창 은은한 미세 번짐 (고정 Glow) ================= */
+/* ================= 🌟 외곽 큰 창은 은은한 Glow, 내부 작은 창은 깔끔하게 정리 ================= */
 
-/* 🏔️ 누적고도 전용 에메랄드 네온 Glow 스타일 */
+/* 1. 외곽 큰 창 (레전드 스타 / 천상계 / 누적 고도) */
+
+/* 🏔️ 누적 고도 외곽 큰 창 */
 .is-emerald-subtle-glow {
     border: 1.5px solid #a7f3d0 !important; /* emerald-200 */
     box-shadow: 0 0 12px rgba(16, 185, 129, 0.25), inset 0 0 8px rgba(16, 185, 129, 0.1) !important;
 }
 
-/* 🔥 슈퍼별 전체창: 로즈/주황 네온 Glow 스타일 */
-.is-super-subtle-glow {
-    border: 1.5px solid #fca5a5 !important; /* red-300 / rose계열 */
-    box-shadow: 0 0 12px rgba(244, 63, 94, 0.25), inset 0 0 8px rgba(244, 63, 94, 0.1) !important;
-}
-
-/* ✨ 스페셜별 전체창: 보라/바이올렛 네온 Glow 스타일 */
+/* 🌟 전설의 별 (슈퍼/스페셜) 외곽 큰 창 */
+.is-super-subtle-glow,
 .is-special-subtle-glow {
-    border: 1.5px solid #d8b4fe !important; /* purple-300 */
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.25), inset 0 0 8px rgba(168, 85, 247, 0.1) !important;
+    border: 1.5px solid #fca5a5 !important; /* 은은한 붉은빛 테두리 */
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.22), inset 0 0 8px rgba(244, 63, 94, 0.08) !important;
 }
 
-/* 👑 천상계(Lv.100) 전체창: 골드/골든 옐로우 네온 Glow 스타일 */
+/* 👑 천상계 외곽 큰 창 */
 .gold-inner-glow {
-    border: 1.5px solid #fde047 !important; /* yellow-300 */
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.25), inset 0 0 8px rgba(245, 158, 11, 0.1) !important;
+    border: 1.5px solid #fde047 !important; /* 은은한 골드 테두리 */
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.22), inset 0 0 8px rgba(245, 158, 11, 0.08) !important;
 }
 
+
+/* 2. 내부 작은 창 번짐 제거 (깔끔한 기본 스타일로 고정) */
+
+/* 슈퍼별 / 스페셜별 / 천상계 내부 작은 박스들 */
+.is-super-subtle-glow .bg-white,
+.is-special-subtle-glow .bg-white,
+.gold-inner-glow .bg-white,
+.badge-super-box,
+.badge-special-box {
+    border: 1px solid #f1f5f9 !important; /* slate-100 아주 옅은 테두리 */
+    box-shadow: none !important; /* 네온/그림자 번짐 완전 제거 */
+    animation: none !important;
+}
 
 
 
