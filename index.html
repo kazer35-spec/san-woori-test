@@ -8659,10 +8659,11 @@ window.openHeightDetailModal = function() {
 
        
 
-   // 📢 전광판 배너 (sanwoori/오즈 문서의 Banner 필드 직접 연동)
+
+  // 📢 전광판 배너 (sanwoori/오즈 문서의 Banner 필드 직접 연동)
 window.bannerCache = [];
 
-// 1. 배너 불러오기
+// 1. 배너 불러오기 (페이지 로드 시 및 변경 시 실행)
 window.loadBannerMessages = async function() {
   try {
     const ozRef = doc(db, "sanwoori", "오즈");
@@ -8678,25 +8679,15 @@ window.loadBannerMessages = async function() {
       renderVibeHallOfFame();
     }
   } catch (error) {
-    console.error("전광판 불러오기 에러:", error);
+    console.error("전광판 로드 실패:", error);
   }
 };
 
-// 2. 배너 저장하기 (강제 호출 및 탐색)
-window.saveBannerMessage = async function(event) {
-  if (event) event.preventDefault(); // Form 새로고침 방지
-
-  // 클릭 즉시 동작 여부 확인용 팝업
-  console.log("saveBannerMessage 호출됨");
-
-  // 입력창 태그 탐색 (ID, PlaceHolder 모두 검색)
-  const input = document.getElementById('bannerTextInputModal') || 
-                document.getElementById('bannerTextInput') || 
-                document.querySelector('input[placeholder*="메시지"]') ||
-                document.querySelector('input[placeholder*="배너"]');
-
+// 2. 배너 저장하기 (HTML의 bannerTextInput 및 saveBannerMessage 완벽 매핑)
+window.saveBannerMessage = async function() {
+  const input = document.getElementById('bannerTextInput');
   if (!input) {
-    alert("❌ 오류: 입력창(input)을 찾지 못했습니다. HTML 태그의 ID를 확인해 주세요.");
+    alert("❌ 오류: 입력창(bannerTextInput)을 찾을 수 없습니다.");
     return;
   }
 
@@ -8714,8 +8705,11 @@ window.saveBannerMessage = async function(event) {
       createdAt: Date.now()
     };
 
+    // 최신글 상단 추가 및 최대 5개 제한
     currentList.unshift(newBanner);
-    if (currentList.length > 5) currentList = currentList.slice(0, 5);
+    if (currentList.length > 5) {
+      currentList = currentList.slice(0, 5);
+    }
 
     // sanwoori/오즈 문서의 Banner 필드 업데이트
     const ozRef = doc(db, "sanwoori", "오즈");
@@ -8723,13 +8717,14 @@ window.saveBannerMessage = async function(event) {
 
     window.bannerCache = currentList;
     input.value = '';
-    alert("📢 '오즈' 문서에 전광판 배너가 등록되었습니다!");
+    alert("📢 전광판 메시지가 정상 등록되었습니다!");
 
+    // 모달 목록 갱신 및 전광판 UI 반영
     if (typeof openBannerListModal === 'function') openBannerListModal();
     if (typeof renderVibeHallOfFame === 'function') renderVibeHallOfFame();
 
   } catch (error) {
-    console.error("저장 에러 상세:", error);
+    console.error("전광판 저장 실패 원인:", error);
     alert("❌ DB 저장 실패: " + error.message);
   }
 };
@@ -8748,12 +8743,12 @@ window.deleteBannerMessage = async function(id) {
     if (typeof openBannerListModal === 'function') openBannerListModal();
     if (typeof renderVibeHallOfFame === 'function') renderVibeHallOfFame();
   } catch (error) {
-    console.error("삭제 에러:", error);
-    alert("삭제 실패: " + error.message);
+    console.error("삭제 실패:", error);
+    alert("❌ 삭제 실패: " + error.message);
   }
 };
 
-// 4. 모달 관리
+// 4. 모달 열기
 window.openBannerListModal = function() {
   const modal = document.getElementById('bannerListModal');
   const body = document.getElementById('bannerListModalBody');
@@ -8791,6 +8786,7 @@ window.openBannerListModal = function() {
   modal.style.display = 'flex';
 };
 
+// 5. 모달 닫기
 window.closeBannerListModal = function() {
   const modal = document.getElementById('bannerListModal');
   if (modal) {
@@ -8799,13 +8795,13 @@ window.closeBannerListModal = function() {
   }
 };
 
-// 초기화 호출
+// 페이지 로드 즉시 데이터 로딩
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => window.loadBannerMessages());
 } else {
   window.loadBannerMessages();
 }
- 
+
 
 
 
