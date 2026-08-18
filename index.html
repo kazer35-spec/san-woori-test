@@ -3411,22 +3411,13 @@ margin: 0 2px !important;
     </button>
   </div>
 </div>
-<!-- ⚙️ 관리자 전용 전광판 관리 구역 -->
-<div class="p-4 bg-white rounded-2xl border border-slate-100 space-y-3">
-  <div class="text-xs font-bold text-slate-800">📢 전광판 관리 (관리자 전용)</div>
-  
-  <div class="flex items-center gap-2">
-    <input type="text" id="bannerTextInput" placeholder="새 메시지 입력..." class="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-white" onkeydown="if(event.key==='Enter') saveBannerMessage()">
-    <button type="button" onclick="saveBannerMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shrink-0 cursor-pointer">
-      등록
-    </button>
-  </div>
-
   <button type="button" onclick="openBannerListModal(true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 rounded-xl transition-all cursor-pointer">
     🗑️ 메시지 삭제 및 관리 목록 보기
   </button>
 </div>
-
+</div>
+</div>
+        
     <!-- 기록 수정 및 레벨 관리 -->
     <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
       <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
@@ -8342,7 +8333,7 @@ function buildTickerBannerHtml() {
   return `
     <div class="mb-3 p-2 bg-slate-900 rounded-xl flex items-center justify-between gap-2 text-xs">
       <div class="flex items-center gap-1 shrink-0 font-bold text-amber-400">
-        <span>📢</span>전광판
+        <span>📢</span>
       </div>
       <div class="flex-1 overflow-hidden whitespace-nowrap text-white font-medium">
         <marquee behavior="scroll" direction="left" scrollamount="4">
