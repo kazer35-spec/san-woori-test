@@ -8261,7 +8261,7 @@ window.toggleVibeModal = function(show) {
           </div>
         </div>
 
-        <!-- 🏔️ 3. 누적 고도 명예의 전당 카드 (천상계/레전드스타 스타일 통일 & 상세보기 추가)-->
+        <!-- 🚩 3. 누적 고도 카드 (전설의 별/천상계와 100% 일치하는 디자인) -->
 <div class="p-3 bg-gradient-to-br from-emerald-50/60 via-teal-50/20 to-emerald-100/10 rounded-2xl border border-emerald-200/60 shadow-2xs">
   <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
     <span class="flex items-center gap-1">
@@ -8270,7 +8270,6 @@ window.toggleVibeModal = function(show) {
         누적 고도 (Accumulated Altitude)
       </span>
     </span>
-    <!-- 🔘 상세보기 버튼 추가 -->
     <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
       상세보기
     </button>
@@ -8279,7 +8278,7 @@ window.toggleVibeModal = function(show) {
   <div class="space-y-1.5">
     <!-- 💎 20만m+ -->
     <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-200/60 shadow-2xs">
-      <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+      <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2 py-0.8 rounded-md shrink-0">
         💎 20만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
@@ -8289,7 +8288,7 @@ window.toggleVibeModal = function(show) {
 
     <!-- 🥇 10만m+ -->
     <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-200/60 shadow-2xs">
-      <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+      <span class="bg-teal-600 text-white text-[9.5px] font-black px-2 py-0.8 rounded-md shrink-0">
         🥇 10만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
@@ -8299,7 +8298,7 @@ window.toggleVibeModal = function(show) {
 
     <!-- 🥈 5만m+ -->
     <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-200/80 shadow-2xs">
-      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2 py-0.8 rounded-md shrink-0">
         🥈 5만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
@@ -8479,18 +8478,56 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-        // 🏔️ 누적 고도 상세 모달 열기 함수
-function openHeightDetailModal() {
-  const modal = document.getElementById('heightDetailModal'); // 기존 상세 모달 ID에 맞춰 변경 가능
-  if (modal) {
-    modal.classList.remove('hidden');
+        // 🏔️ 3. 누적 고도 상세보기 모달
+window.openHeightDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  const title = document.getElementById('historyDetailTitle');
+  const body = document.getElementById('historyDetailBody');
+  if (!modal || !body) return;
+
+  title.innerHTML = `🚩 <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">누적 고도 (Accumulated Altitude)</span> 달성 기록`;
+
+  // 현재 데이터 기준으로 누적 고도 순 정렬
+  const activeMembers = (typeof currentData !== 'undefined' && Array.isArray(currentData)) 
+    ? currentData.filter(m => !m.isHidden && !m.hidden) 
+    : [];
+
+  const sortedMembers = [...activeMembers]
+    .filter(m => (m.totalHeight || 0) > 0)
+    .sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
+
+  if (sortedMembers.length === 0) {
+    body.innerHTML = `<div class="text-center py-8 text-xs text-emerald-700/70 font-bold">아직 누적 고도 기록이 없습니다.</div>`;
   } else {
-    // 모달이 따로 없다면 레전드스타/천상계처럼 전용 상세 팝업 오픈 로직 연동
-    if (typeof openAltitudeDetail === 'function') {
-      openAltitudeDetail();
-    }
+    body.innerHTML = `
+      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+        ${sortedMembers.map((item, idx) => {
+          const isFirst = idx === 0;
+          const heightKm = (item.totalHeight / 1000).toFixed(1);
+          
+          return `
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-emerald-50/90 border-emerald-300 ring-1 ring-emerald-300/60' : 'bg-white border-emerald-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+                ${isFirst 
+                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-black shrink-0">👑 No.1</span>` 
+                  : `<span class="text-[10px] font-black text-emerald-800/80 bg-emerald-100/60 border border-emerald-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                }
+                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+                <span class="text-[11px] font-black text-emerald-600 ml-auto flex items-center gap-0.5 shrink-0 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">
+                  🏔️ ${item.totalHeight ? item.totalHeight.toLocaleString() : 0}m (${heightKm}k)
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
   }
-}
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
 
 // 모달 닫기
 window.closeHistoryDetailModal = function() {
