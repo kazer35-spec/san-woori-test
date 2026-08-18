@@ -3357,17 +3357,17 @@ overflow: hidden;
 <div id="vibeModal" class="modal-overlay" style="display:none;" onclick="toggleVibeModal(false)">
   <div class="modal-content !p-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
     
-    <!-- 1. San:Woori History 영역 (상단 구분선 제거됨) -->
+    <!-- 1. San:Woori History 영역 -->
     <div id="vibeHallOfFame" class="mb-4"></div>
 
-    <!-- 2. Community Passion 영역 (요청하신 위치로 구분선 이동) -->
+    <!-- 2. Community Passion 영역 -->
     <div class="space-y-2 pt-3 border-t border-slate-100">
-      <!-- 헤더 (글자 크기 15px) -->
+      <!-- 헤더 (산정 방식 버튼 규격 통일) -->
       <div class="flex items-center justify-between">
         <h2 class="text-[15px] font-black text-slate-800 flex items-center gap-1.5">
           <span id="vibeModalIcon">🔥</span> Community Passion
         </h2>
-        <button onclick="toggleVibeCalcInfoModal(true)" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md border border-blue-100">
+        <button onclick="toggleVibeCalcInfoModal(true)" class="text-[8px] font-black tracking-widest text-blue-600 bg-blue-50 px-2 py-0.3 rounded-full border border-blue-200 uppercase active:scale-95 transition-all">
           💡 산정 방식
         </button>
       </div>
@@ -3393,6 +3393,7 @@ overflow: hidden;
     </button>
   </div>
 </div>
+
 
 
 
@@ -7926,7 +7927,7 @@ window.toggleVibeCalcInfoModal = function(show) {
 
 
 /**
- * 🏆 SanWoori History 렌더링 함수 (화이트 테마 조화 버전)
+ * 🏆 SanWoori History 렌더링 함수
  */
 function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
@@ -7966,7 +7967,6 @@ function renderVibeHallOfFame() {
     const visibleList = list.slice(0, limit);
     const hiddenList = list.slice(limit);
 
-    // 라이트 배경에 잘 어울리는 모던 칩 스타일
     const bgStyle = isGold 
       ? "bg-amber-50 text-amber-900 border border-amber-200/80 shadow-2xs font-extrabold" 
       : "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
@@ -8005,24 +8005,31 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
+      <!-- 📜 메인 타이틀 (HONOR HALL 삭제 반영) -->
       <div class="flex items-center justify-between mb-2.5">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
         </div>
-        <span class="text-[9px] font-black tracking-widest text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200/50">HONOR HALL</span>
       </div>
 
       <div class="space-y-2.5">
-        <!-- 🌟 Legend Star (은하수 오로라 라이트 테마) -->
+        <!-- 🌟 Legend Star 카드 -->
         <div class="p-3 bg-gradient-to-br from-purple-50/50 via-indigo-50/30 to-slate-50/50 rounded-2xl border border-indigo-100 shadow-2xs">
-          <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center gap-1 tracking-wide">
-            <span class="text-amber-400">🌟</span> Legend Star
+          <!-- 레전드 스타 우측에 LEGEND 배지 추가 (Lv.100 EMPEROR 배지와 동일 크기) -->
+          <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
+            <span class="flex items-center gap-1">
+              <span class="text-amber-400">🌟</span> 전설의 별 (Legend Star)
+            </span>
+            <span class="text-[8px] font-black tracking-widest text-indigo-700 bg-indigo-100/80 border border-indigo-200 px-2 py-0.3 rounded-full uppercase">
+              LEGEND
+            </span>
           </div>
+          
           <div class="space-y-1.5">
             <!-- ★ 슈퍼별 -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-indigo-100/60 shadow-2xs">
               <span class="text-[9px] font-black text-white bg-gradient-to-r from-rose-500 to-pink-500 px-2 py-0.5 rounded-md border border-rose-200/50 shrink-0 shadow-2xs">
-                🔥 슈퍼별
+                ★ 슈퍼별
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
                 ${formatBadgeListWithMore(superHolders, false, 'super', 4)}
@@ -8032,7 +8039,7 @@ function renderVibeHallOfFame() {
             <!-- ✦ 스페셜 -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-indigo-100/60 shadow-2xs">
               <span class="text-[9px] font-black text-white bg-gradient-to-r from-purple-600 to-indigo-500 px-2 py-0.5 rounded-md border border-purple-200/50 shrink-0 shadow-2xs">
-                ✨️ 스페셜
+                ✦ 스페셜
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
                 ${formatBadgeListWithMore(specialHolders, false, 'special', 4)}
@@ -8041,7 +8048,7 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
-        <!-- 👑 Lv.100 Club (천상계 라이트 골드 테마) -->
+        <!-- 👑 Lv.100 Club 카드 -->
         <div class="p-3 bg-gradient-to-br from-amber-50/70 via-orange-50/30 to-amber-100/20 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8059,6 +8066,8 @@ function renderVibeHallOfFame() {
     </div>
   `;
 }
+
+
 
 
       
