@@ -7103,10 +7103,7 @@ window.addMultiActivity = async () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
-            // =============================================================
-// [7106번 라인부터 시작하는 레벨업 / 통계 / 별 기록 처리 통합 블록]
-// =============================================================
-
+            
 const realUpAmount = (isRealHike ? hikeUpAmount : activityUpAmount); // 기존 realUpAmount 계산식
 const oldLevel = member.level || 0;
 const newLevel = oldLevel + realUpAmount;
