@@ -8659,22 +8659,48 @@ window.openHeightDetailModal = function() {
 
        
 
- // -------------------------------------------------------------
-// 📢 전광판 배너 데이터베이스 & 모달 제어 (Firebase v9 최종 수정본)
+// -------------------------------------------------------------
+// 📢 전광판 배너 데이터베이스 & 모달 제어 (만능 호환 수정본)
 // -------------------------------------------------------------
 window.bannerCache = [];
+
+// [내부 헬퍼] Firestore 문서 참조 객체 가져오기
+function getBannerDocRef() {
+  const collectionName = 'settings';
+  const docId = 'hallOfFameBanners';
+
+  // 1. Firebase v9 Modular (doc 함수 이용)
+  if (typeof doc === 'function' && window.db) {
+    return doc(window.db, collectionName, docId);
+  } 
+  // 2. Firebase v8 Compat (db.collection 이용)
+  if (window.db && typeof window.db.collection === 'function') {
+    return window.db.collection(collectionName).doc(docId);
+  }
+  // 3. firebase 글로벌 객체 이용
+  if (typeof firebase !== 'undefined' && firebase.firestore) {
+    return firebase.firestore().collection(collectionName).doc(docId);
+  }
+  return null;
+}
 
 // 1. 배너 데이터 불러오기
 async function loadBannerMessages() {
   try {
-    const docRef = doc(db, 'settings', 'hallOfFameBanners');
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      window.bannerCache = docSnap.data().list || [];
-    } else {
-      window.bannerCache = [];
+    const docRef = getBannerDocRef();
+    if (!docRef) return;
+
+    let data = null;
+
+    if (typeof getDoc === 'function') {
+      const snap = await getDoc(docRef);
+      if (snap.exists()) data = snap.data();
+    } else if (typeof docRef.get === 'function') {
+      const snap = await docRef.get();
+      if (snap.exists) data = snap.data();
     }
+
+    window.bannerCache = (data && data.list) ? data.list : [];
     
     if (typeof renderVibeHallOfFame === 'function') {
       renderVibeHallOfFame();
@@ -8687,7 +8713,10 @@ async function loadBannerMessages() {
 // 2. 배너 메시지 저장
 async function saveBannerMessage() {
   const input = document.getElementById('bannerTextInput');
-  if (!input) return;
+  if (!input) {
+    alert("입력창을 찾을 수 없습니다.");
+    return;
+  }
 
   const text = input.value.trim();
   if (!text) {
@@ -8696,9 +8725,13 @@ async function saveBannerMessage() {
   }
 
   try {
-    const docRef = doc(db, 'settings', 'hallOfFameBanners');
-    let currentList = [...(window.bannerCache || [])];
+    const docRef = getBannerDocRef();
+    if (!docRef) {
+      alert("데이터베이스 연결 실패: DB 객체를 찾을 수 없습니다.");
+      return;
+    }
 
+    let currentList = [...(window.bannerCache || [])];
     const newBanner = {
       id: 'banner_' + Date.now(),
       text: text,
@@ -8706,13 +8739,18 @@ async function saveBannerMessage() {
     };
 
     currentList.unshift(newBanner);
-
     if (currentList.length > 5) {
       currentList = currentList.slice(0, 5);
     }
 
-    // Firebase v9 setDoc 사용
-    await setDoc(docRef, { list: currentList }, { merge: true });
+    // v9 setDoc 함수 우선 시도, 없으면 docRef.set 시도
+    if (typeof setDoc === 'function') {
+      await setDoc(docRef, { list: currentList }, { merge: true });
+    } else if (typeof docRef.set === 'function') {
+      await docRef.set({ list: currentList }, { merge: true });
+    } else {
+      throw new Error("저장 함수를 찾을 수 없습니다.");
+    }
 
     window.bannerCache = currentList;
     input.value = '';
@@ -8720,9 +8758,10 @@ async function saveBannerMessage() {
 
     if (typeof openBannerListModal === 'function') openBannerListModal();
     if (typeof renderVibeHallOfFame === 'function') renderVibeHallOfFame();
+
   } catch (error) {
-    console.error("배너 저장 실패:", error);
-    alert("저장 중 오류가 발생했습니다.");
+    console.error("배너 저장 실패 상세:", error);
+    alert("저장 실패: " + (error.message || error));
   }
 }
 
@@ -8731,10 +8770,16 @@ async function deleteBannerMessage(id) {
   if (!confirm("이 배너 메시지를 삭제하시겠습니까?")) return;
 
   try {
-    const docRef = doc(db, 'settings', 'hallOfFameBanners');
+    const docRef = getBannerDocRef();
+    if (!docRef) return;
+
     let currentList = (window.bannerCache || []).filter(b => b.id !== id);
 
-    await setDoc(docRef, { list: currentList }, { merge: true });
+    if (typeof setDoc === 'function') {
+      await setDoc(docRef, { list: currentList }, { merge: true });
+    } else if (typeof docRef.set === 'function') {
+      await docRef.set({ list: currentList }, { merge: true });
+    }
 
     window.bannerCache = currentList;
     if (typeof openBannerListModal === 'function') openBannerListModal();
@@ -8795,7 +8840,7 @@ window.closeBannerListModal = function() {
 document.addEventListener('DOMContentLoaded', () => {
   loadBannerMessages();
 });
-   
+
 
 
 
