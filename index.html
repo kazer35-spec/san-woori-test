@@ -3566,31 +3566,35 @@ margin: 0 2px !important;
   </div>
 </div>
 
-        <!-- 📢 전광판 전체 보기 모달 -->
-<div id="bannerListModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-
-  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+        <!-- 📢 전광판 히스토리 모달 (index.html 최하단 </body> 바로 위로 이동) -->
+<div id="bannerListModal" class="hidden fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-slate-100 overflow-hidden flex flex-col max-h-[80vh] relative z-[10000]">
     
     <!-- 모달 헤더 -->
-    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
-      <h3 class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        📢 전광판 메시지 히스토리
-      </h3>
-      <button onclick="closeBannerListModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
+    <div class="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+      <div class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+        <span>📢</span> 전광판 메시지 히스토리
+      </div>
+      <button onclick="closeBannerListModal()" class="text-slate-400 hover:text-slate-600 font-bold text-sm p-1 cursor-pointer">
+        ✕
+      </button>
     </div>
 
-    <!-- 모달 본문 (JS로 목록 동적 주입) -->
-    <div id="bannerListModalBody" class="py-1 space-y-2 max-h-[300px] overflow-y-auto">
-      <!-- 동적 생성 구역 -->
+    <!-- 모달 바디 -->
+    <div id="bannerListModalBody" class="p-3 space-y-2 overflow-y-auto flex-1">
+      <!-- 동적 생성 데이터 -->
     </div>
 
-    <!-- 하단 닫기 버튼 -->
-    <button onclick="closeBannerListModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
-      닫기
-    </button>
+    <!-- 모달 푸터 (입력창) -->
+    <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center gap-2">
+      <input type="text" id="bannerTextInput" placeholder="새 메시지 입력..." class="flex-1 text-xs px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 bg-white" onkeydown="if(event.key==='Enter') saveBannerMessage()">
+      <button onclick="saveBannerMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shrink-0 cursor-pointer">
+        등록
+      </button>
+    </div>
+
   </div>
 </div>
-
 
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
@@ -8679,7 +8683,7 @@ async function loadBannerMessages() {
   }
 }
 
-// 2. 배너 메시지 저장
+// 📢 배너 메시지 저장 (최종 보안 및 호환 수정본)
 async function saveBannerMessage() {
   const input = document.getElementById('bannerTextInput');
   if (!input) return;
@@ -8691,7 +8695,6 @@ async function saveBannerMessage() {
   }
 
   try {
-    const docRef = db.collection('settings').doc('hallOfFameBanners');
     let currentList = [...(window.bannerCache || [])];
 
     const newBanner = {
@@ -8702,24 +8705,38 @@ async function saveBannerMessage() {
 
     currentList.unshift(newBanner);
 
+    // 최대 5개 유지
     if (currentList.length > 5) {
       currentList = currentList.slice(0, 5);
     }
 
-    await docRef.set({ list: currentList }, { merge: true });
+    // Firebase 호환성 처리 (v8 / v9 Modular 구분 처리)
+    if (typeof doc === 'function' && typeof setDoc === 'function') {
+      // Modular SDK (v9+)
+      const docRef = doc(db, 'settings', 'hallOfFameBanners');
+      await setDoc(docRef, { list: currentList }, { merge: true });
+    } else if (db && typeof db.collection === 'function') {
+      // Compat SDK (v8)
+      const docRef = db.collection('settings').doc('hallOfFameBanners');
+      await docRef.set({ list: currentList }, { merge: true });
+    } else {
+      throw new Error("Firebase DB 객체를 찾을 수 없습니다.");
+    }
 
     window.bannerCache = currentList;
     input.value = '';
     alert("📢 전광판 배너에 등록되었습니다.");
 
-    if (typeof renderVibeHallOfFame === 'function') {
-      renderVibeHallOfFame();
-    }
+    // 화면 즉시 갱신
+    if (typeof openBannerListModal === 'function') openBannerListModal();
+    if (typeof renderVibeHallOfFame === 'function') renderVibeHallOfFame();
+
   } catch (error) {
     console.error("배너 저장 실패:", error);
-    alert("저장 중 오류가 발생했습니다.");
+    alert("저장 중 오류가 발생했습니다: " + error.message);
   }
 }
+
 
 // 3. 배너 메시지 삭제
 async function deleteBannerMessage(id) {
