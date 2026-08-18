@@ -28,6 +28,47 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* ⚾ 야구장 입간판(A-Board) 롤링 트랙 */
+.vibe-ticker-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.vibe-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: vibeAboardRoll 18s linear infinite;
+}
+
+.vibe-ticker-wrapper:hover .vibe-ticker-track {
+  animation-play-state: paused; /* 마우스 올리면 일시정지 */
+}
+
+@keyframes vibeAboardRoll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ✨ NEW 반짝이 펄스 효과 */
+.vibe-new-sparkle {
+  animation: vibeNewGlow 1.2s infinite ease-in-out alternate;
+}
+
+@keyframes vibeNewGlow {
+  0% {
+    opacity: 0.7;
+    box-shadow: 0 0 2px rgba(244, 63, 94, 0.4);
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.9);
+    transform: scale(1.05);
+  }
+}
+
         /* 텍스트 그라데이션 스타일 */
 .text-gradient-legend {
   background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF007F 100%);
@@ -3383,6 +3424,19 @@ margin: 0 2px !important;
       <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
     </div>
 
+              <!-- 📢 전광판 배너 관리 (새로 추가할 위치) -->
+    <div class="card" style="background-color: #fff8f0; border-color: #ffedd5; margin-bottom: 15px;">
+      <div class="card-title text-orange-700 font-bold mb-2">📢 전광판 배너 관리 (최대 5개)</div>
+      
+      <div class="flex gap-2">
+        <input type="text" id="vibeBannerInput" placeholder="배너 문구를 입력하세요 (예: 4월 정기산행 안내)" class="h-10 text-xs border border-orange-200 rounded-xl px-3 outline-none flex-1 bg-white">
+        <button onclick="handleBannerSubmit()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 h-10 rounded-xl text-xs font-bold shrink-0 shadow-xs active:scale-95 transition-all">
+          등록
+        </button>
+      </div>
+    </div>
+
+           
     <!-- 기록 수정 및 레벨 관리 -->
     <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
       <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
@@ -3532,6 +3586,46 @@ margin: 0 2px !important;
 
     <!-- 하단 닫기 버튼 -->
     <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
+      닫기
+    </button>
+  </div>
+</div>
+
+        <!-- 🌟 레전드스타 상단 야구장 전광판 배너 -->
+<div class="mb-3 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-xl border border-amber-200/80 p-2 flex items-center justify-between shadow-2xs overflow-hidden">
+  
+  <!-- 전광판 아이콘 -->
+  <span class="text-sm mr-2 shrink-0">📢</span>
+
+  <!-- 야구장 입간판 롤링 영역 -->
+  <div class="vibe-ticker-wrapper flex-1">
+    <div id="vibeBannerTicker" class="flex items-center">
+      <!-- JS에서 동적 로드 -->
+    </div>
+  </div>
+
+  <!-- 우측 전체 메시지 보기 버튼 -->
+  <button onclick="openVibeBannerModal()" class="ml-2 px-2 py-0.5 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 text-amber-900 text-[9.5px] font-black rounded-lg shrink-0 transition-all active:scale-95 cursor-pointer">
+    보기
+  </button>
+</div>
+
+<!-- 📜 전체 메시지 보기 모달 -->
+<div id="vibeBannerModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-sm w-full p-4 border border-slate-100 shadow-xl space-y-3">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+      <h3 class="text-xs font-black text-slate-800 flex items-center gap-1">
+        <span>📢</span> 최근 배너 소식 (최대 5개)
+      </h3>
+      <button onclick="closeVibeBannerModal()" class="text-slate-400 hover:text-slate-600 text-sm font-black p-1">✕</button>
+    </div>
+
+    <!-- 배너 히스토리 목록 -->
+    <div id="vibeBannerModalList" class="space-y-1.5 max-h-[260px] overflow-y-auto pr-0.5">
+      <!-- JS에서 동적 로드 -->
+    </div>
+
+    <button onclick="closeVibeBannerModal()" class="w-full py-2 bg-slate-800 text-white text-xs font-bold rounded-xl active:scale-98 transition-all">
       닫기
     </button>
   </div>
@@ -8582,8 +8676,125 @@ window.closeHistoryDetailModal = function() {
   }
 };
    
+// ⚾ 관리자 화면에서 배너 등록 버튼 클릭 시 실행
+async function handleBannerSubmit() {
+  const input = document.getElementById('vibeBannerInput');
+  if (!input) return;
+  
+  const text = input.value;
+  await saveVibeBannerMessage(text);
+  input.value = ''; // 입력창 초기화
+}
 
+// ⚾ 배너 등록 함수 (Firebase DB 저장 & 5개 초과 시 자동 삭제)
+async function saveVibeBannerMessage(messageText) {
+  if (!messageText || !messageText.trim()) return alert("문구를 입력해주세요.");
+  
+  const bannerRef = firebase.database().ref('vibeBannerHistory');
+  
+  // 1. 기존 배너 가져오기 (최근 5개만 조회 - 데이터 절약)
+  const snapshot = await bannerRef.orderByChild('timestamp').limitToLast(5).once('value');
+  let bannerList = [];
+  
+  if (snapshot.exists()) {
+    snapshot.forEach(child => {
+      bannerList.push({ id: child.key, ...child.val() });
+    });
+  }
 
+  // 2. 5개 이상이면 가장 오래된 항목 자동 삭제
+  if (bannerList.length >= 5) {
+    const oldestId = bannerList[0].id;
+    await firebase.database().ref(`vibeBannerHistory/${oldestId}`).remove();
+  }
+
+  // 3. 새 배너 추가
+  const newBanner = {
+    text: messageText.trim(),
+    timestamp: Date.now(),
+    createdAt: new Date().toISOString()
+  };
+
+  await bannerRef.push(newBanner);
+  alert("배너가 정상적으로 등록되었습니다.");
+}
+
+// ⚾ 배너 데이터 실시간 불러오기 및 롤링 렌더링
+function loadVibeBanners() {
+  firebase.database().ref('vibeBannerHistory').limitToLast(5).on('value', (snapshot) => {
+    const bannerContainer = document.getElementById('vibeBannerTicker');
+    const modalListContainer = document.getElementById('vibeBannerModalList');
+    if (!bannerContainer) return;
+
+    if (!snapshot.exists()) {
+      bannerContainer.innerHTML = `<div class="text-xs text-slate-400">등록된 배너가 없습니다.</div>`;
+      if (modalListContainer) modalListContainer.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">등록된 메시지가 없습니다.</div>`;
+      return;
+    }
+
+    const banners = [];
+    snapshot.forEach(child => {
+      banners.push({ id: child.key, ...child.val() });
+    });
+
+    // 최신순 정렬
+    banners.reverse();
+
+    const NOW = Date.now();
+    const THREE_DAYS = 3 * 24 * 60 * 60 * 1000; // 3일
+
+    // 메인 롤링 배너 HTML 생성
+    const bannerItemsHTML = banners.map(b => {
+      const isNew = (NOW - b.timestamp) < THREE_DAYS;
+      const newBadge = isNew ? `<span class="vibe-new-sparkle bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full mr-1 shrink-0">NEW</span>` : '';
+      return `<div class="vibe-ticker-item flex items-center shrink-0 mr-8 text-xs font-bold text-slate-700">${newBadge}<span>${b.text}</span></div>`;
+    }).join('');
+
+    // 야구장 A-Board 연속 롤링용 복제
+    bannerContainer.innerHTML = `<div class="vibe-ticker-track flex items-center">${bannerItemsHTML}${bannerItemsHTML}</div>`;
+
+    // 전체 보기 모달 내 목록 업데이트
+    if (modalListContainer) {
+      modalListContainer.innerHTML = banners.map((b, idx) => {
+        const isNew = (NOW - b.timestamp) < THREE_DAYS;
+        const dateStr = new Date(b.timestamp).toLocaleDateString();
+        return `
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs font-bold">
+            <div class="flex items-center gap-1.5 overflow-hidden mr-2">
+              <span class="text-[10px] text-slate-400 shrink-0">#${banners.length - idx}</span>
+              ${isNew ? `<span class="vibe-new-sparkle bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full shrink-0">NEW</span>` : ''}
+              <span class="text-slate-800 truncate">${b.text}</span>
+            </div>
+            <span class="text-[10px] text-slate-400 shrink-0">${dateStr}</span>
+          </div>
+        `;
+      }).join('');
+    }
+  });
+}
+
+// 페이지 초기화 시 배너 리스너 실행
+document.addEventListener('DOMContentLoaded', () => {
+  loadVibeBanners();
+});
+
+                
+ window.openVibeBannerModal = function() {
+  const modal = document.getElementById('vibeBannerModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  }
+};
+
+window.closeVibeBannerModal = function() {
+  const modal = document.getElementById('vibeBannerModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+};
+ 
 
 
 // 🎯 [전역 캐시 객체 선언] 최초 1회만 Firestore에서 가져오고 이후 재활용합니다.
