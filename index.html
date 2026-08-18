@@ -28,47 +28,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* ⚾ 야구장 입간판(A-Board) 롤링 트랙 */
-.vibe-ticker-wrapper {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  white-space: nowrap;
-}
-
-.vibe-ticker-track {
-  display: flex;
-  width: max-content;
-  animation: vibeAboardRoll 18s linear infinite;
-}
-
-.vibe-ticker-wrapper:hover .vibe-ticker-track {
-  animation-play-state: paused; /* 마우스 올리면 일시정지 */
-}
-
-@keyframes vibeAboardRoll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* ✨ NEW 반짝이 펄스 효과 */
-.vibe-new-sparkle {
-  animation: vibeNewGlow 1.2s infinite ease-in-out alternate;
-}
-
-@keyframes vibeNewGlow {
-  0% {
-    opacity: 0.7;
-    box-shadow: 0 0 2px rgba(244, 63, 94, 0.4);
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 8px rgba(244, 63, 94, 0.9);
-    transform: scale(1.05);
-  }
-}
-
         /* 텍스트 그라데이션 스타일 */
 .text-gradient-legend {
   background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF007F 100%);
@@ -3424,19 +3383,6 @@ margin: 0 2px !important;
       <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
     </div>
 
-              <!-- 📢 전광판 배너 관리 (새로 추가할 위치) -->
-    <div class="card" style="background-color: #fff8f0; border-color: #ffedd5; margin-bottom: 15px;">
-      <div class="card-title text-orange-700 font-bold mb-2">📢 전광판 배너 관리 (최대 5개)</div>
-      
-      <div class="flex gap-2">
-        <input type="text" id="vibeBannerInput" placeholder="배너 문구를 입력하세요 (예: 4월 정기산행 안내)" class="h-10 text-xs border border-orange-200 rounded-xl px-3 outline-none flex-1 bg-white">
-        <button onclick="handleBannerSubmit()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 h-10 rounded-xl text-xs font-bold shrink-0 shadow-xs active:scale-95 transition-all">
-          등록
-        </button>
-      </div>
-    </div>
-
-           
     <!-- 기록 수정 및 레벨 관리 -->
     <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
       <div class="card-title text-yellow-700 font-bold mb-3">✏️ 기록 수정 및 레벨 관리</div>
@@ -3529,70 +3475,67 @@ margin: 0 2px !important;
 </div>
 
 
-/**
- * 📜 1. 메인 History 모달 토글
- */
-window.toggleVibeModal = function(show) {
-  const modal = document.getElementById('vibeModal');
-  if (!modal) return;
-
-  if (show) {
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
-
-    // DOM 표시 후 렌더링
-    setTimeout(() => {
-      if (typeof renderVibeHallOfFame === 'function') {
-        renderVibeHallOfFame();
-      }
-    }, 0);
-  } else {
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
-  }
-};
-
-/**
- * 📜 2. History 상세보기 모달 열기/닫기 (레전드스타, 천상계, 누적고도)
- */
-window.openHistoryDetailModal = function() {
-  const modal = document.getElementById('historyDetailModal');
-  if (!modal) return;
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
-};
-
-window.closeHistoryDetailModal = function() {
-  const modal = document.getElementById('historyDetailModal');
-  if (!modal) return;
-  modal.classList.add('hidden');
-  modal.style.display = 'none';
-};
-
-/**
- * 📢 3. 전광판 전체 메시지 모달 열기/닫기
- */
-window.openVibeBannerModal = function() {
-  const modal = document.getElementById('vibeBannerModal');
-  if (!modal) return;
-  
-  // 배너 데이터 최신화
-  if (typeof loadVibeBanners === 'function') {
-    loadVibeBanners();
-  }
-
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
-};
-
-window.closeVibeBannerModal = function() {
-  const modal = document.getElementById('vibeBannerModal');
-  if (!modal) return;
-  modal.classList.add('hidden');
-  modal.style.display = 'none';
-};
-
+<!-- 📜 San:Woori History 통합 모달 -->
+<div id="vibeModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[9990] flex items-center justify-center p-4" onclick="toggleVibeModal(false)">
+  <div class="modal-content bg-white w-full max-w-sm rounded-3xl !p-4 max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
     
+    <!-- San:Woori History 영역 (레전드 스타 / 누적고도 / 100레벨) -->
+    <div id="vibeHallOfFame"></div>
+
+    <!-- 하단 확인 버튼 -->
+    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
+      확인
+    </button>
+  </div>
+</div>
+
+<!-- 📜 History 상세보기 팝업 모달 -->
+<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
+  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    <!-- 모달 헤더 -->
+    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
+        <!-- JS로 타이틀 주입 -->
+      </h3>
+      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
+    </div>
+
+    <!-- 모달 본문 -->
+    <div id="historyDetailBody" class="py-1">
+      <!-- JS로 상세 목록 주입 -->
+    </div>
+
+    <!-- 하단 닫기 버튼 -->
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
+      닫기
+    </button>
+  </div>
+</div>
+
+
+        <!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단에 배치) -->
+<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
+  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    
+    <!-- 모달 헤더 -->
+    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
+        <!-- JS로 타이틀 주입 -->
+      </h3>
+      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
+    </div>
+
+    <!-- 모달 본문 -->
+    <div id="historyDetailBody" class="py-1">
+      <!-- JS로 상세 목록 주입 -->
+    </div>
+
+    <!-- 하단 닫기 버튼 -->
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
+      닫기
+    </button>
+  </div>
+</div>
 
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
@@ -8126,7 +8069,7 @@ window.historyCache = {
 };
 
 
-  /**
+   /**
  * 💾 1. 별(슈퍼/스페셜) 획득 시 DB 저장 함수
  */
 window.saveSpecialStarToMember = async function(memberId, starType, quarterStr, memberObj, mountainName, activityDate) {
@@ -8219,7 +8162,7 @@ window.toggleVibeModal = function(show) {
 // -------------------------------------------------------------
 // 🏆 SanWoori History 메인 렌더링 함수
 // -------------------------------------------------------------
-function renderVibeHallOfFame() {
+   function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
 
@@ -8246,7 +8189,7 @@ function renderVibeHallOfFame() {
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-  // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
+    // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
   const h100kHolders = sortedHeightMembers
@@ -8302,7 +8245,6 @@ function renderVibeHallOfFame() {
     return html;
   };
 
-  // HTML 한 번에 렌더링
   container.innerHTML = `
     <div>
       <!-- 📜 모달 헤더 -->
@@ -8310,19 +8252,6 @@ function renderVibeHallOfFame() {
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
         </div>
-      </div>
-
-      <!-- 📢 레전드스타 상단 야구장 전광판 배너 -->
-      <div class="mb-3 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-xl border border-amber-200/80 p-2 flex items-center justify-between shadow-2xs overflow-hidden">
-        <span class="text-sm mr-2 shrink-0">📢</span>
-        <div class="vibe-ticker-wrapper flex-1">
-          <div id="vibeBannerTicker" class="flex items-center">
-            <!-- JS에서 동적 로드 -->
-          </div>
-        </div>
-        <button onclick="openVibeBannerModal()" class="ml-2 px-2 py-0.5 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 text-amber-900 text-[9.5px] font-black rounded-lg shrink-0 transition-all active:scale-95 cursor-pointer">
-          보기
-        </button>
       </div>
 
       <div class="space-y-2.5">
@@ -8358,7 +8287,7 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
-        <!-- 👑 2. Lv.100 Club 카드 -->
+        <!-- 👑 2. Lv.100 Club 카드 (위치 이동) -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8373,59 +8302,60 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
-        <!-- 🚩 3. 누적 고도 카드 -->
-        <div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
-          <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
-            <span class="flex items-center gap-1">
-              <span>🚩</span> 
-              <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">
-                누적 고도 (Accumulated Altitude)
-              </span>
-            </span>
-            <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
-              상세보기
-            </button>
-          </div>
+        <!-- 🚩 3. 누적 고도 카드 (10만m+ / 5만m+ / 3만m+ 기준 적용) -->
+<div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
+  
+  <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
+    <span class="flex items-center gap-1">
+      <span>🚩</span> 
+      <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">
+        누적 고도 (Accumulated Altitude)
+      </span>
+    </span>
+    <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
+      상세보기
+    </button>
+  </div>
 
-          <div class="space-y-1.5">
-            <!-- 💎 10만m+ -->
-            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-100 shadow-2xs">
-              <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-                💎 10만m+
-              </span>
-              <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(h100kHolders, 'emerald', 'h100k', 3)}
-              </div>
-            </div>
-
-            <!-- 🥇 5만m+ -->
-            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-100 shadow-2xs">
-              <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-                🥇 5만m+
-              </span>
-              <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(h50kHolders, 'default', 'h50k', 3)}
-              </div>
-            </div>
-
-            <!-- 🥈 3만m+ -->
-            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
-              <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-                🥈 3만m+
-              </span>
-              <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(h30kHolders, 'default', 'h30k', 3)}
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="space-y-1.5">
+    <!-- 💎 10만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-100 shadow-2xs">
+      <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+        💎 10만m+
+      </span>
+      <div class="flex flex-wrap items-center pt-0.5">
+        ${formatBadgeListWithMore(h100kHolders, 'emerald', 'h100k', 3)}
       </div>
     </div>
-  `;
 
-  // DOM 생성 직후 배너 실시간 데이터 연결
-  loadVibeBanners();
-}
+    <!-- 🥇 5만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-100 shadow-2xs">
+      <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+        🥇 5만m+
+      </span>
+      <div class="flex flex-wrap items-center pt-0.5">
+        ${formatBadgeListWithMore(h50kHolders, 'default', 'h50k', 3)}
+      </div>
+    </div>
+
+    <!-- 🥈 3만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
+      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+        🥈 3만m+
+      </span>
+      <div class="flex flex-wrap items-center pt-0.5">
+        ${formatBadgeListWithMore(h30kHolders, 'default', 'h30k', 3)}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    </div>
+    </div>
+  `;
+   }
 
 // -------------------------------------------------------------
 // 📦 히스토리 데이터 캐싱/빌드 함수
@@ -8592,7 +8522,7 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-// 🏔️ 3. 누적 고도 상세보기 모달
+       // 🏔️ 3. 누적 고도 상세보기 모달 (3만m 이상 달성자 출력)
 window.openHeightDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -8605,6 +8535,7 @@ window.openHeightDetailModal = function() {
     ? currentData.filter(m => !m.isHidden && !m.hidden) 
     : [];
 
+  // 🎯 3만m (30,000m) 이상 달성자 필터링
   const heightQualifiedMembers = activeMembers
     .filter(m => (m.totalHeight || 0) >= 30000)
     .sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
@@ -8641,6 +8572,7 @@ window.openHeightDetailModal = function() {
   modal.style.display = 'flex';
 };
 
+ 
 // 모달 닫기
 window.closeHistoryDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
@@ -8649,127 +8581,9 @@ window.closeHistoryDetailModal = function() {
     modal.style.display = 'none';
   }
 };
+   
 
-// ⚾ 관리자 화면 배너 등록 실행 함수
-async function handleBannerSubmit() {
-  const input = document.getElementById('vibeBannerInput');
-  if (!input) return alert("입력창을 찾을 수 없습니다.");
-  
-  const text = input.value;
-  if (!text || !text.trim()) return alert("문구를 입력해주세요.");
 
-  try {
-    const bannerRef = firebase.database().ref('vibeBannerHistory');
-    
-    // 1. 전체 배너 가져오기
-    const snapshot = await bannerRef.once('value');
-    let bannerList = [];
-    
-    if (snapshot.exists()) {
-      snapshot.forEach(child => {
-        bannerList.push({ id: child.key, ...child.val() });
-      });
-    }
-
-    bannerList.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-
-    // 2. 5개 이상이면 가장 오래된 데이터 삭제
-    if (bannerList.length >= 5) {
-      const oldestId = bannerList[0].id;
-      await firebase.database().ref(`vibeBannerHistory/${oldestId}`).remove();
-    }
-
-    // 3. 새 배너 저장
-    await bannerRef.push({
-      text: text.trim(),
-      timestamp: Date.now(),
-      createdAt: new Date().toISOString()
-    });
-
-    alert("배너가 정상적으로 등록되었습니다!");
-    input.value = ''; // 입력창 초기화
-  } catch (error) {
-    console.error("배너 저장 오류:", error);
-    alert("저장 중 오류가 발생했습니다: " + error.message);
-  }
-}
-
-// ⚾ 배너 데이터 실시간 불러오기
-function loadVibeBanners() {
-  const bannerRef = firebase.database().ref('vibeBannerHistory');
-  
-  bannerRef.on('value', (snapshot) => {
-    const bannerContainer = document.getElementById('vibeBannerTicker');
-    const modalListContainer = document.getElementById('vibeBannerModalList');
-    if (!bannerContainer) return;
-
-    if (!snapshot.exists()) {
-      bannerContainer.innerHTML = `<div class="text-xs text-slate-400 font-bold">등록된 배너 소식이 없습니다.</div>`;
-      if (modalListContainer) modalListContainer.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">등록된 메시지가 없습니다.</div>`;
-      return;
-    }
-
-    let banners = [];
-    snapshot.forEach(child => {
-      banners.push({ id: child.key, ...child.val() });
-    });
-
-    banners.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    banners = banners.slice(0, 5);
-
-    const NOW = Date.now();
-    const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
-
-    const bannerItemsHTML = banners.map(b => {
-      const isNew = (NOW - b.timestamp) < THREE_DAYS;
-      const newBadge = isNew ? `<span class="vibe-new-sparkle bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full mr-1 shrink-0">NEW</span>` : '';
-      return `<div class="vibe-ticker-item flex items-center shrink-0 mr-8 text-xs font-bold text-slate-700">${newBadge}<span>${b.text}</span></div>`;
-    }).join('');
-
-    bannerContainer.innerHTML = `<div class="vibe-ticker-track flex items-center">${bannerItemsHTML}${bannerItemsHTML}</div>`;
-
-    if (modalListContainer) {
-      modalListContainer.innerHTML = banners.map((b, idx) => {
-        const isNew = (NOW - b.timestamp) < THREE_DAYS;
-        const dateStr = new Date(b.timestamp).toLocaleDateString();
-        return `
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs font-bold">
-            <div class="flex items-center gap-1.5 overflow-hidden mr-2">
-              <span class="text-[10px] text-slate-400 shrink-0">#${banners.length - idx}</span>
-              ${isNew ? `<span class="vibe-new-sparkle bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full shrink-0">NEW</span>` : ''}
-              <span class="text-slate-800 truncate">${b.text}</span>
-            </div>
-            <span class="text-[10px] text-slate-400 shrink-0">${dateStr}</span>
-          </div>
-        `;
-      }).join('');
-    }
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadVibeBanners();
-});
-     
-          
-
-                
- window.openVibeBannerModal = function() {
-  const modal = document.getElementById('vibeBannerModal');
-  if (modal) {
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
-  }
-};
-
-window.closeVibeBannerModal = function() {
-  const modal = document.getElementById('vibeBannerModal');
-  if (modal) {
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
-  }
-};
- 
 
 
 // 🎯 [전역 캐시 객체 선언] 최초 1회만 Firestore에서 가져오고 이후 재활용합니다.
