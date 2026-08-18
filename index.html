@@ -3441,16 +3441,40 @@ overflow: hidden;
   <div class="modal-content !p-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
     
     <!-- 1. San:Woori History 영역 -->
-    <div id="vibeHallOfFame" class="mb-4"></div>
+    <div id="vibeHallOfFame" class="mb-4 space-y-3">
+      <!-- 👑 LEGEND SECTION (3명) -->
+      <div class="p-3 bg-gradient-to-r from-amber-500/10 via-amber-100/30 to-amber-500/10 rounded-2xl border border-amber-200">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-[11px] font-black text-amber-700 tracking-wider">👑 LEGEND STAR</span>
+          <button onclick="openLegendDetailModal()" class="px-2 py-0.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg shadow-sm transition-all">
+            상세보기 🔍
+          </button>
+        </div>
+        <div id="legendUserList" class="grid grid-cols-3 gap-2">
+          <!-- JS dynamic insertion (최대 3개) -->
+        </div>
+      </div>
+
+      <!-- 👑 EMPEROR SECTION (LV.100 / 4명) -->
+      <div class="p-3 bg-gradient-to-r from-purple-500/10 via-purple-100/30 to-purple-500/10 rounded-2xl border border-purple-200">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-[11px] font-black text-purple-700 tracking-wider">⚡ EMPEROR (LV.100)</span>
+          <button onclick="openEmperorDetailModal()" class="px-2 py-0.5 bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold rounded-lg shadow-sm transition-all">
+            상세보기 🔍
+          </button>
+        </div>
+        <div id="emperorUserList" class="grid grid-cols-4 gap-1.5">
+          <!-- JS dynamic insertion (최대 4개) -->
+        </div>
+      </div>
+    </div>
 
     <!-- 2. Community Passion 영역 -->
     <div class="space-y-2 pt-3 border-t border-slate-100">
-      <!-- 헤더 (산정 방식 버튼 규격 통일) -->
       <div class="flex items-center justify-between">
         <h2 class="text-[15px] font-black text-slate-800 flex items-center gap-1.5">
           <span id="vibeModalIcon">🔥</span> Community Passion
         </h2>
-        
       </div>
 
       <!-- 게이지 카드 -->
@@ -3475,10 +3499,6 @@ overflow: hidden;
   </div>
 </div>
 
-
-
-
-
 <!-- 💡 별도 팝업: 지수 산정 방식 모달 -->
 <div id="vibeCalcInfoModal" class="modal-overlay hidden" style="z-index: 10060; background: rgba(0,0,0,0.6);" onclick="toggleVibeCalcInfoModal(false)">
   <div class="modal-content !p-5 max-w-xs bg-white rounded-2xl border border-slate-200 shadow-xl" onclick="event.stopPropagation()">
@@ -3498,7 +3518,7 @@ overflow: hidden;
     <button onclick="toggleVibeCalcInfoModal(false)" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-extrabold text-xs">닫기</button>
   </div>
 </div>
-
+        
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
 <div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
 <div class="text-center mb-2">
@@ -3512,6 +3532,98 @@ overflow: hidden;
 </div>
 </div>
 
+     <!-- 🌟 [신규] LEGEND STAR 상세 모달 -->
+<div id="legendDetailModal" class="modal-overlay hidden" style="z-index: 10070; background: rgba(0,0,0,0.6);" onclick="toggleLegendDetailModal(false)">
+  <div class="modal-content !p-5 max-w-sm bg-white rounded-3xl border border-amber-200 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
+    <div class="text-center mb-4">
+      <h3 class="text-base font-black text-amber-600 flex items-center justify-center gap-1.5">
+        <span>👑</span> LEGEND STAR 획득 현황
+      </h3>
+      <p class="text-[10px] text-slate-400 font-bold mt-0.5">슈퍼별 및 스페셜별 히스토리</p>
+    </div>
+
+    <div class="space-y-4 overflow-y-auto pr-1 flex-1 text-xs">
+      <!-- 1. 상단: 슈퍼별 히스토리 -->
+      <div class="p-3 bg-amber-50/60 rounded-2xl border border-amber-200/80">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-black text-amber-800 flex items-center gap-1">
+            <span>⭐</span> 슈퍼별 (Super Star)
+          </span>
+        </div>
+        <div id="superStarHistoryList" class="space-y-2">
+          <!-- 최초 획득자 카드 예시 -->
+          <div class="p-2.5 bg-gradient-to-r from-amber-100 to-yellow-50 rounded-xl border-2 border-amber-400 shadow-sm relative overflow-hidden">
+            <span class="absolute -right-3 -top-3 bg-amber-500 text-white text-[8px] font-black px-4 py-1 rotate-12 shadow-sm">1ST PIONEER</span>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-white font-black text-xs ring-2 ring-amber-300">1st</div>
+              <div>
+                <div class="font-extrabold text-slate-800 text-[11px] flex items-center gap-1">
+                  홍길동 <span class="text-[9px] bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded font-black">최초 획득</span>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-0.5">2026.1분기 | 지리산 천왕봉 (2026.03.15)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 하단: 스페셜별 히스토리 -->
+      <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-black text-slate-700 flex items-center gap-1">
+            <span>✨</span> 스페셜별 (Special Star)
+          </span>
+        </div>
+        <div id="specialStarHistoryList" class="space-y-2">
+          <!-- 일반 목록 예시 -->
+          <div class="p-2 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-[10px]">2nd</div>
+              <div>
+                <div class="font-bold text-slate-800 text-[11px]">김산악</div>
+                <div class="text-[9px] text-slate-400">2026.2분기 | 설악산 대청봉 (2026.05.20)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="toggleLegendDetailModal(false)" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-extrabold text-xs">닫기</button>
+  </div>
+</div>
+
+<!-- ⚡ [신규] EMPEROR (LV.100) 상세 모달 -->
+<div id="emperorDetailModal" class="modal-overlay hidden" style="z-index: 10070; background: rgba(0,0,0,0.6);" onclick="toggleEmperorDetailModal(false)">
+  <div class="modal-content !p-5 max-w-sm bg-white rounded-3xl border border-purple-200 shadow-2xl overflow-hidden max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
+    <div class="text-center mb-4">
+      <h3 class="text-base font-black text-purple-700 flex items-center justify-center gap-1.5">
+        <span>⚡</span> LV.100 EMPEROR 명단
+      </h3>
+      <p class="text-[10px] text-slate-400 font-bold mt-0.5">최고 레벨 달성자 달성 이력</p>
+    </div>
+
+    <div id="emperorHistoryList" class="space-y-2 overflow-y-auto pr-1 flex-1 text-xs">
+      <!-- 최초 달성자 예시 -->
+      <div class="p-3 bg-gradient-to-r from-purple-100 via-indigo-50 to-purple-50 rounded-2xl border-2 border-purple-400 shadow-sm relative overflow-hidden">
+        <span class="absolute -right-3 -top-3 bg-purple-600 text-white text-[8px] font-black px-4 py-1 rotate-12 shadow-sm">1ST EMPEROR</span>
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full bg-purple-600 text-white flex items-center justify-center font-black text-xs ring-2 ring-purple-300">1st</div>
+          <div>
+            <div class="font-extrabold text-slate-800 text-[12px] flex items-center gap-1">
+              강호산 <span class="text-[9px] bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded font-black">최초 달성</span>
+            </div>
+            <div class="text-[10px] text-purple-700 font-semibold mt-0.5">2026.04.10 달성</div>
+            <div class="text-[9px] text-slate-500">최종 달성지: 한라산 백록담</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="toggleEmperorDetailModal(false)" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-extrabold text-xs">닫기</button>
+  </div>
+</div>
+        
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
         
@@ -8150,6 +8262,27 @@ function renderVibeHallOfFame() {
 
         
             
+function toggleLegendDetailModal(show) {
+  const modal = document.getElementById('legendDetailModal');
+  if (show) modal.classList.remove('hidden');
+  else modal.classList.add('hidden');
+}
+
+function openLegendDetailModal() {
+  // 모달 데이터 동적 로드 로직 구현 후 호출
+  toggleLegendDetailModal(true);
+}
+
+function toggleEmperorDetailModal(show) {
+  const modal = document.getElementById('emperorDetailModal');
+  if (show) modal.classList.remove('hidden');
+  else modal.classList.add('hidden');
+}
+
+function openEmperorDetailModal() {
+  // 모달 데이터 동적 로드 로직 구현 후 호출
+  toggleEmperorDetailModal(true);
+}
 
 
       
