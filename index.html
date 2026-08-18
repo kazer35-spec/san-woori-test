@@ -8261,7 +8261,7 @@ window.toggleVibeModal = function(show) {
           </div>
         </div>
 
-        // 🏔️ 3. 누적 고도 명예의 전당 카드 (천상계/레전드스타 스타일 통일 & 상세보기 추가)
+        <!-- 🏔️ 3. 누적 고도 명예의 전당 카드 (천상계/레전드스타 스타일 통일 & 상세보기 추가)-->
 <div class="p-3 bg-gradient-to-br from-emerald-50/60 via-teal-50/20 to-emerald-100/10 rounded-2xl border border-emerald-200/60 shadow-2xs">
   <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
     <span class="flex items-center gap-1">
@@ -8478,6 +8478,19 @@ window.openLv100DetailModal = function() {
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
+
+        // 🏔️ 누적 고도 상세 모달 열기 함수
+function openHeightDetailModal() {
+  const modal = document.getElementById('heightDetailModal'); // 기존 상세 모달 ID에 맞춰 변경 가능
+  if (modal) {
+    modal.classList.remove('hidden');
+  } else {
+    // 모달이 따로 없다면 레전드스타/천상계처럼 전용 상세 팝업 오픈 로직 연동
+    if (typeof openAltitudeDetail === 'function') {
+      openAltitudeDetail();
+    }
+  }
+}
 
 // 모달 닫기
 window.closeHistoryDetailModal = function() {
