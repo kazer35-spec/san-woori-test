@@ -8153,19 +8153,19 @@ window.toggleVibeModal = function(show) {
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-  // 3. 누적고도 데이터 (totalHeight 기준 내림차순)
+    // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
-  const h200kHolders = sortedHeightMembers
-    .filter(m => (m.totalHeight || 0) >= 200000)
-    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
-
   const h100kHolders = sortedHeightMembers
-    .filter(m => (m.totalHeight || 0) >= 100000 && (m.totalHeight || 0) < 200000)
+    .filter(m => (m.totalHeight || 0) >= 100000)
     .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
 
   const h50kHolders = sortedHeightMembers
     .filter(m => (m.totalHeight || 0) >= 50000 && (m.totalHeight || 0) < 100000)
+    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
+
+  const h30kHolders = sortedHeightMembers
+    .filter(m => (m.totalHeight || 0) >= 30000 && (m.totalHeight || 0) < 50000)
     .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
 
   // 🏷️ 뱃지 리스트 포맷터
@@ -8266,7 +8266,7 @@ window.toggleVibeModal = function(show) {
           </div>
         </div>
 
-        <!-- 🚩 3. 누적 고도 카드 (네온 Glow 테두리 적용) -->
+        <!-- 🚩 3. 누적 고도 카드 (10만m+ / 5만m+ / 3만m+ 기준 적용) -->
 <div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
   
   <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
@@ -8282,37 +8282,38 @@ window.toggleVibeModal = function(show) {
   </div>
 
   <div class="space-y-1.5">
-    <!-- 💎 20만m+ -->
+    <!-- 💎 10만m+ -->
     <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-100 shadow-2xs">
       <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-        💎 20만m+
+        💎 10만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
-        ${formatBadgeListWithMore(h200kHolders, 'emerald', 'h200k', 3)}
+        ${formatBadgeListWithMore(h100kHolders, 'emerald', 'h100k', 3)}
       </div>
     </div>
 
-    <!-- 🥇 10만m+ -->
+    <!-- 🥇 5만m+ -->
     <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-100 shadow-2xs">
       <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-        🥇 10만m+
-      </span>
-      <div class="flex flex-wrap items-center pt-0.5">
-        ${formatBadgeListWithMore(h100kHolders, 'default', 'h100k', 3)}
-      </div>
-    </div>
-
-    <!-- 🥈 5만m+ -->
-    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
-      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
-        🥈 5만m+
+        🥇 5만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
         ${formatBadgeListWithMore(h50kHolders, 'default', 'h50k', 3)}
       </div>
     </div>
+
+    <!-- 🥈 3만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
+      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+        🥈 3만m+
+      </span>
+      <div class="flex flex-wrap items-center pt-0.5">
+        ${formatBadgeListWithMore(h30kHolders, 'default', 'h30k', 3)}
+      </div>
+    </div>
   </div>
 </div>
+
 
 
     </div>
