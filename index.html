@@ -3529,107 +3529,70 @@ margin: 0 2px !important;
 </div>
 
 
-<!-- 📜 San:Woori History 통합 모달 -->
-<div id="vibeModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[9990] flex items-center justify-center p-4" onclick="toggleVibeModal(false)">
-  <div class="modal-content bg-white w-full max-w-sm rounded-3xl !p-4 max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    
-    <!-- San:Woori History 영역 (레전드 스타 / 누적고도 / 100레벨) -->
-    <div id="vibeHallOfFame"></div>
+/**
+ * 📜 1. 메인 History 모달 토글
+ */
+window.toggleVibeModal = function(show) {
+  const modal = document.getElementById('vibeModal');
+  if (!modal) return;
 
-    <!-- 하단 확인 버튼 -->
-    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
-      확인
-    </button>
-  </div>
-</div>
+  if (show) {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
 
-<!-- 📜 History 상세보기 팝업 모달 -->
-<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
-  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    <!-- 모달 헤더 -->
-    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
-      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        <!-- JS로 타이틀 주입 -->
-      </h3>
-      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
-    </div>
+    // DOM 표시 후 렌더링
+    setTimeout(() => {
+      if (typeof renderVibeHallOfFame === 'function') {
+        renderVibeHallOfFame();
+      }
+    }, 0);
+  } else {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+};
 
-    <!-- 모달 본문 -->
-    <div id="historyDetailBody" class="py-1">
-      <!-- JS로 상세 목록 주입 -->
-    </div>
+/**
+ * 📜 2. History 상세보기 모달 열기/닫기 (레전드스타, 천상계, 누적고도)
+ */
+window.openHistoryDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
 
-    <!-- 하단 닫기 버튼 -->
-    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
-      닫기
-    </button>
-  </div>
-</div>
+window.closeHistoryDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+};
 
-
-        <!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단에 배치) -->
-<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
-  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    
-    <!-- 모달 헤더 -->
-    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
-      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        <!-- JS로 타이틀 주입 -->
-      </h3>
-      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
-    </div>
-
-    <!-- 모달 본문 -->
-    <div id="historyDetailBody" class="py-1">
-      <!-- JS로 상세 목록 주입 -->
-    </div>
-
-    <!-- 하단 닫기 버튼 -->
-    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
-      닫기
-    </button>
-  </div>
-</div>
-
-        <!-- 🌟 레전드스타 상단 야구장 전광판 배너 -->
-<div class="mb-3 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-xl border border-amber-200/80 p-2 flex items-center justify-between shadow-2xs overflow-hidden">
+/**
+ * 📢 3. 전광판 전체 메시지 모달 열기/닫기
+ */
+window.openVibeBannerModal = function() {
+  const modal = document.getElementById('vibeBannerModal');
+  if (!modal) return;
   
-  <!-- 전광판 아이콘 -->
-  <span class="text-sm mr-2 shrink-0">📢</span>
+  // 배너 데이터 최신화
+  if (typeof loadVibeBanners === 'function') {
+    loadVibeBanners();
+  }
 
-  <!-- 야구장 입간판 롤링 영역 -->
-  <div class="vibe-ticker-wrapper flex-1">
-    <div id="vibeBannerTicker" class="flex items-center">
-      <!-- JS에서 동적 로드 -->
-    </div>
-  </div>
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
 
-  <!-- 우측 전체 메시지 보기 버튼 -->
-  <button onclick="openVibeBannerModal()" class="ml-2 px-2 py-0.5 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 text-amber-900 text-[9.5px] font-black rounded-lg shrink-0 transition-all active:scale-95 cursor-pointer">
-    보기
-  </button>
-</div>
+window.closeVibeBannerModal = function() {
+  const modal = document.getElementById('vibeBannerModal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
+};
 
-<!-- 📜 전체 메시지 보기 모달 -->
-<div id="vibeBannerModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-sm w-full p-4 border border-slate-100 shadow-xl space-y-3">
-    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-      <h3 class="text-xs font-black text-slate-800 flex items-center gap-1">
-        <span>📢</span> 최근 배너 소식 (최대 5개)
-      </h3>
-      <button onclick="closeVibeBannerModal()" class="text-slate-400 hover:text-slate-600 text-sm font-black p-1">✕</button>
-    </div>
-
-    <!-- 배너 히스토리 목록 -->
-    <div id="vibeBannerModalList" class="space-y-1.5 max-h-[260px] overflow-y-auto pr-0.5">
-      <!-- JS에서 동적 로드 -->
-    </div>
-
-    <button onclick="closeVibeBannerModal()" class="w-full py-2 bg-slate-800 text-white text-xs font-bold rounded-xl active:scale-98 transition-all">
-      닫기
-    </button>
-  </div>
-</div>
+    
 
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
