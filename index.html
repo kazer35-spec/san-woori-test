@@ -2822,26 +2822,6 @@ box-sizing: border-box;
 .hall-of-fame-btn { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #facc15; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2); }
 .hall-of-fame-btn:hover { transform: scale(1.1); background: #fefce8; }
 
-/* [추가/수정] 열정 온도 버튼 스타일 */
-.vibe-temp-btn {
-width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #fee2e2;
-display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: 0.2s;
-position: relative; overflow: hidden;
-}
-.vibe-temp-btn svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-.vibe-temp-btn circle { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
-.vibe-temp-btn .bg { stroke: #f1f5f9; }
-.vibe-temp-btn .progress { stroke: #ef4444; }
-
-.hall-card { background: #f8fafc; border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid #e2e8f0; position: relative; overflow: hidden; }
-.hall-season-title { font-size: 0.8rem; font-weight: 900; color: #64748b; margin-bottom: 10px; padding-left: 4px; border-left: 3px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
-.hall-rank-flex { display: flex; justify-content: space-between; gap: 8px; }
-.hall-rank-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 16px; background: white; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.hall-rank-name { font-size: 0.75rem; font-weight: 900; color: #1e293b; }
-.hall-rank-label { font-size: 0.6rem; font-weight: 900; }
-
-.status-badge-live { background: #10b981; color: white; font-size: 7px; padding: 1px 5px; border-radius: 4px; animation: live-blink 1.5s infinite; }
-.status-badge-end { background: #94a3b8; color: white; font-size: 7px; padding: 1px 5px; border-radius: 4px; }
 
 /* 명예의 전당 전용 스크롤 영역 */
 .hall-scroll-area {
@@ -2998,8 +2978,8 @@ margin: 0 2px !important;
 
 /* 📜 History 버튼 진한 주황색 테두리 & 선명한 광원 스타일 */
 .vibe-history-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #ffffff;
   border: 2px solid #f97316; /* 진한 오렌지 테두리 */
@@ -8281,22 +8261,25 @@ window.toggleVibeModal = function(show) {
           </div>
         </div>
 
-        <!-- 🏔️ 3. 누적 고도 명예의 전당 카드 (Glow 및 고급 스타일 강화) -->
-<div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-slate-50/50 rounded-2xl border border-emerald-200/80 shadow-2xs relative overflow-hidden" style="box-shadow: 0 0 12px rgba(16, 185, 129, 0.12);">
-  
-  <div class="text-[11px] font-black mb-2 flex items-center justify-between">
+        // 🏔️ 3. 누적 고도 명예의 전당 카드 (천상계/레전드스타 스타일 통일 & 상세보기 추가)
+<div class="p-3 bg-gradient-to-br from-emerald-50/60 via-teal-50/20 to-emerald-100/10 rounded-2xl border border-emerald-200/60 shadow-2xs">
+  <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
     <span class="flex items-center gap-1">
-      <span class="text-xs">🚩</span> 
-      <span class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent font-black tracking-tight">
-        누적 고도 명예의 전당 (Accumulated Altitude)
+      <span>🚩</span> 
+      <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">
+        누적 고도 (Accumulated Altitude)
       </span>
     </span>
+    <!-- 🔘 상세보기 버튼 추가 -->
+    <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
+      상세보기
+    </button>
   </div>
-  
+
   <div class="space-y-1.5">
-    <!-- 💎 20만m+ (에메랄드 글로우 적용) -->
-    <div class="flex items-center gap-2 bg-white/95 p-1.5 rounded-xl border border-emerald-200/90 shadow-2xs transition-all hover:border-emerald-300" style="box-shadow: 0 0 8px rgba(16, 185, 129, 0.15);">
-      <span class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0 shadow-2xs">
+    <!-- 💎 20만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-200/60 shadow-2xs">
+      <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
         💎 20만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
@@ -8305,8 +8288,8 @@ window.toggleVibeModal = function(show) {
     </div>
 
     <!-- 🥇 10만m+ -->
-    <div class="flex items-center gap-2 bg-white/95 p-1.5 rounded-xl border border-teal-200/80 shadow-2xs transition-all hover:border-teal-300">
-      <span class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0 shadow-2xs">
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-200/60 shadow-2xs">
+      <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
         🥇 10만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
@@ -8315,8 +8298,8 @@ window.toggleVibeModal = function(show) {
     </div>
 
     <!-- 🥈 5만m+ -->
-    <div class="flex items-center gap-2 bg-white/95 p-1.5 rounded-xl border border-slate-200/90 shadow-2xs transition-all hover:border-slate-300">
-      <span class="bg-gradient-to-r from-slate-500 to-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0 shadow-2xs">
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-200/80 shadow-2xs">
+      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
         🥈 5만m+
       </span>
       <div class="flex flex-wrap items-center pt-0.5">
@@ -8326,11 +8309,10 @@ window.toggleVibeModal = function(show) {
   </div>
 </div>
 
-        </div>
+    </div>
     </div>
   `;
-   }   
-        
+   }
 
 // -------------------------------------------------------------
 // 📦 히스토리 데이터 캐싱/빌드 함수
