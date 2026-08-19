@@ -28,6 +28,19 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* 텍스트 그라데이션 스타일 */
+.text-gradient-legend {
+  background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF007F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-lv100 {
+  background: linear-gradient(135deg, #FFB703 0%, #FB8500 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
         /* ================= 🏷️ 슈퍼별 / 스페셜 배지 고유 그라데이션 ================= */
 
 /* 🔥 슈퍼별 배지: 로즈 → 주황 → 골드 그라데이션 & 미세 입체 그림자 */
@@ -50,6 +63,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     transition: all 0.3s ease;
 }
 
+/* 🏔️ 누적고도 전용 에메랄드 네온 Glow 스타일 */
+.is-emerald-subtle-glow {
+  border: 1.5px solid #a7f3d0 !important; /* emerald-200 */
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25), inset 0 0 8px rgba(16, 185, 129, 0.1) !important;
+}
 
 
 /* ================= 🌟 슈퍼별 / 스페셜별 은은한 미세 번짐 효과 ================= */
@@ -2809,7 +2827,7 @@ box-sizing: border-box;
 .hall-of-fame-btn { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #facc15; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2); }
 .hall-of-fame-btn:hover { transform: scale(1.1); background: #fefce8; }
 
-/* [추가/수정] 열정 온도 버튼 스타일 */
+ /* [추가/수정] 열정 온도 버튼 스타일 */
 .vibe-temp-btn {
 width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #fee2e2;
 display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: 0.2s;
@@ -2829,6 +2847,7 @@ position: relative; overflow: hidden;
 
 .status-badge-live { background: #10b981; color: white; font-size: 7px; padding: 1px 5px; border-radius: 4px; animation: live-blink 1.5s infinite; }
 .status-badge-end { background: #94a3b8; color: white; font-size: 7px; padding: 1px 5px; border-radius: 4px; }
+       
 
 /* 명예의 전당 전용 스크롤 영역 */
 .hall-scroll-area {
@@ -2983,52 +3002,83 @@ margin: 0 2px !important;
 .level-msg-box { background: #f0f9ff; padding: 15px; border-radius: 20px; border: 2px dashed #3b82f6; margin-bottom: 20px; }
 .level-msg-txt { font-size: 1rem; font-weight: 800; color: #0369a1; line-height: 1.5; }
 
-/* [추가] 열정 온도 모달용 스타일 */
-.vibe-temp-card-modal {
-background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
-border: 1.5px solid #fee2e2;
-border-radius: 24px;
-padding: 20px;
-position: relative;
-overflow: hidden;
+/* 📜 History 버튼 진한 주황색 테두리 & 선명한 광원 스타일 */
+/* 📜 History 버튼 (천천히 빛나는 Glow 애니메이션 적용) */
+.vibe-history-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #f97316; /* 진한 오렌지 테두리 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* 3초 동안 아주 천천히 부드럽게 무한 반복 */
+  animation: slowOrangeGlow 3s infinite ease-in-out;
 }
-.temp-gauge-bg { height: 12px; background: #fee2e2; border-radius: 10px; margin-top: 10px; overflow: hidden; position: relative; }
-.temp-gauge-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #f87171, #ef4444); border-radius: 10px; transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.flame-particle { position: absolute; font-size: 14px; pointer-events: none; animation: particle-rise 1s infinite ease-out; opacity: 0; }
-@keyframes particle-rise {
-0% { transform: translateY(0) scale(1); opacity: 1; }
-100% { transform: translateY(-30px) scale(0.5); opacity: 0; }
+
+.vibe-history-btn:active {
+  transform: scale(0.92);
 }
+
+/* 아주 천천히 은은하게 빛나는 Keyframes */
+@keyframes slowOrangeGlow {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(249, 115, 22, 0.25);
+    border-color: #fb923c; /* 은은한 주황 */
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.65);
+    border-color: #ea580c; /* 선명하고 진한 주황 */
+  }
+}
+
 </style>        
 </head>
 <body>
 
          
-       
+  <!-- 🎉 레벨업 카드 최상단 모달 (최외각 id="levelUpCardModal" 적용) -->
+<div id="levelUpCardModal" class="hidden fixed inset-0 bg-slate-900/85 backdrop-blur-md z-[10070] flex items-center justify-center p-4" onclick="closeLevelUpCardModal()">
+  
+  <!-- 모달 컨텐츠 본문 (클릭 이벤트 전파 방지) -->
+  <div class="w-full max-w-[400px] text-center" onclick="event.stopPropagation()">
+    <h2 id="modalTitle" class="text-2xl font-black mb-1 text-white">LEVEL UP!</h2>
+    <p class="text-slate-400 text-[10px] italic mb-5">레벨업 축하합니다 🎉</p>
+
+    <!-- 📸 캡처 대상 영역 -->
+    <div id="cardToCapture" class="inline-block bg-black p-[3px] rounded-[22px]">
+      <div id="cardFrame" class="relative w-[340px] min-h-[340px] bg-[#0f172a] rounded-[20px] overflow-hidden flex flex-col p-6 border-4 border-emerald-500">
+
+        <!-- 카드 내부 렌더링 영역 -->
+        <div id="cardContent" class="flex-grow flex flex-col items-center justify-center"></div>
+
+        <!-- 카드 하단 날짜 -->
+        <div class="mt-4 pt-3 border-t border-slate-800 text-center">
+          <p id="cardDate" class="text-[8px] text-slate-600 tracking-widest uppercase"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 버튼 영역 -->
+    <div class="space-y-3 mt-8">
+      <button onclick="saveCardImage()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-black shadow-lg active:scale-98 transition-all cursor-pointer">
+        📸 이미지 저장하기
+      </button>
+      <button onclick="closeLevelUpCardModal()" class="w-full text-slate-500 hover:text-slate-300 text-sm font-bold cursor-pointer">
+        닫기
+      </button>
+    </div>
+  </div>
+
+</div>
+     
         
-<div id="levelUpCardModal" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md hidden items-center justify-center p-5">
-<div class="w-full max-w-[400px] text-center">
-<h2 id="modalTitle" class="text-2xl font-black mb-1 text-white">LEVEL UP!</h2>
-<p class="text-slate-400 text-[10px] italic mb-5">레벨업 축하합니다 🎉</p>
 
-<div id="cardToCapture" class="inline-block bg-black p-[3px] rounded-[22px]">
-<div id="cardFrame" class="relative w-[340px] min-h-[340px] bg-[#0f172a] rounded-[20px] overflow-hidden flex flex-col p-6 border-4 border-emerald-500">
-
-<div id="cardContent" class="flex-grow flex flex-col items-center justify-center">
-</div>
-
-<div class="mt-4 pt-3 border-t border-slate-800 text-center">
-<p id="cardDate" class="text-[8px] text-slate-600 tracking-widest uppercase"></p>
-</div>
-</div>
-</div>
-
-<div class="space-y-3 mt-8">
-<button onclick="saveCardImage()" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-black shadow-lg">📸 이미지 저장하기</button>
-<button onclick="document.getElementById('levelUpCardModal').style.display='none'; pendingLevelUpCards=[];" class="w-full text-slate-500 text-sm font-bold">닫기</button>
-</div>
-</div>
-</div>
 
 
 <!-- 메인 컨테이너 시작 -->
@@ -3040,31 +3090,32 @@ overflow: hidden;
     <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
   </div>
 
-  <!-- 1. 실시간 현황 뷰 (viewStatus) -->
-  <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
-    
-    <!-- 상단 고정 헤더 영역 -->
-    <div class="year-selector flex justify-between items-center mb-3">
-      <h1 class="main-title">
-        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-        <span>산:우리</span>
-        <span class="slogan-txt">같이 걷는 즐거움</span>
-      </h1>
-      <div class="flex items-center gap-2">
-        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-        <button onclick="toggleVibeModal(true)" class="vibe-temp-btn" id="vibeCircleBtn">
-          <svg viewBox="0 0 36 36">
-            <circle class="bg" cx="18" cy="18" r="16"></circle>
-            <circle class="progress" cx="18" cy="18" r="16" stroke-dasharray="100, 100" stroke-dashoffset="100" id="vibeCircleProgress"></circle>
-          </svg>
-          <span id="vibeCircleIcon" style="z-index: 1;">🍀</span>
-        </button>
-        <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
-          <option value="2026">2026년</option>
-          <option value="2027">2027년</option>
-        </select>
-      </div>
+<!-- 1. 실시간 현황 뷰 (viewStatus) -->
+<div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
+  
+  <!-- 상단 고정 헤더 영역 -->
+  <div class="year-selector flex justify-between items-center mb-3">
+    <h1 class="main-title">
+      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+      <span>산:우리</span>
+      <span class="slogan-txt">같이 걷는 즐거움</span>
+    </h1>
+
+    <div class="flex items-center gap-2">
+      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
+
+      <!-- 📜 San:Woori History 버튼 (주황색 테두리 스타일 적용) -->
+      <button onclick="toggleVibeModal(true)" class="vibe-history-btn" id="vibeCircleBtn">
+        <span id="vibeCircleIcon">📜</span>
+      </button>
+
+      <select id="yearSelect" onchange="changeYear()" class="year-select-custom outline-none">
+        <option value="2026">2026년</option>
+        <option value="2027">2027년</option>
+      </select>
     </div>
+  </div>
+
 
     <!-- 검색 및 필터 컨트롤 -->
     <div class="flex gap-2 mb-3 h-10 items-center">
@@ -3436,68 +3487,44 @@ overflow: hidden;
 </div>
 
 
-<!-- 🔥 활동지수 & 히스토리 통합 모달 -->
-<div id="vibeModal" class="modal-overlay" style="display:none;" onclick="toggleVibeModal(false)">
-  <div class="modal-content !p-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
+<!-- 📜 San:Woori History 통합 모달 -->
+<div id="vibeModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[9990] flex items-center justify-center p-4" onclick="toggleVibeModal(false)">
+  <div class="modal-content bg-white w-full max-w-sm rounded-3xl !p-4 max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
     
-    <!-- 1. San:Woori History 영역 -->
-    <div id="vibeHallOfFame" class="mb-4"></div>
-
-    <!-- 2. Community Passion 영역 -->
-    <div class="space-y-2 pt-3 border-t border-slate-100">
-      <!-- 헤더 (산정 방식 버튼 규격 통일) -->
-      <div class="flex items-center justify-between">
-        <h2 class="text-[15px] font-black text-slate-800 flex items-center gap-1.5">
-          <span id="vibeModalIcon">🔥</span> Community Passion
-        </h2>
-        
-      </div>
-
-      <!-- 게이지 카드 -->
-      <div class="vibe-temp-card-modal p-4 bg-rose-50/40 rounded-2xl border border-rose-100/60" id="vibeCard">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-[10px] font-black text-rose-500 tracking-tight" id="vibeStatusTxt">EXPLOSIVE PASSION</span>
-          <span class="text-[10px] font-bold text-slate-400" id="vibeScoreTxt">100%</span>
-        </div>
-        <div class="temp-gauge-bg h-2.5 bg-rose-100/60 rounded-full overflow-hidden">
-          <div id="vibeGauge" class="temp-gauge-fill h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
-        </div>
-        <div id="vibeDesc" class="text-xs font-bold text-slate-600 mt-3 leading-relaxed">
-          현재 활동지수 최고조! 산행의 열기가 가득합니다.
-        </div>
-      </div>
-    </div>
+    <!-- San:Woori History 영역 (레전드 스타 / 누적고도 / 100레벨) -->
+    <div id="vibeHallOfFame"></div>
 
     <!-- 하단 확인 버튼 -->
-    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
+    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all cursor-pointer">
       확인
     </button>
   </div>
 </div>
 
-
-
-
-
-<!-- 💡 별도 팝업: 지수 산정 방식 모달 -->
-<div id="vibeCalcInfoModal" class="modal-overlay hidden" style="z-index: 10060; background: rgba(0,0,0,0.6);" onclick="toggleVibeCalcInfoModal(false)">
-  <div class="modal-content !p-5 max-w-xs bg-white rounded-2xl border border-slate-200 shadow-xl" onclick="event.stopPropagation()">
-    <h3 class="text-sm font-black text-slate-800 mb-3 flex items-center gap-1.5">
-      <span>💡</span> 커뮤니티 지수 산정 방식
-    </h3>
-    <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 text-[11px] font-bold text-blue-800 leading-relaxed space-y-1.5">
-      <p>• 24시간 방문자 5명당 일정 % 상승</p>
-      <p>• 24시간 산행 기록 1개당 10% 상승</p>
-      <div class="pt-2 border-t border-blue-200/60 flex justify-between text-[10px] text-blue-600 font-extrabold">
-        <span>❄️ 20% 미만</span>
-        <span>🍀 20% 이상</span>
-        <span>☀️ 50% 이상</span>
-        <span>🔥 80% 이상</span>
-      </div>
+<!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단 배치) -->
+<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
+  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    <!-- 모달 헤더 -->
+    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
+        <!-- JS로 타이틀 주입 -->
+      </h3>
+      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none cursor-pointer">&times;</button>
     </div>
-    <button onclick="toggleVibeCalcInfoModal(false)" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-extrabold text-xs">닫기</button>
+
+    <!-- 모달 본문 -->
+    <div id="historyDetailBody" class="py-1">
+      <!-- JS로 상세 목록 주입 -->
+    </div>
+
+    <!-- 하단 닫기 버튼 -->
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all cursor-pointer">
+      닫기
+    </button>
   </div>
 </div>
+
+
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
 <div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
@@ -6739,155 +6766,173 @@ async function startRealtimeSync() {
     }
 }
 
-// 레벨업 알림 카드 대기열 배열 (기존 위치 유지)
+
+// 레벨업 알림 카드 대기열 배열
 let pendingLevelUpCards = [];
 
-
-
-
-
-        
-
 window.checkLevelUpgrade = (name, oldLevel, newLevel) => {
-    // 1. 등급 기준 데이터가 있는지 확인 (변수명이 LevelThresholds 일 수도 있음)
-    const thresholds = (typeof levelThresholds !== 'undefined') ? levelThresholds : (typeof LevelThresholds !== 'undefined' ? LevelThresholds : []);
-    if (thresholds.length === 0) return;
+  // 1. 등급 기준 데이터 확인
+  const thresholds = (typeof levelThresholds !== 'undefined') ? levelThresholds : (typeof LevelThresholds !== 'undefined' ? LevelThresholds : []);
+  if (thresholds.length === 0) return;
 
-    // 2. 이전 등급과 현재 등급의 '명칭'을 가져와서 비교합니다.
-    const oldBadge = getLevelBadge(oldLevel);
-    const newBadge = getLevelBadge(newLevel);
+  // 2. 이전 등급과 현재 등급의 '명칭' 비교
+  const oldBadge = getLevelBadge(oldLevel);
+  const newBadge = getLevelBadge(newLevel);
 
-    // 3. 등급 명칭이 달라졌을 때만 (예: 풀잎 -> 나무) 축하 카드를 만듭니다.
-    if (oldBadge !== newBadge) {
-        const style = getLevelStyle(newLevel);
-        
-        pendingLevelUpCards.push({ 
-            name: name, 
-            level: newLevel, // 도달한 최종 숫자 레벨
-            badgeText: newBadge, // 도달한 최종 등급 마크 (나무 등)
-            color: style.border || "#ffffff" 
-        });
-        
-        console.log(`${name}님 ${newBadge} 등급 달성 축하 카드 생성!`); // 확인용 로그
-    }
+  // 3. 등급 명칭이 달라졌을 때만 축하 카드 생성
+  if (oldBadge !== newBadge) {
+    const style = getLevelStyle(newLevel);
+
+    pendingLevelUpCards.push({
+      name: name,
+      level: newLevel,
+      badgeText: newBadge,
+      color: style.border || "#10b981"
+    });
+
+    console.log(`${name}님 ${newBadge} 등급 달성 축하 카드 생성!`);
+  }
 };
 
+// 모달 닫기 안전 함수
+window.closeLevelUpCardModal = () => {
+  const modal = document.getElementById('levelUpCardModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+  pendingLevelUpCards = []; // 대기열 초기화
+};
+
+// 모달 출력 함수
 window.showCombinedLevelUpAlert = () => {
-    if (pendingLevelUpCards.length === 0) return;
+  if (!pendingLevelUpCards || pendingLevelUpCards.length === 0) {
+    console.warn("⚠️ [LevelUp] 표시할 레벨업 카드 데이터가 없습니다.");
+    return;
+  }
 
-    const modal = document.getElementById('levelUpCardModal');
-    const content = document.getElementById('cardContent');
-    const frame = document.getElementById('cardFrame');
-    const title = document.getElementById('modalTitle');
-    
-    // 첫 번째 인원의 컬러를 메인 테마로 사용
-    const primaryColor = pendingLevelUpCards[0].color || "#10b981";
-    frame.style.borderColor = primaryColor;
-    title.style.color = primaryColor;
+  const modal = document.getElementById('levelUpCardModal');
+  const content = document.getElementById('cardContent');
+  const frame = document.getElementById('cardFrame');
+  const title = document.getElementById('modalTitle');
 
-    content.innerHTML = ''; 
+  if (!modal || !content || !frame || !title) {
+    console.error("❌ #levelUpCardModal DOM 요소를 찾을 수 없습니다.");
+    return;
+  }
 
-    if (pendingLevelUpCards.length === 1) {
-        // [1인 모드] 기존 세로형 디자인 유지
-        const user = pendingLevelUpCards[0];
-        const emoji = user.badgeText.split(' ')[0];
-        const label = user.badgeText.split(' ')[1] || "";
-        content.innerHTML = `
-            <div class="flex flex-col items-center w-full py-4">
-                <div class="text-[9px] font-bold border px-3 py-1 rounded-full uppercase mb-6 tracking-widest" 
-                     style="color:${user.color}; border-color:${user.color}44; background: ${user.color}11;">
-                     SAN WOORI RANKER
-                </div>
-                <div class="text-8xl mb-4 leading-none">${emoji}</div>
-                <div class="text-[10px] font-medium text-white/50 mb-6 tracking-tight">
-                    <span class="font-bold text-white text-xs">"${label}"</span> 등급 획득!
-                </div>
-                <div class="text-5xl font-black mb-1" style="color:${user.color}">LV.${user.level}</div>
-                <div class="text-3xl font-bold text-white mb-4">${user.name} 님</div>
-                <p class="text-slate-400 text-[11px] italic">"산우리의 든든한 등불입니다"</p>
-            </div>
-        `;
-    } else {
-        // [다수 인원 모드] 가로 그리드 레이아웃 (6명 이상 최적화)
-        const container = document.createElement('div');
-        container.className = "flex flex-col items-center w-full h-full";
+  const primaryColor = pendingLevelUpCards[0].color || "#10b981";
+  frame.style.borderColor = primaryColor;
+  title.style.color = primaryColor;
 
-        // 상단 헤더 (빨간 줄 영역 안쪽 상단)
-        const topSection = `
-            <div class="text-[10px] font-bold border px-4 py-1.5 rounded-full uppercase mb-6 tracking-[0.2em]" 
-                 style="color:${primaryColor}; border-color:${primaryColor}44; background: ${primaryColor}11;">
-                 GROUP LEVEL UP ACHIEVED
-            </div>
-            <h4 class="text-white text-lg font-black mb-6 tracking-tighter">축하합니다! 총 ${pendingLevelUpCards.length}명 레벨업</h4>
-        `;
+  content.innerHTML = '';
 
-        // 그리드 설정: 6명 이상이면 3열, 그 미만이면 2열로 가로 배치
-        const gridCount = pendingLevelUpCards.length >= 6 ? 'grid-cols-3' : 'grid-cols-2';
-        const grid = document.createElement('div');
-        grid.className = `grid gap-2 w-full mb-6 ${gridCount}`;
-        
-        pendingLevelUpCards.forEach(user => {
-            const emoji = user.badgeText.split(' ')[0];
-            const label = user.badgeText.split(' ')[1] || "";
-            const userBox = document.createElement('div');
-            
-            // 개별 카드를 가로로 짧고 밀도있게 구성
-            userBox.className = "bg-white/5 rounded-xl p-3 border border-white/10 flex flex-col items-center text-center";
-            userBox.innerHTML = `
-                <div class="text-3xl mb-1">${emoji}</div>
-                <div class="text-[14px] font-black leading-tight" style="color:${user.color}">LV.${user.level}</div>
-                <div class="text-[11px] text-white font-bold truncate w-full">${user.name}</div>
-                <div class="text-[8px] text-white/40 mt-1 scale-90">"${label}"</div>
-            `;
-            grid.appendChild(userBox);
-        });
+  if (pendingLevelUpCards.length === 1) {
+    // 단일 인원
+    const user = pendingLevelUpCards[0];
+    const badgeParts = (user.badgeText || "").split(' ');
+    const emoji = badgeParts[0] || "🌲";
+    const label = badgeParts[1] || user.badgeText || "";
 
-        // 하단 멘트 (빨간 줄 영역 안쪽 하단)
-        const bottomSection = `
-            <div class="mt-auto pt-4 w-full text-center border-t border-white/10">
-                <p class="text-slate-400 text-[10px] italic font-medium">
-                    "우리들의 발걸음이 모여 산우리의 역사가 됩니다"
-                </p>
-            </div>
-        `;
+    content.innerHTML = `
+      <div class="flex flex-col items-center w-full py-2">
+        <div class="text-[9px] font-bold border px-3 py-1 rounded-full uppercase mb-5 tracking-widest"
+             style="color:${user.color}; border-color:${user.color}44; background: ${user.color}11;">
+          SAN WOORI RANKER
+        </div>
+        <div class="text-7xl mb-3 leading-none">${emoji}</div>
+        <div class="text-[10px] font-medium text-white/50 mb-5 tracking-tight">
+          <span class="font-bold text-white text-xs">"${label}"</span> 등급 획득!
+        </div>
+        <div class="text-5xl font-black mb-1" style="color:${user.color}">LV.${user.level}</div>
+        <div class="text-2xl font-bold text-white mb-3">${user.name} 님</div>
+        <p class="text-slate-400 text-[11px] italic">"산우리의 든든한 등불입니다"</p>
+      </div>
+    `;
+  } else {
+    // 다수 인원
+    const container = document.createElement('div');
+    container.className = "flex flex-col items-center w-full h-full";
 
-        container.innerHTML = topSection;
-        container.appendChild(grid);
-        container.innerHTML += bottomSection;
-        content.appendChild(container);
-    }
+    const topSection = `
+      <div class="text-[10px] font-bold border px-4 py-1.5 rounded-full uppercase mb-3 tracking-[0.2em]"
+           style="color:${primaryColor}; border-color:${primaryColor}44; background: ${primaryColor}11;">
+        GROUP LEVEL UP ACHIEVED
+      </div>
+      <h4 class="text-white text-base font-black mb-3 tracking-tighter">축하합니다! 총 ${pendingLevelUpCards.length}명 레벨업</h4>
+    `;
 
-    document.getElementById('cardDate').innerText = `${new Date().toLocaleDateString()} OFFICIAL RECORD`;
-    modal.style.display = 'flex';
+    const gridCount = pendingLevelUpCards.length >= 6 ? 'grid-cols-3' : 'grid-cols-2';
+    const grid = document.createElement('div');
+    grid.className = `grid gap-2 w-full mb-3 max-h-[180px] overflow-y-auto ${gridCount}`;
+
+    pendingLevelUpCards.forEach(user => {
+      const badgeParts = (user.badgeText || "").split(' ');
+      const emoji = badgeParts[0] || "🌲";
+      const label = badgeParts[1] || "";
+      
+      const userBox = document.createElement('div');
+      userBox.className = "bg-white/5 rounded-xl p-2 border border-white/10 flex flex-col items-center text-center";
+      userBox.innerHTML = `
+        <div class="text-2xl mb-0.5">${emoji}</div>
+        <div class="text-[12px] font-black leading-tight" style="color:${user.color}">LV.${user.level}</div>
+        <div class="text-[11px] text-white font-bold truncate w-full">${user.name}</div>
+        <div class="text-[8px] text-white/40 mt-0.5 scale-90">"${label}"</div>
+      `;
+      grid.appendChild(userBox);
+    });
+
+    const bottomSection = `
+      <div class="mt-auto pt-2 w-full text-center border-t border-white/10">
+        <p class="text-slate-400 text-[10px] italic font-medium">
+          "우리들의 발걸음이 모여 산우리의 역사가 됩니다"
+        </p>
+      </div>
+    `;
+
+    container.innerHTML = topSection;
+    container.appendChild(grid);
+    container.innerHTML += bottomSection;
+    content.appendChild(container);
+  }
+
+  const cardDate = document.getElementById('cardDate');
+  if (cardDate) {
+    cardDate.innerText = `${new Date().toLocaleDateString()} OFFICIAL RECORD`;
+  }
+
+  // 💡 강제 모달 출력 (hidden 제거 및 display/z-index 재설정)
+  modal.classList.remove('hidden');
+  modal.style.cssText = "display: flex !important; z-index: 10070 !important;";
 };
+
 
 // 모바일 최적화 이미지 저장 함수
 window.saveCardImage = async () => {
-    const area = document.getElementById('cardToCapture');
-    if (!area) return;
-    
-    try {
-        // 모바일 긴 이미지 저장을 위해 스케일 조정 및 렌더링 옵션 최적화
-        const canvas = await html2canvas(area, {
-            scale: 2, // 모바일 전송용으로 적당한 2배수 (용량 최적화)
-            backgroundColor: "#000000",
-            useCORS: true,
-            allowTaint: true,
-            scrollX: 0,
-            scrollY: -window.scrollY, // 현재 스크롤 위치 무시
-            windowWidth: area.scrollWidth,
-            windowHeight: area.scrollHeight
-        });
-        
-        const image = canvas.toDataURL("image/png");
-        const link = document.createElement('a');
-        link.href = image;
-        link.download = `SanWoori_LevelUp_Mobile.png`;
-        link.click();
-    } catch (e) {
-        console.error("저장 에러:", e);
-        alert("이미지 저장에 실패했습니다. 직접 캡처해 주세요.");
-    }
+  const area = document.getElementById('cardToCapture');
+  if (!area) return;
+
+  try {
+    const canvas = await html2canvas(area, {
+      scale: 2,
+      backgroundColor: "#000000",
+      useCORS: true,
+      allowTaint: true,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: area.scrollWidth,
+      windowHeight: area.scrollHeight
+    });
+
+    const image = canvas.toDataURL("image/png");
+    const link = document.createElement('a');
+    link.href = image;
+    link.download = `SanWoori_LevelUp_Mobile.png`;
+    link.click();
+  } catch (e) {
+    console.error("저장 에러:", e);
+    alert("이미지 저장에 실패했습니다. 직접 캡처해 주세요.");
+  }
 };
 
 
@@ -6940,8 +6985,6 @@ window.toggleDisableCoord = () => {
         if (document.getElementById('isScheduleCheck')) document.getElementById('isScheduleCheck').checked = true;
     }
 };
-
-
 
 
 window.addMultiActivity = async () => {
@@ -7078,37 +7121,53 @@ window.addMultiActivity = async () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
-            const realUpAmount = (isRealHike && !isExtraHike) ? up : 0;
+             // 1) 레벨업 & 실시간 획득 업수 계산
+            const hikeUpAmount = up;
+            const activityUpAmount = up;
+            const realUpAmount = (isRealHike ? hikeUpAmount : activityUpAmount);
             const oldLevel = member.level || 0;
-            const newLevel = oldLevel + realUpAmount; 
-            
+            const newLevel = oldLevel + realUpAmount;
+
             updateData.level = newLevel;
 
-            if (realUpAmount > 0) checkLevelUpgrade(member.name, oldLevel, newLevel);
+            // 🎯 100레벨 최초 달성 시 DB에 날짜/산행지/분기 저장
+            if (oldLevel < 100 && newLevel >= 100) {
+                await checkAndSaveLv100ToMember(
+                    id, 
+                    newLevel, 
+                    mName || "관악산", 
+                    activityDateObj, 
+                    `${currentQuarter}분기`, 
+                    member
+                );
+            }
+
+            if (realUpAmount > 0 && typeof checkLevelUpEffect === 'function') {
+                checkLevelUpEffect(member, oldLevel, newLevel);
+            }
             selectedNames.push(member.name);
 
-            if (isRealHike && !isExtraHike) {
-    // 🎯 0업일 때는 등산 횟수 미증가, 1업 이상(1, 2, 3업)일 때는 무조건 +1회만 증가
-    if (realUpAmount > 0) {
-        updateData.count = _increment(1); 
-    }
-    
-    updateData.lastDate = ts; 
+            // 2) 로그 루프 카운트 선언 및 고도 계산
+            const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne || realUpAmount === 0) ? 1 : realUpAmount;
+            const finalHeightIncrement = height * finalLogLoopCount;
 
-    const logLoopCount = (isRegular || isQuarterOnlyOne || isOnlyLog || realUpAmount === 0) ? 1 : realUpAmount;
-    const finalHeightIncrement = height * logLoopCount; 
-    updateData.totalHeight = _increment(finalHeightIncrement); 
+            if (isRealHike) {
+                if (!isExtraHike) {
+                    if (realUpAmount > 0) {
+                        updateData.count = _increment(1);
+                    }
+                }
 
-    updateData[`quarterlyStats.${qKey}.hike`] = _increment(1);
-    updateData[`quarterlyStats.${qKey}.total`] = _increment(1);
-    
-    updateData.bonusDays = 0;
-    
-    const groupSize = selectedMemberIds.size;
-    const baseQCount = groupSize >= 3 ? 3 : groupSize; 
+                updateData.lastDate = ts;
+                updateData.totalHeight = _increment(finalHeightIncrement);
 
-            
-                // 🎯 0업이어도 기본 분기 점수는 1배수로 획득
+                updateData[`quarterlyStats.${qKey}.hike`] = _increment(1);
+                updateData[`quarterlyStats.${qKey}.totalHeight`] = _increment(finalHeightIncrement);
+
+                updateData.bonusDays = 0;
+                
+                const groupSize = selectedMemberIds.size;
+                const baseQCount = groupSize >= 3 ? 3 : groupSize; 
                 const multiplier = realUpAmount > 0 ? realUpAmount : 1; 
                 const qCountIncrement = baseQCount * multiplier; 
 
@@ -7144,8 +7203,7 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // 🎯 up이 0이어도 개인 로그는 최소 1개 생성 처리
-            const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne || realUpAmount === 0) ? 1 : realUpAmount;
+            // 3) 개인 로그 생성 및 별 획득 처리
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
             const baseDocId = rawMountainName || (isSpecialTracking ? "인정 트레킹" : (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))));
 
@@ -7163,6 +7221,19 @@ window.addMultiActivity = async () => {
                     else if (rand <= 10) starType = "special";
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
+
+                 // 🎯 별(슈퍼/스페셜) 획득 시 DB 저장
+            if (starType === "super" || starType === "special") {
+                const defaultQuarter = `${currentQuarter}분기`;
+                await saveSpecialStarToMember(
+                    id, 
+                    starType, 
+                    defaultQuarter, 
+                    member, 
+                    baseDocId, 
+                    activityDateObj
+                );
+        }
 
                 const logPayload = {
                     date: ts,
@@ -7202,7 +7273,7 @@ window.addMultiActivity = async () => {
             let dupSeq = 2;
             while (checkSnap.exists()) {
                 bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-                bondingRef = doc(doc(db, "bondingForest", bondingDocId));
+                bondingRef = doc(db, "bondingForest", bondingDocId);
                 checkSnap = await getDoc(bondingRef);
                 dupSeq++;
             }
@@ -7217,7 +7288,9 @@ window.addMultiActivity = async () => {
             });
         }
 
-        if (pendingLevelUpCards.length > 0) showCombinedLevelUpAlert();
+        if (typeof pendingLevelUpCards !== 'undefined' && pendingLevelUpCards.length > 0 && typeof showCombinedLevelUpAlert === 'function') {
+            showCombinedLevelUpAlert();
+        }
         
         alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
@@ -7248,10 +7321,9 @@ window.addMultiActivity = async () => {
             if (cb) cb.checked = false;
         });
 
-
-// 🎯 1번 라디오 버튼 기본 재선택
-const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
-if (defaultRadio) defaultRadio.checked = true;
+        // 🎯 1번 라디오 버튼 기본 재선택
+        const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
+        if (defaultRadio) defaultRadio.checked = true;
 
         tempCoord = null; 
         const marker = document.getElementById('adminMapMarker');
@@ -7265,7 +7337,7 @@ if (defaultRadio) defaultRadio.checked = true;
             dateInput.value = kstDate.toISOString().split('T')[0];
         }
         
-        startRealtimeSync(); 
+        if (typeof startRealtimeSync === 'function') startRealtimeSync(); 
     } catch (error) {
         console.error("Error 상세:", error);
         alert("저장 실패: " + error.message);
@@ -7273,8 +7345,9 @@ if (defaultRadio) defaultRadio.checked = true;
 };
 
 
-                     
-
+ 
+            
+            
                     
 
 // 📌 [신규 회원 등록 함수]
@@ -7991,13 +8064,101 @@ window.filterAdminMemberList = () => {
   });
 };
 
+// -------------------------------------------------------------
+// 0. 캐시 객체 및 데이터 세팅 (Firestore 호출 최소화)
+// -------------------------------------------------------------
+window.historyCache = {
+  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt }]
+  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt }]
+  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt }]
+  lastUpdated: null
+};
 
 
-// 💡 지수 산정 방식 팝업 토글 함수
-window.toggleVibeCalcInfoModal = function(show) {
-  const modal = document.getElementById('vibeCalcInfoModal');
+ 
+
+/**
+ * 💾 1. 별(슈퍼/스페셜) 획득 시 DB 저장 함수
+ */
+window.saveSpecialStarToMember = async function(memberId, starType, quarterStr, memberObj, mountainName, activityDate) {
+  try {
+    const formattedDate = activityDate ? 
+      `${activityDate.getFullYear()}.${String(activityDate.getMonth() + 1).padStart(2, '0')}.${String(activityDate.getDate()).padStart(2, '0')}` : 
+      new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+    const starData = {
+      starType: starType,                         
+      mountain: mountainName || "관악산",          
+      date: formattedDate,                        
+      quarter: quarterStr || `${Math.ceil((new Date().getMonth() + 1) / 3)}분기`, 
+      createdAt: new Date()
+    };
+
+    const mRef = doc(db, "sanwoori", memberId);
+    await updateDoc(mRef, {
+      specialStars: arrayUnion(starData)
+    });
+
+    if (memberObj) {
+      if (!memberObj.specialStars) memberObj.specialStars = [];
+      memberObj.specialStars.push(starData);
+    }
+    window.invalidateHistoryCache();
+  } catch (err) {
+    console.error("Special Star DB Save Error:", err);
+  }
+};
+
+/**
+ * 👑 2. Lv.100 최초 달성 시 DB 저장 함수
+ */
+window.checkAndSaveLv100ToMember = async function(memberId, newLevel, mountainName, activityDate, quarterStr, memberObj) {
+  try {
+    if (memberObj && memberObj.lv100Achieved) return;
+
+    const formattedDate = activityDate ? 
+      `${activityDate.getFullYear()}.${String(activityDate.getMonth() + 1).padStart(2, '0')}.${String(activityDate.getDate()).padStart(2, '0')}` : 
+      new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+    const lv100Data = {
+      lv100Achieved: true,
+      lv100Mountain: mountainName || "관악산",
+      lv100Date: formattedDate,
+      lv100Quarter: quarterStr || `${Math.ceil((new Date().getMonth() + 1) / 3)}분기`,
+      lv100CreatedAt: new Date()
+    };
+
+    const mRef = doc(db, "sanwoori", memberId);
+    await updateDoc(mRef, lv100Data);
+
+    if (memberObj) {
+      Object.assign(memberObj, lv100Data);
+    }
+    window.invalidateHistoryCache();
+  } catch (err) {
+    console.error("Lv100 DB Save Error:", err);
+  }
+};
+
+/**
+ * ⚡ 캐시 무효화 함수
+ */
+window.invalidateHistoryCache = function() {
+  if (!window.historyCache) window.historyCache = {};
+  window.historyCache.superStars = null;
+  window.historyCache.specialStars = null;
+  window.historyCache.lv100List = null;
+  window.historyCache.lastUpdated = null;
+};
+
+/**
+ * 📜 메인 모달 열기/닫기 토글 함수
+ */
+window.toggleVibeModal = function(show) {
+  const modal = document.getElementById('vibeModal');
   if (!modal) return;
   if (show) {
+    renderVibeHallOfFame();
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
   } else {
@@ -8006,10 +8167,7 @@ window.toggleVibeCalcInfoModal = function(show) {
   }
 };
 
-
-/**
- * 🏆 SanWoori History 렌더링 함수
- */
+// 🏆 SanWoori History 메인 렌더링 함수
 function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
@@ -8022,12 +8180,8 @@ function renderVibeHallOfFame() {
   activeMembers.forEach(m => {
     if (m.specialStars && Array.isArray(m.specialStars)) {
       m.specialStars.forEach(s => {
-        if (s.starType === 'super' && !superNames.includes(m.name)) {
-          superNames.push(m.name);
-        }
-        if (s.starType === 'special' && !specialNames.includes(m.name)) {
-          specialNames.push(m.name);
-        }
+        if (s.starType === 'super' && !superNames.includes(m.name)) superNames.push(m.name);
+        if (s.starType === 'special' && !specialNames.includes(m.name)) specialNames.push(m.name);
       });
     }
   });
@@ -8039,18 +8193,31 @@ function renderVibeHallOfFame() {
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 3) => {
+  const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
+
+  const h100kHolders = sortedHeightMembers
+    .filter(m => (m.totalHeight || 0) >= 100000)
+    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
+
+  const h50kHolders = sortedHeightMembers
+    .filter(m => (m.totalHeight || 0) >= 50000 && (m.totalHeight || 0) < 100000)
+    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
+
+  const h30kHolders = sortedHeightMembers
+    .filter(m => (m.totalHeight || 0) >= 30000 && (m.totalHeight || 0) < 50000)
+    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
+
+  const formatBadgeListWithMore = (list, styleType = 'default', categoryId = '', limit = 3) => {
     if (!list || list.length === 0) {
-      const emptyTextStyle = isGold ? "text-amber-600/80 font-bold" : "text-slate-400";
-      return `<span class="${emptyTextStyle} text-[10px] pl-1">아직 달성자가 없습니다</span>`;
+      return `<span class="text-slate-400 text-[10px] pl-1">아직 달성자가 없습니다</span>`;
     }
 
     const visibleList = list.slice(0, limit);
     const hiddenList = list.slice(limit);
 
-    const bgStyle = isGold 
-      ? "bg-white/90 text-amber-950 border border-amber-300/80 shadow-2xs font-extrabold" 
-      : "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
+    let bgStyle = "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
+    if (styleType === 'gold') bgStyle = "bg-white/90 text-amber-950 border border-amber-300/80 shadow-2xs font-extrabold";
+    if (styleType === 'emerald') bgStyle = "bg-white/90 text-emerald-950 border border-emerald-300/80 shadow-2xs font-extrabold";
 
     let html = visibleList.map(item => `
       <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
@@ -8065,14 +8232,10 @@ function renderVibeHallOfFame() {
         </span>
       `).join('');
 
-      const btnStyle = isGold 
-        ? "bg-amber-100/60 text-amber-800 border-amber-300/50 hover:bg-amber-200/50" 
-        : "bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200";
-
       html += `
         <button type="button" id="more-btn-${categoryId}" 
           onclick="document.getElementById('more-list-${categoryId}').classList.remove('hidden'); document.getElementById('more-list-${categoryId}').classList.add('inline-flex'); this.classList.add('hidden');" 
-          class="inline-flex items-center ${btnStyle} px-2 py-0.5 rounded-lg border font-black text-[10px] mr-1 mb-1 cursor-pointer transition-all active:scale-95">
+          class="inline-flex items-center bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-lg font-black text-[10px] mr-1 mb-1 cursor-pointer transition-all active:scale-95">
           +${hiddenList.length} more
         </button>
         <span id="more-list-${categoryId}" class="hidden flex-wrap items-center">
@@ -8086,7 +8249,6 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
-      <!-- 📜 타이틀 -->
       <div class="flex items-center justify-between mb-2.5">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
@@ -8094,53 +8256,94 @@ function renderVibeHallOfFame() {
       </div>
 
       <div class="space-y-2.5">
-        <!-- 🌟 Legend Star 카드 -->
+        <!-- 🌟 1. Legend Star 카드 -->
         <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
           <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span class="text-amber-400">🌟</span> 전설의 별 (Legend Star)
+              <span>🌟</span> <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span>
             </span>
-            <span class="text-[8px] font-black tracking-widest text-indigo-700 bg-indigo-100/80 border border-indigo-200 px-2 py-0.3 rounded-full uppercase shrink-0">
-              LEGEND
-            </span>
+            <button onclick="openLegendDetailModal()" class="text-[9px] font-black tracking-tight text-indigo-600 bg-indigo-100/80 hover:bg-indigo-200/80 border border-indigo-200 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
+              상세보기
+            </button>
           </div>
           
           <div class="space-y-1.5">
-            <!-- 🔥 슈퍼별 영역 (3명 표시 후 +more) -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-super-subtle-glow">
               <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 🔥 슈퍼별
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(superHolders, false, 'super', 3)}
+                ${formatBadgeListWithMore(superHolders, 'default', 'super', 3)}
               </div>
             </div>
 
-            <!-- ✨ 스페셜 영역 (3명 표시 후 +more) -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-special-subtle-glow">
               <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 ✨ 스페셜
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(specialHolders, false, 'special', 3)}
+                ${formatBadgeListWithMore(specialHolders, 'default', 'special', 3)}
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 👑 Lv.100 Club 카드 -->
+        <!-- 👑 2. Lv.100 Club 카드 -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span>👑</span> 천상계 (Lv.100 Club)
+              <span>👑</span> <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span>
             </span>
-            <span class="text-[8px] font-black tracking-widest text-amber-700 bg-amber-100/80 border border-amber-200 px-2 py-0.3 rounded-full uppercase shrink-0">
-              EMPEROR
-            </span>
+            <button onclick="openLv100DetailModal()" class="text-[9px] font-black tracking-tight text-amber-800 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
+              상세보기
+            </button>
           </div>
-          <!-- 100레벨 영역 (4명 표시 후 +more) -->
           <div class="flex flex-wrap items-center p-2.5 bg-amber-50/40 rounded-xl border shadow-2xs gold-inner-glow">
-            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 4)}
+            ${formatBadgeListWithMore(level100Holders, 'gold', 'lv100', 4)}
+          </div>
+        </div>
+
+        <!-- 🚩 3. 누적 고도 카드 -->
+        <div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
+          <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
+            <span class="flex items-center gap-1">
+              <span>🚩</span> 
+              <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">
+                누적 고도 (Accumulated Altitude)
+              </span>
+            </span>
+            <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
+              상세보기
+            </button>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-100 shadow-2xs">
+              <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                💎 10만m+
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(h100kHolders, 'emerald', 'h100k', 3)}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-100 shadow-2xs">
+              <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                🥇 5만m+
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(h50kHolders, 'default', 'h50k', 3)}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
+              <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+                🥈 3만m+
+              </span>
+              <div class="flex flex-wrap items-center pt-0.5">
+                ${formatBadgeListWithMore(h30kHolders, 'default', 'h30k', 3)}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -8148,178 +8351,228 @@ function renderVibeHallOfFame() {
   `;
 }
 
-        
-            
+// 히스토리 캐시 구축
+function getOrBuildHistoryCache() {
+  if (!window.historyCache) window.historyCache = {};
 
-
-      
-  
-    
-
-
-// [내부 전용] 지정된 정산 타임 목록 (시 0~23 기준)
-const TARGET_HOURS = [0, 9, 12, 15, 18, 21];
-
-/**
- * [내부 전용] 마지막 정산 시간 이후로 새로운 정산 타임이 지났는지 체크하는 함수
- * @param {Date} lastUpdateDate - 파이어베이스에 기록된 마지막 정산 시간
- * @returns {boolean} - 정산을 새로 해야 하면 true, 아니면 false
- */
-function checkIfNeedUpdate(lastUpdateDate) {
-  const now = new Date();
-  
-  // 두 시간의 날짜가 다르거나, 날짜가 같더라도 타겟 시간대를 지났는지 확인
-  // 가장 단순하고 확실한 방법은 "마지막 정산 시간"과 "현재 시간" 사이에 TARGET_HOURS가 포함되어 있는지 보는 것입니다.
-  const lastHour = lastUpdateDate.getHours();
-  const currentHour = now.getHours();
-
-  // 날짜가 바뀌었으면 무조건 업데이트
-  if (now.getDate() !== lastUpdateDate.getDate() || now.getMonth() !== lastUpdateDate.getMonth()) {
-    return true;
+  if (window.historyCache.superStars && window.historyCache.specialStars && window.historyCache.lv100List) {
+    return window.historyCache;
   }
 
-  // 같은 날짜라면, 마지막 정산 시간의 '시'와 현재 '시' 사이에 정산 타겟 시간이 존재하는지 체크
-  for (const hour of TARGET_HOURS) {
-    if (lastHour < hour && currentHour >= hour) {
-      return true;
-    }
-  }
-  
-  return false;
-}
+  const superItems = [];
+  const specialItems = [];
+  const lv100Items = [];
 
-/**
- * [실제 계산 및 파이어베이스 기록 함수]
- */
-async function runCalculation() {
-  // 1. 데이터 준비 (전체 로그 점수)
-  let totalLogsCount = 0;
-  if (window.currentData) {
-    totalLogsCount = currentData.reduce((acc, m) => acc + (m.qCount || 0), 0);
-  }
+  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+    const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
 
-  // 2. 최근 24시간 방문자 조회 (할당량 보호)
-  const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - 86400000);
-  let recentVisitorCount = 0;
-  
-  try {
-    const visitorSnap = await getDocs(query(
-      collection(db, "visitor_logs"),
-      where("timestamp", ">=", twentyFourHoursAgo),
-      limit(25)
-    )).catch(() => ({ size: 0 }));
-    
-    recentVisitorCount = visitorSnap.size;
-  } catch (e) {
-    console.error("방문자 조회 실패:", e);
-  }
-
-  // 3. 점수 계산
-  let visitorScore = (recentVisitorCount / 5) * 20;
-  let logScore = totalLogsCount * 12;
-  let tempPercent = Math.max(10, Math.min(visitorScore + logScore, 100));
-
-  // 4. 파이어베이스에 덮어쓰기 저장
-  await setDoc(doc(db, "system_status", "vibe_score"), {
-    tempPercent: tempPercent,
-    updatedAt: Timestamp.now()
-  });
-
-  return tempPercent;
-}
-
-
-/**
- * 🔥 [통합 자동화 버전] 활동지수 갱신 함수
- * 누군가 접속하면 이 함수가 실행되면서 정산 필요 여부를 판단합니다.
- */
-async function updateVibeTemp() {
-  try {
-    console.log("📱 활동지수 체크 시작...");
-
-    const scoreDocRef = doc(db, "system_status", "vibe_score");
-    const scoreSnap = await getDoc(scoreDocRef);
-    
-    let tempPercent = 10;
-    let needNewCalculation = false;
-
-    if (scoreSnap.exists()) {
-      const savedData = scoreSnap.data();
-      tempPercent = savedData.tempPercent || 10;
-      
-      if (savedData.updatedAt) {
-        const lastUpdateDate = savedData.updatedAt.toDate();
-        console.log("마지막 정산 시각:", lastUpdateDate.toLocaleString());
-        
-        // 💡 핵심 톱니바퀴: 정산 시간이 지났는지 체크
-        needNewCalculation = checkIfNeedUpdate(lastUpdateDate);
-      } else {
-        needNewCalculation = true; // 시간 정보가 없으면 정산 진행
+    activeMembers.forEach(m => {
+      if (m.specialStars && Array.isArray(m.specialStars)) {
+        m.specialStars.forEach(s => {
+          const item = {
+            name: m.name,
+            mountain: s.mountain || '관악산',
+            date: s.date || '2026.08.18',
+            quarter: s.quarter || '3분기',
+            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : 0
+          };
+          if (s.starType === 'super') superItems.push(item);
+          if (s.starType === 'special') specialItems.push(item);
+        });
       }
-    } else {
-      // 아예 문서가 존재하지 않는 최초 실행 시 무조건 정산 진행
-      needNewCalculation = true;
-    }
 
-    // ⚡ 만약 정산 타이밍이 지났다면? 접속한 이 사람이 '자동 정산' 독박(?)을 씁니다.
-    if (needNewCalculation) {
-      console.log("🔄 [자동 정산 트리거] 새로운 정산 시간이 지나 점수를 갱신합니다...");
-      tempPercent = await runCalculation();
-    } else {
-      console.log("🔹 [캐시 사용] 아직 정산 시간이 되지 않아 저장된 점수를 사용합니다.");
-    }
-
-    // ---------------- UI 구성 요소 반영 ----------------
-    const gauge = document.getElementById('vibeGauge');
-    const scoreTxt = document.getElementById('vibeScoreTxt');
-    const circleProgress = document.getElementById('vibeCircleProgress');
-    const circleIcon = document.getElementById('vibeCircleIcon');
-    const circleBtn = document.getElementById('vibeCircleBtn');
-    const status = document.getElementById('vibeStatusTxt');
-    const desc = document.getElementById('vibeDesc');
-    const modalIcon = document.getElementById('vibeModalIcon');
-
-    if (gauge) gauge.style.width = `${tempPercent}%`;
-    if (scoreTxt) scoreTxt.innerText = `${Math.floor(tempPercent)}%`;
-    if (circleProgress) {
-      circleProgress.style.strokeDashoffset = 100 - tempPercent;
-    }
-
-    let currentEmoji = "🍀";
-    if (tempPercent >= 80) {
-      currentEmoji = "🔥";
-      if (status) status.innerText = "EXPLOSIVE PASSION";
-      if (desc) desc.innerText = "현재 활동지수 최고조! 산행의 열기가 가득합니다.";
-      if (circleBtn) circleBtn.classList.add('hot-vibe');
-    } else if (tempPercent >= 50) {
-      currentEmoji = "☀️";
-      if (status) status.innerText = "VERY ACTIVE";
-      if (desc) desc.innerText = "커뮤니티가 아주 활발합니다. 함께 등산해요!";
-      if (circleBtn) circleBtn.classList.remove('hot-vibe');
-    } else if (tempPercent >= 20) {
-      currentEmoji = "🍀";
-      if (status) status.innerText = "WARMING UP";
-      if (desc) desc.innerText = "산행의 온기가 느껴집니다.";
-      if (circleBtn) circleBtn.classList.remove('hot-vibe');
-    } else {
-      currentEmoji = "❄️";
-      if (status) status.innerText = "CHILLING";
-      if (desc) desc.innerText = "조용한 숲속 같네요. 첫 산행 기록을 남겨보세요!";
-      if (circleBtn) circleBtn.classList.remove('hot-vibe');
-    }
-
-    if (circleIcon) circleIcon.innerText = currentEmoji;
-    if (modalIcon) modalIcon.innerText = currentEmoji;
-
-    console.log("🎯 최종 활동지수 UI 반영 완료:", tempPercent + "%");
-
-    // 🌟 [필수 추가] 활동지수 갱신 완료 후 4가지 명예의 전당 파트 그려주기
-    renderVibeHallOfFame();
-
-  } catch (e) {
-    console.error("온도 갱신 중 오류 발생:", e);
+      if ((m.level || 0) >= 100 || m.lv100Achieved) {
+        lv100Items.push({
+          name: m.name,
+          mountain: m.lv100Mountain || '관악산',
+          date: m.lv100Date || '2026.08.18',
+          quarter: m.lv100Quarter || '3분기',
+          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : 0
+        });
+      }
+    });
   }
+
+  superItems.sort((a, b) => a.createdAt - b.createdAt);
+  specialItems.sort((a, b) => a.createdAt - b.createdAt);
+  lv100Items.sort((a, b) => a.createdAt - b.createdAt);
+
+  window.historyCache = {
+    superStars: superItems,
+    specialStars: specialItems,
+    lv100List: lv100Items,
+    lastUpdated: Date.now()
+  };
+
+  return window.historyCache;
 }
+
+// 모달 상세보기 관련 함수들
+window.openLegendDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  const title = document.getElementById('historyDetailTitle');
+  const body = document.getElementById('historyDetailBody');
+  if (!modal || !body) return;
+
+  title.innerHTML = `🌟 <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span> 획득 기록`;
+
+  const cache = getOrBuildHistoryCache();
+
+  const renderList = (items, type) => {
+    if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
+    
+    return items.map((item, idx) => {
+      const isFirst = idx === 0;
+      const isSuper = type === 'super';
+      
+      return `
+        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+          <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+            ${isFirst 
+              ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
+              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+            }
+            <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+            <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
+            <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+            <span class="text-[10px] text-slate-500 font-bold bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+              📅 ${item.date}
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  body.innerHTML = `
+    <div class="space-y-1.5">
+      <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
+        🔥 슈퍼별 획득 명단
+      </div>
+      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
+        ${renderList(cache.superStars, 'super')}
+      </div>
+    </div>
+
+    <div class="my-2.5 border-t border-dashed border-slate-200"></div>
+
+    <div class="space-y-1.5">
+      <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
+        ✨ 스페셜별 획득 명단
+      </div>
+      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
+        ${renderList(cache.specialStars, 'special')}
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
+window.openLv100DetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  const title = document.getElementById('historyDetailTitle');
+  const body = document.getElementById('historyDetailBody');
+  if (!modal || !body) return;
+
+  title.innerHTML = `👑 <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span> 달성 기록`;
+
+  const cache = getOrBuildHistoryCache();
+  const lv100Items = cache.lv100List;
+
+  if (lv100Items.length === 0) {
+    body.innerHTML = `<div class="text-center py-8 text-xs text-amber-700/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
+  } else {
+    body.innerHTML = `
+      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+        ${lv100Items.map((item, idx) => {
+          const isFirst = idx === 0;
+          return `
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+                ${isFirst 
+                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` 
+                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                }
+                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+                <span class="text-[10px] text-amber-800/60 font-bold">(${item.quarter})</span>
+                <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+                <span class="text-[10px] text-slate-500 font-bold bg-amber-50/80 border border-amber-200/60 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+                  📅 ${item.date}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
+window.openHeightDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  const title = document.getElementById('historyDetailTitle');
+  const body = document.getElementById('historyDetailBody');
+  if (!modal || !body) return;
+
+  title.innerHTML = `🚩 <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">누적 고도 (Accumulated Altitude)</span> 달성 기록`;
+
+  const activeMembers = (typeof currentData !== 'undefined' && Array.isArray(currentData)) 
+    ? currentData.filter(m => !m.isHidden && !m.hidden) 
+    : [];
+
+  const heightQualifiedMembers = activeMembers
+    .filter(m => (m.totalHeight || 0) >= 30000)
+    .sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
+
+  if (heightQualifiedMembers.length === 0) {
+    body.innerHTML = `<div class="text-center py-8 text-xs text-emerald-700/70 font-bold">아직 3만m 이상 달성자가 없습니다.</div>`;
+  } else {
+    body.innerHTML = `
+      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+        ${heightQualifiedMembers.map((item, idx) => {
+          const isFirst = idx === 0;
+          const heightKm = (item.totalHeight / 1000).toFixed(1);
+          
+          return `
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-emerald-50/90 border-emerald-300 ring-1 ring-emerald-300/60' : 'bg-white border-emerald-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+                ${isFirst 
+                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-black shrink-0">👑 No.1</span>` 
+                  : `<span class="text-[10px] font-black text-emerald-800/80 bg-emerald-100/60 border border-emerald-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                }
+                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+                <span class="text-[11px] font-black text-emerald-600 ml-auto flex items-center gap-0.5 shrink-0 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">
+                  🏔️ ${item.totalHeight ? item.totalHeight.toLocaleString() : 0}m (${heightKm}k)
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
+window.closeHistoryDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+};
+
+  
+
+
+
 
 // 🎯 [전역 캐시 객체 선언] 최초 1회만 Firestore에서 가져오고 이후 재활용합니다.
 window.mountainDataCache = window.mountainDataCache || {};
