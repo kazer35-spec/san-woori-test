@@ -7952,6 +7952,95 @@ window.filterAdminMemberList = () => {
   });
 };
 
+/**
+ * 💾 1. 별(슈퍼/스페셜) 획득 시 DB 저장 함수
+ */
+window.saveSpecialStarToMember = async function(memberId, starType, quarterStr, memberObj, mountainName, activityDate) {
+  try {
+    const formattedDate = activityDate ? 
+      `${activityDate.getFullYear()}.${String(activityDate.getMonth() + 1).padStart(2, '0')}.${String(activityDate.getDate()).padStart(2, '0')}` : 
+      new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+    const starData = {
+      starType: starType,                         
+      mountain: mountainName || "관악산",          
+      date: formattedDate,                        
+      quarter: quarterStr || `${Math.ceil((new Date().getMonth() + 1) / 3)}분기`, 
+      createdAt: new Date()
+    };
+
+    const mRef = doc(db, "sanwoori", memberId);
+    await updateDoc(mRef, {
+      specialStars: arrayUnion(starData)
+    });
+
+    if (memberObj) {
+      if (!memberObj.specialStars) memberObj.specialStars = [];
+      memberObj.specialStars.push(starData);
+    }
+    window.invalidateHistoryCache();
+  } catch (err) {
+    console.error("Special Star DB Save Error:", err);
+  }
+};
+
+/**
+ * 👑 2. Lv.100 최초 달성 시 DB 저장 함수
+ */
+window.checkAndSaveLv100ToMember = async function(memberId, newLevel, mountainName, activityDate, quarterStr, memberObj) {
+  try {
+    if (memberObj && memberObj.lv100Achieved) return;
+
+    const formattedDate = activityDate ? 
+      `${activityDate.getFullYear()}.${String(activityDate.getMonth() + 1).padStart(2, '0')}.${String(activityDate.getDate()).padStart(2, '0')}` : 
+      new Date().toISOString().split('T')[0].replace(/-/g, '.');
+
+    const lv100Data = {
+      lv100Achieved: true,
+      lv100Mountain: mountainName || "관악산",
+      lv100Date: formattedDate,
+      lv100Quarter: quarterStr || `${Math.ceil((new Date().getMonth() + 1) / 3)}분기`,
+      lv100CreatedAt: new Date()
+    };
+
+    const mRef = doc(db, "sanwoori", memberId);
+    await updateDoc(mRef, lv100Data);
+
+    if (memberObj) {
+      Object.assign(memberObj, lv100Data);
+    }
+    window.invalidateHistoryCache();
+  } catch (err) {
+    console.error("Lv100 DB Save Error:", err);
+  }
+};
+
+/**
+ * ⚡ 캐시 무효화 함수
+ */
+window.invalidateHistoryCache = function() {
+  if (!window.historyCache) window.historyCache = {};
+  window.historyCache.superStars = null;
+  window.historyCache.specialStars = null;
+  window.historyCache.lv100List = null;
+  window.historyCache.lastUpdated = null;
+};
+
+/**
+ * 📜 메인 모달 열기/닫기 토글 함수
+ */
+window.toggleVibeModal = function(show) {
+  const modal = document.getElementById('vibeModal');
+  if (!modal) return;
+  if (show) {
+    renderVibeHallOfFame(); // 모달을 열 때 최신 데이터로 렌더링
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  } else {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+};
 
 
 // 💡 지수 산정 방식 팝업 토글 함수
