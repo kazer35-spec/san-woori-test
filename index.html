@@ -8175,9 +8175,169 @@ function renderVibeHallOfFame() {
     
 
 
+// [내부 전용] 지정된 정산 타임 목록 (시 0~23 기준)
+const TARGET_HOURS = [0, 9, 12, 15, 18, 21];
 
+/**
+ * [내부 전용] 마지막 정산 시간 이후로 새로운 정산 타임이 지났는지 체크하는 함수
+ * @param {Date} lastUpdateDate - 파이어베이스에 기록된 마지막 정산 시간
+ * @returns {boolean} - 정산을 새로 해야 하면 true, 아니면 false
+ */
+function checkIfNeedUpdate(lastUpdateDate) {
+  const now = new Date();
+  
+  // 두 시간의 날짜가 다르거나, 날짜가 같더라도 타겟 시간대를 지났는지 확인
+  // 가장 단순하고 확실한 방법은 "마지막 정산 시간"과 "현재 시간" 사이에 TARGET_HOURS가 포함되어 있는지 보는 것입니다.
+  const lastHour = lastUpdateDate.getHours();
+  const currentHour = now.getHours();
+
+  // 날짜가 바뀌었으면 무조건 업데이트
+  if (now.getDate() !== lastUpdateDate.getDate() || now.getMonth() !== lastUpdateDate.getMonth()) {
+    return true;
+  }
+
+  // 같은 날짜라면, 마지막 정산 시간의 '시'와 현재 '시' 사이에 정산 타겟 시간이 존재하는지 체크
+  for (const hour of TARGET_HOURS) {
+    if (lastHour < hour && currentHour >= hour) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * [실제 계산 및 파이어베이스 기록 함수]
+ */
+async function runCalculation() {
+  // 1. 데이터 준비 (전체 로그 점수)
+  let totalLogsCount = 0;
+  if (window.currentData) {
+    totalLogsCount = currentData.reduce((acc, m) => acc + (m.qCount || 0), 0);
+  }
+
+  // 2. 최근 24시간 방문자 조회 (할당량 보호)
+  const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - 86400000);
+  let recentVisitorCount = 0;
+  
+  try {
+    const visitorSnap = await getDocs(query(
+      collection(db, "visitor_logs"),
+      where("timestamp", ">=", twentyFourHoursAgo),
+      limit(25)
+    )).catch(() => ({ size: 0 }));
     
+    recentVisitorCount = visitorSnap.size;
+  } catch (e) {
+    console.error("방문자 조회 실패:", e);
+  }
+
+  // 3. 점수 계산
+  let visitorScore = (recentVisitorCount / 5) * 20;
+  let logScore = totalLogsCount * 12;
+  let tempPercent = Math.max(10, Math.min(visitorScore + logScore, 100));
+
+  // 4. 파이어베이스에 덮어쓰기 저장
+  await setDoc(doc(db, "system_status", "vibe_score"), {
+    tempPercent: tempPercent,
+    updatedAt: Timestamp.now()
+  });
+
+  return tempPercent;
+}
+
+
+/**
+ * 🔥 [통합 자동화 버전] 활동지수 갱신 함수
+ * 누군가 접속하면 이 함수가 실행되면서 정산 필요 여부를 판단합니다.
+ */
+async function updateVibeTemp() {
+  try {
+    console.log("📱 활동지수 체크 시작...");
+
+    const scoreDocRef = doc(db, "system_status", "vibe_score");
+    const scoreSnap = await getDoc(scoreDocRef);
     
+    let tempPercent = 10;
+    let needNewCalculation = false;
+
+    if (scoreSnap.exists()) {
+      const savedData = scoreSnap.data();
+      tempPercent = savedData.tempPercent || 10;
+      
+      if (savedData.updatedAt) {
+        const lastUpdateDate = savedData.updatedAt.toDate();
+        console.log("마지막 정산 시각:", lastUpdateDate.toLocaleString());
+        
+        // 💡 핵심 톱니바퀴: 정산 시간이 지났는지 체크
+        needNewCalculation = checkIfNeedUpdate(lastUpdateDate);
+      } else {
+        needNewCalculation = true; // 시간 정보가 없으면 정산 진행
+      }
+    } else {
+      // 아예 문서가 존재하지 않는 최초 실행 시 무조건 정산 진행
+      needNewCalculation = true;
+    }
+
+    // ⚡ 만약 정산 타이밍이 지났다면? 접속한 이 사람이 '자동 정산' 독박(?)을 씁니다.
+    if (needNewCalculation) {
+      console.log("🔄 [자동 정산 트리거] 새로운 정산 시간이 지나 점수를 갱신합니다...");
+      tempPercent = await runCalculation();
+    } else {
+      console.log("🔹 [캐시 사용] 아직 정산 시간이 되지 않아 저장된 점수를 사용합니다.");
+    }
+
+    // ---------------- UI 구성 요소 반영 ----------------
+    const gauge = document.getElementById('vibeGauge');
+    const scoreTxt = document.getElementById('vibeScoreTxt');
+    const circleProgress = document.getElementById('vibeCircleProgress');
+    const circleIcon = document.getElementById('vibeCircleIcon');
+    const circleBtn = document.getElementById('vibeCircleBtn');
+    const status = document.getElementById('vibeStatusTxt');
+    const desc = document.getElementById('vibeDesc');
+    const modalIcon = document.getElementById('vibeModalIcon');
+
+    if (gauge) gauge.style.width = `${tempPercent}%`;
+    if (scoreTxt) scoreTxt.innerText = `${Math.floor(tempPercent)}%`;
+    if (circleProgress) {
+      circleProgress.style.strokeDashoffset = 100 - tempPercent;
+    }
+
+    let currentEmoji = "🍀";
+    if (tempPercent >= 80) {
+      currentEmoji = "🔥";
+      if (status) status.innerText = "EXPLOSIVE PASSION";
+      if (desc) desc.innerText = "현재 활동지수 최고조! 산행의 열기가 가득합니다.";
+      if (circleBtn) circleBtn.classList.add('hot-vibe');
+    } else if (tempPercent >= 50) {
+      currentEmoji = "☀️";
+      if (status) status.innerText = "VERY ACTIVE";
+      if (desc) desc.innerText = "커뮤니티가 아주 활발합니다. 함께 등산해요!";
+      if (circleBtn) circleBtn.classList.remove('hot-vibe');
+    } else if (tempPercent >= 20) {
+      currentEmoji = "🍀";
+      if (status) status.innerText = "WARMING UP";
+      if (desc) desc.innerText = "산행의 온기가 느껴집니다.";
+      if (circleBtn) circleBtn.classList.remove('hot-vibe');
+    } else {
+      currentEmoji = "❄️";
+      if (status) status.innerText = "CHILLING";
+      if (desc) desc.innerText = "조용한 숲속 같네요. 첫 산행 기록을 남겨보세요!";
+      if (circleBtn) circleBtn.classList.remove('hot-vibe');
+    }
+
+    if (circleIcon) circleIcon.innerText = currentEmoji;
+    if (modalIcon) modalIcon.innerText = currentEmoji;
+
+    console.log("🎯 최종 활동지수 UI 반영 완료:", tempPercent + "%");
+
+    // 🌟 [필수 추가] 활동지수 갱신 완료 후 4가지 명예의 전당 파트 그려주기
+    renderVibeHallOfFame();
+
+  } catch (e) {
+    console.error("온도 갱신 중 오류 발생:", e);
+  }
+}
 
 // 🎯 [전역 캐시 객체 선언] 최초 1회만 Firestore에서 가져오고 이후 재활용합니다.
 window.mountainDataCache = window.mountainDataCache || {};
