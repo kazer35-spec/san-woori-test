@@ -3473,6 +3473,35 @@ margin: 0 2px !important;
     </button>
   </div>
 </div>
+<!-- 🏆 레벨업 축하 카드 모달 (최상단 z-[99999] 배치) -->
+<div id="levelUpCardModal" class="modal-overlay hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[99999] flex items-center justify-center p-4">
+  <div id="cardFrame" class="relative w-full max-w-xs bg-slate-950 rounded-3xl p-6 border-2 shadow-2xl overflow-hidden flex flex-col items-center">
+    
+    <!-- 모달 타이틀 (JS 제어) -->
+    <div id="modalTitle" class="text-[10px] font-black uppercase tracking-widest mb-1 text-emerald-400">
+      LEVEL UP NOTICE
+    </div>
+
+    <!-- 카드 메인 컨텐츠 영역 (JS로 1인/다수 모드 HTML 주입) -->
+    <div id="cardContent" class="w-full flex flex-col items-center my-2"></div>
+
+    <!-- 발급 일자 -->
+    <div id="cardDate" class="text-[9px] font-bold text-slate-500 tracking-wider mb-4">
+      2026.08.19 OFFICIAL RECORD
+    </div>
+
+    <!-- 하단 버튼 영역 -->
+    <div class="w-full space-y-2">
+      <button onclick="saveCardImage()" class="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-xs border border-white/10 active:scale-95 transition-all">
+        📸 이미지 저장
+      </button>
+      <button onclick="document.getElementById('levelUpCardModal').style.display='none'; document.getElementById('levelUpCardModal').classList.add('hidden');" class="w-full py-2.5 bg-emerald-600 text-white rounded-xl font-black text-xs active:scale-95 transition-all">
+        확인
+      </button>
+    </div>
+
+  </div>
+</div>
 
 
 <!-- 📜 San:Woori History 통합 모달 -->
