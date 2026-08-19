@@ -6807,59 +6807,58 @@ async function startRealtimeSync() {
     }
 }
 
-// 레벨업 알림 카드 대기열 배열 (기존 위치 유지)
+// 레벨업 알림 카드 대기열 배열
 let pendingLevelUpCards = [];
 
-
-
-
-
-        
-
 window.checkLevelUpgrade = (name, oldLevel, newLevel) => {
-    // 1. 등급 기준 데이터가 있는지 확인 (변수명이 LevelThresholds 일 수도 있음)
+    // 1. 등급 기준 데이터 확인
     const thresholds = (typeof levelThresholds !== 'undefined') ? levelThresholds : (typeof LevelThresholds !== 'undefined' ? LevelThresholds : []);
     if (thresholds.length === 0) return;
 
-    // 2. 이전 등급과 현재 등급의 '명칭'을 가져와서 비교합니다.
-    const oldBadge = getLevelBadge(oldLevel);
-    const newBadge = getLevelBadge(newLevel);
-
-    // 3. 등급 명칭이 달라졌을 때만 (예: 풀잎 -> 나무) 축하 카드를 만듭니다.
-    if (oldBadge !== newBadge) {
+    // 숫자 레벨 자체가 상승했는지 확인
+    if (newLevel > oldLevel) {
+        const oldBadge = getLevelBadge(oldLevel);
+        const newBadge = getLevelBadge(newLevel);
         const style = getLevelStyle(newLevel);
-        
-        pendingLevelUpCards.push({ 
-            name: name, 
-            level: newLevel, // 도달한 최종 숫자 레벨
-            badgeText: newBadge, // 도달한 최종 등급 마크 (나무 등)
-            color: style.border || "#ffffff" 
-        });
-        
-        console.log(`${name}님 ${newBadge} 등급 달성 축하 카드 생성!`); // 확인용 로그
+
+        // 💡 [옵션 선택]
+        // 1) 등급 명칭(뱃지)이 바뀔 때만 카드를 띄우고 싶다면: if (oldBadge !== newBadge)
+        // 2) 숫만 올라가도 무조건 레벨업 카드를 띄우고 싶다면 아래 조건문 없이 바로 push
+        if (oldBadge !== newBadge) { 
+            pendingLevelUpCards.push({ 
+                name: name, 
+                level: newLevel,
+                badgeText: newBadge,
+                color: style.border || "#10b981" 
+            });
+            console.log(`[LevelUp] ${name}님 ${newBadge} (Lv.${newLevel}) 카드가 대기열에 추가되었습니다.`);
+        }
     }
 };
 
 window.showCombinedLevelUpAlert = () => {
-    if (pendingLevelUpCards.length === 0) return;
+    // 대기열에 카드가 없으면 실행하지 않음
+    if (!pendingLevelUpCards || pendingLevelUpCards.length === 0) return;
 
     const modal = document.getElementById('levelUpCardModal');
     const content = document.getElementById('cardContent');
     const frame = document.getElementById('cardFrame');
     const title = document.getElementById('modalTitle');
+
+    if (!modal || !content) return;
     
     // 첫 번째 인원의 컬러를 메인 테마로 사용
     const primaryColor = pendingLevelUpCards[0].color || "#10b981";
-    frame.style.borderColor = primaryColor;
-    title.style.color = primaryColor;
+    if (frame) frame.style.borderColor = primaryColor;
+    if (title) title.style.color = primaryColor;
 
     content.innerHTML = ''; 
 
     if (pendingLevelUpCards.length === 1) {
-        // [1인 모드] 기존 세로형 디자인 유지
+        // [1인 모드]
         const user = pendingLevelUpCards[0];
-        const emoji = user.badgeText.split(' ')[0];
-        const label = user.badgeText.split(' ')[1] || "";
+        const emoji = user.badgeText.split(' ')[0] || "🌟";
+        const label = user.badgeText.split(' ')[1] || user.badgeText;
         content.innerHTML = `
             <div class="flex flex-col items-center w-full py-4">
                 <div class="text-[9px] font-bold border px-3 py-1 rounded-full uppercase mb-6 tracking-widest" 
@@ -6876,11 +6875,10 @@ window.showCombinedLevelUpAlert = () => {
             </div>
         `;
     } else {
-        // [다수 인원 모드] 가로 그리드 레이아웃 (6명 이상 최적화)
+        // [다수 인원 모드]
         const container = document.createElement('div');
         container.className = "flex flex-col items-center w-full h-full";
 
-        // 상단 헤더 (빨간 줄 영역 안쪽 상단)
         const topSection = `
             <div class="text-[10px] font-bold border px-4 py-1.5 rounded-full uppercase mb-6 tracking-[0.2em]" 
                  style="color:${primaryColor}; border-color:${primaryColor}44; background: ${primaryColor}11;">
@@ -6889,17 +6887,15 @@ window.showCombinedLevelUpAlert = () => {
             <h4 class="text-white text-lg font-black mb-6 tracking-tighter">축하합니다! 총 ${pendingLevelUpCards.length}명 레벨업</h4>
         `;
 
-        // 그리드 설정: 6명 이상이면 3열, 그 미만이면 2열로 가로 배치
         const gridCount = pendingLevelUpCards.length >= 6 ? 'grid-cols-3' : 'grid-cols-2';
         const grid = document.createElement('div');
         grid.className = `grid gap-2 w-full mb-6 ${gridCount}`;
         
         pendingLevelUpCards.forEach(user => {
-            const emoji = user.badgeText.split(' ')[0];
-            const label = user.badgeText.split(' ')[1] || "";
+            const emoji = user.badgeText.split(' ')[0] || "🌟";
+            const label = user.badgeText.split(' ')[1] || user.badgeText;
             const userBox = document.createElement('div');
             
-            // 개별 카드를 가로로 짧고 밀도있게 구성
             userBox.className = "bg-white/5 rounded-xl p-3 border border-white/10 flex flex-col items-center text-center";
             userBox.innerHTML = `
                 <div class="text-3xl mb-1">${emoji}</div>
@@ -6910,7 +6906,6 @@ window.showCombinedLevelUpAlert = () => {
             grid.appendChild(userBox);
         });
 
-        // 하단 멘트 (빨간 줄 영역 안쪽 하단)
         const bottomSection = `
             <div class="mt-auto pt-4 w-full text-center border-t border-white/10">
                 <p class="text-slate-400 text-[10px] italic font-medium">
@@ -6925,9 +6920,17 @@ window.showCombinedLevelUpAlert = () => {
         content.appendChild(container);
     }
 
-    document.getElementById('cardDate').innerText = `${new Date().toLocaleDateString()} OFFICIAL RECORD`;
+    const cardDate = document.getElementById('cardDate');
+    if (cardDate) cardDate.innerText = `${new Date().toLocaleDateString()} OFFICIAL RECORD`;
+
+    // 🔥 [핵심] hidden 클래스 제거 및 display 설정
+    modal.classList.remove('hidden');
     modal.style.display = 'flex';
+
+    // 🔥 [핵심] 모달을 화면에 띄운 후 대기열 초기화 (중복 방지)
+    pendingLevelUpCards = [];
 };
+
 
 // 모바일 최적화 이미지 저장 함수
 window.saveCardImage = async () => {
