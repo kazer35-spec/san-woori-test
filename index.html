@@ -8199,7 +8199,230 @@ function renderVibeHallOfFame() {
 }
 
         
-            
+      // -------------------------------------------------------------
+// 📦 히스토리 데이터 캐싱/빌드 함수
+// -------------------------------------------------------------
+function getOrBuildHistoryCache() {
+  if (!window.historyCache) window.historyCache = {};
+
+  if (window.historyCache.superStars && window.historyCache.specialStars && window.historyCache.lv100List) {
+    return window.historyCache;
+  }
+
+  const superItems = [];
+  const specialItems = [];
+  const lv100Items = [];
+
+  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+    const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
+
+    activeMembers.forEach(m => {
+      if (m.specialStars && Array.isArray(m.specialStars)) {
+        m.specialStars.forEach(s => {
+          const item = {
+            name: m.name,
+            mountain: s.mountain || '관악산',
+            date: s.date || '2026.08.18',
+            quarter: s.quarter || '3분기',
+            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : 0
+          };
+          if (s.starType === 'super') superItems.push(item);
+          if (s.starType === 'special') specialItems.push(item);
+        });
+      }
+
+      if ((m.level || 0) >= 100 || m.lv100Achieved) {
+        lv100Items.push({
+          name: m.name,
+          mountain: m.lv100Mountain || '관악산',
+          date: m.lv100Date || '2026.08.18',
+          quarter: m.lv100Quarter || '3분기',
+          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : 0
+        });
+      }
+    });
+  }
+
+  superItems.sort((a, b) => a.createdAt - b.createdAt);
+  specialItems.sort((a, b) => a.createdAt - b.createdAt);
+  lv100Items.sort((a, b) => a.createdAt - b.createdAt);
+
+  window.historyCache = {
+    superStars: superItems,
+    specialStars: specialItems,
+    lv100List: lv100Items,
+    lastUpdated: Date.now()
+  };
+
+  return window.historyCache;
+}
+
+// 🌟 1. 전설의 별 상세보기 모달
+window.openLegendDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  const title = document.getElementById('historyDetailTitle');
+  const body = document.getElementById('historyDetailBody');
+  if (!modal || !body) return;
+
+  title.innerHTML = `🌟 <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span> 획득 기록`;
+
+  const cache = getOrBuildHistoryCache();
+
+  const renderList = (items, type) => {
+    if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
+    
+    return items.map((item, idx) => {
+      const isFirst = idx === 0;
+      const isSuper = type === 'super';
+      
+      return `
+        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+          <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+            ${isFirst 
+              ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
+              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+            }
+            <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+            <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
+            <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+            <span class="text-[10px] text-slate-500 font-bold bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+              📅 ${item.date}
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  body.innerHTML = `
+    <div class="space-y-1.5">
+      <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
+        🔥 슈퍼별 획득 명단
+      </div>
+      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
+        ${renderList(cache.superStars, 'super')}
+      </div>
+    </div>
+
+    <div class="my-2.5 border-t border-dashed border-slate-200"></div>
+
+    <div class="space-y-1.5">
+      <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
+        ✨ 스페셜별 획득 명단
+      </div>
+      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
+        ${renderList(cache.specialStars, 'special')}
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
+// 👑 2. Lv.100 Club 상세보기 모달
+window.openLv100DetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  const title = document.getElementById('historyDetailTitle');
+  const body = document.getElementById('historyDetailBody');
+  if (!modal || !body) return;
+
+  title.innerHTML = `👑 <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span> 달성 기록`;
+
+  const cache = getOrBuildHistoryCache();
+  const lv100Items = cache.lv100List;
+
+  if (lv100Items.length === 0) {
+    body.innerHTML = `<div class="text-center py-8 text-xs text-amber-700/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
+  } else {
+    body.innerHTML = `
+      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+        ${lv100Items.map((item, idx) => {
+          const isFirst = idx === 0;
+          return `
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+                ${isFirst 
+                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` 
+                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                }
+                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+                <span class="text-[10px] text-amber-800/60 font-bold">(${item.quarter})</span>
+                <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+                <span class="text-[10px] text-slate-500 font-bold bg-amber-50/80 border border-amber-200/60 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+                  📅 ${item.date}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
+       // 🏔️ 3. 누적 고도 상세보기 모달 (3만m 이상 달성자 출력)
+window.openHeightDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  const title = document.getElementById('historyDetailTitle');
+  const body = document.getElementById('historyDetailBody');
+  if (!modal || !body) return;
+
+  title.innerHTML = `🚩 <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">누적 고도 (Accumulated Altitude)</span> 달성 기록`;
+
+  const activeMembers = (typeof currentData !== 'undefined' && Array.isArray(currentData)) 
+    ? currentData.filter(m => !m.isHidden && !m.hidden) 
+    : [];
+
+  // 🎯 3만m (30,000m) 이상 달성자 필터링
+  const heightQualifiedMembers = activeMembers
+    .filter(m => (m.totalHeight || 0) >= 30000)
+    .sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
+
+  if (heightQualifiedMembers.length === 0) {
+    body.innerHTML = `<div class="text-center py-8 text-xs text-emerald-700/70 font-bold">아직 3만m 이상 달성자가 없습니다.</div>`;
+  } else {
+    body.innerHTML = `
+      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
+        ${heightQualifiedMembers.map((item, idx) => {
+          const isFirst = idx === 0;
+          const heightKm = (item.totalHeight / 1000).toFixed(1);
+          
+          return `
+            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-emerald-50/90 border-emerald-300 ring-1 ring-emerald-300/60' : 'bg-white border-emerald-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+                ${isFirst 
+                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-black shrink-0">👑 No.1</span>` 
+                  : `<span class="text-[10px] font-black text-emerald-800/80 bg-emerald-100/60 border border-emerald-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                }
+                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+                <span class="text-[11px] font-black text-emerald-600 ml-auto flex items-center gap-0.5 shrink-0 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">
+                  🏔️ ${item.totalHeight ? item.totalHeight.toLocaleString() : 0}m (${heightKm}k)
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
+
+ 
+// 모달 닫기
+window.closeHistoryDetailModal = function() {
+  const modal = document.getElementById('historyDetailModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+};      
 
 
       
