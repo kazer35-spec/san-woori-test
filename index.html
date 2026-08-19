@@ -3454,68 +3454,11 @@ margin: 0 2px !important;
 </div>
 
 
-<!-- 🔥 활동지수 & 히스토리 통합 모달 -->
-<div id="vibeModal" class="modal-overlay" style="display:none;" onclick="toggleVibeModal(false)">
-  <div class="modal-content !p-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
-    
-    <!-- 1. San:Woori History 영역 -->
-    <div id="vibeHallOfFame" class="mb-4"></div>
-
-    <!-- 2. Community Passion 영역 -->
-    <div class="space-y-2 pt-3 border-t border-slate-100">
-      <!-- 헤더 (산정 방식 버튼 규격 통일) -->
-      <div class="flex items-center justify-between">
-        <h2 class="text-[15px] font-black text-slate-800 flex items-center gap-1.5">
-          <span id="vibeModalIcon">🔥</span> Community Passion
-        </h2>
-        
-      </div>
-
-      <!-- 게이지 카드 -->
-      <div class="vibe-temp-card-modal p-4 bg-rose-50/40 rounded-2xl border border-rose-100/60" id="vibeCard">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-[10px] font-black text-rose-500 tracking-tight" id="vibeStatusTxt">EXPLOSIVE PASSION</span>
-          <span class="text-[10px] font-bold text-slate-400" id="vibeScoreTxt">100%</span>
-        </div>
-        <div class="temp-gauge-bg h-2.5 bg-rose-100/60 rounded-full overflow-hidden">
-          <div id="vibeGauge" class="temp-gauge-fill h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
-        </div>
-        <div id="vibeDesc" class="text-xs font-bold text-slate-600 mt-3 leading-relaxed">
-          현재 활동지수 최고조! 산행의 열기가 가득합니다.
-        </div>
-      </div>
-    </div>
-
-    <!-- 하단 확인 버튼 -->
-    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
-      확인
-    </button>
-  </div>
-</div>
-
-
 
 
 
 <!-- 💡 별도 팝업: 지수 산정 방식 모달 -->
-<div id="vibeCalcInfoModal" class="modal-overlay hidden" style="z-index: 10060; background: rgba(0,0,0,0.6);" onclick="toggleVibeCalcInfoModal(false)">
-  <div class="modal-content !p-5 max-w-xs bg-white rounded-2xl border border-slate-200 shadow-xl" onclick="event.stopPropagation()">
-    <h3 class="text-sm font-black text-slate-800 mb-3 flex items-center gap-1.5">
-      <span>💡</span> 커뮤니티 지수 산정 방식
-    </h3>
-    <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 text-[11px] font-bold text-blue-800 leading-relaxed space-y-1.5">
-      <p>• 24시간 방문자 5명당 일정 % 상승</p>
-      <p>• 24시간 산행 기록 1개당 10% 상승</p>
-      <div class="pt-2 border-t border-blue-200/60 flex justify-between text-[10px] text-blue-600 font-extrabold">
-        <span>❄️ 20% 미만</span>
-        <span>🍀 20% 이상</span>
-        <span>☀️ 50% 이상</span>
-        <span>🔥 80% 이상</span>
-      </div>
-    </div>
-    <button onclick="toggleVibeCalcInfoModal(false)" class="w-full mt-4 py-2.5 bg-slate-800 text-white rounded-xl font-extrabold text-xs">닫기</button>
-  </div>
-</div>
+
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
 <div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
