@@ -4974,6 +4974,7 @@ function renderHallModalStructure() {
     `;
 }
 
+
 window.switchHallTab = (tabType) => {
     window.currentHallTab = tabType;
     if (window.hallTimerInterval) {
@@ -5036,31 +5037,34 @@ function renderHallList() {
         let liveMountainFull = [];
         let liveHostFull = [];
         let ozMember = null;
+        let youthMember = null;
 
         // [데이터 절약 모드] 데이터 캐시 확인
         if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
             const cacheKey = `${qKey}_${currentData.length}`;
             
-            if (window.hallDataCache.key === cacheKey) {
-                // 캐시된 데이터 활용 (연산 최소화)
+            if (window.hallDataCache && window.hallDataCache.key === cacheKey) {
+                // 캐시된 데이터 활용
                 liveWithFull = window.hallDataCache.withFull;
                 liveMountainFull = window.hallDataCache.mountainFull;
                 liveHostFull = window.hallDataCache.hostFull;
                 ozMember = window.hallDataCache.ozMember;
+                youthMember = window.hallDataCache.youthMember;
             } else {
-                // 신규 계산 및 캐시 신규 작성
+                // 신규 계산 및 캐시 신규 작성 (오즈 및 유스 제외)
                 ozMember = currentData.find(m => m.name === "오즈") || null;
+                youthMember = currentData.find(m => m.name === "유스") || null;
 
                 liveWithFull = [...currentData]
-                    .filter(m => !m.isHidden && m.name !== "오즈" && (m.qCount || 0) > 0)
+                    .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && (m.qCount || 0) > 0)
                     .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || b.level - a.level);
 
                 liveMountainFull = [...currentData]
-                    .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
+                    .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
                     .sort((a, b) => (b.quarterlyStats?.[qKey]?.hike || 0) - (a.quarterlyStats?.[qKey]?.hike || 0) || b.level - a.level);
 
                 liveHostFull = [...currentData]
-                    .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
+                    .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
                     .sort((a, b) => (b.quarterlyStats?.[qKey]?.hosted || 0) - (a.quarterlyStats?.[qKey]?.hosted || 0) || b.level - a.level);
 
                 window.hallDataCache = {
@@ -5068,7 +5072,8 @@ function renderHallList() {
                     withFull: liveWithFull,
                     mountainFull: liveMountainFull,
                     hostFull: liveHostFull,
-                    ozMember: ozMember
+                    ozMember: ozMember,
+                    youthMember: youthMember
                 };
             }
         }
@@ -5100,57 +5105,72 @@ function renderHallList() {
         };
 
         /* ==========================================
-   더보기 4위 이하 목록 HTML 생성 헬퍼 (수정본)
-   ========================================== */
-const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, scoreTail) => {
-    const listFrom4th = fullList.slice(3); // 4위부터 추출
-    let ozRowHtml = '';
+           더보기 4위 이하 목록 HTML 생성 헬퍼 (ADMIN & 초월자 포함)
+           ========================================== */
+        const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, youthScore, scoreGetter, scoreTail) => {
+            const listFrom4th = fullList.slice(3);
+            let ozRowHtml = '';
+            let youthRowHtml = '';
 
-    // 1. ADMIN 오즈 영역 ((수치 참고) 문구 제거)
-    if (ozMember) {
-        ozRowHtml = `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 11px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 9.5px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 2px 6px; border-radius: 5px; letter-spacing: -0.02em;">ADMIN</span>
-                <span style="font-weight: 700; color: #334155;">오즈</span>
-            </div>
-            <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">
-                ${ozScore}${scoreTail}
-            </span>
-        </div>`;
-    }
+            // 1. ADMIN 오즈 영역
+            if (ozMember) {
+                ozRowHtml = `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 11px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 9.5px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 2px 6px; border-radius: 5px; letter-spacing: -0.02em;">ADMIN</span>
+                        <span style="font-weight: 700; color: #334155;">오즈</span>
+                    </div>
+                    <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">
+                        ${ozScore}${scoreTail}
+                    </span>
+                </div>`;
+            }
 
-    if (listFrom4th.length === 0) {
-        return `
-        <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-            ${ozRowHtml}
-            <div style="text-align: center; color: #94a3b8; font-size: 10.5px; padding: 8px 0;">4위 이하 순위 데이터가 없습니다.</div>
-        </div>`;
-    }
+            // 2. 초월자 유스 영역 (ADMIN 바로 아래 표시)
+            if (youthMember) {
+                youthRowHtml = `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 11px; background: #faf5ff; border: 1px solid #f3e8ff; border-radius: 10px; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 9.5px; font-weight: 800; color: #9333ea; background: #f3e8ff; padding: 2px 6px; border-radius: 5px; letter-spacing: -0.02em;">초월자</span>
+                        <span style="font-weight: 700; color: #334155;">유스</span>
+                    </div>
+                    <span style="font-weight: 800; color: #7e22ce; font-size: 11px;">
+                        ${youthScore}${scoreTail}
+                    </span>
+                </div>`;
+            }
 
-    // 2. 4위 이하 목록 생성
-    let rows = listFrom4th.map((m, idx) => {
-        const rank = idx + 4;
-        return `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; font-size: 11px; border-bottom: 1px dashed #f1f5f9;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-weight: 800; color: #64748b; min-width: 26px;">${rank}위</span>
-                <span style="font-weight: 700; color: #334155;">${m.name}</span>
-            </div>
-            <span style="font-weight: 700; color: #475569; font-size: 10.5px;">
-                ${scoreGetter(m)}${scoreTail}
-            </span>
-        </div>`;
-    }).join('');
+            if (listFrom4th.length === 0) {
+                return `
+                <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                    ${ozRowHtml}
+                    ${youthRowHtml}
+                    <div style="text-align: center; color: #94a3b8; font-size: 10.5px; padding: 8px 0;">4위 이하 순위 데이터가 없습니다.</div>
+                </div>`;
+            }
 
-    // '4위 이하 순위 (N명)' 소제목 항목 제거 후 바로 ADMIN 및 4위 목록 출력
-    return `
-    <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0; max-height: 200px; overflow-y: auto;">
-        ${ozRowHtml}
-        ${rows}
-    </div>`;
-};
+            // 3. 4위 이하 목록 생성
+            let rows = listFrom4th.map((m, idx) => {
+                const rank = idx + 4;
+                return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; font-size: 11px; border-bottom: 1px dashed #f1f5f9;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-weight: 800; color: #64748b; min-width: 26px;">${rank}위</span>
+                        <span style="font-weight: 700; color: #334155;">${m.name}</span>
+                    </div>
+                    <span style="font-weight: 700; color: #475569; font-size: 10.5px;">
+                        ${scoreGetter(m)}${scoreTail}
+                    </span>
+                </div>`;
+            }).join('');
 
+            return `
+            <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0; max-height: 200px; overflow-y: auto;">
+                ${ozRowHtml}
+                ${youthRowHtml}
+                ${rows}
+            </div>`;
+        };
 
         combinedHtml += `
         <div id="hallLiveTimerContainer" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 9px 12px; margin-top: 0px !important; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
@@ -5171,6 +5191,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
         if (liveWith.length > 0) {
             const isExpanded = window.expandedLiveSections.with;
             const ozValue = ozMember ? (ozMember.qCount || 0) : 0;
+            const youthValue = youthMember ? (youthMember.qCount || 0) : 0;
 
             combinedHtml += `
             <div class="hall-card" style="margin-top: 0px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ffedd5; background: linear-gradient(180deg, #fffbee 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(251, 146, 60, 0.04);">
@@ -5191,7 +5212,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                     ${makeLiveCompactRow("🥈길잡이", liveWith[1]?.name, liveWith[1]?.qCount || 0, "점", glowClasses[1])}
                     ${makeLiveCompactRow("🥉마당발", liveWith[2]?.name, liveWith[2]?.qCount || 0, "점", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml('with', liveWithFull, ozValue, m => m.qCount || 0, "점") : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml('with', liveWithFull, ozValue, youthValue, m => m.qCount || 0, "점") : ''}
             </div>`;
         }
 
@@ -5199,6 +5220,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
         if (liveMountain.length > 0) {
             const isExpanded = window.expandedLiveSections.mountain;
             const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.hike || 0) : 0;
+            const youthValue = youthMember ? (youthMember.quarterlyStats?.[qKey]?.hike || 0) : 0;
 
             combinedHtml += `
             <div class="hall-card" style="margin-top: 10px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ccfbf1; background: linear-gradient(180deg, #f0fdfa 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(26, 188, 156, 0.04);">
@@ -5219,7 +5241,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                     ${makeLiveCompactRow("🥈심마니", liveMountain[1]?.name, liveMountain[1]?.quarterlyStats?.[qKey]?.hike || 0, "회", glowClasses[1])}
                     ${makeLiveCompactRow("🥉나무꾼", liveMountain[2]?.name, liveMountain[2]?.quarterlyStats?.[qKey]?.hike || 0, "회", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml('mountain', liveMountainFull, ozValue, m => m.quarterlyStats?.[qKey]?.hike || 0, "회") : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml('mountain', liveMountainFull, ozValue, youthValue, m => m.quarterlyStats?.[qKey]?.hike || 0, "회") : ''}
             </div>`;
         }
 
@@ -5227,6 +5249,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
         if (liveHost.length > 0) {
             const isExpanded = window.expandedLiveSections.host;
             const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.hosted || 0) : 0;
+            const youthValue = youthMember ? (youthMember.quarterlyStats?.[qKey]?.hosted || 0) : 0;
 
             combinedHtml += `
             <div class="hall-card" style="margin-top: 10px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #e0f2fe; background: linear-gradient(180deg, #f0f9ff 0%, #fff 100%); box-shadow: 0 3px 5px -1px rgba(0, 191, 255, 0.04);">
@@ -5247,7 +5270,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                     ${makeLiveCompactRow("🥈선봉장", liveHost[1]?.name, liveHost[1]?.quarterlyStats?.[qKey]?.hosted || 0, "회", glowClasses[1])}
                     ${makeLiveCompactRow("🥉파수꾼", liveHost[2]?.name, liveHost[2]?.quarterlyStats?.[qKey]?.hosted || 0, "회", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml('host', liveHostFull, ozValue, m => m.quarterlyStats?.[qKey]?.hosted || 0, "회") : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml('host', liveHostFull, ozValue, youthValue, m => m.quarterlyStats?.[qKey]?.hosted || 0, "회") : ''}
             </div>`;
         }
 
@@ -5307,19 +5330,19 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                 if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
                     if (window.currentHallTab === 'mountain') {
                         top3 = [...currentData]
-                            .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[loopQKey]?.hike) || 0) > 0)
+                            .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[loopQKey]?.hike) || 0) > 0)
                             .sort((a, b) => (b.quarterlyStats?.[loopQKey]?.hike || 0) - (a.quarterlyStats?.[loopQKey]?.hike || 0) || b.level - a.level)
                             .slice(0, 3)
                             .map(m => ({ name: m.name }));
                     } else if (window.currentHallTab === 'host') {
                         top3 = [...currentData]
-                            .filter(m => !m.isHidden && m.name !== "오즈" && ((m.quarterlyStats?.[loopQKey]?.hosted) || 0) > 0)
+                            .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[loopQKey]?.hosted) || 0) > 0)
                             .sort((a, b) => (b.quarterlyStats?.[loopQKey]?.hosted || 0) - (a.quarterlyStats?.[loopQKey]?.hosted || 0) || b.level - a.level)
                             .slice(0, 3)
                             .map(m => ({ name: m.name }));
                     } else {
                         top3 = [...currentData]
-                            .filter(m => !m.isHidden && m.name !== "오즈" && (m.qCount || 0) > 0)
+                            .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && (m.qCount || 0) > 0)
                             .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || b.level - a.level)
                             .slice(0, 3)
                             .map(m => ({ name: m.name }));
@@ -5328,9 +5351,9 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
             } 
             else if (s.year === 2026 && s.quarter === 2) {
                 if (window.currentHallTab === 'mountain') {
-                    top3 = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
+                    top3 = [{ name: "하트" }, { name: "아랑" }];
                 } else if (window.currentHallTab === 'host') {
-                    top3 = [{ name: "아랑" }, { name: "해수" }, { name: "유스" }]; 
+                    top3 = [{ name: "아랑" }, { name: "해수" }]; 
                 } else {
                     top3 = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }]; 
                 }
@@ -5345,7 +5368,7 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
                 }
             }
             else if (s.year === 2025 && s.quarter === 4) {
-                top3 = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }];
+                top3 = [{ name: "아랑" }, { name: "용삼" }];
             }
 
             if (top3.length > 0) {
@@ -5380,12 +5403,9 @@ const makeMoreListFrom4thHtml = (sectionKey, fullList, ozScore, scoreGetter, sco
     
     listArea.innerHTML = combinedHtml;
 }
-
         
-                    
-                
 
-            
+                 
 
     
 window.toggleVibeModal = (show) => {
