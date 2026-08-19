@@ -3042,31 +3042,43 @@ margin: 0 2px !important;
 <body>
 
          
-       
+  <!-- 🎉 레벨업 카드 최상단 모달 (최외각 id="levelUpCardModal" 적용) -->
+<div id="levelUpCardModal" class="hidden fixed inset-0 bg-slate-900/85 backdrop-blur-md z-[10070] flex items-center justify-center p-4" onclick="closeLevelUpCardModal()">
+  
+  <!-- 모달 컨텐츠 본문 (클릭 이벤트 전파 방지) -->
+  <div class="w-full max-w-[400px] text-center" onclick="event.stopPropagation()">
+    <h2 id="modalTitle" class="text-2xl font-black mb-1 text-white">LEVEL UP!</h2>
+    <p class="text-slate-400 text-[10px] italic mb-5">레벨업 축하합니다 🎉</p>
+
+    <!-- 📸 캡처 대상 영역 -->
+    <div id="cardToCapture" class="inline-block bg-black p-[3px] rounded-[22px]">
+      <div id="cardFrame" class="relative w-[340px] min-h-[340px] bg-[#0f172a] rounded-[20px] overflow-hidden flex flex-col p-6 border-4 border-emerald-500">
+
+        <!-- 카드 내부 렌더링 영역 -->
+        <div id="cardContent" class="flex-grow flex flex-col items-center justify-center"></div>
+
+        <!-- 카드 하단 날짜 -->
+        <div class="mt-4 pt-3 border-t border-slate-800 text-center">
+          <p id="cardDate" class="text-[8px] text-slate-600 tracking-widest uppercase"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 버튼 영역 -->
+    <div class="space-y-3 mt-8">
+      <button onclick="saveCardImage()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-black shadow-lg active:scale-98 transition-all cursor-pointer">
+        📸 이미지 저장하기
+      </button>
+      <button onclick="closeLevelUpCardModal()" class="w-full text-slate-500 hover:text-slate-300 text-sm font-bold cursor-pointer">
+        닫기
+      </button>
+    </div>
+  </div>
+
+</div>
+     
         
-<div id="levelUpCardModal" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md hidden items-center justify-center p-5">
-<div class="w-full max-w-[400px] text-center">
-<h2 id="modalTitle" class="text-2xl font-black mb-1 text-white">LEVEL UP!</h2>
-<p class="text-slate-400 text-[10px] italic mb-5">레벨업 축하합니다 🎉</p>
 
-<div id="cardToCapture" class="inline-block bg-black p-[3px] rounded-[22px]">
-<div id="cardFrame" class="relative w-[340px] min-h-[340px] bg-[#0f172a] rounded-[20px] overflow-hidden flex flex-col p-6 border-4 border-emerald-500">
-
-<div id="cardContent" class="flex-grow flex flex-col items-center justify-center">
-</div>
-
-<div class="mt-4 pt-3 border-t border-slate-800 text-center">
-<p id="cardDate" class="text-[8px] text-slate-600 tracking-widest uppercase"></p>
-</div>
-</div>
-</div>
-
-<div class="space-y-3 mt-8">
-<button onclick="saveCardImage()" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-black shadow-lg">📸 이미지 저장하기</button>
-<button onclick="document.getElementById('levelUpCardModal').style.display='none'; pendingLevelUpCards=[];" class="w-full text-slate-500 text-sm font-bold">닫기</button>
-</div>
-</div>
-</div>
 
 
 <!-- 메인 컨테이너 시작 -->
@@ -6782,8 +6794,22 @@ window.checkLevelUpgrade = (name, oldLevel, newLevel) => {
   }
 };
 
+// 모달 닫기 안전 함수
+window.closeLevelUpCardModal = () => {
+  const modal = document.getElementById('levelUpCardModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  }
+  pendingLevelUpCards = []; // 대기열 초기화
+};
+
+// 모달 출력 함수
 window.showCombinedLevelUpAlert = () => {
-  if (pendingLevelUpCards.length === 0) return;
+  if (!pendingLevelUpCards || pendingLevelUpCards.length === 0) {
+    console.warn("⚠️ [LevelUp] 표시할 레벨업 카드 데이터가 없습니다.");
+    return;
+  }
 
   const modal = document.getElementById('levelUpCardModal');
   const content = document.getElementById('cardContent');
@@ -6791,11 +6817,10 @@ window.showCombinedLevelUpAlert = () => {
   const title = document.getElementById('modalTitle');
 
   if (!modal || !content || !frame || !title) {
-    console.error("레벨업 카드 모달 DOM 요소를 찾을 수 없습니다.");
+    console.error("❌ #levelUpCardModal DOM 요소를 찾을 수 없습니다.");
     return;
   }
 
-  // 첫 번째 인원의 컬러를 메인 테마로 사용
   const primaryColor = pendingLevelUpCards[0].color || "#10b981";
   frame.style.borderColor = primaryColor;
   title.style.color = primaryColor;
@@ -6803,59 +6828,62 @@ window.showCombinedLevelUpAlert = () => {
   content.innerHTML = '';
 
   if (pendingLevelUpCards.length === 1) {
-    // [1인 모드]
+    // 단일 인원
     const user = pendingLevelUpCards[0];
-    const emoji = user.badgeText.split(' ')[0];
-    const label = user.badgeText.split(' ')[1] || "";
+    const badgeParts = (user.badgeText || "").split(' ');
+    const emoji = badgeParts[0] || "🌲";
+    const label = badgeParts[1] || user.badgeText || "";
+
     content.innerHTML = `
-      <div class="flex flex-col items-center w-full py-4">
-        <div class="text-[9px] font-bold border px-3 py-1 rounded-full uppercase mb-6 tracking-widest"
+      <div class="flex flex-col items-center w-full py-2">
+        <div class="text-[9px] font-bold border px-3 py-1 rounded-full uppercase mb-5 tracking-widest"
              style="color:${user.color}; border-color:${user.color}44; background: ${user.color}11;">
           SAN WOORI RANKER
         </div>
-        <div class="text-8xl mb-4 leading-none">${emoji}</div>
-        <div class="text-[10px] font-medium text-white/50 mb-6 tracking-tight">
+        <div class="text-7xl mb-3 leading-none">${emoji}</div>
+        <div class="text-[10px] font-medium text-white/50 mb-5 tracking-tight">
           <span class="font-bold text-white text-xs">"${label}"</span> 등급 획득!
         </div>
         <div class="text-5xl font-black mb-1" style="color:${user.color}">LV.${user.level}</div>
-        <div class="text-3xl font-bold text-white mb-4">${user.name} 님</div>
+        <div class="text-2xl font-bold text-white mb-3">${user.name} 님</div>
         <p class="text-slate-400 text-[11px] italic">"산우리의 든든한 등불입니다"</p>
       </div>
     `;
   } else {
-    // [다수 인원 모드]
+    // 다수 인원
     const container = document.createElement('div');
     container.className = "flex flex-col items-center w-full h-full";
 
     const topSection = `
-      <div class="text-[10px] font-bold border px-4 py-1.5 rounded-full uppercase mb-6 tracking-[0.2em]"
+      <div class="text-[10px] font-bold border px-4 py-1.5 rounded-full uppercase mb-3 tracking-[0.2em]"
            style="color:${primaryColor}; border-color:${primaryColor}44; background: ${primaryColor}11;">
         GROUP LEVEL UP ACHIEVED
       </div>
-      <h4 class="text-white text-lg font-black mb-6 tracking-tighter">축하합니다! 총 ${pendingLevelUpCards.length}명 레벨업</h4>
+      <h4 class="text-white text-base font-black mb-3 tracking-tighter">축하합니다! 총 ${pendingLevelUpCards.length}명 레벨업</h4>
     `;
 
     const gridCount = pendingLevelUpCards.length >= 6 ? 'grid-cols-3' : 'grid-cols-2';
     const grid = document.createElement('div');
-    grid.className = `grid gap-2 w-full mb-6 ${gridCount}`;
+    grid.className = `grid gap-2 w-full mb-3 max-h-[180px] overflow-y-auto ${gridCount}`;
 
     pendingLevelUpCards.forEach(user => {
-      const emoji = user.badgeText.split(' ')[0];
-      const label = user.badgeText.split(' ')[1] || "";
+      const badgeParts = (user.badgeText || "").split(' ');
+      const emoji = badgeParts[0] || "🌲";
+      const label = badgeParts[1] || "";
+      
       const userBox = document.createElement('div');
-
-      userBox.className = "bg-white/5 rounded-xl p-3 border border-white/10 flex flex-col items-center text-center";
+      userBox.className = "bg-white/5 rounded-xl p-2 border border-white/10 flex flex-col items-center text-center";
       userBox.innerHTML = `
-        <div class="text-3xl mb-1">${emoji}</div>
-        <div class="text-[14px] font-black leading-tight" style="color:${user.color}">LV.${user.level}</div>
+        <div class="text-2xl mb-0.5">${emoji}</div>
+        <div class="text-[12px] font-black leading-tight" style="color:${user.color}">LV.${user.level}</div>
         <div class="text-[11px] text-white font-bold truncate w-full">${user.name}</div>
-        <div class="text-[8px] text-white/40 mt-1 scale-90">"${label}"</div>
+        <div class="text-[8px] text-white/40 mt-0.5 scale-90">"${label}"</div>
       `;
       grid.appendChild(userBox);
     });
 
     const bottomSection = `
-      <div class="mt-auto pt-4 w-full text-center border-t border-white/10">
+      <div class="mt-auto pt-2 w-full text-center border-t border-white/10">
         <p class="text-slate-400 text-[10px] italic font-medium">
           "우리들의 발걸음이 모여 산우리의 역사가 됩니다"
         </p>
@@ -6873,11 +6901,11 @@ window.showCombinedLevelUpAlert = () => {
     cardDate.innerText = `${new Date().toLocaleDateString()} OFFICIAL RECORD`;
   }
 
-  // 💡 z-index 조율 및 Tailwind hidden 클래스 제거 (최상단 노출 보장)
-  modal.style.zIndex = '10070';
+  // 💡 강제 모달 출력 (hidden 제거 및 display/z-index 재설정)
   modal.classList.remove('hidden');
-  modal.style.display = 'flex';
+  modal.style.cssText = "display: flex !important; z-index: 10070 !important;";
 };
+
 
 // 모바일 최적화 이미지 저장 함수
 window.saveCardImage = async () => {
