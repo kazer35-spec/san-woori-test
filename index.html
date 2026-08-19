@@ -8043,41 +8043,24 @@ window.toggleVibeModal = function(show) {
 };
 
 
-// 💡 지수 산정 방식 팝업 토글 함수
-window.toggleVibeCalcInfoModal = function(show) {
-  const modal = document.getElementById('vibeCalcInfoModal');
-  if (!modal) return;
-  if (show) {
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
-  } else {
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
-  }
-};
-
-
-/**
- * 🏆 SanWoori History 렌더링 함수
- */
-function renderVibeHallOfFame() {
+// -------------------------------------------------------------
+// 🏆 SanWoori History 메인 렌더링 함수
+// -------------------------------------------------------------
+   function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
 
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
 
+  // 1. 전설의 별 데이터
   const superNames = [];
   const specialNames = [];
 
   activeMembers.forEach(m => {
     if (m.specialStars && Array.isArray(m.specialStars)) {
       m.specialStars.forEach(s => {
-        if (s.starType === 'super' && !superNames.includes(m.name)) {
-          superNames.push(m.name);
-        }
-        if (s.starType === 'special' && !specialNames.includes(m.name)) {
-          specialNames.push(m.name);
-        }
+        if (s.starType === 'super' && !superNames.includes(m.name)) superNames.push(m.name);
+        if (s.starType === 'special' && !specialNames.includes(m.name)) specialNames.push(m.name);
       });
     }
   });
@@ -8085,22 +8068,38 @@ function renderVibeHallOfFame() {
   const superHolders = superNames.map((name, idx) => `No.${idx + 1} ${name}`);
   const specialHolders = specialNames.map((name, idx) => `No.${idx + 1} ${name}`);
 
+  // 2. Lv.100 Club 데이터
   const level100Holders = activeMembers
     .filter(m => (m.level || 0) >= 100)
     .map((m, idx) => `No.${idx + 1} ${m.name}`);
 
-  const formatBadgeListWithMore = (list, isGold = false, categoryId = '', limit = 3) => {
+    // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
+  const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
+
+  const h100kHolders = sortedHeightMembers
+    .filter(m => (m.totalHeight || 0) >= 100000)
+    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
+
+  const h50kHolders = sortedHeightMembers
+    .filter(m => (m.totalHeight || 0) >= 50000 && (m.totalHeight || 0) < 100000)
+    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
+
+  const h30kHolders = sortedHeightMembers
+    .filter(m => (m.totalHeight || 0) >= 30000 && (m.totalHeight || 0) < 50000)
+    .map(m => `${m.name} (${Math.floor(m.totalHeight / 1000)}k)`);
+
+  // 🏷️ 뱃지 리스트 포맷터
+  const formatBadgeListWithMore = (list, styleType = 'default', categoryId = '', limit = 3) => {
     if (!list || list.length === 0) {
-      const emptyTextStyle = isGold ? "text-amber-600/80 font-bold" : "text-slate-400";
-      return `<span class="${emptyTextStyle} text-[10px] pl-1">아직 달성자가 없습니다</span>`;
+      return `<span class="text-slate-400 text-[10px] pl-1">아직 달성자가 없습니다</span>`;
     }
 
     const visibleList = list.slice(0, limit);
     const hiddenList = list.slice(limit);
 
-    const bgStyle = isGold 
-      ? "bg-white/90 text-amber-950 border border-amber-300/80 shadow-2xs font-extrabold" 
-      : "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
+    let bgStyle = "bg-white text-slate-700 border border-slate-200/80 shadow-2xs font-bold";
+    if (styleType === 'gold') bgStyle = "bg-white/90 text-amber-950 border border-amber-300/80 shadow-2xs font-extrabold";
+    if (styleType === 'emerald') bgStyle = "bg-white/90 text-emerald-950 border border-emerald-300/80 shadow-2xs font-extrabold";
 
     let html = visibleList.map(item => `
       <span class="inline-flex items-center ${bgStyle} px-2.5 py-0.5 rounded-lg text-[10px] mr-1 mb-1 transition-all">
@@ -8115,14 +8114,10 @@ function renderVibeHallOfFame() {
         </span>
       `).join('');
 
-      const btnStyle = isGold 
-        ? "bg-amber-100/60 text-amber-800 border-amber-300/50 hover:bg-amber-200/50" 
-        : "bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200";
-
       html += `
         <button type="button" id="more-btn-${categoryId}" 
           onclick="document.getElementById('more-list-${categoryId}').classList.remove('hidden'); document.getElementById('more-list-${categoryId}').classList.add('inline-flex'); this.classList.add('hidden');" 
-          class="inline-flex items-center ${btnStyle} px-2 py-0.5 rounded-lg border font-black text-[10px] mr-1 mb-1 cursor-pointer transition-all active:scale-95">
+          class="inline-flex items-center bg-slate-100 hover:bg-slate-200 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-lg font-black text-[10px] mr-1 mb-1 cursor-pointer transition-all active:scale-95">
           +${hiddenList.length} more
         </button>
         <span id="more-list-${categoryId}" class="hidden flex-wrap items-center">
@@ -8136,7 +8131,7 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
-      <!-- 📜 타이틀 -->
+      <!-- 📜 모달 헤더 -->
       <div class="flex items-center justify-between mb-2.5">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
@@ -8144,59 +8139,109 @@ function renderVibeHallOfFame() {
       </div>
 
       <div class="space-y-2.5">
-        <!-- 🌟 Legend Star 카드 -->
+        <!-- 🌟 1. Legend Star 카드 -->
         <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
           <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span class="text-amber-400">🌟</span> 전설의 별 (Legend Star)
+              <span>🌟</span> <span class="text-gradient-legend font-black">전설의 별 (Legend Star)</span>
             </span>
-            <span class="text-[8px] font-black tracking-widest text-indigo-700 bg-indigo-100/80 border border-indigo-200 px-2 py-0.3 rounded-full uppercase shrink-0">
-              LEGEND
-            </span>
+            <button onclick="openLegendDetailModal()" class="text-[9px] font-black tracking-tight text-indigo-600 bg-indigo-100/80 hover:bg-indigo-200/80 border border-indigo-200 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5">
+              상세보기
+            </button>
           </div>
           
           <div class="space-y-1.5">
-            <!-- 🔥 슈퍼별 영역 (3명 표시 후 +more) -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-super-subtle-glow">
               <span class="badge-super-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 🔥 슈퍼별
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(superHolders, false, 'super', 3)}
+                ${formatBadgeListWithMore(superHolders, 'default', 'super', 3)}
               </div>
             </div>
 
-            <!-- ✨ 스페셜 영역 (3명 표시 후 +more) -->
             <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border shadow-2xs is-special-subtle-glow">
               <span class="badge-special-gradient text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
                 ✨ 스페셜
               </span>
               <div class="flex flex-wrap items-center pt-0.5">
-                ${formatBadgeListWithMore(specialHolders, false, 'special', 3)}
+                ${formatBadgeListWithMore(specialHolders, 'default', 'special', 3)}
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 👑 Lv.100 Club 카드 -->
+        <!-- 👑 2. Lv.100 Club 카드 (위치 이동) -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
-              <span>👑</span> 천상계 (Lv.100 Club)
+              <span>👑</span> <span class="text-gradient-lv100 font-black">천상계 (Lv.100 Club)</span>
             </span>
-            <span class="text-[8px] font-black tracking-widest text-amber-700 bg-amber-100/80 border border-amber-200 px-2 py-0.3 rounded-full uppercase shrink-0">
-              EMPEROR
-            </span>
+            <button onclick="openLv100DetailModal()" class="text-[9px] font-black tracking-tight text-amber-800 bg-amber-100 hover:bg-amber-200 border border-amber-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5">
+              상세보기
+            </button>
           </div>
-          <!-- 100레벨 영역 (4명 표시 후 +more) -->
           <div class="flex flex-wrap items-center p-2.5 bg-amber-50/40 rounded-xl border shadow-2xs gold-inner-glow">
-            ${formatBadgeListWithMore(level100Holders, true, 'lv100', 4)}
+            ${formatBadgeListWithMore(level100Holders, 'gold', 'lv100', 4)}
           </div>
         </div>
+
+        <!-- 🚩 3. 누적 고도 카드 (10만m+ / 5만m+ / 3만m+ 기준 적용) -->
+<div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
+  
+  <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
+    <span class="flex items-center gap-1">
+      <span>🚩</span> 
+      <span class="bg-gradient-to-r from-emerald-700 via-teal-600 to-emerald-800 bg-clip-text text-transparent font-black">
+        누적 고도 (Accumulated Altitude)
+      </span>
+    </span>
+    <button onclick="openHeightDetailModal()" class="text-[9px] font-black tracking-tight text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300/80 px-2 py-0.5 rounded-full shrink-0 transition-all active:scale-95 flex items-center gap-0.5 cursor-pointer">
+      상세보기
+    </button>
+  </div>
+
+  <div class="space-y-1.5">
+    <!-- 💎 10만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-emerald-100 shadow-2xs">
+      <span class="bg-emerald-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+        💎 10만m+
+      </span>
+      <div class="flex flex-wrap items-center pt-0.5">
+        ${formatBadgeListWithMore(h100kHolders, 'emerald', 'h100k', 3)}
       </div>
     </div>
+
+    <!-- 🥇 5만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-teal-100 shadow-2xs">
+      <span class="bg-teal-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+        🥇 5만m+
+      </span>
+      <div class="flex flex-wrap items-center pt-0.5">
+        ${formatBadgeListWithMore(h50kHolders, 'default', 'h50k', 3)}
+      </div>
+    </div>
+
+    <!-- 🥈 3만m+ -->
+    <div class="flex items-center gap-2 bg-white/90 p-1.5 rounded-xl border border-slate-100 shadow-2xs">
+      <span class="bg-slate-600 text-white text-[9.5px] font-black px-2.5 py-0.8 rounded-md shrink-0">
+        🥈 3만m+
+      </span>
+      <div class="flex flex-wrap items-center pt-0.5">
+        ${formatBadgeListWithMore(h30kHolders, 'default', 'h30k', 3)}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    </div>
+    </div>
   `;
-}
+   }
+
+      
 
         
       // -------------------------------------------------------------
