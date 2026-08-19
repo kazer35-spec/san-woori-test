@@ -3457,7 +3457,67 @@ margin: 0 2px !important;
 
 
 
-<!-- 💡 별도 팝업: 지수 산정 방식 모달 -->
+<!-- 📜 San:Woori History 통합 모달 -->
+<div id="vibeModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[9990] flex items-center justify-center p-4" onclick="toggleVibeModal(false)">
+  <div class="modal-content bg-white w-full max-w-sm rounded-3xl !p-4 max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    
+    <!-- San:Woori History 영역 (레전드 스타 / 누적고도 / 100레벨) -->
+    <div id="vibeHallOfFame"></div>
+
+    <!-- 하단 확인 버튼 -->
+    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
+      확인
+    </button>
+  </div>
+</div>
+
+<!-- 📜 History 상세보기 팝업 모달 -->
+<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
+  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    <!-- 모달 헤더 -->
+    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
+        <!-- JS로 타이틀 주입 -->
+      </h3>
+      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
+    </div>
+
+    <!-- 모달 본문 -->
+    <div id="historyDetailBody" class="py-1">
+      <!-- JS로 상세 목록 주입 -->
+    </div>
+
+    <!-- 하단 닫기 버튼 -->
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
+      닫기
+    </button>
+  </div>
+</div>
+
+
+        <!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단에 배치) -->
+<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
+  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    
+    <!-- 모달 헤더 -->
+    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
+        <!-- JS로 타이틀 주입 -->
+      </h3>
+      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
+    </div>
+
+    <!-- 모달 본문 -->
+    <div id="historyDetailBody" class="py-1">
+      <!-- JS로 상세 목록 주입 -->
+    </div>
+
+    <!-- 하단 닫기 버튼 -->
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
+      닫기
+    </button>
+  </div>
+</div>
 
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
