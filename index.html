@@ -4119,7 +4119,7 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 테이블 랜더링 ───
-window.renderStatusTable = function() {
+Window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
         const searchInput = document.getElementById('searchInput');
@@ -4181,7 +4181,7 @@ window.renderStatusTable = function() {
             return 0;
         });
 
-        // 🌟 오즈, 유스 제외
+        // 🌟 칭호 부여 대상(TOP 3) 선정 시 '오즈', '유스' 제외
         const topNames = [...processedData]
             .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스")
             .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
@@ -4192,9 +4192,6 @@ window.renderStatusTable = function() {
         let htmlBuilder = ""; 
 
         processedData.forEach((m) => {
-            // 🌟 테이블 렌더링 시 오즈, 유스 제외
-            if (m.name === "오즈" || m.name === "유스") return;
-
             if (typeof isAdminLoggedIn !== 'undefined' && !isAdminLoggedIn && m.isHidden) return;
             
             if (search && !isMatchName(m.name, search)) return;
@@ -4206,7 +4203,9 @@ window.renderStatusTable = function() {
 
             let rankT = ""; 
             let rankC = "";
-            if ((m.qCount || 0) > 0 && !m.isHidden) {
+
+            // 🌟 오즈/유스가 아니면서 점수가 있고, topNames 목록에 있을 때만 랭킹 칭호 부여
+            if (m.name !== "오즈" && m.name !== "유스" && (m.qCount || 0) > 0 && !m.isHidden) {
                 const idx = topNames.indexOf(m.name);
                 
                 let activeQuarter = 1; 
@@ -4323,16 +4322,7 @@ window.renderStatusTable = function() {
     }
 };
 
-            
 
-
-
-      
-        
-        
-            
-
-        
             
             
             
