@@ -28,6 +28,19 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+    /* 텍스트 그라데이션 스타일 */
+.text-gradient-legend {
+  background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF007F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-lv100 {
+  background: linear-gradient(135deg, #FFB703 0%, #FB8500 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
         /* ================= 🏷️ 슈퍼별 / 스페셜 배지 고유 그라데이션 ================= */
 
 /* 🔥 슈퍼별 배지: 로즈 → 주황 → 골드 그라데이션 & 미세 입체 그림자 */
@@ -50,6 +63,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     transition: all 0.3s ease;
 }
 
+/* 🏔️ 누적고도 전용 에메랄드 네온 Glow 스타일 */
+.is-emerald-subtle-glow {
+  border: 1.5px solid #a7f3d0 !important; /* emerald-200 */
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25), inset 0 0 8px rgba(16, 185, 129, 0.1) !important;
+}
 
 
 /* ================= 🌟 슈퍼별 / 스페셜별 은은한 미세 번짐 효과 ================= */
@@ -112,6 +130,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     }
 }
 
+    
 
         /* ================= 레벨 배지 핀 래퍼 ================= */
 .pin-wrapper {
