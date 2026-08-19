@@ -28,7 +28,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* 텍스트 그라데이션 스타일 */
+    /* 텍스트 그라데이션 스타일 */
 .text-gradient-legend {
   background: linear-gradient(135deg, #FFD700 0%, #FF8C00 50%, #FF007F 100%);
   -webkit-background-clip: text;
@@ -130,6 +130,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     }
 }
 
+    
 
         /* ================= 레벨 배지 핀 래퍼 ================= */
 .pin-wrapper {
@@ -2827,7 +2828,7 @@ box-sizing: border-box;
 .hall-of-fame-btn { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #facc15; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(250, 204, 21, 0.2); }
 .hall-of-fame-btn:hover { transform: scale(1.1); background: #fefce8; }
 
- /* [추가/수정] 열정 온도 버튼 스타일 */
+/* [추가/수정] 열정 온도 버튼 스타일 */
 .vibe-temp-btn {
 width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1.5px solid #fee2e2;
 display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: 0.2s;
@@ -2847,7 +2848,6 @@ position: relative; overflow: hidden;
 
 .status-badge-live { background: #10b981; color: white; font-size: 7px; padding: 1px 5px; border-radius: 4px; animation: live-blink 1.5s infinite; }
 .status-badge-end { background: #94a3b8; color: white; font-size: 7px; padding: 1px 5px; border-radius: 4px; }
-       
 
 /* 명예의 전당 전용 스크롤 영역 */
 .hall-scroll-area {
@@ -3002,8 +3002,7 @@ margin: 0 2px !important;
 .level-msg-box { background: #f0f9ff; padding: 15px; border-radius: 20px; border: 2px dashed #3b82f6; margin-bottom: 20px; }
 .level-msg-txt { font-size: 1rem; font-weight: 800; color: #0369a1; line-height: 1.5; }
 
-/* 📜 History 버튼 진한 주황색 테두리 & 선명한 광원 스타일 */
-/* 📜 History 버튼 (천천히 빛나는 Glow 애니메이션 적용) */
+  /* 📜 History 버튼 (천천히 빛나는 Glow 애니메이션 적용) */
 .vibe-history-btn {
   width: 32px;
   height: 32px;
@@ -3035,7 +3034,7 @@ margin: 0 2px !important;
     box-shadow: 0 0 12px rgba(249, 115, 22, 0.65);
     border-color: #ea580c; /* 선명하고 진한 주황 */
   }
-}
+}      
 
 </style>        
 </head>
@@ -3078,21 +3077,19 @@ margin: 0 2px !important;
     <button id="tabAdmin" class="tab-btn" onclick="handleAdminTab()">🔐 관리자 설정</button>
   </div>
 
-<!-- 1. 실시간 현황 뷰 (viewStatus) -->
-<div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
-  
-  <!-- 상단 고정 헤더 영역 -->
-  <div class="year-selector flex justify-between items-center mb-3">
-    <h1 class="main-title">
-      <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
-      <span>산:우리</span>
-      <span class="slogan-txt">같이 걷는 즐거움</span>
-    </h1>
-
-    <div class="flex items-center gap-2">
-      <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
-
-      <!-- 📜 San:Woori History 버튼 (주황색 테두리 스타일 적용) -->
+  <!-- 1. 실시간 현황 뷰 (viewStatus) -->
+  <div id="viewStatus" class="view-content p-5 flex-1 flex flex-col overflow-hidden">
+    
+    <!-- 상단 고정 헤더 영역 -->
+    <div class="year-selector flex justify-between items-center mb-3">
+      <h1 class="main-title">
+        <img src="https://i.ibb.co/3mHmBPXd/1770301184544.png" alt="산:우리 로고" class="brand-logo">
+        <span>산:우리</span>
+        <span class="slogan-txt">같이 걷는 즐거움</span>
+      </h1>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleHallModal(true)" class="hall-of-fame-btn">🏆</button>
+        <!-- 📜 San:Woori History 버튼 (주황색 테두리 스타일 적용) -->
       <button onclick="toggleVibeModal(true)" class="vibe-history-btn" id="vibeCircleBtn">
         <span id="vibeCircleIcon">📜</span>
       </button>
@@ -3473,6 +3470,9 @@ margin: 0 2px !important;
     </button>
   </div>
 </div>
+
+
+
 
 
 <!-- 📜 San:Woori History 통합 모달 -->
@@ -6981,6 +6981,8 @@ window.toggleDisableCoord = () => {
 };
 
 
+
+
 window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
@@ -7115,53 +7117,37 @@ window.addMultiActivity = async () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
-             // 1) 레벨업 & 실시간 획득 업수 계산
-            const hikeUpAmount = up;
-            const activityUpAmount = up;
-            const realUpAmount = (isRealHike ? hikeUpAmount : activityUpAmount);
+            const realUpAmount = (isRealHike && !isExtraHike) ? up : 0;
             const oldLevel = member.level || 0;
-            const newLevel = oldLevel + realUpAmount;
-
+            const newLevel = oldLevel + realUpAmount; 
+            
             updateData.level = newLevel;
 
-            // 🎯 100레벨 최초 달성 시 DB에 날짜/산행지/분기 저장
-            if (oldLevel < 100 && newLevel >= 100) {
-                await checkAndSaveLv100ToMember(
-                    id, 
-                    newLevel, 
-                    mName || "관악산", 
-                    activityDateObj, 
-                    `${currentQuarter}분기`, 
-                    member
-                );
-            }
-
-            if (realUpAmount > 0 && typeof checkLevelUpEffect === 'function') {
-                checkLevelUpEffect(member, oldLevel, newLevel);
-            }
+            if (realUpAmount > 0) checkLevelUpgrade(member.name, oldLevel, newLevel);
             selectedNames.push(member.name);
 
-            // 2) 로그 루프 카운트 선언 및 고도 계산
-            const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne || realUpAmount === 0) ? 1 : realUpAmount;
-            const finalHeightIncrement = height * finalLogLoopCount;
+            if (isRealHike && !isExtraHike) {
+    // 🎯 0업일 때는 등산 횟수 미증가, 1업 이상(1, 2, 3업)일 때는 무조건 +1회만 증가
+    if (realUpAmount > 0) {
+        updateData.count = _increment(1); 
+    }
+    
+    updateData.lastDate = ts; 
 
-            if (isRealHike) {
-                if (!isExtraHike) {
-                    if (realUpAmount > 0) {
-                        updateData.count = _increment(1);
-                    }
-                }
+    const logLoopCount = (isRegular || isQuarterOnlyOne || isOnlyLog || realUpAmount === 0) ? 1 : realUpAmount;
+    const finalHeightIncrement = height * logLoopCount; 
+    updateData.totalHeight = _increment(finalHeightIncrement); 
 
-                updateData.lastDate = ts;
-                updateData.totalHeight = _increment(finalHeightIncrement);
+    updateData[`quarterlyStats.${qKey}.hike`] = _increment(1);
+    updateData[`quarterlyStats.${qKey}.total`] = _increment(1);
+    
+    updateData.bonusDays = 0;
+    
+    const groupSize = selectedMemberIds.size;
+    const baseQCount = groupSize >= 3 ? 3 : groupSize; 
 
-                updateData[`quarterlyStats.${qKey}.hike`] = _increment(1);
-                updateData[`quarterlyStats.${qKey}.totalHeight`] = _increment(finalHeightIncrement);
-
-                updateData.bonusDays = 0;
-                
-                const groupSize = selectedMemberIds.size;
-                const baseQCount = groupSize >= 3 ? 3 : groupSize; 
+            
+                // 🎯 0업이어도 기본 분기 점수는 1배수로 획득
                 const multiplier = realUpAmount > 0 ? realUpAmount : 1; 
                 const qCountIncrement = baseQCount * multiplier; 
 
@@ -7197,7 +7183,8 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // 3) 개인 로그 생성 및 별 획득 처리
+            // 🎯 up이 0이어도 개인 로그는 최소 1개 생성 처리
+            const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne || realUpAmount === 0) ? 1 : realUpAmount;
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
             const baseDocId = rawMountainName || (isSpecialTracking ? "인정 트레킹" : (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))));
 
@@ -7215,19 +7202,6 @@ window.addMultiActivity = async () => {
                     else if (rand <= 10) starType = "special";
                     else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
                 }
-
-                 // 🎯 별(슈퍼/스페셜) 획득 시 DB 저장
-            if (starType === "super" || starType === "special") {
-                const defaultQuarter = `${currentQuarter}분기`;
-                await saveSpecialStarToMember(
-                    id, 
-                    starType, 
-                    defaultQuarter, 
-                    member, 
-                    baseDocId, 
-                    activityDateObj
-                );
-        }
 
                 const logPayload = {
                     date: ts,
@@ -7267,7 +7241,7 @@ window.addMultiActivity = async () => {
             let dupSeq = 2;
             while (checkSnap.exists()) {
                 bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-                bondingRef = doc(db, "bondingForest", bondingDocId);
+                bondingRef = doc(doc(db, "bondingForest", bondingDocId));
                 checkSnap = await getDoc(bondingRef);
                 dupSeq++;
             }
@@ -7282,9 +7256,7 @@ window.addMultiActivity = async () => {
             });
         }
 
-        if (typeof pendingLevelUpCards !== 'undefined' && pendingLevelUpCards.length > 0 && typeof showCombinedLevelUpAlert === 'function') {
-            showCombinedLevelUpAlert();
-        }
+        if (pendingLevelUpCards.length > 0) showCombinedLevelUpAlert();
         
         alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
@@ -7315,9 +7287,10 @@ window.addMultiActivity = async () => {
             if (cb) cb.checked = false;
         });
 
-        // 🎯 1번 라디오 버튼 기본 재선택
-        const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
-        if (defaultRadio) defaultRadio.checked = true;
+
+// 🎯 1번 라디오 버튼 기본 재선택
+const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
+if (defaultRadio) defaultRadio.checked = true;
 
         tempCoord = null; 
         const marker = document.getElementById('adminMapMarker');
@@ -7331,7 +7304,7 @@ window.addMultiActivity = async () => {
             dateInput.value = kstDate.toISOString().split('T')[0];
         }
         
-        if (typeof startRealtimeSync === 'function') startRealtimeSync(); 
+        startRealtimeSync(); 
     } catch (error) {
         console.error("Error 상세:", error);
         alert("저장 실패: " + error.message);
@@ -7339,9 +7312,8 @@ window.addMultiActivity = async () => {
 };
 
 
- 
-            
-            
+                     
+
                     
 
 // 📌 [신규 회원 등록 함수]
@@ -8058,18 +8030,7 @@ window.filterAdminMemberList = () => {
   });
 };
 
-// -------------------------------------------------------------
-// 0. 캐시 객체 및 데이터 세팅 (Firestore 호출 최소화)
-// -------------------------------------------------------------
-window.historyCache = {
-  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt }]
-  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt }]
-  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt }]
-  lastUpdated: null
-};
-
-
-   /**
+/**
  * 💾 1. 별(슈퍼/스페셜) 획득 시 DB 저장 함수
  */
 window.saveSpecialStarToMember = async function(memberId, starType, quarterStr, memberObj, mountainName, activityDate) {
@@ -8158,6 +8119,7 @@ window.toggleVibeModal = function(show) {
     modal.style.display = 'none';
   }
 };
+
 
 // -------------------------------------------------------------
 // 🏆 SanWoori History 메인 렌더링 함수
@@ -8357,7 +8319,10 @@ window.toggleVibeModal = function(show) {
   `;
    }
 
-// -------------------------------------------------------------
+      
+
+        
+      // -------------------------------------------------------------
 // 📦 히스토리 데이터 캐싱/빌드 함수
 // -------------------------------------------------------------
 function getOrBuildHistoryCache() {
@@ -8580,10 +8545,16 @@ window.closeHistoryDetailModal = function() {
     modal.classList.add('hidden');
     modal.style.display = 'none';
   }
-};
-   
+};      
 
 
+      
+  
+    
+
+
+
+    
 
 
 // 🎯 [전역 캐시 객체 선언] 최초 1회만 Firestore에서 가져오고 이후 재활용합니다.
