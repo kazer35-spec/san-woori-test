@@ -3286,8 +3286,10 @@ margin: 0 2px !important;
     </div>
   </div>
 
+  <!-- 회원 목록 그리드 -->
   <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
 
+  <!-- 산 정보 및 좌표 설정 영역 -->
   <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
     <div class="flex items-center justify-between mb-2">
       <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
@@ -3307,6 +3309,7 @@ margin: 0 2px !important;
       </div>
     </div>
 
+    <!-- 활동 유형 선택 -->
     <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
       <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
@@ -3325,6 +3328,7 @@ margin: 0 2px !important;
       </label>
     </div>
 
+    <!-- 속성 포인트 입력 -->
     <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
       <div class="flex-1 flex items-center gap-1">
         <span class="text-[9px] text-gray-400 shrink-0">🪨바위</span>
@@ -3340,41 +3344,7 @@ margin: 0 2px !important;
       </div>
     </div>
 
-
-  
-
-  <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
-    <div class="flex items-center justify-between mb-2">
-      <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-      <div class="flex gap-2">
-        <!-- 1. 국립 체크박스 -->
-        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-          <input type="checkbox" id="isNationalParkCheck" class="w-3.5 h-3.5">
-          <span class="text-[10px] font-black text-emerald-600">국립</span>
-        </label>
-        <!-- 2. 산림청 체크박스 -->
-        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-          <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-          <span class="text-[10px] font-black text-blue-600">산림청</span>
-        </label>
-        <!-- 3. BAC 체크박스 -->
-        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-          <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-          <span class="text-[10px] font-black text-red-500">BAC</span>
-        </label>
-      </div>
-    </div>
-
-    <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
-      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
-      </label>
-      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
-      </label>
-
-
-    <!-- 등산한 산 이름 및 개별 단축 체크박스 영역 -->
+    <!-- 산 이름 및 단축 체크박스 영역 -->
     <div class="flex gap-2 mb-2 items-center">
       <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름" class="h-9 text-xs flex-1 border rounded px-2 outline-none">
       <div class="flex gap-2 shrink-0 bg-white px-2 h-9 items-center border rounded-lg">
@@ -3387,38 +3357,42 @@ margin: 0 2px !important;
       </div>
     </div>
           
-    <div class="flex gap-2 mb-2">
-      <select id="adminManualRegionSelect" class="region-select-mini flex-1 rounded-lg border">
-        <option value="기타">📍 수동 지역 선택 (선택 안함)</option>
-        <option value="서울특별시">서울특별시</option>
-        <option value="인천광역시">인천광역시</option>
-        <option value="경기도">경기도</option>
-        <option value="강원도">강원도</option>
-        <option value="충청북도">충청북도</option>
-        <option value="충청남도">충청남도</option>
-        <option value="대전/세종">대전/세종</option>
-        <option value="전라북도">전라북도</option>
-        <option value="전라남도">전라남도</option>
-        <option value="광주광역시">광주광역시</option>
-        <option value="경상북도">경상북도</option>
-        <option value="경상남도">경상남도</option>
-        <option value="대구광역시">대구광역시</option>
-        <option value="울산광역시">울산광역시</option>
-        <option value="부산광역시">부산광역시</option>
-        <option value="제주도">제주도</option>
-      </select>
-      
-      <!-- 📌 위치 이동: 좌표 OFF 좌측에 산 정보 일괄수정 버튼배치 -->
-      <button onclick="globalSyncMountainInfo()" class="h-9 text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 rounded-lg font-black shrink-0 hover:bg-red-100 transition-colors">
-        ⛰️ 산 정보 일괄수정
-      </button>
+    <!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 (크기 및 높이 통일) -->
+<div class="flex gap-1.5 mb-2 items-center">
+  <!-- 1. 수동 지역 선택 -->
+  <select id="adminManualRegionSelect" class="region-select-mini flex-[1.2] h-9 text-xs rounded-lg border px-1 outline-none bg-white">
+    <option value="기타">📍 수동 지역 선택 (선택 안함)</option>
+    <option value="서울특별시">서울특별시</option>
+    <option value="인천광역시">인천광역시</option>
+    <option value="경기도">경기도</option>
+    <option value="강원도">강원도</option>
+    <option value="충청북도">충청북도</option>
+    <option value="충청남도">충청남도</option>
+    <option value="대전/세종">대전/세종</option>
+    <option value="전라북도">전라북도</option>
+    <option value="전라남도">전라남도</option>
+    <option value="광주광역시">광주광역시</option>
+    <option value="경상북도">경상북도</option>
+    <option value="경상남도">경상남도</option>
+    <option value="대구광역시">대구광역시</option>
+    <option value="울산광역시">울산광역시</option>
+    <option value="부산광역시">부산광역시</option>
+    <option value="제주도">제주도</option>
+  </select>
+  
+  <!-- 2. 일괄수정 버튼 (텍스트 변경 및 크기 통일) -->
+  <button onclick="globalSyncMountainInfo()" class="flex-1 h-9 text-xs bg-red-50 text-red-600 border border-red-200 rounded-lg font-bold shrink-0 hover:bg-red-100 transition-colors flex items-center justify-center gap-0.5">
+    ⛰️ 일괄수정
+  </button>
 
-      <!-- 🎯 toggleDisableCoord() 함수 연결 -->
-      <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white px-2 h-9 border rounded-lg shrink-0">
-        <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
-      </label>
-    </div>
+  <!-- 3. 좌표 OFF 체크박스 (크기 및 높이 통일) -->
+  <label class="flex-1 h-9 flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap text-xs font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
+    <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
+  </label>
+</div>
 
+
+    <!-- 높이 및 UP 수량 설정 -->
     <div class="flex gap-2 mb-2">
       <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
       <div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
@@ -3435,6 +3409,7 @@ margin: 0 2px !important;
       </div>
     </div>
 
+    <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
       <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
       <div id="adminMapMarker" class="map-point hidden"></div>
