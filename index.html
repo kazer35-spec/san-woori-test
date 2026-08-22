@@ -28,28 +28,30 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* 체크된 회원 카드의 시인성 강화 (초록색 배경 + 흰색 글씨) */
+        /* 체크된 회원 카드 초록색 강조 (시인성 극대화) */
 #multiMemberList label:has(input[type="checkbox"]:checked) {
-  background-color: #10b981 !important; /* 선명한 에메랄드 초록 */
+  background-color: #10b981 !important;
   color: #ffffff !important;
   border-color: #059669 !important;
-  font-weight: bold;
+  font-weight: 800 !important;
 }
 #multiMemberList label:has(input[type="checkbox"]:checked) span {
   color: #ffffff !important;
 }
 
-/* 벙주(정기) 체크박스 테두리 깜빡임 애니메이션 */
-@keyframes leaderBlink {
+/* 벙주(정기🚩) 미체크 시 테두리 red 깜빡임 */
+@keyframes blinkLeaderBorder {
   0%, 100% { border-color: #ef4444; background-color: #fef2f2; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
   50% { border-color: #dc2626; background-color: #fee2e2; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3); }
 }
 
-.blink-leader {
-  animation: leaderBlink 0.8s infinite ease-in-out;
-  border-radius: 6px;
+.blink-leader-alert {
+  animation: blinkLeaderBorder 0.8s infinite ease-in-out;
+  border: 1.5px solid #ef4444 !important;
+  border-radius: 8px;
   padding: 2px 4px;
 }
+
 
         /* 텍스트 그라데이션 스타일 */
 .text-gradient-legend {
@@ -3254,7 +3256,7 @@ margin: 0 2px !important;
       <div id="adminSubRoomList" class="admin-subroom-grid"></div>
     </div>
 
-    <!-- 신규 회원 등록 -->
+          <!-- 신규 회원 등록 -->
 <div class="card">
   <div class="card-title text-green-600 font-bold">🆕 신규 회원 등록</div>
   <input type="text" id="newName" placeholder="회원 이름" class="input-gap">
@@ -3265,41 +3267,39 @@ margin: 0 2px !important;
   <input type="date" id="regDate" class="input-gap">
   <button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
 </div>
-
+          
 <!-- 등산 기록 및 좌표 정복 관리 카드의 시작 -->
 <div class="card">
   <div class="card-title text-blue-600 font-bold flex justify-between items-center">
     <span>📅 등산 기록 및 좌표 정복 관리</span>
+  </div>
+
+  <!-- 회원 검색 입력창 및 우측 인원수 표시 영역 -->
+  <div class="relative w-full mb-2">
+    <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 pl-4 pr-24 rounded-xl w-full text-xs bg-blue-50 border-blue-100 outline-none border">
     
-    <!-- 선택 인원 및 벙주 경고 표시 영역 -->
-    <div class="flex items-center gap-1.5">
-      <span id="selectedMemberBadge" class="text-[11px] bg-emerald-100 text-emerald-700 border border-emerald-300 px-2 py-0.5 rounded-full font-black hidden">
-        선택: <span id="memberCountNum">0</span>명
-      </span>
-      <span id="leaderWarningBadge" class="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-bold animate-bounce hidden">
-        ⚠️ 벙주 미선택
+    <!-- 🎯 검색창 우측 안쪽 인원수 뱃지 -->
+    <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+      <span id="selectedMemberBadge" class="text-[11px] bg-emerald-500 text-white px-2 py-0.5 rounded-lg font-black shadow-sm hidden">
+        선택 <span id="memberCountNum">0</span>명
       </span>
     </div>
   </div>
 
-  <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 px-4 rounded-xl w-full mb-2 text-xs bg-blue-50 border-blue-100 outline-none border">
   <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
 
   <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
     <div class="flex items-center justify-between mb-2">
       <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
       <div class="flex gap-2">
-        <!-- 1. 국립 체크박스 -->
         <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
           <input type="checkbox" id="isNationalParkCheck" class="w-3.5 h-3.5">
           <span class="text-[10px] font-black text-emerald-600">국립</span>
         </label>
-        <!-- 2. 산림청 체크박스 -->
         <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
           <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
           <span class="text-[10px] font-black text-blue-600">산림청</span>
         </label>
-        <!-- 3. BAC 체크박스 -->
         <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
           <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
           <span class="text-[10px] font-black text-red-500">BAC</span>
@@ -3339,6 +3339,40 @@ margin: 0 2px !important;
         <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border rounded px-1 text-center">
       </div>
     </div>
+
+
+  
+
+  <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+      <div class="flex gap-2">
+        <!-- 1. 국립 체크박스 -->
+        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+          <input type="checkbox" id="isNationalParkCheck" class="w-3.5 h-3.5">
+          <span class="text-[10px] font-black text-emerald-600">국립</span>
+        </label>
+        <!-- 2. 산림청 체크박스 -->
+        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+          <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+          <span class="text-[10px] font-black text-blue-600">산림청</span>
+        </label>
+        <!-- 3. BAC 체크박스 -->
+        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+          <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+          <span class="text-[10px] font-black text-red-500">BAC</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
+      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
+      </label>
+      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+        <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
+      </label>
+
 
     <!-- 등산한 산 이름 및 개별 단축 체크박스 영역 -->
     <div class="flex gap-2 mb-2 items-center">
@@ -4105,42 +4139,39 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
  
-  // ==========================================
-// 📌 인원 선택 카운트 & 벙주 깜빡임 실시간 자동 감지
+// ==========================================
+// 📌 검색창 우측 인원수 카운트 & 벙주 깜빡임 실시간 감지
 // ==========================================
 function updateSelectedMemberUI() {
-  // 1. multiMemberList 내 체크된 체크박스 개수 감지
+  // 체크박스 선택 수 확인
   const checkedBoxes = document.querySelectorAll('#multiMemberList input[type="checkbox"]:checked');
   const count = checkedBoxes.length;
 
-  const countBadge = document.getElementById('selectedMemberBadge');
+  const badge = document.getElementById('selectedMemberBadge');
   const countNum = document.getElementById('memberCountNum');
-  const leaderWarning = document.getElementById('leaderWarningBadge');
   
-  // 벙주(정기🚩) 체크박스 및 라벨
+  // 벙주 (정기🚩) 체크박스
   const isRegularCheck = document.getElementById('isRegularCheck');
   const isRegularLabel = isRegularCheck ? isRegularCheck.parentElement : null;
 
-  // 2. 선택 인원 수 뱃지 업데이트
+  // 1. 검색창 오른쪽 숫 표시
   if (count > 0) {
     if (countNum) countNum.innerText = count;
-    if (countBadge) countBadge.classList.remove('hidden');
+    if (badge) badge.classList.remove('hidden');
   } else {
-    if (countBadge) countBadge.classList.add('hidden');
+    if (badge) badge.classList.add('hidden');
   }
 
-  // 3. 인원이 1명 이상인데 벙주(정기🚩) 체크 안 됨 -> 경고 및 깜빡임
+  // 2. 인원 1명 이상인데 벙주(정기🚩) 안 켜졌으면 깜빡임
   if (count > 0 && isRegularCheck && !isRegularCheck.checked) {
     if (isRegularLabel) isRegularLabel.classList.add('blink-leader-alert');
-    if (leaderWarning) leaderWarning.classList.remove('hidden');
   } else {
     if (isRegularLabel) isRegularLabel.classList.remove('blink-leader-alert');
-    if (leaderWarning) leaderWarning.classList.add('hidden');
   }
 }
 
-// 회원이 비동기(Firebase)로 언제 로드되든 감지할 수 있도록 주기적 갱신
-setInterval(updateSelectedMemberUI, 300);
+// 0.2 초 간격 실시간 모니터링 (어떤 방식으로 회원을 불러오든 즉시 연동)
+setInterval(updateSelectedMemberUI, 200);
 
            
 
