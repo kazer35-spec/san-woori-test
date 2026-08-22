@@ -3398,21 +3398,22 @@ margin: 0 2px !important;
 </div>
 
 <!-- 높이 및 UP 수량 설정 -->
-<div class="flex gap-2 mb-2 items-center">
-  <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white">
-  <div class="h-9 flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border border-gray-200">
-    <span class="text-[10px] font-bold text-gray-400 shrink-0">UP:</span>
-    <div class="up-amount-group !mb-0 !p-0 border-none flex items-center justify-between w-full">
-      <label class="!text-[10px] flex items-center gap-0.5 cursor-pointer"><input type="radio" name="upAmount" value="0">0</label>
-      <label class="!text-[10px] flex items-center gap-0.5 cursor-pointer"><input type="radio" name="upAmount" value="1" checked>1</label>
-      <label class="!text-[10px] flex items-center gap-0.5 cursor-pointer"><input type="radio" name="upAmount" value="2">2</label>
-      <label class="!text-[10px] flex items-center gap-0.5 cursor-pointer"><input type="radio" name="upAmount" value="3">3</label>
-      <label class="flex items-center cursor-pointer ml-1">
-        <input type="checkbox" id="isQuarterCheck" class="w-3.5 h-3.5 accent-red-500">
-      </label>
+    <div class="flex gap-2 mb-2">
+      <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
+      <div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
+        <span class="text-[9px] font-bold text-gray-400">UP:</span>
+        <div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
+          <label class="!text-[9px]"><input type="radio" name="upAmount" value="0">0</label>
+          <label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
+          <label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
+          <label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
+          <label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
+            <input type="checkbox" id="isQuarterCheck">
+          </label>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+
 
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
