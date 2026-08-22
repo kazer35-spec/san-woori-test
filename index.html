@@ -8156,41 +8156,46 @@ window.toggleModal = (show) => {
   }
 };
 
+let searchTimer = null; // 1초 대기를 위한 타이머 변수
+
 window.filterAdminMemberList = () => {
-  const inputVal = document.getElementById('adminSearchInput').value.toLowerCase().trim();
-  
-  // 공백, 쉼표, 슬래시 등으로 입력된 이름 분리 ("재용/이네/튜브" -> ["재용", "이네", "튜브"])
-  const searchNames = inputVal.split(/[\s,/]+/).filter(name => name.length > 0);
+  // 사용자가 타이핑하는 동안 기존 타이머 취소 (1초 타이머 리셋)
+  if (searchTimer) clearTimeout(searchTimer);
 
-  document.querySelectorAll('.admin-member-row, #multiMemberList label, #multiMemberList > div').forEach(card => { 
-    const rowText = card.innerText.toLowerCase().trim();
-    
-    if (searchNames.length === 0) {
-      // 검색어가 없으면 전체 표시
-      card.style.setProperty('display', 'flex', 'important');
-    } else {
-      // 입력된 이름 중 포함된 회원 확인
+  const inputVal = document.getElementById('adminSearchInput').value.trim().toLowerCase();
+
+  // 입력창을 다 지우면 전체 카드를 모두 숨김없이 원래대로 표시만 함
+  if (!inputVal) return;
+
+  // 1초(1000ms) 동안 추가 입력이 없을 때 실행
+  searchTimer = setTimeout(() => {
+    // 공백, 쉼표, 슬래시 등으로 검색 이름 분리 ("그니 길치" -> ["그니", "길치"])
+    const searchNames = inputVal.split(/[\s,/]+/).filter(name => name.length >= 2); // 🎯 2글자 이상만 추출
+    if (searchNames.length === 0) return;
+
+    // 전체 회원 카드 순회 (화면에서 숨기지 않음!)
+    document.querySelectorAll('.admin-member-row, #multiMemberList label, #multiMemberList > div').forEach(card => {
+      const rowText = card.innerText.trim().toLowerCase();
+
+      // 입력한 이름(2글자 이상)과 완벽히 또는 부분 일치하는지 확인
       const isMatched = searchNames.some(name => rowText.includes(name));
-      
-      // 검색어와 맞는 카드만 화면에 남김
-      card.style.setProperty('display', isMatched ? 'flex' : 'none', 'important');
 
-      // 🎯 오른쪽 사진처럼 카드 클릭(선택) 처리 (체크박스 체크 X)
       if (isMatched) {
-        // 이미 선택된 상태(selected/active)가 아니라면 카드를 직접 클릭시켜서 테두리 초록색 적용
+        // 이미 선택된 상태가 아니라면 카드를 클릭하여 초록색 테두리 선택 적용
         const isAlreadySelected = card.classList.contains('selected') || card.classList.contains('active');
         if (!isAlreadySelected) {
-          card.click(); // 카드 자체 클릭 이벤트 실행
+          card.click(); // 기존 웹사이트의 카드 클릭 선택 이벤트 호출
         }
       }
-    }
-  });
+    });
 
-  // UI 카운트 갱신
-  if (typeof updateAdminSelectedMemberUI === 'function') {
-    updateAdminSelectedMemberUI();
-  }
+    // 상단 인원수 & 벙주 경고 UI 실시간 갱신
+    if (typeof updateAdminSelectedMemberUI === 'function') {
+      updateAdminSelectedMemberUI();
+    }
+  }, 1000); // 🎯 1초 대기 후 자동 선택
 };
+
 
 
 // -------------------------------------------------------------
