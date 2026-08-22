@@ -3358,7 +3358,7 @@ margin: 0 2px !important;
       <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲번외산행
     </label>
     <label class="flex items-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-teal-600">
-      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾인정트레킹
+      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾인트레킹
     </label>
   </div>
 </div>
@@ -3366,7 +3366,7 @@ margin: 0 2px !important;
 <!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 -->
 <div class="flex gap-2 mb-2 items-center w-full">
   <!-- 1. 수동 지역 선택 -->
-  <select id="adminManualRegionSelect" class="flex-1 h-9 text-[10px] font-black rounded-lg border border-blue-500 text-blue-600 px-1 outline-none bg-white min-w-0">
+  <select id="adminManualRegionSelect" class="flex-1 h-9 text-[10px] font-black rounded-lg border border-blue-500 text-blue-600 outline-none bg-white min-w-0" style="text-align: left !important; padding-left: 8px !important;">
     <option value="기타">📍 지역 선택 (선택 안함)</option>
     <option value="서울특별시">서울특별시</option>
     <option value="인천광역시">인천광역시</option>
@@ -3393,9 +3393,9 @@ margin: 0 2px !important;
       ⛰️일괄수정
     </button>
 
-    <!-- 3. 좌표 OFF 체크박스 -->
-    <label class="flex-1 h-9 px-1 flex items-center justify-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg">
-      <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표OFF
+    <!-- 3. 좌표 OFF 체크박스 (체크박스+글자 왼쪽으로 밀착) -->
+    <label class="flex-1 h-9 px-1.5 flex items-center justify-start gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg">
+      <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500 shrink-0"><span>좌표OFF</span>
     </label>
   </div>
 </div>
@@ -3423,7 +3423,7 @@ margin: 0 2px !important;
   <div id="adminMapMarker" class="map-point hidden"></div>
 </div>
 
-<!-- 좌표 표시 문구 (왼쪽 정렬 강제 지정) -->
+<!-- 좌표 표시 문구 -->
 <div id="coordDisplay" class="coordinate-display" style="text-align: left !important; padding-left: 4px;">좌표: 없음 (지도 클릭)</div>
 
 <!-- 날짜 입력 및 저장 버튼 -->
