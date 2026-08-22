@@ -3355,10 +3355,10 @@ margin: 0 2px !important;
   <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white min-w-0">
   <div class="w-[155px] shrink-0 bg-white px-1.5 h-9 flex items-center justify-between border border-gray-200 rounded-lg">
     <label class="flex items-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-amber-600">
-      <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲번외
+      <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲번외산행
     </label>
     <label class="flex items-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-teal-600">
-      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾인트레킹
+      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾인정트레킹
     </label>
   </div>
 </div>
@@ -3423,13 +3423,12 @@ margin: 0 2px !important;
   <div id="adminMapMarker" class="map-point hidden"></div>
 </div>
 
-<!-- 좌표 표시 문구 (왼쪽 정렬 적용) -->
-<div id="coordDisplay" class="coordinate-display !text-left px-1">좌표: 없음 (지도 클릭)</div>
+<!-- 좌표 표시 문구 (왼쪽 정렬 강제 지정) -->
+<div id="coordDisplay" class="coordinate-display" style="text-align: left !important; padding-left: 4px;">좌표: 없음 (지도 클릭)</div>
 
 <!-- 날짜 입력 및 저장 버튼 -->
 <input type="date" id="activityDate" class="h-9 text-xs border border-gray-200 rounded-lg px-2 outline-none bg-white w-full mb-2">
 <button onclick="addMultiActivity()" class="h-9 w-full text-xs font-bold bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg transition-colors flex items-center justify-center">기록 저장하기</button>
-
 
 
 
