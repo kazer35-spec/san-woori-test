@@ -3269,10 +3269,16 @@ margin: 0 2px !important;
 </div>
           
 <!-- 등산 기록 및 좌표 정복 관리 카드의 시작 -->
+<!-- 등산 기록 및 좌표 정복 관리 카드의 시작 -->
 <div class="card">
-  <div class="card-title text-blue-600 font-bold flex justify-between items-center">
+  <!-- 🎯 변경된 카드 타이틀 영역 (우측에 로그아웃 버튼 추가) -->
+  <div class="card-title text-blue-600 font-bold flex justify-between items-center mb-3">
     <span>📅 등산 기록 및 좌표 정복 관리</span>
+    <button onclick="logoutAdmin()" class="px-2.5 py-1 text-[11px] font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 transition-colors">
+      🚪 로그아웃
+    </button>
   </div>
+
 
 <!-- 회원 검색 입력창 및 우측 인원수/경고 표시 영역 -->
 <div class="relative w-full mb-2">
