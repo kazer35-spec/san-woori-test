@@ -3274,17 +3274,22 @@ margin: 0 2px !important;
     <span>📅 등산 기록 및 좌표 정복 관리</span>
   </div>
 
-  <!-- 회원 검색 입력창 및 우측 인원수 표시 영역 -->
-  <div class="relative w-full mb-2">
-    <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 pl-4 pr-24 rounded-xl w-full text-xs bg-blue-50 border-blue-100 outline-none border">
-    
-    <!-- 🎯 검색창 우측 안쪽 인원수 뱃지 -->
-    <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-      <span id="selectedMemberBadge" class="text-[11px] bg-emerald-500 text-white px-2 py-0.5 rounded-lg font-black shadow-sm hidden">
-        선택 <span id="memberCountNum">0</span>명
-      </span>
-    </div>
+<!-- 회원 검색 입력창 및 우측 인원수/경고 표시 영역 -->
+<div class="relative w-full mb-2">
+  <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 pl-4 pr-36 rounded-xl w-full text-xs bg-blue-50 border-blue-100 outline-none border">
+  
+  <!-- 🎯 검색창 우측 안쪽: 인원수 뱃지 + 벙주 경고 뱃지 -->
+  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+    <!-- 벙주 미선택 경고 -->
+    <span id="leaderWarningBadge" class="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-md font-bold hidden">
+      ⚠️ 벙주 미선택
+    </span>
+    <!-- 선택 인원수 카운트 -->
+    <span id="selectedMemberBadge" class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-md font-black shadow-sm hidden">
+      선택 <span id="memberCountNum">0</span>명
+    </span>
   </div>
+</div>
 
   <!-- 회원 목록 그리드 -->
   <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
@@ -3357,11 +3362,11 @@ margin: 0 2px !important;
       </div>
     </div>
           
-    <!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 (크기 및 높이 통일) -->
-<div class="flex gap-1.5 mb-2 items-center">
-  <!-- 1. 수동 지역 선택 -->
-  <select id="adminManualRegionSelect" class="region-select-mini flex-[1.2] h-9 text-xs rounded-lg border px-1 outline-none bg-white">
-    <option value="기타">📍 수동 지역 선택 (선택 안함)</option>
+    <!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 (모바일 1줄 맞춤) -->
+<div class="flex gap-1 mb-2 items-center w-full">
+  <!-- 1. 수동 지역 선택 (글자 크기 축소 및 너비 최적화) -->
+  <select id="adminManualRegionSelect" class="region-select-mini flex-1 h-9 text-[10px] font-bold rounded-lg border border-gray-200 px-1 outline-none bg-white min-w-0">
+    <option value="기타">📍 지역 선택 (선택 안함)</option>
     <option value="서울특별시">서울특별시</option>
     <option value="인천광역시">인천광역시</option>
     <option value="경기도">경기도</option>
@@ -3380,16 +3385,17 @@ margin: 0 2px !important;
     <option value="제주도">제주도</option>
   </select>
   
-  <!-- 2. 일괄수정 버튼 (텍스트 변경 및 크기 통일) -->
-  <button onclick="globalSyncMountainInfo()" class="flex-1 h-9 text-xs bg-red-50 text-red-600 border border-red-200 rounded-lg font-bold shrink-0 hover:bg-red-100 transition-colors flex items-center justify-center gap-0.5">
+  <!-- 2. 일괄수정 버튼 -->
+  <button onclick="globalSyncMountainInfo()" class="h-9 px-2 text-[10px] bg-red-50 text-red-600 border border-red-200 rounded-lg font-black shrink-0 hover:bg-red-100 transition-colors flex items-center justify-center gap-0.5 whitespace-nowrap">
     ⛰️ 일괄수정
   </button>
 
-  <!-- 3. 좌표 OFF 체크박스 (크기 및 높이 통일) -->
-  <label class="flex-1 h-9 flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap text-xs font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
+  <!-- 3. 좌표 OFF 체크박스 -->
+  <label class="h-9 px-2 flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
     <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
   </label>
 </div>
+
 
 
     <!-- 높이 및 UP 수량 설정 -->
@@ -4115,21 +4121,22 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
 // ==========================================
-// 📌 검색창 우측 인원수 카운트 & 벙주 깜빡임 실시간 감지
+// 📌 회원 선택 카운트 & 벙주 체크 실시간 감지
 // ==========================================
 function updateSelectedMemberUI() {
-  // 체크박스 선택 수 확인
+  // 1. multiMemberList 안에서 체크된 모든 체크박스 가져오기
   const checkedBoxes = document.querySelectorAll('#multiMemberList input[type="checkbox"]:checked');
   const count = checkedBoxes.length;
 
   const badge = document.getElementById('selectedMemberBadge');
   const countNum = document.getElementById('memberCountNum');
+  const leaderWarning = document.getElementById('leaderWarningBadge');
   
-  // 벙주 (정기🚩) 체크박스
+  // 벙주(정기🚩) 체크박스 및 라벨
   const isRegularCheck = document.getElementById('isRegularCheck');
   const isRegularLabel = isRegularCheck ? isRegularCheck.parentElement : null;
 
-  // 1. 검색창 오른쪽 숫 표시
+  // 2. 인원수 표시 갱신
   if (count > 0) {
     if (countNum) countNum.innerText = count;
     if (badge) badge.classList.remove('hidden');
@@ -4137,15 +4144,17 @@ function updateSelectedMemberUI() {
     if (badge) badge.classList.add('hidden');
   }
 
-  // 2. 인원 1명 이상인데 벙주(정기🚩) 안 켜졌으면 깜빡임
+  // 3. 인원 1명 이상인데 벙주(정기🚩) 안 켜졌으면 경고 표시 & 깜빡임
   if (count > 0 && isRegularCheck && !isRegularCheck.checked) {
+    if (leaderWarning) leaderWarning.classList.remove('hidden');
     if (isRegularLabel) isRegularLabel.classList.add('blink-leader-alert');
   } else {
+    if (leaderWarning) leaderWarning.classList.add('hidden');
     if (isRegularLabel) isRegularLabel.classList.remove('blink-leader-alert');
   }
 }
 
-// 0.2 초 간격 실시간 모니터링 (어떤 방식으로 회원을 불러오든 즉시 연동)
+// 0.2초마다 실시간 체크 (회원 목록을 비동기로 가져와도 무조건 작동)
 setInterval(updateSelectedMemberUI, 200);
 
            
