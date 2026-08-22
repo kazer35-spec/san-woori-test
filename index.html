@@ -8163,8 +8163,8 @@ window.filterAdminMemberList = () => {
   if (searchTimer) clearTimeout(searchTimer);
 
   const inputVal = document.getElementById('adminSearchInput').value.trim().toLowerCase();
-
-  // 입력창을 다 지우면 전체 카드를 모두 숨김없이 원래대로 표시만 함
+  
+  // 검색창이 비어있으면 동작 안 함
   if (!inputVal) return;
 
   // 1초(1000ms) 동안 추가 입력이 없을 때 실행
@@ -8173,18 +8173,29 @@ window.filterAdminMemberList = () => {
     const searchNames = inputVal.split(/[\s,/]+/).filter(name => name.length >= 2); // 🎯 2글자 이상만 추출
     if (searchNames.length === 0) return;
 
-    // 전체 회원 카드 순회 (화면에서 숨기지 않음!)
-    document.querySelectorAll('.admin-member-row, #multiMemberList label, #multiMemberList > div').forEach(card => {
-      const rowText = card.innerText.trim().toLowerCase();
+    // 현재 렌더링된 전체 회원 행(row) 순회
+    document.querySelectorAll('.admin-member-row').forEach(row => {
+      // 닉네임이 들어있는 왼쪽 영역 요소 찾기
+      const nameEl = row.querySelector('[onclick*="toggleSelectMember"]');
+      if (!nameEl) return;
 
-      // 입력한 이름(2글자 이상)과 완벽히 또는 부분 일치하는지 확인
+      const rowText = row.innerText.trim().toLowerCase();
       const isMatched = searchNames.some(name => rowText.includes(name));
 
       if (isMatched) {
-        // 이미 선택된 상태가 아니라면 카드를 클릭하여 초록색 테두리 선택 적용
-        const isAlreadySelected = card.classList.contains('selected') || card.classList.contains('active');
-        if (!isAlreadySelected) {
-          card.click(); // 기존 웹사이트의 카드 클릭 선택 이벤트 호출
+        // 🎯 현재 선택되어 있는지 확인 (selectedMemberIds Set 활용)
+        // onclick 속성 안에서 m.id 값을 추출하거나 row 내부 구조 분석
+        const onclickAttr = nameEl.getAttribute('onclick') || '';
+        const matchId = onclickAttr.match(/toggleSelectMember\(['"]([^'"]+)['"]/);
+        
+        if (matchId && matchId[1]) {
+          const memberId = matchId[1];
+          const isAlreadySelected = typeof selectedMemberIds !== 'undefined' && selectedMemberIds.has(memberId);
+
+          // 아직 선택되지 않은 상태라면 공식 선택 함수를 강제로 실행하여 녹색 테두리 및 데이터 동기화
+          if (!isAlreadySelected) {
+            window.toggleSelectMember(memberId, nameEl);
+          }
         }
       }
     });
