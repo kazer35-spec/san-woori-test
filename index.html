@@ -4106,12 +4106,10 @@ window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); ale
 
  
   // ==========================================
-// 📌 [신규] 인원 선택 카운터 및 벙주 미체크 감지 로직
+// 📌 인원 선택 카운트 & 벙주 깜빡임 실시간 자동 감지
 // ==========================================
-
-// 회원 선택 상태 및 벙주 체크 확인 함수
-function updateMemberSelectionState() {
-  // 1. multiMemberList 내의 선택된 체크박스 감지
+function updateSelectedMemberUI() {
+  // 1. multiMemberList 내 체크된 체크박스 개수 감지
   const checkedBoxes = document.querySelectorAll('#multiMemberList input[type="checkbox"]:checked');
   const count = checkedBoxes.length;
 
@@ -4119,11 +4117,11 @@ function updateMemberSelectionState() {
   const countNum = document.getElementById('memberCountNum');
   const leaderWarning = document.getElementById('leaderWarningBadge');
   
-  // 벙주 (정기🚩) 체크박스
+  // 벙주(정기🚩) 체크박스 및 라벨
   const isRegularCheck = document.getElementById('isRegularCheck');
   const isRegularLabel = isRegularCheck ? isRegularCheck.parentElement : null;
 
-  // 2. 선택 인원 수 뱃지 표시
+  // 2. 선택 인원 수 뱃지 업데이트
   if (count > 0) {
     if (countNum) countNum.innerText = count;
     if (countBadge) countBadge.classList.remove('hidden');
@@ -4131,23 +4129,19 @@ function updateMemberSelectionState() {
     if (countBadge) countBadge.classList.add('hidden');
   }
 
-  // 3. 인원이 1명 이상인데 벙주(정기🚩)가 체크되지 않은 경우 경고 및 깜빡임
+  // 3. 인원이 1명 이상인데 벙주(정기🚩) 체크 안 됨 -> 경고 및 깜빡임
   if (count > 0 && isRegularCheck && !isRegularCheck.checked) {
-    if (isRegularLabel) isRegularLabel.classList.add('blink-leader');
+    if (isRegularLabel) isRegularLabel.classList.add('blink-leader-alert');
     if (leaderWarning) leaderWarning.classList.remove('hidden');
   } else {
-    if (isRegularLabel) isRegularLabel.classList.remove('blink-leader');
+    if (isRegularLabel) isRegularLabel.classList.remove('blink-leader-alert');
     if (leaderWarning) leaderWarning.classList.add('hidden');
   }
 }
 
-// 회원을 클릭하거나 정기(벙주) 체크박스를 누를 때 자동으로 동작하도록 이벤트 연결
-document.addEventListener('change', function(e) {
-  if (e.target.closest('#multiMemberList') || e.target.id === 'isRegularCheck') {
-    updateMemberSelectionState();
-  }
-});
-           
+// 회원이 비동기(Firebase)로 언제 로드되든 감지할 수 있도록 주기적 갱신
+setInterval(updateSelectedMemberUI, 300);
+
            
 
 // ─── 1. 한글 초성 유틸리티 ───
