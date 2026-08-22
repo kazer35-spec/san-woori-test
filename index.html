@@ -3363,9 +3363,9 @@ margin: 0 2px !important;
   </div>
 </div>
       
-<!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 (모바일 1줄 맞춤) -->
-<div class="flex gap-1 mb-2 items-center w-full">
-  <!-- 1. 수동 지역 선택 (36px 높이 맞춤 + 파란색 테두리/글씨 유지) -->
+<!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 (수직 라인 일치 조정) -->
+<div class="flex gap-2 mb-2 items-center w-full">
+  <!-- 1. 수동 지역 선택 (왼쪽 입력창과 동일하게 flex-1) -->
   <select id="adminManualRegionSelect" class="flex-1 h-9 text-[10px] font-black rounded-lg border border-blue-500 text-blue-600 px-1 outline-none bg-white min-w-0">
     <option value="기타">📍 지역 선택 (선택 안함)</option>
     <option value="서울특별시">서울특별시</option>
@@ -3386,46 +3386,48 @@ margin: 0 2px !important;
     <option value="제주도">제주도</option>
   </select>
   
-  <!-- 2. 일괄수정 버튼 -->
-  <button onclick="globalSyncMountainInfo()" class="h-9 px-2 text-[10px] bg-red-50 text-red-600 border border-red-200 rounded-lg font-black shrink-0 hover:bg-red-100 transition-colors flex items-center justify-center gap-0.5 whitespace-nowrap">
-    ⛰️ 일괄수정
-  </button>
+  <!-- 오른쪽 상자 영역 (위/아래 오른쪽 박스와 수직 라인 맞춤) -->
+  <div class="flex gap-1 shrink-0">
+    <!-- 2. 일괄수정 버튼 -->
+    <button onclick="globalSyncMountainInfo()" class="h-9 px-1.5 text-[10px] bg-red-50 text-red-600 border border-red-200 rounded-lg font-black hover:bg-red-100 transition-colors flex items-center justify-center gap-0.5 whitespace-nowrap">
+      ⛰️ 일괄수정
+    </button>
 
-  <!-- 3. 좌표 OFF 체크박스 -->
-  <label class="h-9 px-2 flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
-    <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
-  </label>
+    <!-- 3. 좌표 OFF 체크박스 -->
+    <label class="h-9 px-1.5 flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg">
+      <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
+    </label>
+  </div>
 </div>
 
 <!-- 높이 및 UP 수량 설정 -->
-    <div class="flex gap-2 mb-2">
-      <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border rounded-lg px-2 outline-none">
-      <div class="flex-1 flex gap-1 items-center bg-white px-2 rounded-lg border">
-        <span class="text-[9px] font-bold text-gray-400">UP:</span>
-        <div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none">
-          <label class="!text-[9px]"><input type="radio" name="upAmount" value="0">0</label>
-          <label class="!text-[9px]"><input type="radio" name="upAmount" value="1" checked>1</label>
-          <label class="!text-[9px]"><input type="radio" name="upAmount" value="2">2</label>
-          <label class="!text-[9px]"><input type="radio" name="upAmount" value="3">3</label>
-          <label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; vertical-align: middle;">
-            <input type="checkbox" id="isQuarterCheck">
-          </label>
-        </div>
-      </div>
+<div class="flex gap-2 mb-2 items-center">
+  <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white">
+  <div class="h-9 shrink-0 flex gap-1 items-center bg-white px-2 rounded-lg border border-gray-200">
+    <span class="text-[9px] font-bold text-gray-400">UP:</span>
+    <div class="up-amount-group !mb-0 !h-[30px] !p-0.5 border-none flex items-center gap-1">
+      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="0">0</label>
+      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="1" checked>1</label>
+      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="2">2</label>
+      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="3">3</label>
+      <label style="margin-left: 9px; font-size: 13px; color: #ff4d4d; cursor: pointer; display: flex; align-items: center;">
+        <input type="checkbox" id="isQuarterCheck" class="w-3.5 h-3.5 accent-red-500">
+      </label>
     </div>
-
-
-    <!-- 지도 영역 -->
-    <div class="map-container" onclick="setAdminCoordinate(event)">
-      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
-      <div id="adminMapMarker" class="map-point hidden"></div>
-    </div>
-    <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
   </div>
-
-  <input type="date" id="activityDate" class="input-gap">
-  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
 </div>
+
+<!-- 지도 영역 -->
+<div class="map-container" onclick="setAdminCoordinate(event)">
+  <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+  <div id="adminMapMarker" class="map-point hidden"></div>
+</div>
+<div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
+
+<!-- 날짜 입력 및 저장 버튼 -->
+<input type="date" id="activityDate" class="h-9 text-xs border border-gray-200 rounded-lg px-2 outline-none bg-white w-full mb-2">
+<button onclick="addMultiActivity()" class="h-9 w-full text-xs font-bold bg-blue-500 hover:bg-blue-600 text-white border-none rounded-lg transition-colors flex items-center justify-center">기록 저장하기</button>
+
 
 
 
