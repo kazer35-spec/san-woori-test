@@ -8159,35 +8159,34 @@ window.toggleModal = (show) => {
 window.filterAdminMemberList = () => {
   const inputVal = document.getElementById('adminSearchInput').value.toLowerCase().trim();
   
-  // 1. 공백, 쉼표, 슬래시 등으로 입력된 이름들 분리 ("오즈 구름 나스" -> ["오즈", "구름", "나스"])
-  const searchNames = inputVal.split(/[\s,+/]+/).filter(name => name.length > 0);
+  // 공백, 쉼표, 슬래시 등으로 입력된 이름 분리 ("재용/이네/튜브" -> ["재용", "이네", "튜브"])
+  const searchNames = inputVal.split(/[\s,/]+/).filter(name => name.length > 0);
 
-  document.querySelectorAll('.admin-member-row').forEach(c => { 
-    const rowText = c.innerText.toLowerCase().trim();
+  document.querySelectorAll('.admin-member-row, #multiMemberList label, #multiMemberList > div').forEach(card => { 
+    const rowText = card.innerText.toLowerCase().trim();
     
     if (searchNames.length === 0) {
-      // 검색어가 비어있을 때는 전체 항목을 보여줌
-      c.style.setProperty('display', 'flex', 'important');
+      // 검색어가 없으면 전체 표시
+      card.style.setProperty('display', 'flex', 'important');
     } else {
-      // 입력된 이름 중 하나라도 포함되어 있는지 검사
+      // 입력된 이름 중 포함된 회원 확인
       const isMatched = searchNames.some(name => rowText.includes(name));
       
-      // 2. 검색어와 일치하는 카드만 화면에 표시 (필터링)
-      c.style.setProperty('display', isMatched ? 'flex' : 'none', 'important');
+      // 검색어와 맞는 카드만 화면에 남김
+      card.style.setProperty('display', isMatched ? 'flex' : 'none', 'important');
 
-      // 3. 일치하는 카드의 체크박스는 자동으로 체크
+      // 🎯 오른쪽 사진처럼 카드 클릭(선택) 처리 (체크박스 체크 X)
       if (isMatched) {
-        const checkbox = c.querySelector('input[type="checkbox"]');
-        if (checkbox && !checkbox.checked) {
-          checkbox.checked = true;
-          // 기존 시스템의 선택 데이터(Set/Array)도 연동되도록 이벤트 발생
-          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        // 이미 선택된 상태(selected/active)가 아니라면 카드를 직접 클릭시켜서 테두리 초록색 적용
+        const isAlreadySelected = card.classList.contains('selected') || card.classList.contains('active');
+        if (!isAlreadySelected) {
+          card.click(); // 카드 자체 클릭 이벤트 실행
         }
       }
     }
   });
 
-  // UI 실시간 카운트 갱신
+  // UI 카운트 갱신
   if (typeof updateAdminSelectedMemberUI === 'function') {
     updateAdminSelectedMemberUI();
   }
