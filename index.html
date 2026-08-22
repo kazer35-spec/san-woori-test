@@ -3392,15 +3392,14 @@ margin: 0 2px !important;
       ⛰️일괄수정
     </button>
 
-  <!-- 3. 좌표 OFF 체크박스 -->
-  <label class="h-9 px-2 flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
-    <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
-  </label>
+    <!-- 3. 좌표 OFF 체크박스 (왼쪽 정렬 justify-start 및 px-2 적용) -->
+    <label class="h-9 px-2 flex items-center justify-start gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
+      <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
+    </label>
+  </div>
 </div>
 
-
-
-    <!-- 높이 및 UP 수량 설정 -->
+<!-- 높이 및 UP 수량 설정 -->
 <div class="flex gap-2 mb-2 items-center w-full">
   <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white min-w-0">
   <div class="w-[155px] shrink-0 h-9 flex items-center justify-between bg-white px-1.5 rounded-lg border border-gray-200">
