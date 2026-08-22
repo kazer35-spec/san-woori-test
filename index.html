@@ -4119,45 +4119,56 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
- 
 // ==========================================
-// 📌 회원 선택 카운트 & 벙주 체크 실시간 감지
+// 📌 회원 선택 수 & 벙주 체크 실시간 감지 통합 로직
 // ==========================================
-function updateSelectedMemberUI() {
-  // 1. multiMemberList 안에서 체크된 모든 체크박스 가져오기
-  const checkedBoxes = document.querySelectorAll('#multiMemberList input[type="checkbox"]:checked');
-  const count = checkedBoxes.length;
-
+function updateAdminSelectedMemberUI() {
   const badge = document.getElementById('selectedMemberBadge');
   const countNum = document.getElementById('memberCountNum');
   const leaderWarning = document.getElementById('leaderWarningBadge');
-  
-  // 벙주(정기🚩) 체크박스 및 라벨
-  const isRegularCheck = document.getElementById('isRegularCheck');
-  const isRegularLabel = isRegularCheck ? isRegularCheck.parentElement : null;
 
-  // 2. 인원수 표시 갱신
-  if (count > 0) {
-    if (countNum) countNum.innerText = count;
-    if (badge) badge.classList.remove('hidden');
-  } else {
-    if (badge) badge.classList.add('hidden');
+  if (!badge || !countNum) return;
+
+  // 1. 다양한 형태의 선택 요소 스캔 (체크박스, selected 클래스, global Set 등)
+  const checkedBoxes = document.querySelectorAll('#multiMemberList input:checked, .admin-member-row input:checked');
+  const activeCards = document.querySelectorAll('#multiMemberList .selected, #multiMemberList .active, .admin-member-row.selected, .admin-member-row.active');
+  
+  // 전역 변수(Set/Array)로 관리되는 경우도 함께 체크
+  let globalSetCount = 0;
+  if (typeof selectedMemberIds !== 'undefined' && selectedMemberIds instanceof Set) {
+    globalSetCount = selectedMemberIds.size;
+  } else if (typeof selectedMembers !== 'undefined' && Array.isArray(selectedMembers)) {
+    globalSetCount = selectedMembers.length;
   }
 
-  // 3. 인원 1명 이상인데 벙주(정기🚩) 안 켜졌으면 경고 표시 & 깜빡임
-  if (count > 0 && isRegularCheck && !isRegularCheck.checked) {
-    if (leaderWarning) leaderWarning.classList.remove('hidden');
-    if (isRegularLabel) isRegularLabel.classList.add('blink-leader-alert');
+  // 감지된 인원수 중 가장 큰 값 채택
+  const count = Math.max(checkedBoxes.length, activeCards.length, globalSetCount);
+
+  // 2. 벙주(정기🚩) 체크박스 상태 확인
+  const isRegularCheck = document.getElementById('isRegularCheck');
+  const isRegularChecked = isRegularCheck ? isRegularCheck.checked : false;
+
+  // 3. UI 갱신 (선택 뱃지 및 벙주 미선택 경고)
+  if (count > 0) {
+    countNum.innerText = count;
+    badge.classList.remove('hidden');
+
+    // 인원 1명 이상인데 벙주(정기🚩) 미체크 시 경고 표시
+    if (!isRegularChecked && leaderWarning) {
+      leaderWarning.classList.remove('hidden');
+    } else if (leaderWarning) {
+      leaderWarning.classList.add('hidden');
+    }
   } else {
+    badge.classList.add('hidden');
     if (leaderWarning) leaderWarning.classList.add('hidden');
-    if (isRegularLabel) isRegularLabel.classList.remove('blink-leader-alert');
   }
 }
 
-// 0.2초마다 실시간 체크 (회원 목록을 비동기로 가져와도 무조건 작동)
-setInterval(updateSelectedMemberUI, 200);
+// 0.15초마다 실시간으로 선택 상태 감지
+setInterval(updateAdminSelectedMemberUI, 150);
 
-           
+        
 
 // ─── 1. 한글 초성 유틸리티 ───
 const CHOSUNG_LIST = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
