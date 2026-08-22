@@ -8156,17 +8156,43 @@ window.toggleModal = (show) => {
   }
 };
 
-// ==========================================================================
-// 🔍 [수정] 회원 이름 검색 필터 함수 (그리드 레이아웃 유지를 위해 block 대신 flex로 원복)
-// ==========================================================================
-if (typeof status !== 'undefined' && status) status.innerText = "EXPLOSIVE PASSION";
-
 window.filterAdminMemberList = () => {
-  const q = document.getElementById('adminSearchInput').value.toLowerCase();
+  const inputVal = document.getElementById('adminSearchInput').value.toLowerCase().trim();
+  
+  // 1. 공백, 쉼표, 슬래시 등으로 입력된 이름들 분리 ("오즈 구름 나스" -> ["오즈", "구름", "나스"])
+  const searchNames = inputVal.split(/[\s,+/]+/).filter(name => name.length > 0);
+
   document.querySelectorAll('.admin-member-row').forEach(c => { 
-    c.style.setProperty('display', c.innerText.toLowerCase().includes(q) ? 'flex' : 'none', 'important'); 
+    const rowText = c.innerText.toLowerCase().trim();
+    
+    if (searchNames.length === 0) {
+      // 검색어가 비어있을 때는 전체 항목을 보여줌
+      c.style.setProperty('display', 'flex', 'important');
+    } else {
+      // 입력된 이름 중 하나라도 포함되어 있는지 검사
+      const isMatched = searchNames.some(name => rowText.includes(name));
+      
+      // 2. 검색어와 일치하는 카드만 화면에 표시 (필터링)
+      c.style.setProperty('display', isMatched ? 'flex' : 'none', 'important');
+
+      // 3. 일치하는 카드의 체크박스는 자동으로 체크
+      if (isMatched) {
+        const checkbox = c.querySelector('input[type="checkbox"]');
+        if (checkbox && !checkbox.checked) {
+          checkbox.checked = true;
+          // 기존 시스템의 선택 데이터(Set/Array)도 연동되도록 이벤트 발생
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    }
   });
+
+  // UI 실시간 카운트 갱신
+  if (typeof updateAdminSelectedMemberUI === 'function') {
+    updateAdminSelectedMemberUI();
+  }
 };
+
 
 // -------------------------------------------------------------
 // 0. 캐시 객체 및 데이터 세팅 (Firestore 호출 최소화)
