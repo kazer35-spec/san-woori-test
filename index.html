@@ -8307,7 +8307,7 @@ window.showMemberMountain = async (mId, mName) => {
     const existingBlast = document.getElementById('mwSupernovaBlast');
     if (existingBlast) existingBlast.remove();
 
-    // 헤더 타이틀 셋팅
+    // 헤더 및 TOTAL 라벨 배치 (두 번째 영상 레이아웃)
     if (mwMountainName) {
         mwMountainName.className = 'cosmic-neon-text';
         mwMountainName.style.cssText = 'display: flex; justify-content: space-between; align-items: center; width: 100%;';
@@ -8322,14 +8322,15 @@ window.showMemberMountain = async (mId, mName) => {
         `;
     }
 
-    // 빔 애니메이션 초기화
-    const initializeBeam = (b) => {
+    // [2] 빔 애니메이션 리셋
+    const resetBeam = (b) => {
         if (!b) return;
         b.style.transition = 'none';
         b.style.opacity = '0';
-        b.style.height = '0';
+        b.style.height = '0%';
     };
-    [beam, ringBeam].forEach(initializeBeam);
+    resetBeam(beam);
+    resetBeam(ringBeam);
 
     if (peakLabel) peakLabel.innerText = "";
     peakLayer.innerHTML = bgContainer.innerHTML = sky.innerHTML = "";
@@ -8343,7 +8344,7 @@ window.showMemberMountain = async (mId, mName) => {
     if (beam) beam.style.setProperty('--beam-color', style.border);
     if (ringBeam) ringBeam.style.setProperty('--beam-color', style.border);
 
-    // [2] 배경 별빛 입자 생성
+    // [3] 배경 별빛 생성
     const starFragment = document.createDocumentFragment();
     for (let i = 0; i < 70; i++) {
         const star = document.createElement('div');
@@ -8368,28 +8369,17 @@ window.showMemberMountain = async (mId, mName) => {
     if (ringLaunchedEl) ringLaunchedEl.style.opacity = '0';
 
     try {
-        // [3] 분기별 및 전체 산행 횟수 산출
+        // [4] 데이터 산출
         let pureHikeCount = 0;
-        let hasQuarterlyHike = false;
-
         if (memberInfo && memberInfo.quarterlyStats) {
             const stats = memberInfo.quarterlyStats;
-            const baseCount = (stats['2026_q2'] && typeof stats['2026_q2'].hike === 'number') ? stats['2026_q2'].hike : 0;
-            if (baseCount > 0) hasQuarterlyHike = true;
-            pureHikeCount += baseCount;
-
             Object.keys(stats).forEach(key => {
-                if (key >= '2026_q3') {
-                    const quarter = stats[key];
-                    if (quarter && typeof quarter.hike === 'number') {
-                        if (quarter.hike > 0) hasQuarterlyHike = true;
-                        pureHikeCount += quarter.hike;
-                    }
+                if (stats[key] && typeof stats[key].hike === 'number') {
+                    pureHikeCount += stats[key].hike;
                 }
             });
         }
-
-        if (!hasQuarterlyHike || pureHikeCount === 0) {
+        if (pureHikeCount === 0) {
             pureHikeCount = (memberInfo && typeof memberInfo.count === 'number') ? memberInfo.count : 0;
         }
 
@@ -8400,11 +8390,9 @@ window.showMemberMountain = async (mId, mName) => {
             totalCountEl.innerHTML = `🏔️TOTAL: ${pureHikeCount}회`;
         }
 
-        // [4] 데이터 캐싱 및 로드
-        let allLogs;
-        if (window.mountainDataCache[mId]) {
-            allLogs = window.mountainDataCache[mId];
-        } else {
+        // 로그 데이터 로드
+        let allLogs = window.mountainDataCache[mId];
+        if (!allLogs) {
             const q = query(collection(db, `sanwoori/${mId}/logs`), limit(100));
             const snap = await getDocs(q);
             allLogs = snap.docs.map(d => d.data());
@@ -8413,7 +8401,7 @@ window.showMemberMountain = async (mId, mName) => {
 
         let logs = allLogs.filter(l => (l.height || 0) > 0 && (!l.isSpecial || l.isExtraHike));
 
-        // [5] 산맥 렌더링
+        // [5] 산맥 피크 생성
         if (logs.length > 0) {
             const heights = logs.map(l => l.height);
             const maxHeight = Math.max(...heights);
@@ -8428,7 +8416,7 @@ window.showMemberMountain = async (mId, mName) => {
                 peakLabel.innerHTML = `<span style="background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 10px;">${maxLog.mountain} (${maxLog.height}m)</span>`;
             }
 
-            // 원경 산맥 레이어 생성
+            // 원경 산맥
             const layerCount = Math.min(Math.floor(globalH / 15000) + 2, 4);
             for (let i = 1; i <= layerCount; i++) {
                 const layer = document.createElement('div');
@@ -8444,22 +8432,13 @@ window.showMemberMountain = async (mId, mName) => {
                 bgContainer.appendChild(layer);
             }
 
-            // 근경 산맥 (실제 기록 피크) 생성
-            const darkRedCount = pureHikeCount > 100 ? pureHikeCount - 100 : 0;
-            let mappedPeaks = logs.map((log, index) => ({
-                log,
-                isMax: log.height === maxHeight,
-                isDarkRed: !(log.height === maxHeight) && (index < darkRedCount)
-            }));
-
-            // 렌더링 믹싱
-            mappedPeaks.sort(() => Math.random() - 0.5);
-
+            // 근경 산맥
             peakLayer.style.height = "70%";
-            mappedPeaks.forEach(({ log, isMax, isDarkRed }) => {
+            logs.forEach(log => {
+                const isMax = log.height === maxHeight;
                 const hRatio = (log.height / maxHeight) * 100;
                 const peakDiv = document.createElement('div');
-                peakDiv.className = `peak ${isMax ? 'max-height' : ''} ${isDarkRed ? 'dark-red-peak' : ''}`;
+                peakDiv.className = `peak ${isMax ? 'max-height' : ''}`;
                 peakDiv.style.height = `${hRatio}%`;
 
                 if (isMax) {
@@ -8468,70 +8447,55 @@ window.showMemberMountain = async (mId, mName) => {
                 peakLayer.appendChild(peakDiv);
             });
 
-            // [6] 광선 및 초신성 시퀀스 애니메이션 실행
+            // [6] 두 번째 영상 방식의 광선 연출 시퀀스 (통합 수직 상승)
             setTimeout(() => {
+                // 하단에서 상단 코어까지 한번에 솟구치는 빛줄기
                 if (beam) {
-                    beam.style.background = `linear-gradient(to top, transparent, ${style.border}, rgba(255,255,255,0.8))`;
+                    beam.style.background = `linear-gradient(to top, transparent, ${style.border}, #ffffff)`;
                     beam.style.opacity = '0.9';
-                    beam.style.transition = 'height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                    beam.style.height = '100%';
+                    beam.style.transition = 'height 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                    beam.style.height = '140%'; // 나이테 중앙 코어 위치까지 도달하도록 상향
                 }
 
-                setTimeout(() => {
-                    if (ringBeam) {
-                        ringBeam.style.background = `linear-gradient(to top, ${style.border}, transparent)`;
-                        ringBeam.style.opacity = '0.9';
-                        ringBeam.style.transition = 'height 0.5s ease-out';
-                        ringBeam.style.height = '60%';
+                setTimeout(async () => {
+                    // 빛줄기가 정점에 도달한 뒤 나이테 및 TOTAL 회수 표출
+                    if (memberInfo) {
+                        await window.renderTreeRings(mId, mName, memberInfo.regDate || memberInfo.lastDate, memberInfo.level || 0);
                     }
 
-                    setTimeout(async () => {
-                        // 100회 이상 달성 시 초신성 이펙트
-                        if (pureHikeCount >= 100) {
-                            const totalWrapper = document.getElementById('mwHikeTotalWrapper');
-                            if (totalWrapper && !document.getElementById('mwSupernovaBlast')) {
-                                const blast = document.createElement('div');
-                                blast.id = 'mwSupernovaBlast';
-                                blast.className = 'supernova-blast';
-                                blast.style.setProperty('--blast-color', style.border);
-                                totalWrapper.appendChild(blast);
-                                requestAnimationFrame(() => blast.classList.add('blast-active'));
-                            }
+                    // 100회 초신성 이펙트
+                    if (pureHikeCount >= 100) {
+                        const totalWrapper = document.getElementById('mwHikeTotalWrapper');
+                        if (totalWrapper && !document.getElementById('mwSupernovaBlast')) {
+                            const blast = document.createElement('div');
+                            blast.id = 'mwSupernovaBlast';
+                            blast.className = 'supernova-blast';
+                            blast.style.setProperty('--blast-color', style.border);
+                            totalWrapper.appendChild(blast);
+                            requestAnimationFrame(() => blast.classList.add('blast-active'));
                         }
+                    }
 
-                        // 상단 나이테 그리기 실행
-                        if (memberInfo) {
-                            await window.renderTreeRings(mId, mName, memberInfo.regDate || memberInfo.lastDate, memberInfo.level || 0);
-                        }
+                    // 빛줄기 자연스럽게 페이드아웃
+                    if (beam) {
+                        beam.style.transition = 'opacity 0.6s ease-out';
+                        beam.style.opacity = '0';
+                    }
 
-                        [beam, ringBeam].forEach(b => {
-                            if (b) { b.style.transition = 'opacity 0.6s ease-out'; b.style.opacity = '0'; }
-                        });
-
-                        card.classList.add('glow-active');
-                        if (totalCountEl) totalCountEl.style.opacity = '1';
-                        if (ringLaunchedEl) ringLaunchedEl.style.opacity = '1';
-                    }, 400);
-                }, 300);
+                    card.classList.add('glow-active');
+                    if (totalCountEl) totalCountEl.style.opacity = '1';
+                    if (ringLaunchedEl) ringLaunchedEl.style.opacity = '1';
+                }, 450);
             }, 300);
 
-        } else {
-            // 산행 데이터가 없는 유저 처리
-            if (document.getElementById('myTotalH')) document.getElementById('myTotalH').innerText = "0";
-            if (document.getElementById('globalTotalH')) document.getElementById('globalTotalH').innerText = "0";
-            if (peakLabel) peakLabel.innerHTML = `<span style="font-size: 10px; opacity: 0.6;">아직 기록된 산이 없습니다</span>`;
-
-            if (memberInfo) {
-                await window.renderTreeRings(mId, mName, memberInfo.regDate || memberInfo.lastDate, memberInfo.level || 0);
-            }
-            card.classList.add('glow-active');
-            if (totalCountEl) totalCountEl.style.opacity = '1';
-            if (ringLaunchedEl) ringLaunchedEl.style.opacity = '1';
         }
     } catch (e) {
-        console.error("통합 창 로딩 에러:", e);
+        console.error("수정 연출 로딩 에러:", e);
     }
 };
+
+    
+                        
 
 /**
  * [활동 나이테 SVG 랜더링 함수]
