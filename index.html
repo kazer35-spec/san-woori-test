@@ -3348,7 +3348,7 @@ margin: 0 2px !important;
       <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
     </div>
     <div class="flex-1 flex items-center gap-1">
-      <span class="text-[9px] text-gray-400 shrink-0">🌿숲</span>
+      <span class="text-[9px] text-gray-400 shrink-0">🌿숲속</span>
       <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
     </div>
     <div class="flex-1 flex items-center gap-1">
@@ -3362,21 +3362,25 @@ margin: 0 2px !important;
     </button>
   </div>
 
-  <!-- 🎯 누르면 드롭다운/슬라이드로 펼쳐지는 계절 선택 영역 -->
-  <div id="seasonMarkBox" class="hidden mt-2 pt-1.5 border-t border-pink-100/60 flex items-center justify-around bg-white/80 p-1.5 rounded-md shadow-inner">
-    <label class="text-[10px] flex items-center gap-1 cursor-pointer font-bold text-pink-600">
-      <input type="checkbox" id="isSpringMarkCheck" onchange="selectOnlyOneSeason('isSpringMarkCheck')" class="w-3.5 h-3.5 accent-pink-500"> 🌸 봄
-    </label>
-    <label class="text-[10px] flex items-center gap-1 cursor-pointer font-bold text-emerald-600">
-      <input type="checkbox" id="isSummerMarkCheck" onchange="selectOnlyOneSeason('isSummerMarkCheck')" class="w-3.5 h-3.5 accent-emerald-500"> 🍀 여름
-    </label>
-    <label class="text-[10px] flex items-center gap-1 cursor-pointer font-bold text-amber-600">
-      <input type="checkbox" id="isFallMarkCheck" onchange="selectOnlyOneSeason('isFallMarkCheck')" class="w-3.5 h-3.5 accent-amber-500"> 🍁 가을
-    </label>
-    <label class="text-[10px] flex items-center gap-1 cursor-pointer font-bold text-sky-600">
-      <input type="checkbox" id="isWinterMarkCheck" onchange="selectOnlyOneSeason('isWinterMarkCheck')" class="w-3.5 h-3.5 accent-sky-500"> ❄️ 겨울
-    </label>
-  </div>
+  <!-- 🎯 한 줄로 깔끔하게 정렬되는 계절 선택 영역 -->
+<div id="seasonMarkBox" class="hidden mt-2 pt-1.5 border-t border-pink-100/60 flex items-center justify-around bg-white/80 p-1.5 rounded-md shadow-inner">
+  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-pink-600 whitespace-nowrap">
+    <input type="checkbox" id="isSpringMarkCheck" onchange="selectOnlyOneSeason('isSpringMarkCheck')" class="w-3.5 h-3.5 accent-pink-500">
+    <span>🌸 봄</span>
+  </label>
+  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-emerald-600 whitespace-nowrap">
+    <input type="checkbox" id="isSummerMarkCheck" onchange="selectOnlyOneSeason('isSummerMarkCheck')" class="w-3.5 h-3.5 accent-emerald-500">
+    <span>🍀 여름</span>
+  </label>
+  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-amber-600 whitespace-nowrap">
+    <input type="checkbox" id="isFallMarkCheck" onchange="selectOnlyOneSeason('isFallMarkCheck')" class="w-3.5 h-3.5 accent-amber-500">
+    <span>🍁 가을</span>
+  </label>
+  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-sky-600 whitespace-nowrap">
+    <input type="checkbox" id="isWinterMarkCheck" onchange="selectOnlyOneSeason('isWinterMarkCheck')" class="w-3.5 h-3.5 accent-sky-500">
+    <span>❄️ 겨울</span>
+  </label>
+</div>
 </div>
 
 
