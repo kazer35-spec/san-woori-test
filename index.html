@@ -3322,9 +3322,11 @@ margin: 0 2px !important;
 
     <!-- 활동 유형 선택 -->
     <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
-      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isRegularCheck" class="w-3.5 h-3.5"> 정기🚩
-      </label>
+      <!-- 기존 정기산행 체크박스 수정 -->
+<label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+  <input type="checkbox" id="isRegularCheck" onchange="handleRegularCheckChange(this)" class="w-3.5 h-3.5"> 정기🚩
+</label>
+
       <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
       </label>
@@ -4466,7 +4468,29 @@ window.selectOnlyOneSeason = (selectedId) => {
     });
 };
          
-            
+ // 🎯 정기산행 체크 여부에 따라 계절 선택 박스 자동 펼침/접기
+window.handleRegularCheckChange = (regularCb) => {
+    const box = document.getElementById('seasonMarkBox');
+    const arrow = document.getElementById('seasonArrow');
+    if (!box) return;
+
+    if (regularCb.checked) {
+        // 정기산행 체크 시 계절 박스 열기
+        box.classList.remove('hidden');
+        if (arrow) arrow.innerText = '▲';
+    } else {
+        // 정기산행 해제 시 계절 박스 닫기 및 선택 초기화
+        box.classList.add('hidden');
+        if (arrow) arrow.innerText = '▼';
+        
+        // 계절 선택 체크박스들 초기화
+        ['isSpringMarkCheck', 'isSummerMarkCheck', 'isFallMarkCheck', 'isWinterMarkCheck'].forEach(id => {
+            const cb = document.getElementById(id);
+            if (cb) cb.checked = false;
+        });
+    }
+};
+           
             
 
     
