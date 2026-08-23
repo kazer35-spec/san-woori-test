@@ -3339,6 +3339,25 @@ margin: 0 2px !important;
       </label>
     </div>
 
+          <!-- 계절 이모지 수동 선택 영역 (정기산행 등 커스텀용) -->
+<div class="flex items-center justify-between my-1.5 py-1 px-2 bg-pink-50/50 rounded-lg border border-pink-100">
+  <span class="text-[9px] font-black text-pink-500 shrink-0">🎨 계절 마크</span>
+  <div class="flex gap-2">
+    <label class="text-[10px] flex items-center gap-0.5 cursor-pointer whitespace-nowrap font-bold text-pink-600">
+      <input type="checkbox" id="isSpringMarkCheck" class="w-3.5 h-3.5 accent-pink-500 season-mark-cb"> 🌸 봄
+    </label>
+    <label class="text-[10px] flex items-center gap-0.5 cursor-pointer whitespace-nowrap font-bold text-emerald-600">
+      <input type="checkbox" id="isSummerMarkCheck" class="w-3.5 h-3.5 accent-emerald-500 season-mark-cb"> 🍀 여름
+    </label>
+    <label class="text-[10px] flex items-center gap-0.5 cursor-pointer whitespace-nowrap font-bold text-amber-600">
+      <input type="checkbox" id="isFallMarkCheck" class="w-3.5 h-3.5 accent-amber-500 season-mark-cb"> 🍁 가을
+    </label>
+    <label class="text-[10px] flex items-center gap-0.5 cursor-pointer whitespace-nowrap font-bold text-sky-600">
+      <input type="checkbox" id="isWinterMarkCheck" class="w-3.5 h-3.5 accent-sky-500 season-mark-cb"> ❄️ 겨울
+    </label>
+  </div>
+</div>
+
     <!-- 속성 포인트 입력 -->
     <div class="flex gap-1.5 mb-2 py-1.5 border-t border-b border-gray-50 bg-gray-50/30">
       <div class="flex-1 flex items-center gap-1">
@@ -5504,7 +5523,8 @@ window.toggleVibeModal = (show) => {
 // 필터링 처리를 위해 현재 조회 중인 멤버의 로그 목록을 임시 저장할 전역 변수
 let currentMemberLogs = []; 
 
-window.showMemberTimeline = async (mId, mName) => {
+
+  window.showMemberTimeline = async (mId, mName) => {
     toggleTimelineModal(true);
     const modalContent = document.getElementById('timelineModalContent');
     modalContent.scrollTop = 0;
@@ -5529,37 +5549,34 @@ window.showMemberTimeline = async (mId, mName) => {
         const totalDaysInQ = Math.floor((end - start) / (1000 * 60 * 60 * 24));
 
         // 2. 데이터 로드 (Firebase)
-        // ✅ 지운 자리에 새로 들어갈 절약 코드
+        // 1) 이번 분기 데이터만 DB에서 핀포인트로 가져오기
+        const qQuarter = query(
+            collection(db, `sanwoori/${mId}/logs`),
+            where("date", ">=", start),
+            where("date", "<", end),
+            orderBy("date", "desc")
+        );
+        const snapQuarter = await getDocs(qQuarter);
+        const logsQuarter = snapQuarter.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
 
-// 1. 이번 분기 데이터만 DB에서 핀포인트로 가져오기 (가장 큰 비용 절약)
-const qQuarter = query(
-    collection(db, `sanwoori/${mId}/logs`),
-    where("date", ">=", start),
-    where("date", "<", end),
-    orderBy("date", "desc")
-);
-const snapQuarter = await getDocs(qQuarter);
-const logsQuarter = snapQuarter.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
+        // 2) 최근 30일 데이터만 핀포인트로 가져오기 (HOT 멤버 판정용)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const qRecent = query(
+            collection(db, `sanwoori/${mId}/logs`),
+            where("date", ">=", thirtyDaysAgo),
+            orderBy("date", "desc")
+        );
+        const snapRecent = await getDocs(qRecent);
+        const logsRecent = snapRecent.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
 
-// 2. 최근 30일 데이터만 핀포인트로 가져오기 (HOT 멤버 판정용)
-const thirtyDaysAgo = new Date();
-thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-const qRecent = query(
-    collection(db, `sanwoori/${mId}/logs`),
-    where("date", ">=", thirtyDaysAgo),
-    orderBy("date", "desc")
-);
-const snapRecent = await getDocs(qRecent);
-const logsRecent = snapRecent.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
+        // 3) 역대 전체 개수만 DB 카운트 서비스로 받아오기
+        const snapCount = await getCountFromServer(collection(db, `sanwoori/${mId}/logs`));
+        const totalCount = snapCount.data().count;
 
-// 3. 역대 전체 개수만 DB 카운트 서비스로 받아오기 (문서 다운로드 없이 읽기 1회만 청구)
-const snapCount = await getCountFromServer(collection(db, `sanwoori/${mId}/logs`));
-const totalCount = snapCount.data().count;
+        // 필터링용 전역 변수에 저장 (이번 분기 로그 세팅)
+        currentMemberLogs = logsQuarter; 
 
-// ⭐ 필터링용 전역 변수에 저장 (이번 분기 로그 세팅)
-currentMemberLogs = logsQuarter; 
-
-// 4. 상단 카운트 배지 렌더링
         // 4. 상단 카운트 배지 렌더링
         const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
         const exerciseCount = logsQuarter.length;
@@ -5573,17 +5590,15 @@ currentMemberLogs = logsQuarter;
         const chartData = await calculateGrowthData(mId);
         renderGrowthChart(chartData);
 
-        // 🔥 [중요] HOT 멤버 판별 및 배지 표시
+        // HOT 멤버 판별 및 배지 표시
         let isHotMember = false; 
         
-        // 최근 30일 이내 '산행' 기록(isRunning, isTracking 제외)이 4회 이상인지 확인
         const recentCount = logsRecent.filter(l => !l.isRunning && !l.isTracking).length;
 
         if (recentCount >= 4) {
             vibeArea.innerHTML = `<span class="hot-vibe flex items-center h-[18px] text-[9px] font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">🔥 HOT</span>`;
             isHotMember = true;
         }
-
 
         const weeklyCheck = {};
         const validHikeDays = []; // 나비가 앉을 수 있는 후보들
@@ -5595,7 +5610,6 @@ currentMemberLogs = logsQuarter;
             if(!l.isRunning && !l.isTracking) { // 순수 '산행'만 체크
                 weeklyCheck[weekIdx] = true;
                 
-                // [수정 포인트] 정기산행(isRegular)이 아닌 경우에만 나비 후보지로 등록
                 if (!l.isRegular) {
                     validHikeDays.push(dayOffset); 
                 }
@@ -5613,15 +5627,12 @@ currentMemberLogs = logsQuarter;
         }
 
         if (has4WeeksCombo && validHikeDays.length > 0) {
-            // Fisher-Yates Shuffle
             for (let i = validHikeDays.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [validHikeDays[i], validHikeDays[j]] = [validHikeDays[j], validHikeDays[i]];
             }
-            // 최대 2자리 선정
             butterflyPositions.push(...validHikeDays.slice(0, 2));
         }
-
 
         // 4. 잔디 데이터 분석
         const dateActivities = {};
@@ -5630,11 +5641,15 @@ currentMemberLogs = logsQuarter;
             const key = `${l.date.getFullYear()}-${l.date.getMonth() + 1}-${l.date.getDate()}`;
             
             if(!dateActivities[key]) {
-                // [수정] extraHike 필드 초기값 추가
-                dateActivities[key] = { hike: 0, run: 0, trek: 0, walk: 0, extraHike: 0, isRegular: false };
+                // 🎯 seasonIcon 초기 필드 추가
+                dateActivities[key] = { hike: 0, run: 0, trek: 0, walk: 0, extraHike: 0, isRegular: false, seasonIcon: null };
             }
             
-            // 🔥 [핵심 추가] 번외산행 판정 우선순위
+            // 🎯 수동 지정된 계절 마크가 있으면 객체에 등록
+            if (l.seasonIcon) {
+                dateActivities[key].seasonIcon = l.seasonIcon;
+            }
+
             if (l.isExtraHike) {
                 dateActivities[key].extraHike++;
             } else if(l.isRunning) {
@@ -5666,9 +5681,7 @@ currentMemberLogs = logsQuarter;
 
             let butterflyTag = "";
             if (butterflyPositions.includes(i)) {
-                // 움직임 타입 랜덤 (m-1 ~ m-4)
                 const moveType = `m-${Math.floor(Math.random() * 4) + 1}`;
-                // 날개짓 속도 랜덤 (기본, f-fast, f-slow)
                 const flapSpeed = ['f-fast', 'f-slow', ''][Math.floor(Math.random() * 3)];
                 
                 butterflyTag = `
@@ -5683,7 +5696,7 @@ currentMemberLogs = logsQuarter;
             const month = cur.getMonth() + 1;
 
             if (act) {
-                // --- [로직 A] 정기산행 또는 HOT 멤버 꽃 피우기 ---
+                // --- [로직 A] 정기산행 꽃/마크 피우기 ---
                 if (act.isRegular) {
                     style = `background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0) !important; 
                              border: none !important; 
@@ -5692,10 +5705,11 @@ currentMemberLogs = logsQuarter;
                     
                     cl += " grass-regular-premium"; 
 
-                    // 계절별 이모지 로직
-                    let qIcon = (month >= 3 && month <= 5) ? "🌸" : 
+                    // 🎯 수동 지정된 seasonIcon이 있으면 해당 이모지 사용, 없으면 월별 자동 지정
+                    let qIcon = act.seasonIcon || (
+                                (month >= 3 && month <= 5) ? "🌸" : 
                                 (month >= 6 && month <= 8) ? "🍀" : 
-                                (month >= 9 && month <= 11) ? "🍁" : "❄️";
+                                (month >= 9 && month <= 11) ? "🍁" : "❄️");
 
                     iconTag = `<span style="font-size: 11px; display: flex; align-items: center; justify-content: center; height: 100%; pointer-events: none; position: relative; z-index: 5; text-shadow: 0 0 3px rgba(0,0,0,0.3);">${qIcon}</span>`;
                 }
@@ -5724,7 +5738,7 @@ currentMemberLogs = logsQuarter;
                     if (hasWalk) activeColors.push(colors.walk);
                     if (hasRun) activeColors.push(colors.run);
 
-                    // 3. 스타일 결정 로직 (통합 버전)
+                    // 3. 스타일 결정 로직
                     if (activeColors.length >= 2) {
                         if (activeColors.length === 2) {
                             style = `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`;
@@ -5778,8 +5792,7 @@ currentMemberLogs = logsQuarter;
 
         grassBoard.innerHTML = grassHtml;
 
-        // 6. 🛠️ 동적 탭 컨테이너 삽입 및 초기 리스트 렌더링
-        // 타임라인 컨테이너의 상단에 탭 인터페이스를 강제로 렌더링하고, 기본으로 '전체' 데이터를 표시합니다.
+        // 6. 동적 탭 컨테이너 삽입 및 초기 리스트 렌더링
         setupTimelineTabs();
 
     } catch (e) {
@@ -5787,6 +5800,7 @@ currentMemberLogs = logsQuarter;
         container.innerHTML = "<p class='text-center text-xs text-red-400'>데이터 조회 실패</p>";
     }
 };
+      
 
 // 🌟 [추가 함수 1] 타임라인 상단 탭 배치 & 초기화
 function setupTimelineTabs() {
@@ -7082,8 +7096,7 @@ window.toggleDisableCoord = () => {
 };
 
 
- 
-window.addMultiActivity = async () => {
+ window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -7127,6 +7140,13 @@ window.addMultiActivity = async () => {
     // 단축 체크박스 확인
     const isExtraHikeCheck = document.getElementById('isExtraHikeCheck')?.checked || false;
     const isSpecialTrackingCheck = document.getElementById('isSpecialTrackingCheck')?.checked || false;
+
+    // 🎯 계절 이모지 수동 선택 값 확인
+    const selectedSeasonMark = 
+        document.getElementById('isSpringMarkCheck')?.checked ? "🌸" :
+        document.getElementById('isSummerMarkCheck')?.checked ? "🍀" :
+        document.getElementById('isFallMarkCheck')?.checked ? "🍁" :
+        document.getElementById('isWinterMarkCheck')?.checked ? "❄️" : null;
 
     // 단축 체크박스 선택 시 값 강제 적용
     if (isExtraHikeCheck) {
@@ -7238,7 +7258,6 @@ window.addMultiActivity = async () => {
                 );
             }
 
-            // 🎯 [수정] checkLevelUpEffect -> checkLevelUpgrade 변경
             if (realUpAmount > 0 && typeof checkLevelUpgrade === 'function') {
                 checkLevelUpgrade(member.name, oldLevel, newLevel);
             }
@@ -7300,7 +7319,7 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // 3) 개인 로그 생성 및 별 획득 처리
+            // 3) 개인 로그 생성 및 별/계절마크 획득 처리
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
             const baseDocId = rawMountainName || (isSpecialTracking ? "인정 트레킹" : (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))));
 
@@ -7344,6 +7363,7 @@ window.addMultiActivity = async () => {
                     isSchedule,  
                     isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
+                    seasonIcon: selectedSeasonMark, // 👈 [추가] 수동 선택된 계절 이모지 저장
                     isSpecial: isSpecialTracking ? false : isSpecial,
                     pRock, pForest, pValley
                 };
@@ -7370,7 +7390,7 @@ window.addMultiActivity = async () => {
             let dupSeq = 2;
             while (checkSnap.exists()) {
                 bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-                bondingRef = doc(db, "bondingForest", bondingDocId);
+                bondingRef = doc(doc, "bondingForest", bondingDocId);
                 checkSnap = await getDoc(bondingRef);
                 dupSeq++;
             }
@@ -7411,7 +7431,8 @@ window.addMultiActivity = async () => {
             'isRegularCheck', 'isScheduleCheck', 'isRunningCheck', 
             'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 
             'isQuarterCheck', 'disableCoordCheck',
-            'isExtraHikeCheck', 'isSpecialTrackingCheck'
+            'isExtraHikeCheck', 'isSpecialTrackingCheck',
+            'isSpringMarkCheck', 'isSummerMarkCheck', 'isFallMarkCheck', 'isWinterMarkCheck' // 👈 [추가] 계절 체크박스 초기화
         ];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
@@ -7441,13 +7462,8 @@ window.addMultiActivity = async () => {
     }
 };
 
-            
-                
-                
-        
 
-
- 
+                    
             
             
                     
