@@ -6689,23 +6689,44 @@ window.showMemberMap = async (mId, mName) => {
         }).join('');
     }
 
-    // ㄱㄴㄷ 순 정렬 - 100대 명산
-    top100FullList = Object.keys(top100Map)
-        .sort((a, b) => a.localeCompare(b, 'ko'))
-        .map(mName => ({
-            name: mName,
-            count: top100Map[mName].count,
-            height: top100Map[mName].height
-        }));
+    // 🟢 한글/영문/숫자로 시작하는지 확인하는 함수 (특수문자 구분용)
+const isNormalChar = (str) => /^[가-힣a-zA-Z0-9]/.test(str);
 
-    // ㄱㄴㄷ 순 정렬 - 정복한 산
-    normalFullList = Object.keys(normalMap)
-        .sort((a, b) => a.localeCompare(b, 'ko'))
-        .map(mName => ({
-            name: mName,
-            count: normalMap[mName].count,
-            height: normalMap[mName].height
-        }));
+// ㄱㄴㄷ 순 정렬 (특수문자는 맨 뒤로) - 100대 명산
+top100FullList = Object.keys(top100Map)
+    .sort((a, b) => {
+        const aIsNormal = isNormalChar(a);
+        const bIsNormal = isNormalChar(b);
+
+        // 둘 중 하나만 특수문자로 시작할 경우, 일반 문자를 앞으로 배치
+        if (aIsNormal && !bIsNormal) return -1;
+        if (!aIsNormal && bIsNormal) return 1;
+
+        // 둘 다 일반 문적이거나 둘 다 특수문자인 경우 ㄱㄴㄷ 순 정렬
+        return a.localeCompare(b, 'ko');
+    })
+    .map(mName => ({
+        name: mName,
+        count: top100Map[mName].count,
+        height: top100Map[mName].height
+    }));
+
+// ㄱㄴㄷ 순 정렬 (특수문자는 맨 뒤로) - 정복한 산
+normalFullList = Object.keys(normalMap)
+    .sort((a, b) => {
+        const aIsNormal = isNormalChar(a);
+        const bIsNormal = isNormalChar(b);
+
+        if (aIsNormal && !bIsNormal) return -1;
+        if (!aIsNormal && bIsNormal) return 1;
+
+        return a.localeCompare(b, 'ko');
+    })
+    .map(mName => ({
+        name: mName,
+        count: normalMap[mName].count,
+        height: normalMap[mName].height
+    }));
 
     renderMoreTop100();
     renderMoreNormal();
