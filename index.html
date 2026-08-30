@@ -6644,6 +6644,7 @@ window.showMemberMap = async (mId, mName) => {
     const normalMap = {};
 
     logsData.forEach(log => {
+        logsData.forEach(log => {
         totalH += (log.height || 0);
 
         if (log.coords) {
@@ -6654,20 +6655,31 @@ window.showMemberMap = async (mId, mName) => {
             regionCounts[rName] = (regionCounts[rName] || 0) + 1;
 
             if (log.mountain) {
+                // 🟢 괄호 안의 코스 정보 및 앞뒤 공백 제거 (예: "관악산 (사당능선)" -> "관악산")
+                const cleanMountainName = log.mountain.replace(/\s*\(.*?\)/g, '').trim();
+
                 if (log.isTop100) {
-                    if (!top100Map[log.mountain]) {
-                        top100Map[log.mountain] = { count: 0, height: log.height || 0 };
+                    if (!top100Map[cleanMountainName]) {
+                        top100Map[cleanMountainName] = { count: 0, height: log.height || 0 };
                     }
-                    top100Map[log.mountain].count += 1;
+                    top100Map[cleanMountainName].count += 1;
+                    // 높이 정보가 누락되어 있던 기록이 있다면 기존 높이값 보완
+                    if (!top100Map[cleanMountainName].height && log.height) {
+                        top100Map[cleanMountainName].height = log.height;
+                    }
                 } else {
-                    if (!normalMap[log.mountain]) {
-                        normalMap[log.mountain] = { count: 0, height: log.height || 0 };
+                    if (!normalMap[cleanMountainName]) {
+                        normalMap[cleanMountainName] = { count: 0, height: log.height || 0 };
                     }
-                    normalMap[log.mountain].count += 1;
+                    normalMap[cleanMountainName].count += 1;
+                    if (!normalMap[cleanMountainName].height && log.height) {
+                        normalMap[cleanMountainName].height = log.height;
+                    }
                 }
             }
         }
     });
+
 
     // 💡 지역 점유율 전체 렌더링
     const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
