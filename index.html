@@ -28,39 +28,54 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* 빛 효과용 컨테이너 */
-.shimmer-btn {
-    position: relative;
-    overflow: hidden;
+        /* 1. 강력해진 빛 이동 애니메이션 */
+@keyframes sweepGlow {
+    0% {
+        left: -120%;
+    }
+    40%, 100% {
+        left: 140%;
+    }
 }
 
-/* 좌우로 이동하는 빛 레이어 */
-.shimmer-btn::before {
+/* 2. 버튼 전체 맥박(Pulse) 및 후광 효과 */
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.45);
+    }
+}
+
+.high-notice-btn {
+    position: relative;
+    overflow: hidden;
+    /* 에메랄드 그라데이션으로 존재감 부여 */
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+/* 좌우로 강하게 스치는 하이라이트 빛 */
+.high-notice-btn::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 60%;
+    left: -120%;
+    width: 70%;
     height: 100%;
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.1) 20%,
+        rgba(255, 255, 255, 0.85) 50%,
+        rgba(255, 255, 255, 0.1) 80%,
         transparent 100%
     );
-    transform: skewX(-20deg);
-    animation: shimmer 2.5s infinite;
+    transform: skewX(-25deg);
+    animation: sweepGlow 2.2s infinite ease-in-out;
     pointer-events: none;
-}
-
-/* 빛 이동 애니메이션 */
-@keyframes shimmer {
-    0% {
-        left: -100%;
-    }
-    60%, 100% {
-        left: 140%;
-    }
 }
         
         /* 1. 기본 인원 선택 시 카드 전체 연한 녹색(Green) 채우기 */
