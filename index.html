@@ -28,37 +28,40 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* 1. 강력해진 빛 이동 애니메이션 */
+        /* 1. 빛 이동 애니메이션 */
 @keyframes sweepGlow {
     0% {
         left: -120%;
     }
-    40%, 100% {
+    45%, 100% {
         left: 140%;
     }
 }
 
-/* 2. 버튼 전체 맥박(Pulse) 및 후광 효과 */
-@keyframes pulseGlow {
+/* 2. 연한 은은한 은광 펄스 효과 */
+@keyframes softPulse {
     0%, 100% {
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+        border-color: #a7f3d0;
     }
     50% {
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.45);
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        border-color: #6ee7b7;
     }
 }
 
-.high-notice-btn {
+.soft-notice-btn {
     position: relative;
     overflow: hidden;
-    /* 에메랄드 그라데이션으로 존재감 부여 */
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    color: #ffffff !important;
-    animation: pulseGlow 2s infinite ease-in-out;
+    /* 은은하게 화사한 연한 에메랄드 파스텔 배경 */
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+    color: #065f46 !important; /* 글자색은 선명한 딥 에메랄드 */
+    border: 1px solid #a7f3d0;
+    animation: softPulse 2.5s infinite ease-in-out;
 }
 
-/* 좌우로 강하게 스치는 하이라이트 빛 */
-.high-notice-btn::before {
+/* 좌우로 강하게 스치는 흰색 하이라이트 */
+.soft-notice-btn::before {
     content: '';
     position: absolute;
     top: 0;
@@ -68,9 +71,9 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.1) 20%,
-        rgba(255, 255, 255, 0.85) 50%,
-        rgba(255, 255, 255, 0.1) 80%,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0.95) 50%,
+        rgba(255, 255, 255, 0.2) 80%,
         transparent 100%
     );
     transform: skewX(-25deg);
@@ -3743,10 +3746,10 @@ margin: 0 2px !important;
 
         <!-- 메인 인연의 숲 버튼 -->
         <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" 
-        class="high-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all mt-3">
-    <span class="relative z-10 flex items-center gap-1.5 text-white drop-shadow-sm">
+        class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all mt-3">
+    <span class="relative z-10 flex items-center gap-1.5">
         <span>🌳 인연의 숲 자세히 보기</span>
-        <span class="text-emerald-200">▶</span>
+        <span class="text-emerald-700">▶</span>
     </span>
         </button>
             
