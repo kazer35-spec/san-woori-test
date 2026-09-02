@@ -5509,26 +5509,32 @@ function renderHallList() {
                 }
             } 
             else if (s.year === 2026 && s.quarter === 2) {
-                if (window.currentHallTab === 'mountain') {
-                    top3 = [{ name: "하트" }, { name: "아랑" }];
-                } else if (window.currentHallTab === 'host') {
-                    top3 = [{ name: "아랑" }, { name: "해수" }]; 
-                } else {
-                    top3 = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }]; 
-                }
-            }
-            else if (s.year === 2026 && s.quarter === 1) {
-                if (window.currentHallTab === 'mountain') {
-                    top3 = [{ name: "지니" }, { name: "나스" }, { name: "해수" }];
-                } else if (window.currentHallTab === 'host') {
-                    top3 = [{ name: "지니" }, { name: "해수" }, { name: "용삼" }]; 
-                } else {
-                    top3 = [{ name: "지니" }, { name: "해수" }, { name: "하트" }];
-                }
-            }
-            else if (s.year === 2025 && s.quarter === 4) {
-                top3 = [{ name: "아랑" }, { name: "용삼" }];
-            }
+    if (window.currentHallTab === 'mountain') {
+        top3 = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
+    } else if (window.currentHallTab === 'host') {
+        top3 = [{ name: "유스" }, { name: "아랑" }, { name: "해수" }]; 
+    } else {
+        top3 = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }]; 
+    }
+}
+else if (s.year === 2026 && s.quarter === 1) {
+    if (window.currentHallTab === 'mountain') {
+        top3 = [{ name: "지니" }, { name: "나스" }, { name: "해수" }];
+    } else if (window.currentHallTab === 'host') {
+        top3 = [{ name: "지니" }, { name: "해수" }, { name: "용삼" }]; 
+    } else {
+        top3 = [{ name: "지니" }, { name: "해수" }, { name: "하트" }];
+    }
+}
+else if (s.year === 2025 && s.quarter === 4) {
+    if (window.currentHallTab === 'mountain') {
+        top3 = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }];
+    } else if (window.currentHallTab === 'host') {
+        top3 = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }]; // 탭별 명단 지정 필요
+    } else {
+        top3 = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }];
+    }
+}
 
             if (top3.length > 0) {
                 const cardMarginStyle = isCurrent ? 'margin-top: 0px !important;' : 'margin-top: 10px !important;';
