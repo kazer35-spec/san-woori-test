@@ -28,6 +28,41 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* 빛 효과용 컨테이너 */
+.shimmer-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+/* 좌우로 이동하는 빛 레이어 */
+.shimmer-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        transparent 100%
+    );
+    transform: skewX(-20deg);
+    animation: shimmer 2.5s infinite;
+    pointer-events: none;
+}
+
+/* 빛 이동 애니메이션 */
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    60%, 100% {
+        left: 140%;
+    }
+}
+        
         /* 1. 기본 인원 선택 시 카드 전체 연한 녹색(Green) 채우기 */
 #multiMemberList .admin-member-row.border-emerald-400,
 #multiMemberList .admin-member-row.bg-emerald-50\/20 {
@@ -3692,11 +3727,14 @@ margin: 0 2px !important;
         </div>
 
         <!-- 메인 인연의 숲 버튼 -->
-        <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" class="w-full py-3 bg-emerald-50 text-emerald-600 rounded-xl font-extrabold text-sm border border-emerald-100 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform mt-3">
-            <span>🌳 인연의 숲 자세히 보기</span>
-            <span class="text-emerald-400">▶</span>
+        <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" 
+        class="shimmer-btn w-full py-3 bg-emerald-50 text-emerald-600 rounded-xl font-extrabold text-sm border border-emerald-200 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform mt-3 shadow-sm">
+    <span class="relative z-10 flex items-center gap-1.5">
+        <span>🌳 인연의 숲 자세히 보기</span>
+        <span class="text-emerald-500">▶</span>
+    </span>
         </button>
-
+            
         <!-- 닫기 버튼 -->
         <button onclick="toggleTimelineModal(false)" class="w-full mt-2 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm active:scale-[0.98] transition-transform">
             닫기
