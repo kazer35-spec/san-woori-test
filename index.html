@@ -167,6 +167,17 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 #scrollModal.is-lv100 .scroll-item-name * {
     color: #fcf6ba !important;
 }
+        
+        /* 6-1. 산림청 100대명산 등 파란색/보라색 인라인 텍스트 골드 톤으로 강제 통일 */
+.is-lv100 .scroll-item-name font,
+.is-lv100 .scroll-item-name span,
+.is-lv100 .scroll-item-name [style*="color"],
+#scrollModal.is-lv100 .scroll-item-name font,
+#scrollModal.is-lv100 .scroll-item-name span,
+#scrollModal.is-lv100 .scroll-item-name [style*="color"] {
+    color: #fcf6ba !important; /* 기본 산 이름과 동일한 밝은 크림골드 */
+}
+
 
 /* 🎯 7. 우측 '일정/정기산행' 배지 전용 통합 타겟팅 */
 .is-lv100 .scroll-timeline-item .schedule-badge,
