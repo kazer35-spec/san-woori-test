@@ -28,84 +28,89 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* ==========================================
-   🏆 Level 100 레전더리 블랙 & 골드 테마
+       /* ==========================================
+   🏆 Level 100 레전더리 블랙 & 골드 테마 (스크롤 모달 전용)
    ========================================== */
 
-/* 1. 개인 운동 상태 리포트 모달 (scrollModal) */
-#scrollModal .fading-scroll.is-lv100 {
+/* 1. 모달 카드 메인 컨테이너 */
+#scrollModal.is-lv100 .fading-scroll {
     background: linear-gradient(180deg, #0b0f19 0%, #080a10 100%) !important;
     border: 1.5px solid #dfb76c !important;
     box-shadow: 0 0 25px rgba(223, 183, 108, 0.35) !important;
     color: #e2e8f0 !important;
 }
 
-#scrollModal .fading-scroll.is-lv100 .scroll-title-sub {
+/* 2. 타이틀 & 헤더 텍스트 */
+#scrollModal.is-lv100 .scroll-title-sub {
     color: #dfb76c !important;
 }
 
-#scrollModal .fading-scroll.is-lv100 .scroll-title-main {
+#scrollModal.is-lv100 .scroll-title-main {
     color: #ffffff !important;
 }
 
-#scrollModal .fading-scroll.is-lv100 .modal-close-btn {
+#scrollModal.is-lv100 .modal-close-btn {
     color: #dfb76c !important;
     background: rgba(223, 183, 108, 0.15) !important;
     border-radius: 50%;
 }
 
-#scrollModal .fading-scroll.is-lv100 .user-report-summary-card {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border-color: rgba(223, 183, 108, 0.3) !important;
+/* 3. 상단 종합 요약 리포트 카드 */
+#scrollModal.is-lv100 .user-report-summary-card {
+    background: rgba(15, 23, 42, 0.75) !important;
+    border-color: rgba(223, 183, 108, 0.4) !important;
     color: #cbd5e1 !important;
 }
 
-#scrollModal .fading-scroll.is-lv100 .user-report-summary-card strong {
+#scrollModal.is-lv100 .user-report-summary-card strong,
+#scrollModal.is-lv100 .user-report-summary-card span {
     color: #f1f5f9 !important;
 }
 
-/* 2. 분기 잔디 모달 (timelineModal) */
-#timelineModal.is-lv100 .bg-white,
-#timelineModal.is-lv100 .timeline-modal-container { /* 실제 잔디 모달 컨테이너 클래스로 지정 */
-    background: linear-gradient(180deg, #0c101d 0%, #05070c 100%) !important;
-    border: 1.5px solid #d4af37 !important;
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
-    color: #f1f5f9 !important;
+#scrollModal.is-lv100 .user-status-row-bar {
+    border-bottom-color: rgba(223, 183, 108, 0.3) !important;
 }
 
-/* 3. 지도 모달 (mapModal) */
-#mapModal.is-lv100 .bg-white,
-#mapModal.is-lv100 .map-modal-container { /* 실제 지도 모달 컨테이너 클래스로 지정 */
-    background: linear-gradient(180deg, #0c101d 0%, #05070c 100%) !important;
-    border: 1.5px solid #d4af37 !important;
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
-    color: #f1f5f9 !important;
+#scrollModal.is-lv100 .dday-count-badge {
+    background: rgba(223, 183, 108, 0.2) !important;
+    color: #dfb76c !important;
+    border: 1px solid rgba(223, 183, 108, 0.5) !important;
 }
 
-/* 공통: 텍스트 및 카드 요소 커스텀 */
-.is-lv100 .text-slate-500,
-.is-lv100 .text-slate-600,
-.is-lv100 .text-slate-700,
-.is-lv100 .text-slate-800,
-.is-lv100 .text-gray-600 {
-    color: #e2e8f0 !important;
+/* 4. 탭 버튼 커스텀 */
+#scrollModal.is-lv100 .tab-btn {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border: 1px solid rgba(223, 183, 108, 0.2) !important;
 }
 
-.is-lv100 #timelineLegend,
-.is-lv100 #chartBox,
-.is-lv100 .bg-slate-50\/60 {
-    background-color: rgba(255, 255, 255, 0.04) !important;
-    border-color: rgba(212, 175, 55, 0.3) !important;
+#scrollModal.is-lv100 .tab-btn.active {
+    background: linear-gradient(135deg, #bf953f, #dfb76c) !important;
+    color: #0b0f19 !important;
+    font-weight: 800 !important;
 }
 
-/* 하단 버튼 및 액센트 골드 그라데이션 */
-.is-lv100 .soft-notice-btn {
-    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7) !important;
-    color: #0f172a !important;
-    font-weight: 900 !important;
-    border: none !important;
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3) !important;
+/* 5. 하단 타임라인 리스트 아이템 */
+#scrollModal.is-lv100 .scroll-timeline-item {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border-bottom: 1px solid rgba(223, 183, 108, 0.15) !important;
 }
+
+#scrollModal.is-lv100 .scroll-item-date {
+    color: #dfb76c !important;
+}
+
+#scrollModal.is-lv100 .scroll-item-name span {
+    color: #f8fafc !important;
+}
+
+/* 더보기 버튼 */
+#scrollModal.is-lv100 #scrollMoreBtnArea button {
+    background: #1e293b !important;
+    border-color: rgba(223, 183, 108, 0.4) !important;
+    color: #dfb76c !important;
+}
+ 
 
         /* 1. 빛 이동 애니메이션 */
 @keyframes sweepGlow {
@@ -114,6 +119,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     }
     45%, 100% {
         left: 140%;
+ 
     }
 }
 
@@ -10118,7 +10124,7 @@ window.scrollPagination = {
     currentPageSize: 6
 };
 
-window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
+      window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
     const modal = document.getElementById('scrollModal');
     const content = document.getElementById('scrollContent');
     const scrollWrap = document.querySelector('.fading-scroll'); 
@@ -10131,12 +10137,11 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
         return;
     }
 
-    // 🎯 [신규] 100레벨 판정 및 블랙&골드 테마 적용 (안전한 방어 코드 포함)
+    // 🎯 100레벨 판정 및 모달 부모(#scrollModal)에 is-lv100 부여
     const memberInfo = (typeof currentData !== 'undefined' && currentData) 
         ? currentData.find(m => String(m.id) === String(safeMemberId) || (m.name && m.name === safeMemberId)) 
         : null;
 
-    // 인자로 넘어온 level 또는 currentData에서 가져온 level 확인
     const currentLevel = memberInfo ? Number(memberInfo.level) : Number(level || 0);
 
     if (currentLevel >= 100) {
@@ -10311,9 +10316,10 @@ window.closeScrollModal = function() {
     const modal = document.getElementById('scrollModal');
     if (modal) {
         modal.style.display = 'none';
-        modal.classList.remove('is-lv100'); // 닫을 때 테마 클래스 초기화
+        modal.classList.remove('is-lv100'); // 모달 닫을 때 테마 클래스 제거
     }
 };
+          
     
 window.switchScrollTab = (category) => {
     if (window.scrollPagination.currentCategory === category) return;
