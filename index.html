@@ -30,10 +30,12 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 
     
 /* ==========================================
-   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (완전 강제화)
+   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (완전 수정본)
    ========================================== */
 
-/* 1. 모달 전체 배경 및 외곽선 */
+/* 1. 모달 전체 배경, 외곽선 및 최상위 다크 처리 */
+#scrollModal.is-lv100,
+#scrollModal.is-lv100 > div,
 .is-lv100.fading-scroll,
 .is-lv100 .fading-scroll,
 #scrollModal.is-lv100 .fading-scroll {
@@ -61,7 +63,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: rgba(212, 175, 55, 0.15) !important;
 }
 
-/* 3. 상단 요약 카드의 흰색 배경 강제 제거 및 딥골드화 */
+/* 3. 상단 요약 카드의 딥골드화 */
 .is-lv100 .user-report-summary-card,
 #scrollModal.is-lv100 .user-report-summary-card {
     background: rgba(18, 26, 43, 0.95) !important;
@@ -91,12 +93,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #d4af37 !important;
 }
 
-/* 4. 탭 버튼 영역 및 하단 영역 흰색 배경 강제 다크화 */
+/* 4. 탭 컨테이너 전체 배경 및 흰색 테두리 박스 -> 딥 골드 변환 (빨간 원 영역 해결) */
 .is-lv100 .tab-scroll-container,
+#scrollModal.is-lv100 .tab-scroll-container {
+    background: #090d16 !important;
+    border: 1px solid rgba(212, 175, 55, 0.4) !important;
+    border-radius: 14px !important;
+    padding: 5px !important;
+}
+
 .is-lv100 .tab-header-buttons,
 .is-lv100 .scroll-filtered-list-box,
 .is-lv100 #scrollFilteredList,
-#scrollModal.is-lv100 .tab-scroll-container,
 #scrollModal.is-lv100 .tab-header-buttons,
 #scrollModal.is-lv100 .scroll-filtered-list-box,
 #scrollModal.is-lv100 #scrollFilteredList {
@@ -120,20 +128,21 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     opacity: 1;
 }
 
-/* 6. 리스트 아이템 및 산 이름/날짜 골드 텍스트 적용 */
+/* 6. 리스트 아이템 규격 -> [정상 코드] 간격과 100% 동일하게 일치시킴 */
 .is-lv100 .scroll-timeline-item,
 #scrollModal.is-lv100 .scroll-timeline-item {
     background: #121a2b !important;
     border: 1px solid rgba(212, 175, 55, 0.3) !important;
     border-radius: 8px !important;
-    margin-bottom: 6px !important;
-    padding: 8px 10px !important;
+    padding: 5px 4px !important; /* 기본 정상 코드 패딩 수치로 복구 */
+    margin-bottom: 0px !important; /* 기본 정상 코드와 동일하게 하단 마진 제거 */
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important;
 }
 
 .is-lv100 .scroll-item-date,
 #scrollModal.is-lv100 .scroll-item-date {
     color: #d4af37 !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     font-size: 11px !important;
 }
 
