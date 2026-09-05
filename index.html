@@ -4547,8 +4547,11 @@ window.handleRegularCheckChange = (regularCb) => {
     }
 };
            
-     // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
-window.showBondingForestModal = async (targetName, targetId) => {
+            
+
+    
+// ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
+ window.showBondingForestModal = async (targetName, targetId) => {
     if (!targetName) return alert("회원 이름이 지정되지 않았습니다.");
     
     const mName = targetName.trim();
@@ -4607,14 +4610,12 @@ window.showBondingForestModal = async (targetName, targetId) => {
             } 
         };
 
-        // 🎯 [읽기 비용 절감] 타겟 회원이 포함된 문서만 array-contains로 필터링
+        // 🎯 [읽기 비용 절감] 등초님이 포함된 문서만 array-contains로 타겟팅 다운로드
         const bondingQuery = query(
             collection(db, "bondingForest"),
             where("members", "array-contains", mName)
         );
         const bondingSnap = await getDocs(bondingQuery);
-
-        let currentQuarterHikes = 0; // 이번 분기 전체 동행 횟수
 
         bondingSnap.forEach(doc => {
             const data = doc.data();
@@ -4655,33 +4656,18 @@ window.showBondingForestModal = async (targetName, targetId) => {
                         cached.quarterlyPartners[year][qKey][p] = (cached.quarterlyPartners[year][qKey][p] || 0) + 1;
                     }
                 });
-
-                // 현재 분기 산행 횟수 산출
-                const now = new Date();
-                const curMonth = now.getMonth() + 1;
-                let curQKey = "q1";
-                if (curMonth >= 4 && curMonth <= 6) curQKey = "q2";
-                else if (curMonth >= 7 && curMonth <= 9) curQKey = "q3";
-                else if (curMonth >= 10 && curMonth <= 12) curQKey = "q4";
-
-                if (year === currentYear && qKey === curQKey) {
-                    currentQuarterHikes++;
-                }
             }
         });
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(cached));
 
-        // 전체 동행지수 계산
+        // 🎯 [연산 버그 해결 완료] DB 내부 필드 값을 있는 그대로 바인딩하여 분모가 튀는 현상 원천 차단
         const finalTotalHikes = memberInfo ? (memberInfo.count || 0) : 0; 
         const myMultiHikes = memberInfo ? (memberInfo.buddyCount || 0) : 0;
+        
+        // 동행 횟수가 전체 산행 횟수보다 크게 잡히는 구조적 예외 방어식 추가
         const adjustedTotalHikes = Math.max(finalTotalHikes, myMultiHikes);
         const finalSynergy = adjustedTotalHikes > 0 ? Math.min(100, Math.round((myMultiHikes / adjustedTotalHikes) * 100)) : 0;
-
-        // 분기 동행지수 계산 (이번 분기 산행 수 대비 동행 수)
-        const qTotalHikes = memberInfo ? (memberInfo.qCount || memberInfo.quarterCount || currentQuarterHikes) : currentQuarterHikes;
-        const qAdjustedTotal = Math.max(qTotalHikes, currentQuarterHikes);
-        const quarterSynergy = qAdjustedTotal > 0 ? Math.min(100, Math.round((currentQuarterHikes / qAdjustedTotal) * 100)) : 0;
 
         const getBestInQuarter = (qMap) => {
             let name = "데이터 없음";
@@ -4712,11 +4698,19 @@ window.showBondingForestModal = async (targetName, targetId) => {
         const currentYearData = cached.quarterlyPartners[currentYear] || { q1: {}, q2: {}, q3: {}, q4: {} };
         const currentQData = getBestInQuarter(currentYearData[currentQKey]);
 
-        // 동행지수 게이지 색상
-        let gaugeColor = "#10b981"; 
-        let glowClass = finalSynergy >= 80 ? "gauge-glow" : "";
+        let gaugeColor = "#ef4444"; 
+        let glowClass = "";
+        if (finalSynergy >= 80) {
+            gaugeColor = "#10b981"; 
+            glowClass = "gauge-glow"; 
+        } else if (finalSynergy >= 60) {
+            gaugeColor = "#22c55e"; 
+        } else if (finalSynergy >= 40) {
+            gaugeColor = "#f59e0b"; 
+        }
 
         // 하위 팝업 함수 바인딩 스크립트
+        // [우정 포인트 사용 안내 팝업]
         window.showFriendshipGuide = () => {
             const guideHTML = `
                 <div id="fpGuideOverlay" class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity" onclick="this.remove()">
@@ -4744,6 +4738,8 @@ window.showBondingForestModal = async (targetName, targetId) => {
             document.body.insertAdjacentHTML('beforeend', guideHTML);
         };
 
+
+        // 분기별 최고 파트너 모달 레이아웃 (올려주신 스크린샷 UI 완벽 적용)
         window.showQuarterlyDetails = () => {
             const nameEl = document.querySelector('#forestModal h3');
             if(!nameEl) return;
@@ -4893,17 +4889,14 @@ window.showBondingForestModal = async (targetName, targetId) => {
             document.body.insertAdjacentHTML('beforeend', popupHTML);
         };
 
-        // 메인 모달 UI 바인딩 (우측 상단 닫기 버튼 및 분기 동행지수 반영)
+        // 메인 모달 UI 바인딩
         const modalHTML = `
             <div id="forestModal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 backdrop-blur-md" onclick="this.remove()">
-                <div class="relative bg-[#0f172a] border border-emerald-500/30 p-6 rounded-[2.5rem] w-[320px] text-center shadow-2xl" onclick="event.stopPropagation()">
-                    
-                    <button onclick="document.getElementById('forestModal').remove()" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 active:scale-95 transition-all text-base font-bold">
-                        ✕
-                    </button>
-
-                    <div class="text-emerald-400 text-[10px] font-black mb-2 tracking-[0.4em] pt-1">BONDING FOREST</div>
-                    <h3 class="text-white text-xl font-bold mb-4">${mName}님의 인연</h3>
+                <div class="bg-[#0f172a] border border-emerald-500/30 p-6 rounded-[2.5rem] w-[320px] text-center shadow-2xl" onclick="event.stopPropagation()">
+                    <div class="text-emerald-400 text-[10px] font-black mb-2 tracking-[0.4em]">BONDING FOREST</div>
+                    <div class="text-6xl mb-1"></div>
+                    <h3 class="text-white text-xl font-bold mb-1">${mName}님의 인연</h3>
+                    <p class="text-[11px] text-slate-500 mb-4 leading-relaxed"></p>
                     
                     <div class="space-y-2 text-left">
                         <div class="bg-white/[0.03] py-2.5 px-4 rounded-2xl border border-white/[0.06]">
@@ -4914,17 +4907,6 @@ window.showBondingForestModal = async (targetName, targetId) => {
                             </div>
                             <div class="w-full h-1.5 bg-white/10 rounded-full mt-1.5 overflow-hidden">
                                 <div class="h-full transition-all duration-1000 ${glowClass}" style="width: ${finalSynergy}%; background-color: ${gaugeColor}"></div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white/[0.03] py-2.5 px-4 rounded-2xl border border-white/[0.06]">
-                            <div class="text-[10px] font-bold mb-1 text-teal-400">🌿 분기 동행 지수 (Quarterly Synergy)</div>
-                            <div class="flex justify-between items-end">
-                                <div class="text-white text-[14px] font-bold">이번 분기 ${qAdjustedTotal}회 중 ${currentQuarterHikes}회</div>
-                                <div class="text-lg font-black text-teal-400">${quarterSynergy}%</div>
-                            </div>
-                            <div class="w-full h-1.5 bg-white/10 rounded-full mt-1.5 overflow-hidden">
-                                <div class="h-full bg-teal-400 transition-all duration-1000" style="width: ${quarterSynergy}%;"></div>
                             </div>
                         </div>
 
@@ -4967,6 +4949,8 @@ window.showBondingForestModal = async (targetName, targetId) => {
                                 ${currentFP < 1000 ? `<div class="text-[9px] text-red-500 font-bold italic">사용 불가</div>` : `<div class="text-[9px] text-amber-400/50 italic">사용 가능</div>`}
                             </div>
                         </div>
+
+                        <button onclick="document.getElementById('forestModal').remove()" class="mt-5 w-full py-4 bg-emerald-500 text-white text-xs font-black rounded-2xl transition-transform active:scale-95">숲에서 나가기</button>
                     </div>
                 </div>
             </div>`;
@@ -4981,10 +4965,48 @@ window.showBondingForestModal = async (targetName, targetId) => {
     }
 };
        
+       
+window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
+    try {
+        if (!mountainName || !dateStr) {
+            alert("산 이름과 날짜는 필수 정보입니다.");
+            return;
+        }
 
-    
+        // 1. 공백 제거 및 문서 ID 포맷팅 (예: 관악산_2026-08-03)
+        const cleanMountain = mountainName.trim().replace(/\s+/g, "");
+        const cleanDate = dateStr.trim();
+        let customDocId = `${cleanMountain}_${cleanDate}`;
 
-    
+        // 2. 혹시 같은 날, 같은 산을 2번 이상 저장할 경우를 대비한 중복 방어
+        let docRef = doc(db, "bondingForest", customDocId);
+        let checkDoc = await getDoc(docRef);
+        let dupIndex = 2;
+
+        while (checkDoc.exists()) {
+            customDocId = `${cleanMountain}_${cleanDate}_${dupIndex}`;
+            docRef = doc(db, "bondingForest", customDocId);
+            checkDoc = await getDoc(docRef);
+            dupIndex++;
+        }
+
+        // 3. addDoc 대신 setDoc을 사용하여 내가 지정한 ID(customDocId)로 저장!
+        await setDoc(docRef, {
+            mountain: cleanMountain,
+            date: cleanDate,
+            members: membersList || [],
+            memberCount: (membersList || []).length,
+            createdAt: serverTimestamp()
+        });
+
+        console.log(`✅ [bondingForest] 지정한 ID로 저장 완료: ${customDocId}`);
+        return customDocId;
+
+    } catch (error) {
+        console.error("❌ 저장 실패:", error);
+        alert("산행 기록 저장 중 오류가 발생했습니다.");
+    }
+};
 
 
 // ==========================================
