@@ -28,9 +28,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-    
 /* ==========================================
-   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (배지 스타일 완벽 수정본)
+   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (배지 핀포인트 수정본)
    ========================================== */
 
 /* 1. 모달 전체 배경, 외곽선 및 최상위 다크 처리 */
@@ -151,17 +150,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #fcf6ba !important;
 }
 
-/* 🎯 7. 우측 배지 박스 타겟팅 (배경은 골드 다크, 글자색은 고유 색상 보존) */
-.is-lv100 .scroll-timeline-item > div:last-child span,
-.is-lv100 .scroll-timeline-item span:last-child,
-#scrollModal.is-lv100 .scroll-timeline-item > div:last-child span,
-#scrollModal.is-lv100 .scroll-timeline-item span:last-child {
+/* 🎯 7. 우측 '일정/정기산행' 배지 전용 핀포인트 타겟팅 */
+.is-lv100 .scroll-timeline-item .schedule-badge,
+.is-lv100 .scroll-timeline-item .badge,
+.is-lv100 .scroll-timeline-item span[class*="badge"],
+.is-lv100 .scroll-timeline-item > div:nth-child(2) span,
+#scrollModal.is-lv100 .scroll-timeline-item .schedule-badge,
+#scrollModal.is-lv100 .scroll-timeline-item .badge,
+#scrollModal.is-lv100 .scroll-timeline-item span[class*="badge"],
+#scrollModal.is-lv100 .scroll-timeline-item > div:nth-child(2) span {
     background-color: rgba(212, 175, 55, 0.15) !important;
     background: rgba(212, 175, 55, 0.15) !important;
     border: 1px solid rgba(212, 175, 55, 0.5) !important;
-    border-radius: 4px !important;
-    padding: 1px 5px !important;
-    font-weight: bold !important;
 }
 
 /* 8. 더보기 버튼 영역 다크 & 골드화 */
@@ -181,10 +181,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 #scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb {
     background: #d4af37 !important;
 }
-
-        
-
-
+    
+    
 
 
         /* 1. 빛 이동 애니메이션 */
