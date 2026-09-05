@@ -168,21 +168,17 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #fcf6ba !important;
 }
         
-        /* 6-1. 산림청 100대명산 파란색/보라색 인라인 텍스트 및 자식 요소 전체 골드화 */
-.is-lv100 .scroll-timeline-item *,
-.is-lv100 .scroll-item-name,
-.is-lv100 .scroll-item-name *,
-#scrollModal.is-lv100 .scroll-timeline-item *,
-#scrollModal.is-lv100 .scroll-item-name,
-#scrollModal.is-lv100 .scroll-item-name * {
-    color: #fcf6ba !important;
+        /* 6-1. [국공/산림/BAC] 태그 뱃지 & 파란색 산 이름 골드 테마 최적화 */
+.is-lv100 .scroll-timeline-item span[style*="255, 255, 255"],
+.is-lv100 .scroll-timeline-item span[style*="2563eb"],
+.is-lv100 .scroll-timeline-item span[style*="25, 99, 235"],
+#scrollModal.is-lv100 .scroll-timeline-item span[style*="2563eb"],
+#scrollModal.is-lv100 .scroll-timeline-item span[style*="25, 99, 235"] {
+    color: #dfb76c !important; /* 파란색 태그/텍스트를 골드로 변경 */
+    border-color: #dfb76c !important; /* 테두리도 골드로 변경 */
 }
 
-/* 예외: 날짜, 우측 배지, 더보기 버튼 등 원래 골드/포인트 색상 유지 */
-.is-lv100 .scroll-item-date,
-#scrollModal.is-lv100 .scroll-item-date {
-    color: #d4af37 !important;
-}
+
 
 
 /* 🎯 7. 우측 '일정/정기산행' 배지 전용 통합 타겟팅 */
