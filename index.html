@@ -28,84 +28,111 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-    /* ==========================================
-   🏆 100레벨 상단 영역 & 딥 골드 텍스트 완전 적용
+    
+/* ==========================================
+   🏆 [Lv100] 블랙&골드 완벽 고정 (우선순위 강제 적용)
    ========================================== */
 
-/* 1. 모달 전체 배경 다크화 */
+/* 1. 모달 전체 배경 및 외곽선 */
 #scrollModal.is-lv100 .fading-scroll,
 .is-lv100 .fading-scroll {
     background: #090d16 !important;
     border: 1.5px solid #d4af37 !important;
     box-shadow: 0 0 25px rgba(212, 175, 55, 0.35) !important;
+    color: #e2e8f0 !important;
 }
 
-/* 2. 메인 타이틀 & 서브 타이틀 (진한 골드) */
+/* 2. 상단 헤더 타이틀 (진한 골드) */
 #scrollModal.is-lv100 .scroll-title-sub,
 .is-lv100 .scroll-title-sub {
     color: #d4af37 !important;
-    font-weight: 800 !important;
 }
-
 #scrollModal.is-lv100 .scroll-title-main,
 .is-lv100 .scroll-title-main {
-    color: #fcf6ba !important; /* 밝고 화려한 샴페인 골드 */
+    color: #fcf6ba !important;
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
 }
-
 #scrollModal.is-lv100 .modal-close-btn,
 .is-lv100 .modal-close-btn {
     color: #d4af37 !important;
     background: rgba(212, 175, 55, 0.15) !important;
 }
 
-/* 3. 상단 운동 요약 카드 다크 & 진한 골드화 */
+/* 3. 상단 요약 카드 다크화 */
 #scrollModal.is-lv100 .user-report-summary-card,
 .is-lv100 .user-report-summary-card {
     background: rgba(18, 26, 43, 0.95) !important;
     border: 1px solid rgba(212, 175, 55, 0.4) !important;
-    color: #e2e8f0 !important;
 }
-
 #scrollModal.is-lv100 .user-report-summary-card strong,
 .is-lv100 .user-report-summary-card strong {
-    color: #d4af37 !important; /* 숫자/횟수 텍스트 진한 골드 */
-    font-weight: 800 !important;
-}
-
-#scrollModal.is-lv100 .user-report-summary-card span,
-.is-lv100 .user-report-summary-card span {
-    color: #cbd5e1 !important;
-}
-
-/* 4. D-Day 뱃지 & 가입일 라인 */
-#scrollModal.is-lv100 .dday-count-badge,
-.is-lv100 .dday-count-badge {
-    background: rgba(212, 175, 55, 0.2) !important;
-    color: #fcf6ba !important;
-    border: 1px solid #d4af37 !important;
-}
-
-#scrollModal.is-lv100 .user-status-row-bar,
-.is-lv100 .user-status-row-bar {
-    border-bottom: 1px dashed rgba(212, 175, 55, 0.3) !important;
-}
-
-#scrollModal.is-lv100 .member-since-date,
-.is-lv100 .member-since-date {
     color: #d4af37 !important;
 }
 
-/* 5. 산 이름 및 리스트 글씨 딥 골드 포인트 */
-#scrollModal.is-lv100 .scroll-item-name span,
-.is-lv100 .scroll-item-name span {
-    color: #ffffff !important;
+/* 4. [핵심] 하단 탭 및 리스트 박스 영구 다크화 */
+#scrollModal.is-lv100 .tab-scroll-container,
+#scrollModal.is-lv100 .scroll-filtered-list-box,
+#scrollModal.is-lv100 #scrollFilteredList,
+.is-lv100 .tab-scroll-container,
+.is-lv100 .scroll-filtered-list-box,
+.is-lv100 #scrollFilteredList {
+    background: #090d16 !important;
 }
 
+/* 5. 탭 버튼 스타일 */
+#scrollModal.is-lv100 .tab-header-buttons,
+.is-lv100 .tab-header-buttons {
+    background: #121a2b !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 10px !important;
+    padding: 3px !important;
+}
+#scrollModal.is-lv100 .tab-btn,
+.is-lv100 .tab-btn {
+    background: transparent !important;
+    color: #94a3b8 !important;
+    border: none !important;
+}
+#scrollModal.is-lv100 .tab-btn.active,
+.is-lv100 .tab-btn.active {
+    background: linear-gradient(135deg, #c5a059 0%, #dfb76c 50%, #9e7d3b 100%) !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4) !important;
+}
+
+/* 6. [핵심] 타임라인 카드 & 안 보이던 산 이름 텍스트 가독성 확보 */
+#scrollModal.is-lv100 .scroll-timeline-item,
+.is-lv100 .scroll-timeline-item {
+    background: #121a2b !important;
+    border: 1px solid rgba(212, 175, 55, 0.25) !important;
+    border-radius: 8px !important;
+    margin-bottom: 8px !important;
+    padding: 10px 12px !important;
+}
 #scrollModal.is-lv100 .scroll-item-date,
 .is-lv100 .scroll-item-date {
     color: #d4af37 !important;
+    font-weight: 700 !important;
 }
+/* 사라졌던 산 이름/텍스트 강제 가시화 */
+#scrollModal.is-lv100 .scroll-item-name,
+#scrollModal.is-lv100 .scroll-item-name *,
+.is-lv100 .scroll-item-name,
+.is-lv100 .scroll-item-name * {
+    color: #ffffff !important; /* 흰색 글씨 선명하게 고정 */
+}
+
+/* 7. 더보기 버튼 영역 */
+#scrollModal.is-lv100 #scrollMoreBtnArea button,
+.is-lv100 #scrollMoreBtnArea button {
+    background: #121a2b !important;
+    border: 1px solid #d4af37 !important;
+    color: #d4af37 !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+}
+
    
 
 
