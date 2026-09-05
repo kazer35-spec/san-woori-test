@@ -168,14 +168,20 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #fcf6ba !important;
 }
         
-        /* 6-1. 산림청 100대명산 등 파란색/보라색 인라인 텍스트 골드 톤으로 강제 통일 */
-.is-lv100 .scroll-item-name font,
-.is-lv100 .scroll-item-name span,
-.is-lv100 .scroll-item-name [style*="color"],
-#scrollModal.is-lv100 .scroll-item-name font,
-#scrollModal.is-lv100 .scroll-item-name span,
-#scrollModal.is-lv100 .scroll-item-name [style*="color"] {
-    color: #fcf6ba !important; /* 기본 산 이름과 동일한 밝은 크림골드 */
+        /* 6-1. 산림청 100대명산 파란색/보라색 인라인 텍스트 및 자식 요소 전체 골드화 */
+.is-lv100 .scroll-timeline-item *,
+.is-lv100 .scroll-item-name,
+.is-lv100 .scroll-item-name *,
+#scrollModal.is-lv100 .scroll-timeline-item *,
+#scrollModal.is-lv100 .scroll-item-name,
+#scrollModal.is-lv100 .scroll-item-name * {
+    color: #fcf6ba !important;
+}
+
+/* 예외: 날짜, 우측 배지, 더보기 버튼 등 원래 골드/포인트 색상 유지 */
+.is-lv100 .scroll-item-date,
+#scrollModal.is-lv100 .scroll-item-date {
+    color: #d4af37 !important;
 }
 
 
