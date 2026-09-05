@@ -153,21 +153,35 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #fcf6ba !important;
 }
 
-/* 🎯 7. 우측 '일정' 뱃지: JS 인라인 흰색 배경(rgb/hex/속성명 변환 대응)만 딥골드로 변경 */
-.is-lv100 .scroll-timeline-item span[style*="255, 255, 255"],
-.is-lv100 .scroll-timeline-item span[style*="255,255,255"],
-.is-lv100 .scroll-timeline-item span[style*="white"],
-.is-lv100 .scroll-timeline-item span[style*="#fff"],
-.is-lv100 .scroll-timeline-item span[style*="#ffffff"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="255, 255, 255"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="255,255,255"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="white"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="#fff"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="#ffffff"] {
+/* 🎯 7. 우측 '일정/정기산행' 배지 전용 통합 타겟팅 */
+
+/* 7-1. 클래스 기반 배지 타겟팅 (정기산행 및 전용 클래스 배지) */
+.is-lv100 .scroll-timeline-item .schedule-badge,
+.is-lv100 .scroll-timeline-item .badge,
+.is-lv100 .scroll-timeline-item span[class*="badge"],
+#scrollModal.is-lv100 .scroll-timeline-item .schedule-badge,
+#scrollModal.is-lv100 .scroll-timeline-item .badge,
+#scrollModal.is-lv100 .scroll-timeline-item span[class*="badge"],
+
+/* 7-2. 인라인 스타일 기반 흰색 배지 타겟팅 (일정 배지 배경만 딥골드로 변경) */
+.is-lv100 .scroll-timeline-item [style*="background-color: white"],
+.is-lv100 .scroll-timeline-item [style*="background-color: #fff"],
+.is-lv100 .scroll-timeline-item [style*="background: white"],
+.is-lv100 .scroll-timeline-item [style*="background: #fff"],
+.is-lv100 .scroll-timeline-item [style*="255, 255, 255"],
+.is-lv100 .scroll-timeline-item [style*="255,255,255"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: white"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: #fff"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background: white"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background: #fff"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="255, 255, 255"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="255,255,255"] {
     background: rgba(212, 175, 55, 0.15) !important;
     background-color: rgba(212, 175, 55, 0.15) !important;
     border: 1px solid rgba(212, 175, 55, 0.5) !important;
+    /* color는 !important를 지정하지 않아 JS가 부여한 고유 텍스트 색상 유지 */
 }
+
 
 
 /* 8. 더보기 버튼 영역 다크 & 골드화 */
