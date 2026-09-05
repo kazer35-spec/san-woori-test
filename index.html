@@ -154,16 +154,17 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 /* 🎯 7. 우측 '일정' 뱃지: 흰색 배경만 딥골드로 변경 (글자색 및 타 요소 보존) */
-.is-lv100 .scroll-timeline-item [style*="background: white"],
-.is-lv100 .scroll-timeline-item [style*="background: #fff"],
-.is-lv100 .scroll-timeline-item [style*="background-color: white"],
-.is-lv100 .scroll-timeline-item [style*="background-color: #fff"],
-#scrollModal.is-lv100 .scroll-timeline-item [style*="background: white"],
-#scrollModal.is-lv100 .scroll-timeline-item [style*="background: #fff"],
-#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: white"],
-#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: #fff"] {
-    background: rgba(212, 175, 55, 0.15) !important;
+/* 🎯 7. 우측 '일정/정기산행' 배지 전용 핀포인트 타겟팅 */
+.is-lv100 .scroll-timeline-item .schedule-badge,
+.is-lv100 .scroll-timeline-item .badge,
+.is-lv100 .scroll-timeline-item span[class*="badge"],
+.is-lv100 .scroll-timeline-item > div:nth-child(2) span,
+#scrollModal.is-lv100 .scroll-timeline-item .schedule-badge,
+#scrollModal.is-lv100 .scroll-timeline-item .badge,
+#scrollModal.is-lv100 .scroll-timeline-item span[class*="badge"],
+#scrollModal.is-lv100 .scroll-timeline-item > div:nth-child(2) span {
     background-color: rgba(212, 175, 55, 0.15) !important;
+    background: rgba(212, 175, 55, 0.15) !important;
     border: 1px solid rgba(212, 175, 55, 0.5) !important;
 }
 
