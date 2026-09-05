@@ -33,62 +33,59 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
    🏆 [Lv100] 뱃지 및 전체 외곽선 딥 골드화
    ========================================== */
 
-/* 1. 리스트 우측 뱃지 박스 (흰 배경 -> 다크 골드 스타일) */
-.is-lv100 .scroll-timeline-item span[style*="background"],
-.is-lv100 .scroll-timeline-item div[style*="background"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="background"],
-#scrollModal.is-lv100 .scroll-timeline-item div[style*="background"] {
-    background: rgba(212, 175, 55, 0.15) !important;
-    border: 1px solid #d4af37 !important;
-    color: #fcf6ba !important;
-    font-weight: 700 !important;
+
+
+/* ==========================================
+   🏆 [Lv100] 최상위 모달 및 하얀 배경 완전 박멸
+   ========================================== */
+
+/* 1. 최상위 모달 본체 배경 다크화 */
+#scrollModal.is-lv100,
+#scrollModal.is-lv100 > div,
+.is-lv100#scrollModal {
+    background-color: rgba(0, 0, 0, 0.75) !important;
 }
 
-/* 2. 뱃지 안쪽 텍스트 '일정' 등 흰색 글씨 -> 골드로 강제 */
-.is-lv100 .scroll-timeline-item .badge,
-.is-lv100 .scroll-timeline-item [class*="badge"],
-.is-lv100 .scroll-timeline-item [class*="tag"],
-#scrollModal.is-lv100 .scroll-timeline-item .badge,
-#scrollModal.is-lv100 .scroll-timeline-item [class*="badge"],
-#scrollModal.is-lv100 .scroll-timeline-item [class*="tag"] {
-    background: rgba(212, 175, 55, 0.15) !important;
-    border: 1px solid #d4af37 !important;
-    color: #fcf6ba !important;
+/* 2. 카드 메인 컨테이너 칠흑색 & 골드 림 적용 */
+#scrollModal.is-lv100 .fading-scroll,
+.is-lv100 .fading-scroll {
+    background: #090d16 !important;
+    border: 1.5px solid #d4af37 !important;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.35) !important;
+    color: #e2e8f0 !important;
 }
 
-/* 3. [왼쪽 원] 리스트 전체 라인 및 외곽선 테두리 골드화 */
-.is-lv100 .tab-scroll-container,
-.is-lv100 .scroll-filtered-list-box,
-#scrollModal.is-lv100 .tab-scroll-container,
-#scrollModal.is-lv100 .scroll-filtered-list-box {
+/* 3. 상단 리포트 요약 카드 다크 배경 처리 */
+#scrollModal.is-lv100 .user-report-summary-card,
+.is-lv100 .user-report-summary-card {
+    background: rgba(18, 26, 43, 0.95) !important;
     border: 1px solid rgba(212, 175, 55, 0.4) !important;
+}
+
+/* 4. D-Day 뱃지 & 상단 텍스트 골드화 */
+#scrollModal.is-lv100 .dday-count-badge,
+.is-lv100 .dday-count-badge {
+    background: rgba(212, 175, 55, 0.15) !important;
+    color: #fcf6ba !important;
+    border: 1px solid #d4af37 !important;
+}
+
+#scrollModal.is-lv100 .user-report-summary-card strong,
+.is-lv100 .user-report-summary-card strong,
+#scrollModal.is-lv100 .member-since-date,
+.is-lv100 .member-since-date {
+    color: #d4af37 !important;
+}
+
+/* 5. 탭 컨테이너 전체 라인 및 외곽 박스 골드화 */
+#scrollModal.is-lv100 .tab-scroll-container,
+.is-lv100 .tab-scroll-container {
+    background: #090d16 !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
     border-radius: 12px !important;
+    padding: 8px !important;
 }
 
-/* 4. 리스트 아이템 개별 외곽선 딥 골드 지정 */
-.is-lv100 .scroll-timeline-item,
-#scrollModal.is-lv100 .scroll-timeline-item {
-    border: 1px solid rgba(212, 175, 55, 0.35) !important;
-    box-shadow: 0 0 5px rgba(212, 175, 55, 0.1) !important;
-}
-
-
-/* 5. 탭 버튼 글꼴 및 골드 그라데이션 */
-.is-lv100 .tab-btn,
-#scrollModal.is-lv100 .tab-btn {
-    background: transparent !important;
-    color: #dfb76c !important;
-    border: none !important;
-    opacity: 0.7;
-}
-
-.is-lv100 .tab-btn.active,
-#scrollModal.is-lv100 .tab-btn.active {
-    background: linear-gradient(135deg, #c5a059 0%, #dfb76c 50%, #9e7d3b 100%) !important;
-    color: #000000 !important;
-    font-weight: 800 !important;
-    opacity: 1;
-}
 
 /* 6. 리스트 아이템 및 산 이름/날짜 골드 텍스트 적용 */
 .is-lv100 .scroll-timeline-item,
@@ -10169,9 +10166,12 @@ window.scrollPagination = {
     // showFadingScroll 함수 내부의 레벨 판정 부분
 const currentLevel = memberInfo ? Number(memberInfo.level) : Number(level || 0);
 
+// JS 내부 레벨 체크 로직 부분
 if (currentLevel >= 100) {
     if (modal) modal.classList.add('is-lv100');
     if (scrollWrap) scrollWrap.classList.add('is-lv100');
+}
+
 } else {
     if (modal) modal.classList.remove('is-lv100');
     if (scrollWrap) scrollWrap.classList.remove('is-lv100');
