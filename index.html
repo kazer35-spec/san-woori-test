@@ -29,11 +29,16 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
     
+
+
+
 /* ==========================================
-   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (완전 강제화)
+   🏆 [Lv100] 블랙 & 딥골드 레전더리 테마 (최종 통합본)
    ========================================== */
 
-/* 1. 모달 전체 배경 및 외곽선 */
+/* 1. 최상위 모달 및 전체 카드 배경 다크화 */
+#scrollModal.is-lv100,
+#scrollModal.is-lv100 > div,
 .is-lv100.fading-scroll,
 .is-lv100 .fading-scroll,
 #scrollModal.is-lv100 .fading-scroll {
@@ -61,7 +66,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: rgba(212, 175, 55, 0.15) !important;
 }
 
-/* 3. 상단 요약 카드의 흰색 배경 강제 제거 및 딥골드화 */
+/* 3. 상단 리포트 요약 카드 */
 .is-lv100 .user-report-summary-card,
 #scrollModal.is-lv100 .user-report-summary-card {
     background: rgba(18, 26, 43, 0.95) !important;
@@ -70,7 +75,9 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 .is-lv100 .user-report-summary-card strong,
-#scrollModal.is-lv100 .user-report-summary-card strong {
+#scrollModal.is-lv100 .user-report-summary-card strong,
+.is-lv100 .member-since-date,
+#scrollModal.is-lv100 .member-since-date {
     color: #d4af37 !important;
 }
 
@@ -86,12 +93,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     border-bottom: 1px dashed rgba(212, 175, 55, 0.3) !important;
 }
 
-.is-lv100 .member-since-date,
-#scrollModal.is-lv100 .member-since-date {
-    color: #d4af37 !important;
-}
-
-/* 4. 탭 버튼 영역 및 하단 영역 흰색 배경 강제 다크화 */
+/* 4. 탭 버튼 영역 및 탭 상단 흰색 박스 제거 */
 .is-lv100 .tab-scroll-container,
 .is-lv100 .tab-header-buttons,
 .is-lv100 .scroll-filtered-list-box,
@@ -100,16 +102,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 #scrollModal.is-lv100 .tab-header-buttons,
 #scrollModal.is-lv100 .scroll-filtered-list-box,
 #scrollModal.is-lv100 #scrollFilteredList {
+    background-color: #090d16 !important;
     background: #090d16 !important;
+    border-color: rgba(212, 175, 55, 0.3) !important;
 }
 
-/* 5. 탭 버튼 글꼴 및 골드 그라데이션 */
+/* 5. 탭 버튼 글꼴 및 미선택/선택 스타일 */
 .is-lv100 .tab-btn,
 #scrollModal.is-lv100 .tab-btn {
     background: transparent !important;
     color: #dfb76c !important;
     border: none !important;
-    opacity: 0.7;
+    opacity: 0.8 !important;
 }
 
 .is-lv100 .tab-btn.active,
@@ -117,14 +121,14 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: linear-gradient(135deg, #c5a059 0%, #dfb76c 50%, #9e7d3b 100%) !important;
     color: #000000 !important;
     font-weight: 800 !important;
-    opacity: 1;
+    opacity: 1 !important;
 }
 
-/* 6. 리스트 아이템 및 산 이름/날짜 골드 텍스트 적용 */
+/* 6. 리스트 아이템 및 산 이름/날짜 */
 .is-lv100 .scroll-timeline-item,
 #scrollModal.is-lv100 .scroll-timeline-item {
     background: #121a2b !important;
-    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border: 1px solid rgba(212, 175, 55, 0.35) !important;
     border-radius: 8px !important;
     margin-bottom: 6px !important;
     padding: 8px 10px !important;
@@ -144,7 +148,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #fcf6ba !important;
 }
 
-/* 7. 더보기 버튼 영역 다크 & 골드화 */
+/* 7. 우측 '일정' 등 뱃지 박스 강제 골드화 (인라인 스타일 덮어쓰기) */
+.is-lv100 .scroll-timeline-item span,
+.is-lv100 .scroll-timeline-item div,
+#scrollModal.is-lv100 .scroll-timeline-item span,
+#scrollModal.is-lv100 .scroll-timeline-item div {
+    background-color: rgba(212, 175, 55, 0.15) !important;
+    background: rgba(212, 175, 55, 0.15) !important;
+    border: 1px solid #d4af37 !important;
+    color: #fcf6ba !important;
+}
+
+/* 8. 더보기 버튼 및 스크롤바 */
 .is-lv100 #scrollMoreBtnArea,
 .is-lv100 #scrollMoreBtnArea button,
 #scrollModal.is-lv100 #scrollMoreBtnArea,
@@ -156,7 +171,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     border-radius: 8px !important;
 }
 
-/* 8. 골드 스크롤바 */
 .is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb,
 #scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb {
     background: #d4af37 !important;
