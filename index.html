@@ -73,6 +73,65 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 
+/* 5. 탭 버튼 글꼴 및 골드 그라데이션 */
+.is-lv100 .tab-btn,
+#scrollModal.is-lv100 .tab-btn {
+    background: transparent !important;
+    color: #dfb76c !important;
+    border: none !important;
+    opacity: 0.7;
+}
+
+.is-lv100 .tab-btn.active,
+#scrollModal.is-lv100 .tab-btn.active {
+    background: linear-gradient(135deg, #c5a059 0%, #dfb76c 50%, #9e7d3b 100%) !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    opacity: 1;
+}
+
+/* 6. 리스트 아이템 및 산 이름/날짜 골드 텍스트 적용 */
+.is-lv100 .scroll-timeline-item,
+#scrollModal.is-lv100 .scroll-timeline-item {
+    background: #121a2b !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 8px !important;
+    margin-bottom: 6px !important;
+    padding: 8px 10px !important;
+}
+
+.is-lv100 .scroll-item-date,
+#scrollModal.is-lv100 .scroll-item-date {
+    color: #d4af37 !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+}
+
+.is-lv100 .scroll-item-name,
+.is-lv100 .scroll-item-name *,
+#scrollModal.is-lv100 .scroll-item-name,
+#scrollModal.is-lv100 .scroll-item-name * {
+    color: #fcf6ba !important;
+}
+
+/* 7. 더보기 버튼 영역 다크 & 골드화 */
+.is-lv100 #scrollMoreBtnArea,
+.is-lv100 #scrollMoreBtnArea button,
+#scrollModal.is-lv100 #scrollMoreBtnArea,
+#scrollModal.is-lv100 #scrollMoreBtnArea button {
+    background: #121a2b !important;
+    border: 1px solid #d4af37 !important;
+    color: #d4af37 !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+}
+
+/* 8. 골드 스크롤바 */
+.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb,
+#scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb {
+    background: #d4af37 !important;
+}
+
 
 
 
@@ -10107,13 +10166,17 @@ window.scrollPagination = {
         ? currentData.find(m => String(m.id) === String(safeMemberId) || (m.name && m.name === safeMemberId)) 
         : null;
 
-    const currentLevel = memberInfo ? Number(memberInfo.level) : Number(level || 0);
+    // showFadingScroll 함수 내부의 레벨 판정 부분
+const currentLevel = memberInfo ? Number(memberInfo.level) : Number(level || 0);
 
-    if (currentLevel >= 100) {
-        modal.classList.add('is-lv100');
-    } else {
-        modal.classList.remove('is-lv100');
-    }
+if (currentLevel >= 100) {
+    if (modal) modal.classList.add('is-lv100');
+    if (scrollWrap) scrollWrap.classList.add('is-lv100');
+} else {
+    if (modal) modal.classList.remove('is-lv100');
+    if (scrollWrap) scrollWrap.classList.remove('is-lv100');
+}
+
 
     if (!window.scrollPagination) window.scrollPagination = {};
     
