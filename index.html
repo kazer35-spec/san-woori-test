@@ -5727,26 +5727,31 @@ let currentMemberLogs = [];
   window.showMemberTimeline = async (mId, mName) => {
     toggleTimelineModal(true);
     
-    // 🎯 100레벨 판정 및 블랙&골드 테마 적용
+    // 🎯 안전한 100레벨 판정 및 블랙&골드 테마 적용
     const timelineModal = document.getElementById('timelineModal');
-    const memberInfo = currentData.find(m => m.id === mId || m.name === mName);
+    
+    // currentData 존재 여부 및 mId 타입 일치 안전 검사
+    const memberInfo = (typeof currentData !== 'undefined' && currentData) 
+        ? currentData.find(m => String(m.id) === String(mId) || m.name === mName) 
+        : null;
     
     if (timelineModal) {
-        if (memberInfo && (memberInfo.level >= 100)) {
+        if (memberInfo && Number(memberInfo.level) >= 100) {
             timelineModal.classList.add('is-lv100');
         } else {
             timelineModal.classList.remove('is-lv100');
         }
     }
 
-    
     const modalContent = document.getElementById('timelineModalContent');
-    modalContent.scrollTop = 0;
+    if (modalContent) modalContent.scrollTop = 0;
+    
     const container = document.getElementById('timelineContent');
     const grassBoard = document.getElementById('grassBoard');
     const vibeArea = document.getElementById('passionVibeArea');
     const chartBox = document.getElementById('chartBox');
 
+    
     // 1. 기본 텍스트 및 정보 세팅
     document.getElementById('timelineMemberName').innerText = mName;
     const memberInfo = currentData.find(m => m.id === mId);
