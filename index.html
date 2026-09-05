@@ -28,8 +28,9 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+    
 /* ==========================================
-   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (배지 핀포인트 수정본)
+   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (뱃지 컬러 복구 완료)
    ========================================== */
 
 /* 1. 모달 전체 배경, 외곽선 및 최상위 다크 처리 */
@@ -146,22 +147,23 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 .is-lv100 .scroll-item-name,
-#scrollModal.is-lv100 .scroll-item-name {
+.is-lv100 .scroll-item-name *,
+#scrollModal.is-lv100 .scroll-item-name,
+#scrollModal.is-lv100 .scroll-item-name * {
     color: #fcf6ba !important;
 }
 
-/* 🎯 7. 우측 '일정/정기산행' 배지 전용 핀포인트 타겟팅 */
-.is-lv100 .scroll-timeline-item .schedule-badge,
-.is-lv100 .scroll-timeline-item .badge,
-.is-lv100 .scroll-timeline-item span[class*="badge"],
-.is-lv100 .scroll-timeline-item > div:nth-child(2) span,
-#scrollModal.is-lv100 .scroll-timeline-item .schedule-badge,
-#scrollModal.is-lv100 .scroll-timeline-item .badge,
-#scrollModal.is-lv100 .scroll-timeline-item span[class*="badge"],
-#scrollModal.is-lv100 .scroll-timeline-item > div:nth-child(2) span {
+/* 🎯 7. 우측 '일정' 뱃지: 흰색 배경만 딥골드로 바꾸고, 인라인 글자 색상은 원래대로 유지 */
+.is-lv100 .scroll-timeline-item [style*="background-color: white"],
+.is-lv100 .scroll-timeline-item [style*="background-color: #fff"],
+.is-lv100 .scroll-timeline-item [style*="background: white"],
+.is-lv100 .scroll-timeline-item [style*="background: #fff"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: white"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: #fff"] {
     background-color: rgba(212, 175, 55, 0.15) !important;
     background: rgba(212, 175, 55, 0.15) !important;
     border: 1px solid rgba(212, 175, 55, 0.5) !important;
+    /* color는 !important를 지정하지 않아 JS가 부여한 고유 텍스트 색상 유지 */
 }
 
 /* 8. 더보기 버튼 영역 다크 & 골드화 */
@@ -181,8 +183,9 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 #scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb {
     background: #d4af37 !important;
 }
-    
-    
+
+
+
 
 
         /* 1. 빛 이동 애니메이션 */
