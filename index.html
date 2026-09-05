@@ -153,22 +153,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #fcf6ba !important;
 }
 
-/* 🎯 7. 우측 '일정' 뱃지: JS 인라인 흰색 배경(rgb/hex 포함)만 정확히 타겟팅하여 딥골드로 변경 */
-.is-lv100 .scroll-timeline-item span[style*="rgb(255, 255, 255)"],
-.is-lv100 .scroll-timeline-item span[style*="255, 255, 255"],
-.is-lv100 .scroll-timeline-item span[style*="white"],
-.is-lv100 .scroll-timeline-item span[style*="#fff"],
-.is-lv100 .scroll-timeline-item span[style*="#ffffff"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="rgb(255, 255, 255)"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="255, 255, 255"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="white"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="#fff"],
-#scrollModal.is-lv100 .scroll-timeline-item span[style*="#ffffff"] {
-    background: rgba(212, 175, 55, 0.15) !important;
+/* 🎯 7. 우측 '일정' 뱃지: 흰색 배경만 딥골드로 바꾸고, 인라인 글자 색상은 원래대로 유지 */
+.is-lv100 .scroll-timeline-item [style*="background-color: white"],
+.is-lv100 .scroll-timeline-item [style*="background-color: #fff"],
+.is-lv100 .scroll-timeline-item [style*="background: white"],
+.is-lv100 .scroll-timeline-item [style*="background: #fff"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: white"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: #fff"] {
     background-color: rgba(212, 175, 55, 0.15) !important;
+    background: rgba(212, 175, 55, 0.15) !important;
     border: 1px solid rgba(212, 175, 55, 0.5) !important;
+    /* color는 !important를 지정하지 않아 JS가 부여한 고유 텍스트 색상 유지 */
 }
-
 
 /* 8. 더보기 버튼 영역 다크 & 골드화 */
 .is-lv100 #scrollMoreBtnArea,
