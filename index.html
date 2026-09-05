@@ -30,110 +30,79 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 
     
 /* ==========================================
-   🏆 [Lv100] 블랙&골드 완벽 고정 (우선순위 강제 적용)
+   🏆 [Lv100] 레전더리 골드 디테일 & 간격 조절
    ========================================== */
 
-/* 1. 모달 전체 배경 및 외곽선 */
-#scrollModal.is-lv100 .fading-scroll,
-.is-lv100 .fading-scroll {
-    background: #090d16 !important;
-    border: 1.5px solid #d4af37 !important;
-    box-shadow: 0 0 25px rgba(212, 175, 55, 0.35) !important;
-    color: #e2e8f0 !important;
-}
-
-/* 2. 상단 헤더 타이틀 (진한 골드) */
-#scrollModal.is-lv100 .scroll-title-sub,
-.is-lv100 .scroll-title-sub {
-    color: #d4af37 !important;
-}
-#scrollModal.is-lv100 .scroll-title-main,
-.is-lv100 .scroll-title-main {
-    color: #fcf6ba !important;
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
-}
-#scrollModal.is-lv100 .modal-close-btn,
-.is-lv100 .modal-close-btn {
-    color: #d4af37 !important;
+/* 1. D-Day 뱃지 (하늘색 -> 딥 골드) */
+#scrollModal.is-lv100 .dday-count-badge,
+.is-lv100 .dday-count-badge {
     background: rgba(212, 175, 55, 0.15) !important;
+    color: #fcf6ba !important;
+    border: 1px solid #d4af37 !important;
 }
 
-/* 3. 상단 요약 카드 다크화 */
-#scrollModal.is-lv100 .user-report-summary-card,
-.is-lv100 .user-report-summary-card {
-    background: rgba(18, 26, 43, 0.95) !important;
-    border: 1px solid rgba(212, 175, 55, 0.4) !important;
-}
-#scrollModal.is-lv100 .user-report-summary-card strong,
-.is-lv100 .user-report-summary-card strong {
-    color: #d4af37 !important;
-}
-
-/* 4. [핵심] 하단 탭 및 리스트 박스 영구 다크화 */
-#scrollModal.is-lv100 .tab-scroll-container,
-#scrollModal.is-lv100 .scroll-filtered-list-box,
-#scrollModal.is-lv100 #scrollFilteredList,
-.is-lv100 .tab-scroll-container,
-.is-lv100 .scroll-filtered-list-box,
-.is-lv100 #scrollFilteredList {
-    background: #090d16 !important;
-}
-
-/* 5. 탭 버튼 스타일 */
-#scrollModal.is-lv100 .tab-header-buttons,
-.is-lv100 .tab-header-buttons {
-    background: #121a2b !important;
-    border: 1px solid rgba(212, 175, 55, 0.3) !important;
-    border-radius: 10px !important;
-    padding: 3px !important;
-}
+/* 2. 탭 버튼 미선택 글씨 (골드톤으로 변경) */
 #scrollModal.is-lv100 .tab-btn,
 .is-lv100 .tab-btn {
     background: transparent !important;
-    color: #94a3b8 !important;
+    color: #dfb76c !important; /* 미선택 탭도 샴페인 골드 */
     border: none !important;
+    opacity: 0.7;
 }
+
 #scrollModal.is-lv100 .tab-btn.active,
 .is-lv100 .tab-btn.active {
     background: linear-gradient(135deg, #c5a059 0%, #dfb76c 50%, #9e7d3b 100%) !important;
     color: #000000 !important;
     font-weight: 800 !important;
-    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4) !important;
+    opacity: 1;
 }
 
-/* 6. [핵심] 타임라인 카드 & 안 보이던 산 이름 텍스트 가독성 확보 */
-#scrollModal.is-lv100 .scroll-timeline-item,
-.is-lv100 .scroll-timeline-item {
-    background: #121a2b !important;
-    border: 1px solid rgba(212, 175, 55, 0.25) !important;
-    border-radius: 8px !important;
-    margin-bottom: 8px !important;
-    padding: 10px 12px !important;
-}
-#scrollModal.is-lv100 .scroll-item-date,
-.is-lv100 .scroll-item-date {
-    color: #d4af37 !important;
-    font-weight: 700 !important;
-}
-/* 사라졌던 산 이름/텍스트 강제 가시화 */
+/* 3. 산 이름 & 장소 텍스트 (화이트 -> 골드) */
 #scrollModal.is-lv100 .scroll-item-name,
 #scrollModal.is-lv100 .scroll-item-name *,
 .is-lv100 .scroll-item-name,
 .is-lv100 .scroll-item-name * {
-    color: #ffffff !important; /* 흰색 글씨 선명하게 고정 */
+    color: #fcf6ba !important; /* 딥 골드 & 샴페인 골드 */
 }
 
-/* 7. 더보기 버튼 영역 */
-#scrollModal.is-lv100 #scrollMoreBtnArea button,
-.is-lv100 #scrollMoreBtnArea button {
+/* 4. 우측 스크롤바 (흰색 -> 얇은 골드 스크롤바) */
+#scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar,
+.is-lv100 #scrollFilteredList::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+#scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-track,
+.is-lv100 #scrollFilteredList::-webkit-scrollbar-track {
+    background: rgba(9, 13, 22, 0.5) !important;
+}
+
+#scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb,
+.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb {
+    background: #d4af37 !important;
+    border-radius: 4px !important;
+}
+
+/* 5. 리스트 간격 및 내부 여백 조절 (왼쪽 사진처럼 촘촘하고 깔끔하게) */
+#scrollModal.is-lv100 .scroll-timeline-item,
+.is-lv100 .scroll-timeline-item {
     background: #121a2b !important;
-    border: 1px solid #d4af37 !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 8px !important;
+    margin-bottom: 6px !important; /* 카드 간 간격 축소 */
+    padding: 8px 10px !important;  /* 내부 여백 슬림화 */
+}
+
+/* 날짜 폰트 크기 및 간격 정돈 */
+#scrollModal.is-lv100 .scroll-item-date,
+.is-lv100 .scroll-item-date {
     color: #d4af37 !important;
     font-weight: 700 !important;
-    border-radius: 8px !important;
+    font-size: 11px !important;
+    margin-bottom: 2px !important;
 }
 
-   
+
 
 
 
