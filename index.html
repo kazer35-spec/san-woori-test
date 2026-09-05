@@ -5726,6 +5726,20 @@ let currentMemberLogs = [];
 
   window.showMemberTimeline = async (mId, mName) => {
     toggleTimelineModal(true);
+    
+    // 🎯 100레벨 판정 및 블랙&골드 테마 적용
+    const timelineModal = document.getElementById('timelineModal');
+    const memberInfo = currentData.find(m => m.id === mId || m.name === mName);
+    
+    if (timelineModal) {
+        if (memberInfo && (memberInfo.level >= 100)) {
+            timelineModal.classList.add('is-lv100');
+        } else {
+            timelineModal.classList.remove('is-lv100');
+        }
+    }
+
+    
     const modalContent = document.getElementById('timelineModalContent');
     modalContent.scrollTop = 0;
     const container = document.getElementById('timelineContent');
