@@ -10611,15 +10611,20 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 ? `<span style="margin-left: auto; background: linear-gradient(135deg, rgba(255, 105, 180, 0.15), rgba(160, 32, 240, 0.15)); color: #7e22ce; border: 1px solid rgba(160, 32, 240, 0.35); font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; display: inline-flex; align-items: center; line-height: 1; flex-shrink: 0;">정기산행</span>`
                 : '';
 
-            // 🎯 100대 명산(산림청) 블루 텍스트 처리
-            let mountainHtml = '';
-            if (isPureRegularHike) {
-                mountainHtml = `${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`;
-            } else if (isTop100Log) {
-                mountainHtml = `<span class="top100-blue" style="color: #2563eb !important; font-weight: 700;">${rawMountain} (${heightVal}${unit})</span>`;
-            } else {
-                mountainHtml = `<span>${rawMountain} (${heightVal}${unit})</span>`;
-            }
+            // 🎯 레벨 체크 (보유하신 레벨 변수명 userLevel 사용)
+const isLv100 = typeof userLevel !== 'undefined' ? userLevel >= 100 : false;
+
+// 🎯 100대 명산(산림청) 텍스트 처리 (100레벨: 엠버 오렌지 #ff9f43 / 일반: 파란색 #2563eb)
+let mountainHtml = '';
+if (isPureRegularHike) {
+    mountainHtml = `${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`;
+} else if (isTop100Log) {
+    const top100TextColor = isLv100 ? '#ff9f43' : '#2563eb';
+    mountainHtml = `<span class="top100-mountain" style="color: ${top100TextColor} !important; font-weight: 700;">${rawMountain} (${heightVal}${unit})</span>`;
+} else {
+    mountainHtml = `<span>${rawMountain} (${heightVal}${unit})</span>`;
+}
+
 
             return `
                 <div class="scroll-timeline-item">
