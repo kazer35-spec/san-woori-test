@@ -64,27 +64,33 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 /* 3. 상단 요약 카드 (진한 골드 라벨 & 크림골드 횟수/날짜 적용) */
+/* 3. 상단 요약 카드의 딥골드화 */
 .is-lv100 .user-report-summary-card,
 #scrollModal.is-lv100 .user-report-summary-card {
     background: rgba(18, 26, 43, 0.95) !important;
     border: 1px solid rgba(212, 175, 55, 0.4) !important;
-    color: #d4af37 !important; /* 기본 라벨 텍스트: 진한 골드 */
+    color: #d4af37 !important; /* 기본 라벨 텍스트 전체를 진한 골드로 지정 */
 }
 
-/* 횟수 숫자 및 날짜 값: OO산과 동일한 연크림 골드(#fcf6ba) */
+/* 상단 카드 내 모든 일반 텍스트, span, div 라벨을 진한 골드(#d4af37)로 강제 고정 */
+.is-lv100 .user-report-summary-card *,
+#scrollModal.is-lv100 .user-report-summary-card * {
+    color: #d4af37 !important;
+}
+
+/* 오직 '숫자(회)' 및 '날짜 값'만 크림골드(#fcf6ba)로 유지 */
 .is-lv100 .user-report-summary-card strong,
-.is-lv100 .user-report-summary-card span:not([class*="badge"]),
 .is-lv100 .member-since-date,
+.is-lv100 .dday-count-badge,
 #scrollModal.is-lv100 .user-report-summary-card strong,
-#scrollModal.is-lv100 .user-report-summary-card span:not([class*="badge"]),
-#scrollModal.is-lv100 .member-since-date {
+#scrollModal.is-lv100 .member-since-date,
+#scrollModal.is-lv100 .dday-count-badge {
     color: #fcf6ba !important;
 }
 
 .is-lv100 .dday-count-badge,
 #scrollModal.is-lv100 .dday-count-badge {
     background: rgba(212, 175, 55, 0.15) !important;
-    color: #fcf6ba !important;
     border: 1px solid #d4af37 !important;
 }
 
@@ -92,6 +98,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 #scrollModal.is-lv100 .user-status-row-bar {
     border-bottom: 1px dashed rgba(212, 175, 55, 0.3) !important;
 }
+
 
 /* 4. 탭 컨테이너 전체 배경 및 외곽선 */
 .is-lv100 .tab-scroll-container,
