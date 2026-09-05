@@ -30,7 +30,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 
     
 /* ==========================================
-   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (뱃지 컬러 복구 완료)
+   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (배지 스타일 완벽 수정본)
    ========================================== */
 
 /* 1. 모달 전체 배경, 외곽선 및 최상위 다크 처리 */
@@ -147,23 +147,21 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 .is-lv100 .scroll-item-name,
-.is-lv100 .scroll-item-name *,
-#scrollModal.is-lv100 .scroll-item-name,
-#scrollModal.is-lv100 .scroll-item-name * {
+#scrollModal.is-lv100 .scroll-item-name {
     color: #fcf6ba !important;
 }
 
-/* 🎯 7. 우측 '일정' 뱃지: 흰색 배경만 딥골드로 바꾸고, 인라인 글자 색상은 원래대로 유지 */
-.is-lv100 .scroll-timeline-item [style*="background-color: white"],
-.is-lv100 .scroll-timeline-item [style*="background-color: #fff"],
-.is-lv100 .scroll-timeline-item [style*="background: white"],
-.is-lv100 .scroll-timeline-item [style*="background: #fff"],
-#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: white"],
-#scrollModal.is-lv100 .scroll-timeline-item [style*="background-color: #fff"] {
+/* 🎯 7. 우측 배지 박스 타겟팅 (배경은 골드 다크, 글자색은 고유 색상 보존) */
+.is-lv100 .scroll-timeline-item > div:last-child span,
+.is-lv100 .scroll-timeline-item span:last-child,
+#scrollModal.is-lv100 .scroll-timeline-item > div:last-child span,
+#scrollModal.is-lv100 .scroll-timeline-item span:last-child {
     background-color: rgba(212, 175, 55, 0.15) !important;
     background: rgba(212, 175, 55, 0.15) !important;
     border: 1px solid rgba(212, 175, 55, 0.5) !important;
-    /* color는 !important를 지정하지 않아 JS가 부여한 고유 텍스트 색상 유지 */
+    border-radius: 4px !important;
+    padding: 1px 5px !important;
+    font-weight: bold !important;
 }
 
 /* 8. 더보기 버튼 영역 다크 & 골드화 */
@@ -184,6 +182,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: #d4af37 !important;
 }
 
+        
 
 
 
