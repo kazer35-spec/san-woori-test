@@ -28,6 +28,85 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* ==========================================
+   🏆 Level 100 레전더리 블랙 & 골드 테마
+   ========================================== */
+
+/* 1. 개인 운동 상태 리포트 모달 (scrollModal) */
+#scrollModal .fading-scroll.is-lv100 {
+    background: linear-gradient(180deg, #0b0f19 0%, #080a10 100%) !important;
+    border: 1.5px solid #dfb76c !important;
+    box-shadow: 0 0 25px rgba(223, 183, 108, 0.35) !important;
+    color: #e2e8f0 !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .scroll-title-sub {
+    color: #dfb76c !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .scroll-title-main {
+    color: #ffffff !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .modal-close-btn {
+    color: #dfb76c !important;
+    background: rgba(223, 183, 108, 0.15) !important;
+    border-radius: 50%;
+}
+
+#scrollModal .fading-scroll.is-lv100 .user-report-summary-card {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(223, 183, 108, 0.3) !important;
+    color: #cbd5e1 !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .user-report-summary-card strong {
+    color: #f1f5f9 !important;
+}
+
+/* 2. 분기 잔디 모달 (timelineModal) */
+#timelineModal.is-lv100 .bg-white,
+#timelineModal.is-lv100 .timeline-modal-container { /* 실제 잔디 모달 컨테이너 클래스로 지정 */
+    background: linear-gradient(180deg, #0c101d 0%, #05070c 100%) !important;
+    border: 1.5px solid #d4af37 !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+/* 3. 지도 모달 (mapModal) */
+#mapModal.is-lv100 .bg-white,
+#mapModal.is-lv100 .map-modal-container { /* 실제 지도 모달 컨테이너 클래스로 지정 */
+    background: linear-gradient(180deg, #0c101d 0%, #05070c 100%) !important;
+    border: 1.5px solid #d4af37 !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+/* 공통: 텍스트 및 카드 요소 커스텀 */
+.is-lv100 .text-slate-500,
+.is-lv100 .text-slate-600,
+.is-lv100 .text-slate-700,
+.is-lv100 .text-slate-800,
+.is-lv100 .text-gray-600 {
+    color: #e2e8f0 !important;
+}
+
+.is-lv100 #timelineLegend,
+.is-lv100 #chartBox,
+.is-lv100 .bg-slate-50\/60 {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+/* 하단 버튼 및 액센트 골드 그라데이션 */
+.is-lv100 .soft-notice-btn {
+    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7) !important;
+    color: #0f172a !important;
+    font-weight: 900 !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3) !important;
+}
+
         /* 1. 빛 이동 애니메이션 */
 @keyframes sweepGlow {
     0% {
@@ -10052,6 +10131,20 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
         return;
     }
 
+    // 🎯 [신규] 100레벨 판정 및 블랙&골드 테마 적용 (안전한 방어 코드 포함)
+    const memberInfo = (typeof currentData !== 'undefined' && currentData) 
+        ? currentData.find(m => String(m.id) === String(safeMemberId) || (m.name && m.name === safeMemberId)) 
+        : null;
+
+    // 인자로 넘어온 level 또는 currentData에서 가져온 level 확인
+    const currentLevel = memberInfo ? Number(memberInfo.level) : Number(level || 0);
+
+    if (currentLevel >= 100) {
+        modal.classList.add('is-lv100');
+    } else {
+        modal.classList.remove('is-lv100');
+    }
+
     if (!window.scrollPagination) window.scrollPagination = {};
     
     window.scrollPagination.mId = safeMemberId;
@@ -10218,6 +10311,7 @@ window.closeScrollModal = function() {
     const modal = document.getElementById('scrollModal');
     if (modal) {
         modal.style.display = 'none';
+        modal.classList.remove('is-lv100'); // 닫을 때 테마 클래스 초기화
     }
 };
     
@@ -10248,13 +10342,12 @@ window.switchScrollTab = (category) => {
 
 // 🌟 스크롤 모달 목록 페이징 렌더링
 window.loadScrollLogsPage = (isFirstPage = false) => {
-        // 국립공원 산 목록 (함수 맨 위에 붙여넣기)
-const NATIONAL_PARKS = [
-  '가야산', '지리산', '설악산', '한라산', '북한산', '내장산', '덕유산', 
-  '주왕산', '오대산', '치악산', '월악산', '속리산', '계룡산', '무등산', 
-  '태백산', '소백산', '팔공산', '(경주)', '내변산', '월출산', '팔영산',
-  '금정산'
-];
+    const NATIONAL_PARKS = [
+      '가야산', '지리산', '설악산', '한라산', '북한산', '내장산', '덕유산', 
+      '주왕산', '오대산', '치악산', '월악산', '속리산', '계룡산', '무등산', 
+      '태백산', '소백산', '팔공산', '(경주)', '내변산', '월출산', '팔영산',
+      '금정산'
+    ];
 
     if (!window.scrollPagination) return;
     
@@ -10334,20 +10427,19 @@ const NATIONAL_PARKS = [
                           log.isNationalPark == 1 ||
                           NATIONAL_PARKS.some(np => rawMountain.includes(np));
 
-const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
+            const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
 
-// 🎯 3개 다 해당하는지 체크 (3개 모두 있으면 '국공'->'국', '산림'->'산'으로 축소)
-const isAllThree = isNationalParkLog && isTop100Log && log.isBAC;
-const npText = isAllThree ? '국' : '국공';
-const top100Text = isAllThree ? '산' : '산림';
+            // 🎯 3개 다 해당하는지 체크
+            const isAllThree = isNationalParkLog && isTop100Log && log.isBAC;
+            const npText = isAllThree ? '국' : '국공';
+            const top100Text = isAllThree ? '산' : '산림';
 
-const npTag = isNationalParkLog ? `<span style="background: transparent; color: #0d9488; border: 1px solid #0d9488; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">${npText}</span>` : '';
-const top100Tag = isTop100Log ? `<span style="background: transparent; color: #2563eb; border: 1px solid #2563eb; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">${top100Text}</span>` : '';
-const bacTag = log.isBAC ? '<span style="background: transparent; color: #ef4444; border: 1px solid #ef4444; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">BAC</span>' : '';
+            const npTag = isNationalParkLog ? `<span style="background: transparent; color: #0d9488; border: 1px solid #0d9488; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">${npText}</span>` : '';
+            const top100Tag = isTop100Log ? `<span style="background: transparent; color: #2563eb; border: 1px solid #2563eb; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">${top100Text}</span>` : '';
+            const bacTag = log.isBAC ? '<span style="background: transparent; color: #ef4444; border: 1px solid #ef4444; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; margin-right: 1px; display: inline-block; line-height: 1.2;">BAC</span>' : '';
 
-const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
+            const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
 
-        
             // 아이콘 태그 (★ / ✔)
             let starTag = '';
             if (isTop100Log) {
@@ -10448,6 +10540,11 @@ const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
         moreBtnArea.innerHTML = `<span style="font-size:11px; color:#e53e3e;">데이터 로드 오류: ${e.message}</span>`;
     }
 };
+
+                    
+    
+         
+        
 
                  
                 
