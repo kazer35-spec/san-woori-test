@@ -30,7 +30,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 
     
 /* ==========================================
-   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (뱃지 컬러 복구 완료)
+   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (상단 요약 텍스트 컬러 수정본)
    ========================================== */
 
 /* 1. 모달 전체 배경, 외곽선 및 최상위 다크 처리 */
@@ -63,17 +63,22 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: rgba(212, 175, 55, 0.15) !important;
 }
 
-/* 3. 상단 요약 카드의 딥골드화 */
+/* 3. 상단 요약 카드 (진한 골드 라벨 & 크림골드 횟수/날짜 적용) */
 .is-lv100 .user-report-summary-card,
 #scrollModal.is-lv100 .user-report-summary-card {
     background: rgba(18, 26, 43, 0.95) !important;
     border: 1px solid rgba(212, 175, 55, 0.4) !important;
-    color: #cbd5e1 !important;
+    color: #d4af37 !important; /* 기본 라벨 텍스트: 진한 골드 */
 }
 
+/* 횟수 숫자 및 날짜 값: OO산과 동일한 연크림 골드(#fcf6ba) */
 .is-lv100 .user-report-summary-card strong,
-#scrollModal.is-lv100 .user-report-summary-card strong {
-    color: #d4af37 !important;
+.is-lv100 .user-report-summary-card span:not([class*="badge"]),
+.is-lv100 .member-since-date,
+#scrollModal.is-lv100 .user-report-summary-card strong,
+#scrollModal.is-lv100 .user-report-summary-card span:not([class*="badge"]),
+#scrollModal.is-lv100 .member-since-date {
+    color: #fcf6ba !important;
 }
 
 .is-lv100 .dday-count-badge,
@@ -86,11 +91,6 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .is-lv100 .user-status-row-bar,
 #scrollModal.is-lv100 .user-status-row-bar {
     border-bottom: 1px dashed rgba(212, 175, 55, 0.3) !important;
-}
-
-.is-lv100 .member-since-date,
-#scrollModal.is-lv100 .member-since-date {
-    color: #d4af37 !important;
 }
 
 /* 4. 탭 컨테이너 전체 배경 및 외곽선 */
@@ -154,16 +154,12 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 }
 
 /* 🎯 7. 우측 '일정/정기산행' 배지 전용 통합 타겟팅 */
-
-/* 7-1. 클래스 기반 배지 타겟팅 (정기산행 및 전용 클래스 배지) */
 .is-lv100 .scroll-timeline-item .schedule-badge,
 .is-lv100 .scroll-timeline-item .badge,
 .is-lv100 .scroll-timeline-item span[class*="badge"],
 #scrollModal.is-lv100 .scroll-timeline-item .schedule-badge,
 #scrollModal.is-lv100 .scroll-timeline-item .badge,
 #scrollModal.is-lv100 .scroll-timeline-item span[class*="badge"],
-
-/* 7-2. 인라인 스타일 기반 흰색 배지 타겟팅 (일정 배지 배경만 딥골드로 변경) */
 .is-lv100 .scroll-timeline-item [style*="background-color: white"],
 .is-lv100 .scroll-timeline-item [style*="background-color: #fff"],
 .is-lv100 .scroll-timeline-item [style*="background: white"],
@@ -179,10 +175,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     background: rgba(212, 175, 55, 0.15) !important;
     background-color: rgba(212, 175, 55, 0.15) !important;
     border: 1px solid rgba(212, 175, 55, 0.5) !important;
-    /* color는 !important를 지정하지 않아 JS가 부여한 고유 텍스트 색상 유지 */
 }
-
-
 
 /* 8. 더보기 버튼 영역 다크 & 골드화 */
 .is-lv100 #scrollMoreBtnArea,
@@ -201,6 +194,8 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 #scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb {
     background: #d4af37 !important;
 }
+
+
 
 
 
