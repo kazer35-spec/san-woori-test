@@ -28,6 +28,86 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* ==========================================
+   🏆 Level 100 레전더리 블랙 & 골드 테마
+   ========================================== */
+
+/* 1. 개인 운동 상태 리포트 모달 (scrollModal) */
+#scrollModal .fading-scroll.is-lv100 {
+    background: linear-gradient(180deg, #0b0f19 0%, #080a10 100%) !important;
+    border: 1.5px solid #dfb76c !important;
+    box-shadow: 0 0 25px rgba(223, 183, 108, 0.35) !important;
+    color: #e2e8f0 !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .scroll-title-sub {
+    color: #dfb76c !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .scroll-title-main {
+    color: #ffffff !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .modal-close-btn {
+    color: #dfb76c !important;
+    background: rgba(223, 183, 108, 0.15) !important;
+    border-radius: 50%;
+}
+
+#scrollModal .fading-scroll.is-lv100 .user-report-summary-card {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(223, 183, 108, 0.3) !important;
+    color: #cbd5e1 !important;
+}
+
+#scrollModal .fading-scroll.is-lv100 .user-report-summary-card strong {
+    color: #f1f5f9 !important;
+}
+
+/* 2. 분기 잔디 모달 (timelineModal) */
+#timelineModal.is-lv100 .bg-white,
+#timelineModal.is-lv100 .timeline-modal-container { /* 실제 잔디 모달 컨테이너 클래스로 지정 */
+    background: linear-gradient(180deg, #0c101d 0%, #05070c 100%) !important;
+    border: 1.5px solid #d4af37 !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+/* 3. 지도 모달 (mapModal) */
+#mapModal.is-lv100 .bg-white,
+#mapModal.is-lv100 .map-modal-container { /* 실제 지도 모달 컨테이너 클래스로 지정 */
+    background: linear-gradient(180deg, #0c101d 0%, #05070c 100%) !important;
+    border: 1.5px solid #d4af37 !important;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+/* 공통: 텍스트 및 카드 요소 커스텀 */
+.is-lv100 .text-slate-500,
+.is-lv100 .text-slate-600,
+.is-lv100 .text-slate-700,
+.is-lv100 .text-slate-800,
+.is-lv100 .text-gray-600 {
+    color: #e2e8f0 !important;
+}
+
+.is-lv100 #timelineLegend,
+.is-lv100 #chartBox,
+.is-lv100 .bg-slate-50\/60 {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+/* 하단 버튼 및 액센트 골드 그라데이션 */
+.is-lv100 .soft-notice-btn {
+    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7) !important;
+    color: #0f172a !important;
+    font-weight: 900 !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3) !important;
+}
+
+   
         /* 1. 빛 이동 애니메이션 */
 @keyframes sweepGlow {
     0% {
@@ -5647,6 +5727,20 @@ let currentMemberLogs = [];
 
   window.showMemberTimeline = async (mId, mName) => {
     toggleTimelineModal(true);
+    
+    // 🎯 100레벨 판정 및 블랙&골드 테마 적용
+    const timelineModal = document.getElementById('timelineModal');
+    const memberInfo = currentData.find(m => m.id === mId || m.name === mName);
+    
+    if (timelineModal) {
+        if (memberInfo && (memberInfo.level >= 100)) {
+            timelineModal.classList.add('is-lv100');
+        } else {
+            timelineModal.classList.remove('is-lv100');
+        }
+    }
+
+    
     const modalContent = document.getElementById('timelineModalContent');
     modalContent.scrollTop = 0;
     const container = document.getElementById('timelineContent');
@@ -6662,11 +6756,24 @@ window.loadNext20Normal = () => {
 
 // [3] 메인 지도 및 데이터 로드
 window.showMemberMap = async (mId, mName) => {
-    // 🟢 1. 무조건 보여줄 개수를 20개로 초기화
     top100DisplayCount = 20;
     normalDisplayCount = 20;
 
     toggleMapModal(true);
+    
+    // 🎯 100레벨 판정 및 블랙&골드 테마 적용
+    const mapModal = document.getElementById('mapModal');
+    const memberInfo = currentData.find(m => m.id === mId || m.name === mName);
+    
+    if (mapModal) {
+        if (memberInfo && (memberInfo.level >= 100)) {
+            mapModal.classList.add('is-lv100');
+        } else {
+            mapModal.classList.remove('is-lv100');
+        }
+    }
+
+
     document.getElementById('mapModalContent').scrollTop = 0;
     toggleMapView('main');
     switchStatsTab('top100'); // 기본 탭을 100대 명산으로 설정
@@ -10045,6 +10152,20 @@ window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = n
     const scrollWrap = document.querySelector('.fading-scroll'); 
     
     if(!modal || !content) return;
+
+    // 🎯 100레벨 판정 및 블랙&골드 테마 적용
+    const memberInfo = currentData?.find(m => m.id === mId || m.name === mId);
+    const userLevel = level || memberInfo?.level || 0;
+
+    if (scrollWrap) {
+        if (userLevel >= 100) {
+            scrollWrap.classList.add('is-lv100');
+        } else {
+            scrollWrap.classList.remove('is-lv100');
+        }
+    }
+
+
 
     const safeMemberId = mId ? String(mId).trim() : "";
     if (!safeMemberId) {
