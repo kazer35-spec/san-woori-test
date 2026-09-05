@@ -34,16 +34,24 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
    ========================================== */
 
 /* 1. 모달 전체 배경, 외곽선 및 최상위 다크 처리 */
-#scrollModal.is-lv100,
+/* 1. 모달 전체 오버레이(배경)는 반투명 딤 처리, 내부 창만 다크&골드 카드화 */
+#scrollModal.is-lv100 {
+    background: rgba(0, 0, 0, 0.65) !important; /* 바깥 배경을 반투명으로 만들어 뒤 레이어 비치게 수정 */
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 실제 중앙 모달 팝업 창 박스 */
 #scrollModal.is-lv100 > div,
 .is-lv100.fading-scroll,
-.is-lv100 .fading-scroll,
-#scrollModal.is-lv100 .fading-scroll {
+.is-lv100 .fading-scroll {
     background: #090d16 !important;
     border: 1.5px solid #d4af37 !important;
+    border-radius: 20px !important;
     box-shadow: 0 0 25px rgba(212, 175, 55, 0.35) !important;
     color: #e2e8f0 !important;
 }
+
 
 /* 2. 상단 타이틀 & 헤더 텍스트 */
 .is-lv100 .scroll-title-sub,
