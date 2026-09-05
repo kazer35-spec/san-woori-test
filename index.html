@@ -10254,18 +10254,22 @@ window.scrollPagination = {
         return;
     }
 
-    // 🎯 100레벨 판정 및 모달 부모(#scrollModal)에 is-lv100 부여
-    const memberInfo = (typeof currentData !== 'undefined' && currentData) 
-        ? currentData.find(m => String(m.id) === String(safeMemberId) || (m.name && m.name === safeMemberId)) 
-        : null;
+                // 🎯 레벨 체크 (모달/타임라인의 레벨 참조)
+            const currentLevel = typeof level !== 'undefined' ? level : (typeof memberLevel !== 'undefined' ? memberLevel : (typeof m !== 'undefined' ? m.level : 0));
+            const isLv100 = Number(currentLevel) >= 100;
 
-    const currentLevel = memberInfo ? Number(memberInfo.level) : Number(level || 0);
+            let mountainHtml = '';
+            if (isPureRegularHike) {
+                mountainHtml = `${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`;
+            } else if (isTop100Log) {
+                // 100레벨 이상이면 엠버 오렌지(#ff9f43), 일반 회원이면 파란색(#2563eb)
+                const top100NameColor = isLv100 ? '#ff9f43' : '#2563eb';
+                mountainHtml = `<span style="color: ${top100NameColor} !important; font-weight: 700;">${rawMountain} (${heightVal}${unit})</span>`;
+            } else {
+                // 일반 산은 기존 골드(#fcf6ba) 또는 기본 색상 유지
+                mountainHtml = `<span>${rawMountain} (${heightVal}${unit})</span>`;
+            }
 
-    if (currentLevel >= 100) {
-        modal.classList.add('is-lv100');
-    } else {
-        modal.classList.remove('is-lv100');
-    }
 
     if (!window.scrollPagination) window.scrollPagination = {};
     
