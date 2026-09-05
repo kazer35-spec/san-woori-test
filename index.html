@@ -29,8 +29,10 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
     
+
+
 /* ==========================================
-   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (완전 수정본)
+   🏆 100레벨 블랙 & 딥골드 레전더리 테마 (배지/텍스트 퍼펙트 골드)
    ========================================== */
 
 /* 1. 모달 전체 배경, 외곽선 및 최상위 다크 처리 */
@@ -93,7 +95,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #d4af37 !important;
 }
 
-/* 4. 탭 컨테이너 전체 배경 및 흰색 테두리 박스 -> 딥 골드 변환 (빨간 원 영역 해결) */
+/* 4. 탭 컨테이너 전체 배경 및 골드 외곽선 */
 .is-lv100 .tab-scroll-container,
 #scrollModal.is-lv100 .tab-scroll-container {
     background: #090d16 !important;
@@ -128,14 +130,14 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     opacity: 1;
 }
 
-/* 6. 리스트 아이템 규격 -> [정상 코드] 간격과 100% 동일하게 일치시킴 */
+/* 6. 리스트 아이템 기본 레이아웃 */
 .is-lv100 .scroll-timeline-item,
 #scrollModal.is-lv100 .scroll-timeline-item {
     background: #121a2b !important;
     border: 1px solid rgba(212, 175, 55, 0.3) !important;
     border-radius: 8px !important;
-    padding: 5px 4px !important; /* 기본 정상 코드 패딩 수치로 복구 */
-    margin-bottom: 0px !important; /* 기본 정상 코드와 동일하게 하단 마진 제거 */
+    padding: 5px 4px !important;
+    margin-bottom: 0px !important;
     border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important;
 }
 
@@ -146,6 +148,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     font-size: 11px !important;
 }
 
+/* 일반 산/운동 이름 텍스트 골드화 */
 .is-lv100 .scroll-item-name,
 .is-lv100 .scroll-item-name *,
 #scrollModal.is-lv100 .scroll-item-name,
@@ -153,7 +156,31 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     color: #fcf6ba !important;
 }
 
-/* 7. 더보기 버튼 영역 다크 & 골드화 */
+/* 🎯 7. '정기산행' 산 이름/보라색 텍스트 계열 골드 그라데이션 적용 */
+.is-lv100 .scroll-item-name.top100-blue,
+.is-lv100 .scroll-item-name[style*="color"],
+.is-lv100 .scroll-timeline-item span[style*="color: purple"],
+.is-lv100 .scroll-timeline-item span[style*="color: #"],
+#scrollModal.is-lv100 .scroll-item-name.top100-blue {
+    background: linear-gradient(135deg, #ffe082 0%, #d4af37 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-weight: 800 !important;
+}
+
+/* 🎯 8. 우측 '일정' 흰색 뱃지 & '정기산행' 보라색 뱃지 전체 골드화 */
+.is-lv100 .scroll-timeline-item [style*="background"],
+.is-lv100 .scroll-timeline-item span[style*="background-color"],
+#scrollModal.is-lv100 .scroll-timeline-item [style*="background"],
+#scrollModal.is-lv100 .scroll-timeline-item span[style*="background-color"] {
+    background: rgba(212, 175, 55, 0.18) !important;
+    background-color: rgba(212, 175, 55, 0.18) !important;
+    border: 1px solid #d4af37 !important;
+    color: #fcf6ba !important;
+    -webkit-text-fill-color: #fcf6ba !important; /* 텍스트 클리핑 방지 */
+}
+
+/* 9. 더보기 버튼 영역 다크 & 골드화 */
 .is-lv100 #scrollMoreBtnArea,
 .is-lv100 #scrollMoreBtnArea button,
 #scrollModal.is-lv100 #scrollMoreBtnArea,
@@ -165,12 +192,11 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
     border-radius: 8px !important;
 }
 
-/* 8. 골드 스크롤바 */
+/* 10. 골드 스크롤바 */
 .is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb,
 #scrollModal.is-lv100 #scrollFilteredList::-webkit-scrollbar-thumb {
     background: #d4af37 !important;
 }
-
 
 
 
