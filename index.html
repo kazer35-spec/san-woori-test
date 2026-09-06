@@ -8969,8 +8969,9 @@ function renderVibeHallOfFame() {
   `;
           }
   
-        // -------------------------------------------------------------
-// 📦 히스토리 데이터 캐싱/빌드 함수
+                            
+// -------------------------------------------------------------
+// 📦 히스토리 데이터 캐싱/빌드 함수 (동순위 및 ㄱㄴㄷ 정렬 반영)
 // -------------------------------------------------------------
 function getOrBuildHistoryCache() {
   if (!window.historyCache) window.historyCache = {};
@@ -8992,7 +8993,7 @@ function getOrBuildHistoryCache() {
           const item = {
             name: m.name,
             mountain: s.mountain || '관악산',
-            date: s.date || '2026.08.18',
+            date: s.date || '',
             quarter: s.quarter || '3분기',
             createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : 0
           };
@@ -9005,7 +9006,7 @@ function getOrBuildHistoryCache() {
         lv100Items.push({
           name: m.name,
           mountain: m.lv100Mountain || '관악산',
-          date: m.lv100Date || '2026.08.18',
+          date: m.lv100Date || '',
           quarter: m.lv100Quarter || '3분기',
           createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : 0
         });
@@ -9013,21 +9014,26 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  superItems.sort((a, b) => a.createdAt - b.createdAt);
-  specialItems.sort((a, b) => a.createdAt - b.createdAt);
-  lv100Items.sort((a, b) => a.createdAt - b.createdAt);
+  // 정렬 로직: 1차 획득일자/타임스탬프 오름차순(최초 달성 순) -> 2차 이름 ㄱㄴㄷ 순
+  const sortHistoryItems = (list) => {
+    return list.sort((a, b) => {
+      if (a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.name.localeCompare(b.name, 'ko');
+    });
+  };
 
   window.historyCache = {
-    superStars: superItems,
-    specialStars: specialItems,
-    lv100List: lv100Items,
+    superStars: sortHistoryItems(superItems),
+    specialStars: sortHistoryItems(specialItems),
+    lv100List: sortHistoryItems(lv100Items),
     lastUpdated: Date.now()
   };
 
   return window.historyCache;
 }
 
-// 🌟 1. 전설의 별 상세보기 모달
+// 🌟 1. 전설의 별 상세보기 모달 (동순위 No.N 적용)
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9041,8 +9047,19 @@ window.openLegendDetailModal = function() {
   const renderList = (items, type) => {
     if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
     
+    // 동순위 계산 로직
+    let currentRank = 1;
+    
     return items.map((item, idx) => {
-      const isFirst = idx === 0;
+      if (idx > 0) {
+        const prev = items[idx - 1];
+        const isSameMoment = (item.createdAt > 0 && item.createdAt === prev.createdAt) || (item.date && item.date === prev.date);
+        if (!isSameMoment) {
+          currentRank = idx + 1;
+        }
+      }
+
+      const isFirst = currentRank === 1;
       const isSuper = type === 'super';
       
       return `
@@ -9050,7 +9067,7 @@ window.openLegendDetailModal = function() {
           <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
             ${isFirst 
               ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
-              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${currentRank}</span>`
             }
             <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
             <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
@@ -9090,7 +9107,7 @@ window.openLegendDetailModal = function() {
   modal.style.display = 'flex';
 };
 
-// 👑 2. Lv.100 Club 상세보기 모달
+// 👑 2. Lv.100 Club 상세보기 모달 (동순위 No.N 적용)
 window.openLv100DetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9105,16 +9122,27 @@ window.openLv100DetailModal = function() {
   if (lv100Items.length === 0) {
     body.innerHTML = `<div class="text-center py-8 text-xs text-amber-700/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
   } else {
+    let currentRank = 1;
+
     body.innerHTML = `
       <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
         ${lv100Items.map((item, idx) => {
-          const isFirst = idx === 0;
+          if (idx > 0) {
+            const prev = lv100Items[idx - 1];
+            const isSameMoment = (item.createdAt > 0 && item.createdAt === prev.createdAt) || (item.date && item.date === prev.date);
+            if (!isSameMoment) {
+              currentRank = idx + 1;
+            }
+          }
+
+          const isFirst = currentRank === 1;
+
           return `
             <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
               <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
                 ${isFirst 
                   ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초 획득</span>` 
-                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${currentRank}</span>`
                 }
                 <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
                 <span class="text-[10px] text-amber-800/60 font-bold">(${item.quarter})</span>
@@ -9134,7 +9162,7 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-       // 🏔️ 3. 누적 고도 상세보기 모달 (3만m 이상 달성자 출력)
+// 🏔️ 3. 누적 고도 상세보기 모달 (3만m 이상 달성자 출력 및 동순위 적용)
 window.openHeightDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9147,18 +9175,30 @@ window.openHeightDetailModal = function() {
     ? currentData.filter(m => !m.isHidden && !m.hidden) 
     : [];
 
-  // 🎯 3만m (30,000m) 이상 달성자 필터링
+  // 🎯 3만m 이상 달성자 필터링 (고도 내림차순 -> 이름 오름차순 정렬)
   const heightQualifiedMembers = activeMembers
     .filter(m => (m.totalHeight || 0) >= 30000)
-    .sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
+    .sort((a, b) => {
+      if ((b.totalHeight || 0) !== (a.totalHeight || 0)) return (b.totalHeight || 0) - (a.totalHeight || 0);
+      return a.name.localeCompare(b.name, 'ko');
+    });
 
   if (heightQualifiedMembers.length === 0) {
     body.innerHTML = `<div class="text-center py-8 text-xs text-emerald-700/70 font-bold">아직 3만m 이상 달성자가 없습니다.</div>`;
   } else {
+    let currentRank = 1;
+
     body.innerHTML = `
       <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
         ${heightQualifiedMembers.map((item, idx) => {
-          const isFirst = idx === 0;
+          if (idx > 0) {
+            const prev = heightQualifiedMembers[idx - 1];
+            if ((item.totalHeight || 0) !== (prev.totalHeight || 0)) {
+              currentRank = idx + 1;
+            }
+          }
+
+          const isFirst = currentRank === 1;
           const heightKm = (item.totalHeight / 1000).toFixed(1);
           
           return `
@@ -9166,7 +9206,7 @@ window.openHeightDetailModal = function() {
               <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
                 ${isFirst 
                   ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-black shrink-0">👑 No.1</span>` 
-                  : `<span class="text-[10px] font-black text-emerald-800/80 bg-emerald-100/60 border border-emerald-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
+                  : `<span class="text-[10px] font-black text-emerald-800/80 bg-emerald-100/60 border border-emerald-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${currentRank}</span>`
                 }
                 <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
                 <span class="text-[11px] font-black text-emerald-600 ml-auto flex items-center gap-0.5 shrink-0 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">
