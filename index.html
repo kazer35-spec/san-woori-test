@@ -8904,7 +8904,41 @@ function getLatestLegendHolders(starType) {
 }
 
 
-  // 📦 1. 히스토리 데이터 캐싱 함수 (천상계 & 별 기록 통합 로직)
+// 📅 안전한 날짜 포맷팅 도우미 함수 (Timestamp, Date, 문자열 모두 대응)
+function formatDate(dateValue) {
+  if (!dateValue) return '날짜없음';
+  
+  try {
+    // Firebase Timestamp 객체 (.toDate() 존재)
+    if (dateValue && typeof dateValue.toDate === 'function') {
+      const d = dateValue.toDate();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}.${mm}.${dd}`;
+    }
+    
+    // 이미 "YYYY.MM.DD" 문자열인 경우
+    if (typeof dateValue === 'string' && dateValue.includes('.')) {
+      return dateValue.trim();
+    }
+    
+    // 숫징 타임스탬프 또는 Date 객체/문자열 처리
+    const d = new Date(dateValue);
+    if (!isNaN(d.getTime())) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}.${mm}.${dd}`;
+    }
+  } catch (e) {
+    console.error("Date Format Error:", e);
+  }
+  
+  return '날짜없음';
+}
+
+// 📦 1. 히스토리 데이터 캐싱 함수 (문서 ID '🍁 청계산' 및 이모지 필드 대응)
 function getOrBuildHistoryCache() {
   if (!window.historyCache) window.historyCache = {};
 
@@ -8916,23 +8950,33 @@ function getOrBuildHistoryCache() {
     const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
 
     activeMembers.forEach(m => {
-      // 🎯 최근 활동 로그(logs) 기반 fallback 추출
       const memberLogs = Array.isArray(m.logs) ? m.logs : [];
       const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
 
-      const fallbackMountain = m.lastMountain || m.recentMountain || (latestLog ? latestLog.mountain : '') || '청계산';
-      const fallbackDate = m.lastDate || (latestLog ? latestLog.date : '') || '2026.09.06';
+      // 산 이름 추출 (문서 필드 -> 로그 객체 id/docId -> 유저 기본값 순)
+      let extractedMountain = '';
+      if (latestLog) {
+        extractedMountain = latestLog.mountain || latestLog.id || latestLog.docId || '';
+      }
+      
+      const fallbackMountain = extractedMountain || m.lastMountain || m.recentMountain || '🍁 청계산';
+      const rawFallbackDate = m.lastDate || (latestLog ? latestLog.date : '') || new Date();
 
       // 🌟 전설의 별 데이터 수집
       if (m.specialStars && Array.isArray(m.specialStars)) {
         m.specialStars.forEach(s => {
+          const formattedDate = formatDate(s.date || s.timestamp || s.createdAt || rawFallbackDate);
+          const monthMatch = formattedDate.split('.')[1];
+          const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
+
           const item = {
             name: m.name,
             mountain: s.mountain || s.mountainName || fallbackMountain,
-            date: s.date || fallbackDate,
-            quarter: s.quarter || (s.date ? `${Math.ceil(parseInt(s.date.split('.')[1] || '9') / 3)}Q` : '3Q'),
+            date: formattedDate,
+            quarter: s.quarter || calculatedQuarter,
             createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : (s.timestamp || Date.now())
           };
+
           if (s.starType === 'super') superItems.push(item);
           if (s.starType === 'special') specialItems.push(item);
         });
@@ -8940,11 +8984,15 @@ function getOrBuildHistoryCache() {
 
       // 👑 Lv.100 천상계 데이터 수집
       if ((m.level || 0) >= 100 || m.lv100Achieved) {
+        const formattedDate = formatDate(m.lv100Date || m.achievedDate || rawFallbackDate);
+        const monthMatch = formattedDate.split('.')[1];
+        const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
+
         lv100Items.push({
           name: m.name,
           mountain: m.lv100Mountain || fallbackMountain,
-          date: m.lv100Date || m.achievedDate || fallbackDate,
-          quarter: m.lv100Quarter || '3Q',
+          date: formattedDate,
+          quarter: m.lv100Quarter || calculatedQuarter,
           createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : Date.now()
         });
       }
@@ -9088,7 +9136,7 @@ window.openLv100DetailModal = function() {
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
-        
+             
 
 // 🏔️ 3. 누적 고도 상세보기 모달
 window.openHeightDetailModal = function() {
