@@ -8944,9 +8944,8 @@ function formatDate(dateValue) {
   return '날짜없음';
 }
 
-// -------------------------------------------------------------
-// 📦 1. 히스토리 데이터 캐싱 함수 (날짜 기반 순위 계산 및 최신순 정렬 보정)
-// -------------------------------------------------------------
+
+// 📦 1. 히스토리 데이터 캐싱 함수 (동일 날짜 공동 순위 계산 및 최신순 정렬)
 function getOrBuildHistoryCache() {
   if (!window.historyCache) window.historyCache = {};
 
@@ -9002,22 +9001,25 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  // 🎯 순위 계산 및 최신순 정렬 도우미 함수
+  // 🎯 날짜 기준 공동 순위 부여 및 최신순(내림차순) 정렬 처리
   const processRankAndSort = (list) => {
-    // 1단계: 생성일/달성일 오름차순 정렬하여 최초 순위 부여
+    if (!list || list.length === 0) return [];
+
+    // 1단계: 최초 달성일(오름차순) 기준으로 순서 정렬하여 날짜별 공동 순위 매기기
     list.sort((a, b) => a.createdAt - b.createdAt);
+
     let currentRank = 1;
     let prevDate = null;
 
     list.forEach((item, idx) => {
       if (prevDate !== null && item.date !== prevDate) {
-        currentRank = idx + 1;
+        currentRank = idx + 1; // 날짜가 바뀌면 새로운 순위 부여
       }
       item.rank = currentRank;
       prevDate = item.date;
     });
 
-    // 2단계: UI 표출을 위해 최신 달성순(내림차순)으로 다시 정렬
+    // 2단계: 화면 표출(메인 및 상세보기 모달)을 위해 최신 날짜(내림차순) 순으로 재정렬
     return list.sort((a, b) => b.createdAt - a.createdAt);
   };
 
