@@ -9171,6 +9171,39 @@ window.closeHistoryDetailModal = function() {
 
 
       
+// -------------------------------------------------------------
+// 닫기 버튼 및 외부 영역 클릭 이벤트 핸들러
+// -------------------------------------------------------------
+
+// ESC 키 눌렀을 때 모달 닫기 처리
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    window.toggleVibeModal(false);
+    window.closeHistoryDetailModal();
+  }
+});
+
+// 외부 배경 클릭 시 모달 닫기 이벤트 등록
+document.addEventListener('DOMContentLoaded', function() {
+  const vibeModal = document.getElementById('vibeModal') || document.getElementById('galaxyModal');
+  const historyDetailModal = document.getElementById('historyDetailModal');
+
+  if (vibeModal) {
+    vibeModal.addEventListener('click', function(e) {
+      if (e.target === vibeModal) {
+        window.toggleVibeModal(false);
+      }
+    });
+  }
+
+  if (historyDetailModal) {
+    historyDetailModal.addEventListener('click', function(e) {
+      if (e.target === historyDetailModal) {
+        window.closeHistoryDetailModal();
+      }
+    });
+  }
+});
 
   
 
