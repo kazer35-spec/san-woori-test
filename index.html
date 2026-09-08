@@ -8589,9 +8589,6 @@ window.filterAdminMemberList = () => {
 
 
 
-
-
-      
 // -------------------------------------------------------------
 // 0. 캐시 객체 및 데이터 세팅 (Firestore 호출 최소화)
 // -------------------------------------------------------------
@@ -8677,13 +8674,17 @@ window.invalidateHistoryCache = function() {
 };
 
 /**
- * 📜 메인 모달 열기/닫기 토글 함수
+ * 📜 메인 모달 열기/닫기 토글 함수 (안전성 강화)
  */
 window.toggleVibeModal = function(show) {
-  const modal = document.getElementById('vibeModal');
+  const modal = document.getElementById('vibeModal') || document.getElementById('galaxyModal');
   if (!modal) return;
   if (show) {
-    renderVibeHallOfFame(); // 모달을 열 때 최신 데이터로 렌더링
+    try {
+      renderVibeHallOfFame(); // 모달을 열 때 최신 데이터로 렌더링
+    } catch (e) {
+      console.error("renderVibeHallOfFame 실행 중 오류:", e);
+    }
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
   } else {
@@ -8692,7 +8693,7 @@ window.toggleVibeModal = function(show) {
   }
 };
 
-// 📅 안전한 날짜 포맷팅 도우미 함수 (Timestamp, Date, 문자열 모두 대응)
+// 📅 안전한 날짜 포맷팅 도우미 함수
 function formatDate(dateValue) {
   if (!dateValue) return '날짜없음';
   try {
@@ -8719,7 +8720,7 @@ function formatDate(dateValue) {
   return '날짜없음';
 }
 
-// 📦 히스토리 데이터 캐싱 함수 (고유 rank 부여 후 최신순 반전)
+// 📦 1. 히스토리 데이터 캐싱 함수 (고유 No. 순위 고정 후 최신순 역정렬)
 function getOrBuildHistoryCache() {
   if (!window.historyCache) window.historyCache = {};
 
@@ -8775,7 +8776,7 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  // 1️⃣ [오름차순 정렬] 최초 달성 순서대로 고유 번호(rank) 고정 부여
+  // 1️⃣ 오름차순 정렬 후 고유 No. 부여 (동일 날짜 동일 순위 부여)
   const assignOriginalRanks = (items) => {
     items.sort((a, b) => a.createdAt - b.createdAt);
     let currentRank = 1;
@@ -8786,7 +8787,7 @@ function getOrBuildHistoryCache() {
         currentRank = idx + 1;
       }
       prevDate = item.date;
-      item.rank = currentRank; // 고유 No. 번호 유지 (등초=1, 율님=2, 후후=2)
+      item.rank = currentRank;
     });
   };
 
@@ -8794,7 +8795,7 @@ function getOrBuildHistoryCache() {
   assignOriginalRanks(specialItems);
   assignOriginalRanks(lv100Items);
 
-  // 2️⃣ [내림차순 정렬] 화면에는 최신 달성자가 위에 오도록 순서 반전
+  // 2️⃣ 배치 순서만 최신순(내림차순)으로 역정렬
   superItems.sort((a, b) => b.createdAt - a.createdAt);
   specialItems.sort((a, b) => b.createdAt - a.createdAt);
   lv100Items.sort((a, b) => b.createdAt - a.createdAt);
@@ -8816,16 +8817,15 @@ function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
 
+  // 캐시 데이터 로드
   const cache = getOrBuildHistoryCache();
 
-  // 고유 rank를 그대로 가져와 "No.X 이름" 형태로 구성 (화차 배치는 최신순)
-  const buildRankedHolders = (items) => items.map(item => `No.${item.rank} ${item.name}`);
+  // No. 고유 번호 기반 배지 명단 생성
+  const superHolders = cache.superStars.map(item => `No.${item.rank} ${item.name}`);
+  const specialHolders = cache.specialStars.map(item => `No.${item.rank} ${item.name}`);
+  const level100Holders = cache.lv100List.map(item => `No.${item.rank} ${item.name}`);
 
-  const superHolders = buildRankedHolders(cache.superStars);
-  const specialHolders = buildRankedHolders(cache.specialStars);
-  const level100Holders = buildRankedHolders(cache.lv100List);
-
-  // 누적 고도 데이터 계산
+  // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
@@ -8986,7 +8986,7 @@ function renderVibeHallOfFame() {
   `;
 }
 
-// 🌟 전설의 별 상세보기 모달
+// 🌟 2. 전설의 별 (Legend Star) 상세보기 모달
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9001,7 +9001,7 @@ window.openLegendDetailModal = function() {
     if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
 
     const renderedCards = items.map((item) => {
-      const isFirst = item.rank === 1; // 고유 No.1일 때만 '👑 최초' 뱃지 표시
+      const isFirst = item.rank === 1;
       const isSuper = type === 'super';
 
       return `
@@ -9066,7 +9066,7 @@ window.openLegendDetailModal = function() {
   modal.style.display = 'flex';
 };
 
-// 👑 천상계 (Lv.100 Club) 상세보기 모달
+// 👑 3. 천상계 (Lv.100 Club) 상세보기 모달
 window.openLv100DetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9168,6 +9168,15 @@ window.closeHistoryDetailModal = function() {
     modal.style.display = 'none';
   }
 };
+
+
+      
+
+  
+
+  
+    
+
 
 
 
