@@ -8944,10 +8944,10 @@ function formatDate(dateValue) {
   return '날짜없음';
 }
 
-
-// 📦 1. 히스토리 데이터 캐싱 함수 (동일 날짜 공동 순위 계산 및 최신순 정렬)
+// 📦 1. 히스토리 데이터 캐싱 함수 (동일 날짜 순위 유지 및 최신순 완전 고정)
 function getOrBuildHistoryCache() {
-  if (!window.historyCache) window.historyCache = {};
+  // 기존 캐시 강제 초기화 (이전 캐시로 인한 렌더링 방지)
+  window.historyCache = null;
 
   const superItems = [];
   const specialItems = [];
@@ -8956,7 +8956,7 @@ function getOrBuildHistoryCache() {
   if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
     const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
 
-    activeMembers.forEach(m => {
+    activeMembers.forEach((m, memberIdx) => {
       const memberLogs = Array.isArray(m.logs) ? m.logs : [];
       const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
 
@@ -8966,7 +8966,7 @@ function getOrBuildHistoryCache() {
 
       // 🌟 전설의 별 데이터 수집
       if (m.specialStars && Array.isArray(m.specialStars)) {
-        m.specialStars.forEach(s => {
+        m.specialStars.forEach((s, starIdx) => {
           const formattedDate = formatDate(s.date || s.timestamp || s.createdAt || rawFallbackDate);
           const monthMatch = formattedDate.split('.')[1];
           const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
@@ -8976,7 +8976,8 @@ function getOrBuildHistoryCache() {
             mountain: s.mountain || s.mountainName || fallbackMountain,
             date: formattedDate,
             quarter: s.quarter || calculatedQuarter,
-            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : (s.timestamp || Date.now())
+            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : (s.timestamp || Date.now()),
+            rawIndex: memberIdx * 100 + starIdx // 동일 날짜/시간일 경우 안정적 정렬을 위한 고유 인덱스
           };
 
           if (s.starType === 'super') superItems.push(item);
@@ -8995,32 +8996,41 @@ function getOrBuildHistoryCache() {
           mountain: m.lv100Mountain || fallbackMountain,
           date: formattedDate,
           quarter: m.lv100Quarter || calculatedQuarter,
-          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : Date.now()
+          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : Date.now(),
+          rawIndex: memberIdx
         });
       }
     });
   }
 
-  // 🎯 날짜 기준 공동 순위 부여 및 최신순(내림차순) 정렬 처리
+  // 🎯 순위 계산 및 최신순 강제 정렬 처리
   const processRankAndSort = (list) => {
     if (!list || list.length === 0) return [];
 
-    // 1단계: 최초 달성일(오름차순) 기준으로 순서 정렬하여 날짜별 공동 순위 매기기
-    list.sort((a, b) => a.createdAt - b.createdAt);
+    // 1단계: 과거 날짜순(오름차순) 정렬 후 날짜별 동일 순위 부여
+    list.sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt);
 
     let currentRank = 1;
     let prevDate = null;
 
     list.forEach((item, idx) => {
       if (prevDate !== null && item.date !== prevDate) {
-        currentRank = idx + 1; // 날짜가 바뀌면 새로운 순위 부여
+        currentRank = idx + 1;
       }
       item.rank = currentRank;
       prevDate = item.date;
     });
 
-    // 2단계: 화면 표출(메인 및 상세보기 모달)을 위해 최신 날짜(내림차순) 순으로 재정렬
-    return list.sort((a, b) => b.createdAt - a.createdAt);
+    // 2단계: 최신 날짜(내림차순) 정렬 (날짜가 같으면 생성시간/등록순으로 정렬)
+    return list.sort((a, b) => {
+      if (b.date !== a.date) {
+        return b.date.localeCompare(a.date); // 날짜 기준 최신순
+      }
+      if (b.createdAt !== a.createdAt) {
+        return b.createdAt - a.createdAt; // 날짜가 같으면 타임스탬프 기준
+      }
+      return a.rawIndex - b.rawIndex; // 타임스탬프까지 같으면 율님 -> 후후 순서 보장
+    });
   };
 
   window.historyCache = {
