@@ -8589,13 +8589,13 @@ window.filterAdminMemberList = () => {
 
 
 
-// -------------------------------------------------------------
+// =============================================================
 // 0. 캐시 객체 및 데이터 세팅 (Firestore 호출 최소화)
-// -------------------------------------------------------------
+// =============================================================
 window.historyCache = {
-  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt, rank }]
-  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt, rank }]
-  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt, rank }]
+  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt }]
+  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt }]
+  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt }]
   lastUpdated: null
 };
 
@@ -8674,17 +8674,13 @@ window.invalidateHistoryCache = function() {
 };
 
 /**
- * 📜 메인 모달 열기/닫기 토글 함수 (안전성 강화)
+ * 📜 메인 모달 열기/닫기 토글 함수
  */
 window.toggleVibeModal = function(show) {
-  const modal = document.getElementById('vibeModal') || document.getElementById('galaxyModal');
+  const modal = document.getElementById('vibeModal');
   if (!modal) return;
   if (show) {
-    try {
-      renderVibeHallOfFame(); // 모달을 열 때 최신 데이터로 렌더링
-    } catch (e) {
-      console.error("renderVibeHallOfFame 실행 중 오류:", e);
-    }
+    renderVibeHallOfFame(); // 모달을 열 때 최신 데이터로 렌더링
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
   } else {
@@ -8699,20 +8695,14 @@ function formatDate(dateValue) {
   try {
     if (dateValue && typeof dateValue.toDate === 'function') {
       const d = dateValue.toDate();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}.${mm}.${dd}`;
+      return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
     }
     if (typeof dateValue === 'string' && dateValue.includes('.')) {
       return dateValue.trim();
     }
     const d = new Date(dateValue);
     if (!isNaN(d.getTime())) {
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}.${mm}.${dd}`;
+      return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
     }
   } catch (e) {
     console.error("Date Format Error:", e);
@@ -8720,7 +8710,7 @@ function formatDate(dateValue) {
   return '날짜없음';
 }
 
-// 📦 1. 히스토리 데이터 캐싱 함수 (고유 No. 순위 고정 후 최신순 역정렬)
+// 📦 1. 히스토리 데이터 캐싱 함수 (날짜 기반 공동 순위 및 최신순 정렬)
 function getOrBuildHistoryCache() {
   if (!window.historyCache) window.historyCache = {};
 
@@ -8776,34 +8766,28 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  // 1️⃣ 오름차순 정렬 후 고유 No. 부여 (동일 날짜 동일 순위 부여)
-  const assignOriginalRanks = (items) => {
-    items.sort((a, b) => a.createdAt - b.createdAt);
+  // 1단계: 날짜 기준 오름차순 정렬하여 최초 획득일순으로 정확한 순위 계산
+  const calculateRanks = (list) => {
+    list.sort((a, b) => a.createdAt - b.createdAt);
     let currentRank = 1;
     let prevDate = null;
 
-    items.forEach((item, idx) => {
+    list.forEach((item, idx) => {
       if (prevDate !== null && item.date !== prevDate) {
         currentRank = idx + 1;
       }
-      prevDate = item.date;
       item.rank = currentRank;
+      prevDate = item.date;
     });
+
+    // 2단계: 화면 표시를 위해 최신순(내림차순)으로 다시 정렬
+    return list.sort((a, b) => b.createdAt - a.createdAt);
   };
 
-  assignOriginalRanks(superItems);
-  assignOriginalRanks(specialItems);
-  assignOriginalRanks(lv100Items);
-
-  // 2️⃣ 배치 순서만 최신순(내림차순)으로 역정렬
-  superItems.sort((a, b) => b.createdAt - a.createdAt);
-  specialItems.sort((a, b) => b.createdAt - a.createdAt);
-  lv100Items.sort((a, b) => b.createdAt - a.createdAt);
-
   window.historyCache = {
-    superStars: superItems,
-    specialStars: specialItems,
-    lv100List: lv100Items,
+    superStars: calculateRanks(superItems),
+    specialStars: calculateRanks(specialItems),
+    lv100List: calculateRanks(lv100Items),
     lastUpdated: Date.now()
   };
 
@@ -8817,15 +8801,14 @@ function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
 
-  // 캐시 데이터 로드
   const cache = getOrBuildHistoryCache();
 
-  // No. 고유 번호 기반 배지 명단 생성
+  // 최신순 정렬된 뱃지 이름 리스트 생성 (순위 포함)
   const superHolders = cache.superStars.map(item => `No.${item.rank} ${item.name}`);
   const specialHolders = cache.specialStars.map(item => `No.${item.rank} ${item.name}`);
   const level100Holders = cache.lv100List.map(item => `No.${item.rank} ${item.name}`);
 
-  // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
+  // 누적고도 데이터 산출
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
@@ -8884,6 +8867,7 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
+      <!-- 📜 모달 헤더 -->
       <div class="flex items-center justify-between mb-2.5">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
@@ -8986,6 +8970,38 @@ function renderVibeHallOfFame() {
   `;
 }
 
+// 📜 상세보기 전용 스크롤 리스트 포맷터 (3개 초과 시 더보기 버튼 생성)
+function renderCollapsibleListHtml(items, sectionKey, cardRenderer) {
+  if (!items || items.length === 0) {
+    return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
+  }
+
+  const limit = 3;
+  const initialItems = items.slice(0, limit);
+  const extraItems = items.slice(limit);
+
+  let html = `<div class="space-y-1.5">`;
+  html += initialItems.map(cardRenderer).join('');
+  html += `</div>`;
+
+  if (extraItems.length > 0) {
+    html += `
+      <div id="detail-more-container-${sectionKey}" class="mt-2 text-center">
+        <button type="button" 
+          onclick="document.getElementById('detail-extra-${sectionKey}').classList.remove('hidden'); document.getElementById('detail-more-container-${sectionKey}').classList.add('hidden');" 
+          class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-black text-xs transition-all active:scale-95 cursor-pointer border border-slate-200">
+          +${extraItems.length}개 더보기
+        </button>
+      </div>
+      <div id="detail-extra-${sectionKey}" class="hidden space-y-1.5 mt-1.5 max-h-[180px] overflow-y-auto pr-1">
+        ${extraItems.map(cardRenderer).join('')}
+      </div>
+    `;
+  }
+
+  return html;
+}
+
 // 🌟 2. 전설의 별 (Legend Star) 상세보기 모달
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
@@ -8997,51 +9013,26 @@ window.openLegendDetailModal = function() {
 
   const cache = getOrBuildHistoryCache();
 
-  const renderExpandableList = (items, type, sectionId) => {
-    if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
+  const renderCard = (item, type) => {
+    const isFirst = item.rank === 1;
+    const isSuper = type === 'super';
 
-    const renderedCards = items.map((item) => {
-      const isFirst = item.rank === 1;
-      const isSuper = type === 'super';
-
-      return `
-        <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
-          <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
-            ${isFirst 
-              ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
-              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
-            }
-            <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
-            <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
-            <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
-            <span class="text-[10px] text-slate-500 font-bold bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
-              📅 ${item.date}
-            </span>
-          </div>
+    return `
+      <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+        <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+          ${isFirst 
+            ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
+            : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
+          }
+          <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+          <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
+          <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+          <span class="text-[10px] text-slate-500 font-bold bg-slate-50 border border-slate-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+            📅 ${item.date}
+          </span>
         </div>
-      `;
-    });
-
-    if (renderedCards.length > 3) {
-      const initialList = renderedCards.slice(0, 3).join('');
-      const hiddenList = renderedCards.slice(3).join('');
-
-      return `
-        <div class="space-y-1.5">
-          ${initialList}
-          <div id="more-detail-container-${sectionId}" class="hidden space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
-            ${hiddenList}
-          </div>
-          <button type="button" 
-            onclick="document.getElementById('more-detail-container-${sectionId}').classList.remove('hidden'); this.classList.add('hidden');"
-            class="w-full py-1.5 text-center text-[11px] font-bold text-indigo-600 bg-indigo-50/80 hover:bg-indigo-100/80 rounded-xl border border-indigo-200 transition-all cursor-pointer">
-            + ${renderedCards.length - 3}개 더보기
-          </button>
-        </div>
-      `;
-    }
-
-    return `<div class="space-y-1.5">${renderedCards.join('')}</div>`;
+      </div>
+    `;
   };
 
   body.innerHTML = `
@@ -9049,16 +9040,16 @@ window.openLegendDetailModal = function() {
       <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
         🔥 슈퍼별 획득 명단
       </div>
-      ${renderExpandableList(cache.superStars, 'super', 'super')}
+      ${renderCollapsibleListHtml(cache.superStars, 'super-detail', item => renderCard(item, 'super'))}
     </div>
 
-    <div class="my-2.5 border-t border-dashed border-slate-200"></div>
+    <div class="my-3 border-t border-dashed border-slate-200"></div>
 
     <div class="space-y-1.5">
       <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
         ✨ 스페셜별 획득 명단
       </div>
-      ${renderExpandableList(cache.specialStars, 'special', 'special')}
+      ${renderCollapsibleListHtml(cache.specialStars, 'special-detail', item => renderCard(item, 'special'))}
     </div>
   `;
 
@@ -9078,40 +9069,34 @@ window.openLv100DetailModal = function() {
   const cache = getOrBuildHistoryCache();
   const items = cache.lv100List || [];
 
-  if (items.length === 0) {
-    body.innerHTML = `<div class="text-center py-8 text-xs text-amber-800/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
-  } else {
-    body.innerHTML = `
-      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-        ${items.map((item) => {
-          const isFirst = item.rank === 1;
+  const renderCard = (item) => {
+    const isFirst = item.rank === 1;
 
-          return `
-            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
-              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
-                ${isFirst 
-                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` 
-                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
-                }
-                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
-                <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
-                <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
-                <span class="text-[10px] text-amber-800 font-bold bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
-                  📅 ${item.date}
-                </span>
-              </div>
-            </div>
-          `;
-        }).join('')}
+    return `
+      <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+        <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+          ${isFirst 
+            ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` 
+            : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
+          }
+          <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+          <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
+          <span class="text-[11px] text-slate-600 font-medium">📍 ${item.mountain}</span>
+          <span class="text-[10px] text-amber-800 font-bold bg-amber-50 border border-amber-200/80 px-1.5 py-0.5 rounded-md ml-auto flex items-center gap-0.5 shrink-0">
+            📅 ${item.date}
+          </span>
+        </div>
       </div>
     `;
-  }
+  };
+
+  body.innerHTML = renderCollapsibleListHtml(items, 'lv100-detail', renderCard);
 
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
 
-// 🏔️ 누적 고도 상세보기 모달
+// 🏔️ 4. 누적 고도 상세보기 모달
 window.openHeightDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9128,39 +9113,33 @@ window.openHeightDetailModal = function() {
     .filter(m => (m.totalHeight || 0) >= 30000)
     .sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
-  if (heightQualifiedMembers.length === 0) {
-    body.innerHTML = `<div class="text-center py-8 text-xs text-emerald-700/70 font-bold">아직 3만m 이상 달성자가 없습니다.</div>`;
-  } else {
-    body.innerHTML = `
-      <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-        ${heightQualifiedMembers.map((item, idx) => {
-          const isFirst = idx === 0;
-          const heightKm = (item.totalHeight / 1000).toFixed(1);
-          
-          return `
-            <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-emerald-50/90 border-emerald-300 ring-1 ring-emerald-300/60' : 'bg-white border-emerald-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
-              <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
-                ${isFirst 
-                  ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-black shrink-0">👑 No.1</span>` 
-                  : `<span class="text-[10px] font-black text-emerald-800/80 bg-emerald-100/60 border border-emerald-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx+1}</span>`
-                }
-                <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
-                <span class="text-[11px] font-black text-emerald-600 ml-auto flex items-center gap-0.5 shrink-0 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">
-                  🏔️ ${item.totalHeight ? item.totalHeight.toLocaleString() : 0}m (${heightKm}k)
-                </span>
-              </div>
-            </div>
-          `;
-        }).join('')}
+  const renderCard = (item, idx) => {
+    const isFirst = idx === 0;
+    const heightKm = (item.totalHeight / 1000).toFixed(1);
+
+    return `
+      <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-emerald-50/90 border-emerald-300 ring-1 ring-emerald-300/60' : 'bg-white border-emerald-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
+        <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
+          ${isFirst 
+            ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-600 text-white font-black shrink-0">👑 No.1</span>` 
+            : `<span class="text-[10px] font-black text-emerald-800/80 bg-emerald-100/60 border border-emerald-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${idx + 1}</span>`
+          }
+          <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
+          <span class="text-[11px] font-black text-emerald-600 ml-auto flex items-center gap-0.5 shrink-0 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md">
+            🏔️ ${item.totalHeight ? item.totalHeight.toLocaleString() : 0}m (${heightKm}k)
+          </span>
+        </div>
       </div>
     `;
-  }
+  };
+
+  body.innerHTML = renderCollapsibleListHtml(heightQualifiedMembers, 'height-detail', renderCard);
 
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
 
-// 모달 닫기
+// ❌ 상세보기 모달 닫기
 window.closeHistoryDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   if (modal) {
@@ -9170,42 +9149,13 @@ window.closeHistoryDetailModal = function() {
 };
 
 
-      
-// -------------------------------------------------------------
-// 닫기 버튼 및 외부 영역 클릭 이벤트 핸들러
-// -------------------------------------------------------------
+    
 
-// ESC 키 눌렀을 때 모달 닫기 처리
-window.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    window.toggleVibeModal(false);
-    window.closeHistoryDetailModal();
-  }
-});
-
-// 외부 배경 클릭 시 모달 닫기 이벤트 등록
-document.addEventListener('DOMContentLoaded', function() {
-  const vibeModal = document.getElementById('vibeModal') || document.getElementById('galaxyModal');
-  const historyDetailModal = document.getElementById('historyDetailModal');
-
-  if (vibeModal) {
-    vibeModal.addEventListener('click', function(e) {
-      if (e.target === vibeModal) {
-        window.toggleVibeModal(false);
-      }
-    });
-  }
-
-  if (historyDetailModal) {
-    historyDetailModal.addEventListener('click', function(e) {
-      if (e.target === historyDetailModal) {
-        window.closeHistoryDetailModal();
-      }
-    });
-  }
-});
 
   
+    
+            
+   
 
   
     
