@@ -8593,14 +8593,13 @@ window.filterAdminMemberList = () => {
 // 0. 캐시 객체 및 데이터 세팅 (Firestore 호출 최소화)
 // -------------------------------------------------------------
 window.historyCache = {
-  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt }]
-  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt }]
-  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt }]
+  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt, rank }]
+  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt, rank }]
+  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt, rank }]
   lastUpdated: null
 };
 
-
-   /**
+/**
  * 💾 1. 별(슈퍼/스페셜) 획득 시 DB 저장 함수
  */
 window.saveSpecialStarToMember = async function(memberId, starType, quarterStr, memberObj, mountainName, activityDate) {
@@ -8690,6 +8689,132 @@ window.toggleVibeModal = function(show) {
   }
 };
 
+// 📅 안전한 날짜 포맷팅 도우미 함수 (Timestamp, Date, 문자열 모두 대응)
+function formatDate(dateValue) {
+  if (!dateValue) return '날짜없음';
+  
+  try {
+    if (dateValue && typeof dateValue.toDate === 'function') {
+      const d = dateValue.toDate();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}.${mm}.${dd}`;
+    }
+    
+    if (typeof dateValue === 'string' && dateValue.includes('.')) {
+      return dateValue.trim();
+    }
+    
+    const d = new Date(dateValue);
+    if (!isNaN(d.getTime())) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}.${mm}.${dd}`;
+    }
+  } catch (e) {
+    console.error("Date Format Error:", e);
+  }
+  
+  return '날짜없음';
+}
+
+// 📦 1. 히스토리 데이터 캐싱 함수 (공동 순위 계산 후 최신순 내림차순 정렬)
+function getOrBuildHistoryCache() {
+  if (window.historyCache && window.historyCache.superStars) {
+    return window.historyCache;
+  }
+
+  const superItems = [];
+  const specialItems = [];
+  const lv100Items = [];
+
+  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+    const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
+
+    activeMembers.forEach((m, mIdx) => {
+      const memberLogs = Array.isArray(m.logs) ? m.logs : [];
+      const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
+
+      let extractedMountain = latestLog ? (latestLog.mountain || latestLog.id || latestLog.docId || '') : '';
+      const fallbackMountain = extractedMountain || m.lastMountain || m.recentMountain || '🍁 청계산';
+      const rawFallbackDate = m.lastDate || (latestLog ? latestLog.date : '') || new Date();
+
+      // 🌟 전설의 별 데이터 수집
+      if (m.specialStars && Array.isArray(m.specialStars)) {
+        m.specialStars.forEach((s, sIdx) => {
+          const formattedDate = formatDate(s.date || s.timestamp || s.createdAt || rawFallbackDate);
+          const monthMatch = formattedDate.split('.')[1];
+          const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
+
+          const item = {
+            name: m.name,
+            mountain: s.mountain || s.mountainName || fallbackMountain,
+            date: formattedDate,
+            quarter: s.quarter || calculatedQuarter,
+            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : (s.timestamp || Date.now()),
+            rawIndex: mIdx * 100 + sIdx
+          };
+
+          if (s.starType === 'super') superItems.push(item);
+          if (s.starType === 'special') specialItems.push(item);
+        });
+      }
+
+      // 👑 Lv.100 천상계 데이터 수집
+      if ((m.level || 0) >= 100 || m.lv100Achieved) {
+        const formattedDate = formatDate(m.lv100Date || m.achievedDate || rawFallbackDate);
+        const monthMatch = formattedDate.split('.')[1];
+        const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
+
+        lv100Items.push({
+          name: m.name,
+          mountain: m.lv100Mountain || fallbackMountain,
+          date: formattedDate,
+          quarter: m.lv100Quarter || calculatedQuarter,
+          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : Date.now(),
+          rawIndex: mIdx
+        });
+      }
+    });
+  }
+
+  // 🎯 날짜 오름차순으로 순위 매긴 후, 최신순(내림차순)으로 반환하는 정렬 로직
+  const processRankAndSort = (list) => {
+    if (!list || list.length === 0) return [];
+
+    // 1단계: 달성일 오름차순 정렬
+    list.sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt);
+
+    let currentRank = 1;
+    let prevDate = null;
+
+    list.forEach((item, idx) => {
+      if (prevDate !== null && item.date !== prevDate) {
+        currentRank = idx + 1; // 날짜 바뀌면 순위 증가
+      }
+      item.rank = currentRank;
+      prevDate = item.date;
+    });
+
+    // 2단계: 화면 표시용 최신순(내림차순) 정렬
+    return list.sort((a, b) => {
+      if (b.date !== a.date) return b.date.localeCompare(a.date);
+      if (b.createdAt !== a.createdAt) return b.createdAt - a.createdAt;
+      return a.rawIndex - b.rawIndex;
+    });
+  };
+
+  window.historyCache = {
+    superStars: processRankAndSort(superItems),
+    specialStars: processRankAndSort(specialItems),
+    lv100List: processRankAndSort(lv100Items),
+    lastUpdated: Date.now()
+  };
+
+  return window.historyCache;
+}
 
 // -------------------------------------------------------------
 // 🏆 SanWoori History 메인 렌더링 함수
@@ -8698,30 +8823,17 @@ function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
 
+  const cache = getOrBuildHistoryCache();
+
+  // 1. 전설의 별 데이터 (최신순 매핑)
+  const superHolders = cache.superStars.map(item => `No.${item.rank} ${item.name}`);
+  const specialHolders = cache.specialStars.map(item => `No.${item.rank} ${item.name}`);
+
+  // 2. Lv.100 Club 데이터 (최신순 매핑)
+  const level100Holders = cache.lv100List.map(item => `No.${item.rank} ${item.name}`);
+
+  // 3. 누적고도 데이터 산출
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
-
-  // 1. 전설의 별 데이터
-  const superNames = [];
-  const specialNames = [];
-
-  activeMembers.forEach(m => {
-    if (m.specialStars && Array.isArray(m.specialStars)) {
-      m.specialStars.forEach(s => {
-        if (s.starType === 'super' && !superNames.includes(m.name)) superNames.push(m.name);
-        if (s.starType === 'special' && !specialNames.includes(m.name)) specialNames.push(m.name);
-      });
-    }
-  });
-
-  const superHolders = superNames.map((name, idx) => `No.${idx + 1} ${name}`);
-  const specialHolders = specialNames.map((name, idx) => `No.${idx + 1} ${name}`);
-
-  // 2. Lv.100 Club 데이터
-  const level100Holders = activeMembers
-    .filter(m => (m.level || 0) >= 100)
-    .map((m, idx) => `No.${idx + 1} ${m.name}`);
-
-  // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
   const h100kHolders = sortedHeightMembers
@@ -8882,168 +8994,6 @@ function renderVibeHallOfFame() {
   `;
 }
 
-// 🌟 같은 날 별을 획득한 모든 보유자 ID 가져오기
-function getLatestLegendHolders(starType) {
-  if (typeof currentData === 'undefined' || !Array.isArray(currentData)) return [];
-
-  let maxTimestamp = -1;
-  let holdersMap = new Map();
-
-  currentData.forEach(member => {
-    if (member.specialStars && Array.isArray(member.specialStars)) {
-      member.specialStars.forEach(item => {
-        if (item.starType === starType) {
-          const ts = item.timestamp || (item.date ? new Date(item.date).getTime() : 0);
-          if (ts > maxTimestamp) {
-            maxTimestamp = ts;
-          }
-          if (!holdersMap.has(ts)) {
-            holdersMap.set(ts, []);
-          }
-          holdersMap.get(ts).push(member.id || member.name);
-        }
-      });
-    }
-  });
-
-  return maxTimestamp > -1 ? (holdersMap.get(maxTimestamp) || []) : [];
-}
-
-
-// 📅 안전한 날짜 포맷팅 도우미 함수 (Timestamp, Date, 문자열 모두 대응)
-function formatDate(dateValue) {
-  if (!dateValue) return '날짜없음';
-  
-  try {
-    // Firebase Timestamp 객체 (.toDate() 존재)
-    if (dateValue && typeof dateValue.toDate === 'function') {
-      const d = dateValue.toDate();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}.${mm}.${dd}`;
-    }
-    
-    // 이미 "YYYY.MM.DD" 문자열인 경우
-    if (typeof dateValue === 'string' && dateValue.includes('.')) {
-      return dateValue.trim();
-    }
-    
-    // 숫징 타임스탬프 또는 Date 객체/문자열 처리
-    const d = new Date(dateValue);
-    if (!isNaN(d.getTime())) {
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}.${mm}.${dd}`;
-    }
-  } catch (e) {
-    console.error("Date Format Error:", e);
-  }
-  
-  return '날짜없음';
-}
-
-// 📦 1. 히스토리 데이터 캐싱 함수 (동일 날짜 순위 유지 및 최신순 완전 고정)
-function getOrBuildHistoryCache() {
-  // 기존 캐시 강제 초기화 (이전 캐시로 인한 렌더링 방지)
-  window.historyCache = null;
-
-  const superItems = [];
-  const specialItems = [];
-  const lv100Items = [];
-
-  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-    const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
-
-    activeMembers.forEach((m, memberIdx) => {
-      const memberLogs = Array.isArray(m.logs) ? m.logs : [];
-      const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
-
-      let extractedMountain = latestLog ? (latestLog.mountain || latestLog.id || latestLog.docId || '') : '';
-      const fallbackMountain = extractedMountain || m.lastMountain || m.recentMountain || '🍁 청계산';
-      const rawFallbackDate = m.lastDate || (latestLog ? latestLog.date : '') || new Date();
-
-      // 🌟 전설의 별 데이터 수집
-      if (m.specialStars && Array.isArray(m.specialStars)) {
-        m.specialStars.forEach((s, starIdx) => {
-          const formattedDate = formatDate(s.date || s.timestamp || s.createdAt || rawFallbackDate);
-          const monthMatch = formattedDate.split('.')[1];
-          const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
-
-          const item = {
-            name: m.name,
-            mountain: s.mountain || s.mountainName || fallbackMountain,
-            date: formattedDate,
-            quarter: s.quarter || calculatedQuarter,
-            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : (s.timestamp || Date.now()),
-            rawIndex: memberIdx * 100 + starIdx // 동일 날짜/시간일 경우 안정적 정렬을 위한 고유 인덱스
-          };
-
-          if (s.starType === 'super') superItems.push(item);
-          if (s.starType === 'special') specialItems.push(item);
-        });
-      }
-
-      // 👑 Lv.100 천상계 데이터 수집
-      if ((m.level || 0) >= 100 || m.lv100Achieved) {
-        const formattedDate = formatDate(m.lv100Date || m.achievedDate || rawFallbackDate);
-        const monthMatch = formattedDate.split('.')[1];
-        const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
-
-        lv100Items.push({
-          name: m.name,
-          mountain: m.lv100Mountain || fallbackMountain,
-          date: formattedDate,
-          quarter: m.lv100Quarter || calculatedQuarter,
-          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : Date.now(),
-          rawIndex: memberIdx
-        });
-      }
-    });
-  }
-
-  // 🎯 순위 계산 및 최신순 강제 정렬 처리
-  const processRankAndSort = (list) => {
-    if (!list || list.length === 0) return [];
-
-    // 1단계: 과거 날짜순(오름차순) 정렬 후 날짜별 동일 순위 부여
-    list.sort((a, b) => a.date.localeCompare(b.date) || a.createdAt - b.createdAt);
-
-    let currentRank = 1;
-    let prevDate = null;
-
-    list.forEach((item, idx) => {
-      if (prevDate !== null && item.date !== prevDate) {
-        currentRank = idx + 1;
-      }
-      item.rank = currentRank;
-      prevDate = item.date;
-    });
-
-    // 2단계: 최신 날짜(내림차순) 정렬 (날짜가 같으면 생성시간/등록순으로 정렬)
-    return list.sort((a, b) => {
-      if (b.date !== a.date) {
-        return b.date.localeCompare(a.date); // 날짜 기준 최신순
-      }
-      if (b.createdAt !== a.createdAt) {
-        return b.createdAt - a.createdAt; // 날짜가 같으면 타임스탬프 기준
-      }
-      return a.rawIndex - b.rawIndex; // 타임스탬프까지 같으면 율님 -> 후후 순서 보장
-    });
-  };
-
-  window.historyCache = {
-    superStars: processRankAndSort(superItems),
-    specialStars: processRankAndSort(specialItems),
-    lv100List: processRankAndSort(lv100Items),
-    lastUpdated: Date.now()
-  };
-
-  return window.historyCache;
-}
-
-
 // 🌟 2. 전설의 별 (Legend Star) 상세보기 모달
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
@@ -9058,24 +9008,17 @@ window.openLegendDetailModal = function() {
   const renderList = (items, type) => {
     if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
 
-    let currentRank = 1;
-    let prevDate = null;
+    const isSuper = type === 'super';
 
-    return items.map((item, idx) => {
-      if (prevDate !== null && item.date !== prevDate) {
-        currentRank = idx + 1;
-      }
-      prevDate = item.date;
-
-      const isFirst = currentRank === 1;
-      const isSuper = type === 'super';
+    return items.map(item => {
+      const isFirst = item.rank === 1;
 
       return `
         <div class="p-2.5 rounded-xl border ${isFirst ? (isSuper ? 'bg-rose-50/90 border-rose-300 ring-1 ring-rose-200' : 'bg-purple-50/90 border-purple-300 ring-1 ring-purple-200') : 'bg-white border-slate-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
           <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
             ${isFirst 
               ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
-              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${currentRank}</span>`
+              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
             }
             <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
             <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
@@ -9130,25 +9073,17 @@ window.openLv100DetailModal = function() {
   if (items.length === 0) {
     body.innerHTML = `<div class="text-center py-8 text-xs text-amber-800/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
   } else {
-    let currentRank = 1;
-    let prevDate = null;
-
     body.innerHTML = `
       <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-        ${items.map((item, idx) => {
-          if (prevDate !== null && item.date !== prevDate) {
-            currentRank = idx + 1;
-          }
-          prevDate = item.date;
-
-          const isFirst = currentRank === 1;
+        ${items.map(item => {
+          const isFirst = item.rank === 1;
 
           return `
             <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
               <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
                 ${isFirst 
                   ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` 
-                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${currentRank}</span>`
+                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
                 }
                 <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
                 <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
@@ -9167,7 +9102,6 @@ window.openLv100DetailModal = function() {
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
-             
 
 // 🏔️ 3. 누적 고도 상세보기 모달
 window.openHeightDetailModal = function() {
@@ -9226,6 +9160,9 @@ window.closeHistoryDetailModal = function() {
     modal.style.display = 'none';
   }
 };
+
+
+        
 
 
 
