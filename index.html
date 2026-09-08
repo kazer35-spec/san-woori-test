@@ -8599,8 +8599,7 @@ window.historyCache = {
   lastUpdated: null
 };
 
-
-   /**
+/**
  * 💾 1. 별(슈퍼/스페셜) 획득 시 DB 저장 함수
  */
 window.saveSpecialStarToMember = async function(memberId, starType, quarterStr, memberObj, mountainName, activityDate) {
@@ -8690,7 +8689,6 @@ window.toggleVibeModal = function(show) {
   }
 };
 
-
 // -------------------------------------------------------------
 // 🏆 SanWoori History 메인 렌더링 함수
 // -------------------------------------------------------------
@@ -8698,30 +8696,28 @@ function renderVibeHallOfFame() {
   const container = document.getElementById('vibeHallOfFame');
   if (!container || typeof currentData === 'undefined' || !Array.isArray(currentData)) return;
 
-  const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
+  const cache = getOrBuildHistoryCache();
 
-  // 1. 전설의 별 데이터
-  const superNames = [];
-  const specialNames = [];
+  // 동순위(같은 날짜/시간)를 고려하여 "No.X 이름" 형태 목록 생성하는 헬퍼 함수
+  const buildRankedHolders = (items) => {
+    let rank = 1;
+    let prevDate = null;
+    return items.map((item, idx) => {
+      if (prevDate !== null && item.date !== prevDate) {
+        rank = idx + 1;
+      }
+      prevDate = item.date;
+      return `No.${rank} ${item.name}`;
+    });
+  };
 
-  activeMembers.forEach(m => {
-    if (m.specialStars && Array.isArray(m.specialStars)) {
-      m.specialStars.forEach(s => {
-        if (s.starType === 'super' && !superNames.includes(m.name)) superNames.push(m.name);
-        if (s.starType === 'special' && !specialNames.includes(m.name)) specialNames.push(m.name);
-      });
-    }
-  });
-
-  const superHolders = superNames.map((name, idx) => `No.${idx + 1} ${name}`);
-  const specialHolders = specialNames.map((name, idx) => `No.${idx + 1} ${name}`);
-
-  // 2. Lv.100 Club 데이터
-  const level100Holders = activeMembers
-    .filter(m => (m.level || 0) >= 100)
-    .map((m, idx) => `No.${idx + 1} ${m.name}`);
+  // 최신순 정렬된 캐시 데이터를 바탕으로 메인 표시 텍스트 산출
+  const superHolders = buildRankedHolders(cache.superStars);
+  const specialHolders = buildRankedHolders(cache.specialStars);
+  const level100Holders = buildRankedHolders(cache.lv100List);
 
   // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
+  const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
   const h100kHolders = sortedHeightMembers
@@ -8779,7 +8775,6 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
-      <!-- 📜 모달 헤더 -->
       <div class="flex items-center justify-between mb-2.5">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
@@ -8787,7 +8782,6 @@ function renderVibeHallOfFame() {
       </div>
 
       <div class="space-y-2.5">
-        <!-- 🌟 1. Legend Star 카드 -->
         <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
           <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8819,7 +8813,6 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
-        <!-- 👑 2. Lv.100 Club 카드 -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8834,7 +8827,6 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
-        <!-- 🚩 3. 누적 고도 카드 -->
         <div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
           <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8882,40 +8874,10 @@ function renderVibeHallOfFame() {
   `;
 }
 
-// 🌟 같은 날 별을 획득한 모든 보유자 ID 가져오기
-function getLatestLegendHolders(starType) {
-  if (typeof currentData === 'undefined' || !Array.isArray(currentData)) return [];
-
-  let maxTimestamp = -1;
-  let holdersMap = new Map();
-
-  currentData.forEach(member => {
-    if (member.specialStars && Array.isArray(member.specialStars)) {
-      member.specialStars.forEach(item => {
-        if (item.starType === starType) {
-          const ts = item.timestamp || (item.date ? new Date(item.date).getTime() : 0);
-          if (ts > maxTimestamp) {
-            maxTimestamp = ts;
-          }
-          if (!holdersMap.has(ts)) {
-            holdersMap.set(ts, []);
-          }
-          holdersMap.get(ts).push(member.id || member.name);
-        }
-      });
-    }
-  });
-
-  return maxTimestamp > -1 ? (holdersMap.get(maxTimestamp) || []) : [];
-}
-
-
-// 📅 안전한 날짜 포맷팅 도우미 함수 (Timestamp, Date, 문자열 모두 대응)
+// 📅 안전한 날짜 포맷팅 도우미 함수
 function formatDate(dateValue) {
   if (!dateValue) return '날짜없음';
-  
   try {
-    // Firebase Timestamp 객체 (.toDate() 존재)
     if (dateValue && typeof dateValue.toDate === 'function') {
       const d = dateValue.toDate();
       const yyyy = d.getFullYear();
@@ -8923,13 +8885,9 @@ function formatDate(dateValue) {
       const dd = String(d.getDate()).padStart(2, '0');
       return `${yyyy}.${mm}.${dd}`;
     }
-    
-    // 이미 "YYYY.MM.DD" 문자열인 경우
     if (typeof dateValue === 'string' && dateValue.includes('.')) {
       return dateValue.trim();
     }
-    
-    // 숫징 타임스탬프 또는 Date 객체/문자열 처리
     const d = new Date(dateValue);
     if (!isNaN(d.getTime())) {
       const yyyy = d.getFullYear();
@@ -8940,11 +8898,10 @@ function formatDate(dateValue) {
   } catch (e) {
     console.error("Date Format Error:", e);
   }
-  
   return '날짜없음';
 }
 
-// 📦 1. 히스토리 데이터 캐싱 함수 (문서 ID '🍁 청계산' 및 이모지 필드 대응)
+// 📦 1. 히스토리 데이터 캐싱 함수 (최신순 내림차순 정렬 적용)
 function getOrBuildHistoryCache() {
   if (!window.historyCache) window.historyCache = {};
 
@@ -8959,7 +8916,6 @@ function getOrBuildHistoryCache() {
       const memberLogs = Array.isArray(m.logs) ? m.logs : [];
       const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
 
-      // 산 이름 추출 (문서 필드 -> 로그 객체 id/docId -> 유저 기본값 순)
       let extractedMountain = '';
       if (latestLog) {
         extractedMountain = latestLog.mountain || latestLog.id || latestLog.docId || '';
@@ -9005,9 +8961,10 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  superItems.sort((a, b) => a.createdAt - b.createdAt);
-  specialItems.sort((a, b) => a.createdAt - b.createdAt);
-  lv100Items.sort((a, b) => a.createdAt - b.createdAt);
+  // 🔄 최신 획득 순서대로 앞쪽부터 배치되도록 내림차순(b - a) 정렬
+  superItems.sort((a, b) => b.createdAt - a.createdAt);
+  specialItems.sort((a, b) => b.createdAt - a.createdAt);
+  lv100Items.sort((a, b) => b.createdAt - a.createdAt);
 
   window.historyCache = {
     superStars: superItems,
@@ -9019,7 +8976,7 @@ function getOrBuildHistoryCache() {
   return window.historyCache;
 }
 
-// 🌟 2. 전설의 별 (Legend Star) 상세보기 모달
+// 🌟 2. 전설의 별 (Legend Star) 상세보기 모달 (최대 3개 표시 + 더보기 토글 스크롤)
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9030,13 +8987,13 @@ window.openLegendDetailModal = function() {
 
   const cache = getOrBuildHistoryCache();
 
-  const renderList = (items, type) => {
+  const renderExpandableList = (items, type, sectionId) => {
     if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
 
     let currentRank = 1;
     let prevDate = null;
 
-    return items.map((item, idx) => {
+    const renderedCards = items.map((item, idx) => {
       if (prevDate !== null && item.date !== prevDate) {
         currentRank = idx + 1;
       }
@@ -9061,7 +9018,29 @@ window.openLegendDetailModal = function() {
           </div>
         </div>
       `;
-    }).join('');
+    });
+
+    // 3개 초과 시 더보기 버튼 및隠し 스크롤 컨테이너 적용
+    if (renderedCards.length > 3) {
+      const initialList = renderedCards.slice(0, 3).join('');
+      const hiddenList = renderedCards.slice(3).join('');
+
+      return `
+        <div class="space-y-1.5">
+          ${initialList}
+          <div id="more-detail-container-${sectionId}" class="hidden space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+            ${hiddenList}
+          </div>
+          <button type="button" 
+            onclick="document.getElementById('more-detail-container-${sectionId}').classList.remove('hidden'); this.classList.add('hidden');"
+            class="w-full py-1.5 text-center text-[11px] font-bold text-indigo-600 bg-indigo-50/80 hover:bg-indigo-100/80 rounded-xl border border-indigo-200 transition-all cursor-pointer">
+            + ${renderedCards.length - 3}개 더보기
+          </button>
+        </div>
+      `;
+    }
+
+    return `<div class="space-y-1.5">${renderedCards.join('')}</div>`;
   };
 
   body.innerHTML = `
@@ -9069,9 +9048,7 @@ window.openLegendDetailModal = function() {
       <div class="text-xs font-black text-rose-600 flex items-center gap-1 border-b border-rose-100 pb-1">
         🔥 슈퍼별 획득 명단
       </div>
-      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
-        ${renderList(cache.superStars, 'super')}
-      </div>
+      ${renderExpandableList(cache.superStars, 'super', 'super')}
     </div>
 
     <div class="my-2.5 border-t border-dashed border-slate-200"></div>
@@ -9080,9 +9057,7 @@ window.openLegendDetailModal = function() {
       <div class="text-xs font-black text-purple-600 flex items-center gap-1 border-b border-purple-100 pb-1">
         ✨ 스페셜별 획득 명단
       </div>
-      <div class="space-y-1.5 max-h-[170px] overflow-y-auto pr-1">
-        ${renderList(cache.specialStars, 'special')}
-      </div>
+      ${renderExpandableList(cache.specialStars, 'special', 'special')}
     </div>
   `;
 
@@ -9142,9 +9117,8 @@ window.openLv100DetailModal = function() {
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 };
-             
 
-// 🏔️ 3. 누적 고도 상세보기 모달
+// 🏔️ 4. 누적 고도 상세보기 모달
 window.openHeightDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9202,6 +9176,10 @@ window.closeHistoryDetailModal = function() {
   }
 };
 
+    
+     
+
+      
 
 
 
