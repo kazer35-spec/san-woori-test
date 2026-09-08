@@ -7447,7 +7447,7 @@ window.toggleDisableCoord = () => {
 };
 
 
- window.addMultiActivity = async () => {
+window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -7682,11 +7682,18 @@ window.toggleDisableCoord = () => {
 
             for (let i = 0; i < finalLogLoopCount; i++) {
                 let starType = null;
+                
+                // 🎯 [수정된 핵심 로직] 정기산행일 경우 전분기 점수 반영 추첨 실행
                 if (isRegular) {
-                    const rand = Math.random() * 100;
-                    if (rand <= 3) starType = "super";
-                    else if (rand <= 10) starType = "special";
-                    else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
+                    if (typeof window.drawRegularHikeStar === 'function') {
+                        starType = window.drawRegularHikeStar(member, currentYear, currentQuarter);
+                    } else {
+                        // Fallback: 함수를 찾을 수 없을 때의 기본 가중치 적용
+                        const rand = Math.random() * 100;
+                        if (rand <= 3) starType = "super";
+                        else if (rand <= 10) starType = "special";
+                        else starType = "regular_" + (Math.floor(Math.random() * 4) + 1);
+                    }
                 }
 
                 // 🎯 별(슈퍼/스페셜) 획득 시 DB 저장
@@ -7714,7 +7721,7 @@ window.toggleDisableCoord = () => {
                     isSchedule,  
                     isRunning, isTracking, isWalking, isExtraHike, isOnlyLog, region,
                     starType, author: member.name,
-                    seasonIcon: selectedSeasonMark, // 👈 [추가] 수동 선택된 계절 이모지 저장
+                    seasonIcon: selectedSeasonMark,
                     isSpecial: isSpecialTracking ? false : isSpecial,
                     pRock, pForest, pValley
                 };
@@ -7783,7 +7790,7 @@ window.toggleDisableCoord = () => {
             'isTrackingCheck', 'isWalkingCheck', 'isOnlyLog', 
             'isQuarterCheck', 'disableCoordCheck',
             'isExtraHikeCheck', 'isSpecialTrackingCheck',
-            'isSpringMarkCheck', 'isSummerMarkCheck', 'isFallMarkCheck', 'isWinterMarkCheck' // 👈 [추가] 계절 체크박스 초기화
+            'isSpringMarkCheck', 'isSummerMarkCheck', 'isFallMarkCheck', 'isWinterMarkCheck'
         ];
         checkIds.forEach(id => {
             const cb = document.getElementById(id);
@@ -7812,9 +7819,8 @@ window.toggleDisableCoord = () => {
         alert("저장 실패: " + error.message);
     }
 };
-
-
-                    
+ 
+                 
             
             
                     
