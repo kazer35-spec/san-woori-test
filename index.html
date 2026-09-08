@@ -8689,11 +8689,39 @@ window.toggleVibeModal = function(show) {
   }
 };
 
+// 🌟 같은 날 별을 획득한 모든 보유자 ID 가져오기
+function getLatestLegendHolders(starType) {
+  if (typeof currentData === 'undefined' || !Array.isArray(currentData)) return [];
+
+  let maxTimestamp = -1;
+  let holdersMap = new Map();
+
+  currentData.forEach(member => {
+    if (member.specialStars && Array.isArray(member.specialStars)) {
+      member.specialStars.forEach(item => {
+        if (item.starType === starType) {
+          const ts = item.timestamp || (item.date ? new Date(item.date).getTime() : 0);
+          if (ts > maxTimestamp) {
+            maxTimestamp = ts;
+          }
+          if (!holdersMap.has(ts)) {
+            holdersMap.set(ts, []);
+          }
+          holdersMap.get(ts).push(member.id || member.name);
+        }
+      });
+    }
+  });
+
+  return maxTimestamp > -1 ? (holdersMap.get(maxTimestamp) || []) : [];
+}
+
 // 📅 안전한 날짜 포맷팅 도우미 함수 (Timestamp, Date, 문자열 모두 대응)
 function formatDate(dateValue) {
   if (!dateValue) return '날짜없음';
   
   try {
+    // Firebase Timestamp 객체 (.toDate() 존재)
     if (dateValue && typeof dateValue.toDate === 'function') {
       const d = dateValue.toDate();
       const yyyy = d.getFullYear();
@@ -8702,10 +8730,12 @@ function formatDate(dateValue) {
       return `${yyyy}.${mm}.${dd}`;
     }
     
+    // 이미 "YYYY.MM.DD" 문자열인 경우
     if (typeof dateValue === 'string' && dateValue.includes('.')) {
       return dateValue.trim();
     }
     
+    // 숫자 타임스탬프 또는 Date 객체/문자열 처리
     const d = new Date(dateValue);
     if (!isNaN(d.getTime())) {
       const yyyy = d.getFullYear();
@@ -8720,7 +8750,7 @@ function formatDate(dateValue) {
   return '날짜없음';
 }
 
-// 📦 1. 히스토리 데이터 캐싱 함수 (공동 순위 계산 후 최신순 내림차순 정렬)
+// 📦 1. 히스토리 데이터 캐싱 함수 (공동 순위 부여 및 최신순 내림차순 정렬)
 function getOrBuildHistoryCache() {
   if (window.historyCache && window.historyCache.superStars) {
     return window.historyCache;
@@ -8737,6 +8767,7 @@ function getOrBuildHistoryCache() {
       const memberLogs = Array.isArray(m.logs) ? m.logs : [];
       const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
 
+      // 산 이름 추출
       let extractedMountain = latestLog ? (latestLog.mountain || latestLog.id || latestLog.docId || '') : '';
       const fallbackMountain = extractedMountain || m.lastMountain || m.recentMountain || '🍁 청계산';
       const rawFallbackDate = m.lastDate || (latestLog ? latestLog.date : '') || new Date();
@@ -8780,7 +8811,7 @@ function getOrBuildHistoryCache() {
     });
   }
 
-  // 🎯 날짜 오름차순으로 순위 매긴 후, 최신순(내림차순)으로 반환하는 정렬 로직
+  // 달성일 기준 순위 계산 후 최신순 내림차순 정렬 로직
   const processRankAndSort = (list) => {
     if (!list || list.length === 0) return [];
 
@@ -8792,13 +8823,13 @@ function getOrBuildHistoryCache() {
 
     list.forEach((item, idx) => {
       if (prevDate !== null && item.date !== prevDate) {
-        currentRank = idx + 1; // 날짜 바뀌면 순위 증가
+        currentRank = idx + 1;
       }
       item.rank = currentRank;
       prevDate = item.date;
     });
 
-    // 2단계: 화면 표시용 최신순(내림차순) 정렬
+    // 2단계: 최신순(내림차순) 정렬 반환
     return list.sort((a, b) => {
       if (b.date !== a.date) return b.date.localeCompare(a.date);
       if (b.createdAt !== a.createdAt) return b.createdAt - a.createdAt;
@@ -8825,11 +8856,11 @@ function renderVibeHallOfFame() {
 
   const cache = getOrBuildHistoryCache();
 
-  // 1. 전설의 별 데이터 (최신순 매핑)
+  // 1. 전설의 별 데이터 (최신순 및 정확한 Rank 연결)
   const superHolders = cache.superStars.map(item => `No.${item.rank} ${item.name}`);
   const specialHolders = cache.specialStars.map(item => `No.${item.rank} ${item.name}`);
 
-  // 2. Lv.100 Club 데이터 (최신순 매핑)
+  // 2. Lv.100 Club 데이터 (최신순 및 정확한 Rank 연결)
   const level100Holders = cache.lv100List.map(item => `No.${item.rank} ${item.name}`);
 
   // 3. 누적고도 데이터 산출
@@ -9161,8 +9192,6 @@ window.closeHistoryDetailModal = function() {
   }
 };
 
-
-        
 
 
 
