@@ -8588,14 +8588,13 @@ window.filterAdminMemberList = () => {
 };
 
 
-
 // -------------------------------------------------------------
 // 0. 캐시 객체 및 데이터 세팅 (Firestore 호출 최소화)
 // -------------------------------------------------------------
 window.historyCache = {
-  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt }]
-  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt }]
-  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt }]
+  superStars: null,    // [{ id, name, starType, mountain, date, quarter, createdAt, rank }]
+  specialStars: null,  // [{ id, name, starType, mountain, date, quarter, createdAt, rank }]
+  lv100List: null,     // [{ id, name, mountain, date, quarter, createdAt, rank }]
   lastUpdated: null
 };
 
@@ -8689,6 +8688,123 @@ window.toggleVibeModal = function(show) {
   }
 };
 
+// 📅 안전한 날짜 포맷팅 도우미 함수
+function formatDate(dateValue) {
+  if (!dateValue) return '날짜없음';
+  try {
+    if (dateValue && typeof dateValue.toDate === 'function') {
+      const d = dateValue.toDate();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}.${mm}.${dd}`;
+    }
+    if (typeof dateValue === 'string' && dateValue.includes('.')) {
+      return dateValue.trim();
+    }
+    const d = new Date(dateValue);
+    if (!isNaN(d.getTime())) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}.${mm}.${dd}`;
+    }
+  } catch (e) {
+    console.error("Date Format Error:", e);
+  }
+  return '날짜없음';
+}
+
+// 📦 3. 히스토리 데이터 캐싱 함수 (최초 달성 순으로 고유 rank 부여 후, 최신순 배치)
+function getOrBuildHistoryCache() {
+  if (!window.historyCache) window.historyCache = {};
+
+  const superItems = [];
+  const specialItems = [];
+  const lv100Items = [];
+
+  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+    const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
+
+    activeMembers.forEach(m => {
+      const memberLogs = Array.isArray(m.logs) ? m.logs : [];
+      const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
+
+      let extractedMountain = latestLog ? (latestLog.mountain || latestLog.id || latestLog.docId || '') : '';
+      const fallbackMountain = extractedMountain || m.lastMountain || m.recentMountain || '🍁 청계산';
+      const rawFallbackDate = m.lastDate || (latestLog ? latestLog.date : '') || new Date();
+
+      // 🌟 전설의 별 데이터 수집
+      if (m.specialStars && Array.isArray(m.specialStars)) {
+        m.specialStars.forEach(s => {
+          const formattedDate = formatDate(s.date || s.timestamp || s.createdAt || rawFallbackDate);
+          const monthMatch = formattedDate.split('.')[1];
+          const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
+
+          const item = {
+            name: m.name,
+            mountain: s.mountain || s.mountainName || fallbackMountain,
+            date: formattedDate,
+            quarter: s.quarter || calculatedQuarter,
+            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : (s.timestamp || Date.now())
+          };
+
+          if (s.starType === 'super') superItems.push(item);
+          if (s.starType === 'special') specialItems.push(item);
+        });
+      }
+
+      // 👑 Lv.100 천상계 데이터 수집
+      if ((m.level || 0) >= 100 || m.lv100Achieved) {
+        const formattedDate = formatDate(m.lv100Date || m.achievedDate || rawFallbackDate);
+        const monthMatch = formattedDate.split('.')[1];
+        const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
+
+        lv100Items.push({
+          name: m.name,
+          mountain: m.lv100Mountain || fallbackMountain,
+          date: formattedDate,
+          quarter: m.lv100Quarter || calculatedQuarter,
+          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : Date.now()
+        });
+      }
+    });
+  }
+
+  // 1️⃣ [오름차순 정렬] 최초 달성 순서대로 고유 순위(rank) 매기기
+  const assignOriginalRanks = (items) => {
+    items.sort((a, b) => a.createdAt - b.createdAt);
+    let currentRank = 1;
+    let prevDate = null;
+
+    items.forEach((item, idx) => {
+      if (prevDate !== null && item.date !== prevDate) {
+        currentRank = idx + 1;
+      }
+      prevDate = item.date;
+      item.rank = currentRank; // 고유 No. 번호 부여 (등초=1, 율님=2, 후후=2)
+    });
+  };
+
+  assignOriginalRanks(superItems);
+  assignOriginalRanks(specialItems);
+  assignOriginalRanks(lv100Items);
+
+  // 2️⃣ [내림차순 정렬] 최신 달성자가 앞쪽에 오도록 배치 뒤집기
+  superItems.sort((a, b) => b.createdAt - a.createdAt);
+  specialItems.sort((a, b) => b.createdAt - a.createdAt);
+  lv100Items.sort((a, b) => b.createdAt - a.createdAt);
+
+  window.historyCache = {
+    superStars: superItems,
+    specialStars: specialItems,
+    lv100List: lv100Items,
+    lastUpdated: Date.now()
+  };
+
+  return window.historyCache;
+}
+
 // -------------------------------------------------------------
 // 🏆 SanWoori History 메인 렌더링 함수
 // -------------------------------------------------------------
@@ -8698,25 +8814,14 @@ function renderVibeHallOfFame() {
 
   const cache = getOrBuildHistoryCache();
 
-  // 동순위(같은 날짜/시간)를 고려하여 "No.X 이름" 형태 목록 생성하는 헬퍼 함수
-  const buildRankedHolders = (items) => {
-    let rank = 1;
-    let prevDate = null;
-    return items.map((item, idx) => {
-      if (prevDate !== null && item.date !== prevDate) {
-        rank = idx + 1;
-      }
-      prevDate = item.date;
-      return `No.${rank} ${item.name}`;
-    });
-  };
+  // 고유 rank를 사용하여 "No.X 이름" 뱃지 생성 도우미
+  const buildRankedHolders = (items) => items.map(item => `No.${item.rank} ${item.name}`);
 
-  // 최신순 정렬된 캐시 데이터를 바탕으로 메인 표시 텍스트 산출
   const superHolders = buildRankedHolders(cache.superStars);
   const specialHolders = buildRankedHolders(cache.specialStars);
   const level100Holders = buildRankedHolders(cache.lv100List);
 
-  // 3. 누적고도 데이터 산출 (3만, 5만, 10만 기준)
+  // 누적고도 데이터 산출
   const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
   const sortedHeightMembers = [...activeMembers].sort((a, b) => (b.totalHeight || 0) - (a.totalHeight || 0));
 
@@ -8775,6 +8880,7 @@ function renderVibeHallOfFame() {
 
   container.innerHTML = `
     <div>
+      <!-- 📜 모달 헤더 -->
       <div class="flex items-center justify-between mb-2.5">
         <div class="text-[15px] font-black text-slate-800 flex items-center gap-1.5 tracking-tight">
           <span class="text-base">📜</span> San:Woori History
@@ -8782,6 +8888,7 @@ function renderVibeHallOfFame() {
       </div>
 
       <div class="space-y-2.5">
+        <!-- 🌟 1. Legend Star 카드 -->
         <div class="p-3 bg-gradient-to-br from-purple-50/40 via-indigo-50/20 to-slate-50/40 rounded-2xl border border-indigo-100/80 shadow-2xs">
           <div class="text-[11px] font-black text-indigo-950 mb-2 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8813,6 +8920,7 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
+        <!-- 👑 2. Lv.100 Club 카드 -->
         <div class="p-3 bg-gradient-to-br from-amber-50/60 via-orange-50/20 to-amber-100/10 rounded-2xl border border-amber-200/60 shadow-2xs">
           <div class="text-[11px] font-black text-amber-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8827,6 +8935,7 @@ function renderVibeHallOfFame() {
           </div>
         </div>
 
+        <!-- 🚩 3. 누적 고도 카드 -->
         <div class="p-3 bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-emerald-100/20 rounded-2xl is-emerald-subtle-glow relative overflow-hidden">
           <div class="text-[11px] font-black text-emerald-950 mb-1.5 flex items-center justify-between">
             <span class="flex items-center gap-1">
@@ -8874,109 +8983,7 @@ function renderVibeHallOfFame() {
   `;
 }
 
-// 📅 안전한 날짜 포맷팅 도우미 함수
-function formatDate(dateValue) {
-  if (!dateValue) return '날짜없음';
-  try {
-    if (dateValue && typeof dateValue.toDate === 'function') {
-      const d = dateValue.toDate();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}.${mm}.${dd}`;
-    }
-    if (typeof dateValue === 'string' && dateValue.includes('.')) {
-      return dateValue.trim();
-    }
-    const d = new Date(dateValue);
-    if (!isNaN(d.getTime())) {
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      return `${yyyy}.${mm}.${dd}`;
-    }
-  } catch (e) {
-    console.error("Date Format Error:", e);
-  }
-  return '날짜없음';
-}
-
-// 📦 1. 히스토리 데이터 캐싱 함수 (최신순 내림차순 정렬 적용)
-function getOrBuildHistoryCache() {
-  if (!window.historyCache) window.historyCache = {};
-
-  const superItems = [];
-  const specialItems = [];
-  const lv100Items = [];
-
-  if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
-    const activeMembers = currentData.filter(m => !m.isHidden && !m.hidden);
-
-    activeMembers.forEach(m => {
-      const memberLogs = Array.isArray(m.logs) ? m.logs : [];
-      const latestLog = memberLogs.length > 0 ? memberLogs[0] : null;
-
-      let extractedMountain = '';
-      if (latestLog) {
-        extractedMountain = latestLog.mountain || latestLog.id || latestLog.docId || '';
-      }
-      
-      const fallbackMountain = extractedMountain || m.lastMountain || m.recentMountain || '🍁 청계산';
-      const rawFallbackDate = m.lastDate || (latestLog ? latestLog.date : '') || new Date();
-
-      // 🌟 전설의 별 데이터 수집
-      if (m.specialStars && Array.isArray(m.specialStars)) {
-        m.specialStars.forEach(s => {
-          const formattedDate = formatDate(s.date || s.timestamp || s.createdAt || rawFallbackDate);
-          const monthMatch = formattedDate.split('.')[1];
-          const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
-
-          const item = {
-            name: m.name,
-            mountain: s.mountain || s.mountainName || fallbackMountain,
-            date: formattedDate,
-            quarter: s.quarter || calculatedQuarter,
-            createdAt: s.createdAt ? (s.createdAt.toDate ? s.createdAt.toDate().getTime() : new Date(s.createdAt).getTime()) : (s.timestamp || Date.now())
-          };
-
-          if (s.starType === 'super') superItems.push(item);
-          if (s.starType === 'special') specialItems.push(item);
-        });
-      }
-
-      // 👑 Lv.100 천상계 데이터 수집
-      if ((m.level || 0) >= 100 || m.lv100Achieved) {
-        const formattedDate = formatDate(m.lv100Date || m.achievedDate || rawFallbackDate);
-        const monthMatch = formattedDate.split('.')[1];
-        const calculatedQuarter = monthMatch ? `${Math.ceil(parseInt(monthMatch, 10) / 3)}Q` : '3Q';
-
-        lv100Items.push({
-          name: m.name,
-          mountain: m.lv100Mountain || fallbackMountain,
-          date: formattedDate,
-          quarter: m.lv100Quarter || calculatedQuarter,
-          createdAt: m.lv100CreatedAt ? (m.lv100CreatedAt.toDate ? m.lv100CreatedAt.toDate().getTime() : new Date(m.lv100CreatedAt).getTime()) : Date.now()
-        });
-      }
-    });
-  }
-
-  // 🔄 최신 획득 순서대로 앞쪽부터 배치되도록 내림차순(b - a) 정렬
-  superItems.sort((a, b) => b.createdAt - a.createdAt);
-  specialItems.sort((a, b) => b.createdAt - a.createdAt);
-  lv100Items.sort((a, b) => b.createdAt - a.createdAt);
-
-  window.historyCache = {
-    superStars: superItems,
-    specialStars: specialItems,
-    lv100List: lv100Items,
-    lastUpdated: Date.now()
-  };
-
-  return window.historyCache;
-}
-
-// 🌟 2. 전설의 별 (Legend Star) 상세보기 모달 (최대 3개 표시 + 더보기 토글 스크롤)
+// 🌟 4. 전설의 별 (Legend Star) 상세보기 모달 (3개 제한 + 더보기 토글 스크롤)
 window.openLegendDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -8990,16 +8997,8 @@ window.openLegendDetailModal = function() {
   const renderExpandableList = (items, type, sectionId) => {
     if (items.length === 0) return `<div class="text-center py-3 text-xs text-slate-400 font-medium">획득 기록이 없습니다.</div>`;
 
-    let currentRank = 1;
-    let prevDate = null;
-
-    const renderedCards = items.map((item, idx) => {
-      if (prevDate !== null && item.date !== prevDate) {
-        currentRank = idx + 1;
-      }
-      prevDate = item.date;
-
-      const isFirst = currentRank === 1;
+    const renderedCards = items.map((item) => {
+      const isFirst = item.rank === 1; // 고유 No.1일 경우에만 '👑 최초' 뱃지 부여
       const isSuper = type === 'super';
 
       return `
@@ -9007,7 +9006,7 @@ window.openLegendDetailModal = function() {
           <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
             ${isFirst 
               ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isSuper ? 'bg-rose-500' : 'bg-purple-600'} text-white font-black shrink-0">👑 최초</span>` 
-              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${currentRank}</span>`
+              : `<span class="text-[10px] font-black text-slate-500 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
             }
             <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
             <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
@@ -9020,7 +9019,6 @@ window.openLegendDetailModal = function() {
       `;
     });
 
-    // 3개 초과 시 더보기 버튼 및隠し 스크롤 컨테이너 적용
     if (renderedCards.length > 3) {
       const initialList = renderedCards.slice(0, 3).join('');
       const hiddenList = renderedCards.slice(3).join('');
@@ -9065,7 +9063,7 @@ window.openLegendDetailModal = function() {
   modal.style.display = 'flex';
 };
 
-// 👑 3. 천상계 (Lv.100 Club) 상세보기 모달
+// 👑 5. 천상계 (Lv.100 Club) 상세보기 모달
 window.openLv100DetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9080,25 +9078,17 @@ window.openLv100DetailModal = function() {
   if (items.length === 0) {
     body.innerHTML = `<div class="text-center py-8 text-xs text-amber-800/70 font-bold">아직 Lv.100 달성자가 없습니다.</div>`;
   } else {
-    let currentRank = 1;
-    let prevDate = null;
-
     body.innerHTML = `
       <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1">
-        ${items.map((item, idx) => {
-          if (prevDate !== null && item.date !== prevDate) {
-            currentRank = idx + 1;
-          }
-          prevDate = item.date;
-
-          const isFirst = currentRank === 1;
+        ${items.map((item) => {
+          const isFirst = item.rank === 1;
 
           return `
             <div class="p-2.5 rounded-xl border ${isFirst ? 'bg-amber-50/90 border-amber-300 ring-1 ring-amber-300/60' : 'bg-white border-amber-100'} shadow-2xs flex items-center justify-between text-xs font-bold overflow-x-auto">
               <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap w-full">
                 ${isFirst 
                   ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500 text-white font-black shrink-0">👑 최초</span>` 
-                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${currentRank}</span>`
+                  : `<span class="text-[10px] font-black text-amber-800/80 bg-amber-100/60 border border-amber-200/80 px-1.5 py-0.5 rounded-md shrink-0">No.${item.rank}</span>`
                 }
                 <span class="font-black text-slate-800 ml-0.5">${item.name}</span>
                 <span class="text-[10px] text-slate-400 font-bold">(${item.quarter})</span>
@@ -9118,7 +9108,7 @@ window.openLv100DetailModal = function() {
   modal.style.display = 'flex';
 };
 
-// 🏔️ 4. 누적 고도 상세보기 모달
+// 🏔️ 6. 누적 고도 상세보기 모달
 window.openHeightDetailModal = function() {
   const modal = document.getElementById('historyDetailModal');
   const title = document.getElementById('historyDetailTitle');
@@ -9176,10 +9166,11 @@ window.closeHistoryDetailModal = function() {
   }
 };
 
-    
-     
+          
+         
 
-      
+
+
 
 
 
