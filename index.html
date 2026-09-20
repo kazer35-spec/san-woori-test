@@ -3891,11 +3891,19 @@ margin: 0 2px !important;
 </div>
 </div>
 
- <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
-    <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
+<div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
+    <!-- relative 클래스 추가로 우측 상단 X 버튼 기준점 확보 -->
+    <div id="timelineModalContent" class="modal-content relative !p-5 !rounded-3xl" onclick="event.stopPropagation()">
         
-        <!-- 1. 최상단 멤버 이름 & 카운트 배지 영역 (복구 완료) -->
-        <div class="flex justify-between items-center mb-3">
+        <!-- ✕ 우측 상단 닫기 버튼 -->
+        <button type="button" onclick="toggleTimelineModal(false)" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 active:scale-95 transition-all rounded-full bg-slate-100/60 hover:bg-slate-200/80">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- 1. 최상단 멤버 이름 & 카운트 배지 영역 (X버튼 고려해 pr-8 여백 추가) -->
+        <div class="flex justify-between items-center mb-3 pr-8">
             <div>
                 <h2 class="text-lg font-black text-slate-800">
                     <span id="timelineMemberName" class="text-blue-600"></span> 님
@@ -3904,39 +3912,38 @@ margin: 0 2px !important;
             <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
         </div>
 
-        <!-- 🟩 일체형 잔디 카드 컨테이너 -->
-<div class="mb-3 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-2.5 shadow-sm overflow-hidden">
-    
-    <!-- 일체형 상단 헤더 -->
-    <div class="flex flex-col gap-1.5 mb-2 pb-1.5 border-b border-slate-200/60">
-        <!-- 타이틀 & HOT/우정포인트 배지 -->
-        <div class="flex items-center justify-between gap-2">
-            <p class="text-xs font-black text-slate-700 flex items-center gap-1 shrink-0">
-                🌱 분기 운동 잔디
-                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
-            </p>
+        <!-- 2. 🟩 일체형 잔디 카드 컨테이너 -->
+        <div class="mb-3 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-2.5 shadow-sm overflow-hidden">
+            
+            <!-- 일체형 상단 헤더 -->
+            <div class="flex flex-col gap-1.5 mb-2 pb-1.5 border-b border-slate-200/60">
+                <!-- 타이틀 & HOT/우정포인트 배지 -->
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-xs font-black text-slate-700 flex items-center gap-1 shrink-0">
+                        🌱 분기 운동 잔디
+                        <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
+                    </p>
 
-            <div class="flex items-center gap-1.5">
-                <div id="passionVibeArea"></div>
-                <div id="friendshipPointArea" class="hidden">
-                    <span id="memberFriendshipPoint">0</span>
+                    <div class="flex items-center gap-1.5">
+                        <div id="passionVibeArea"></div>
+                        <div id="friendshipPointArea" class="hidden">
+                            <span id="memberFriendshipPoint">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 슬림형 분기 선택 탭 -->
+                <div class="grid grid-cols-4 gap-1 bg-slate-200/60 p-0.5 rounded-lg">
+                    <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">1분기</button>
+                    <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">2분기</button>
+                    <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">3분기</button>
+                    <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">4분기</button>
                 </div>
             </div>
+
+            <!-- 일체형 잔디 보드 본체 -->
+            <div id="grassBoard" class="grass-container"></div>
         </div>
-
-        <!-- 슬림형 분기 선택 탭 (세로 패딩 py-0.5, 폰트 text-[11px] 적용) -->
-        <div class="grid grid-cols-4 gap-1 bg-slate-200/60 p-0.5 rounded-lg">
-            <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">1분기</button>
-            <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">2분기</button>
-            <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">3분기</button>
-            <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">4분기</button>
-        </div>
-    </div>
-
-    <!-- 일체형 잔디 보드 본체 -->
-    <div id="grassBoard" class="grass-container"></div>
-</div>
-
 
         <!-- 3. 범례 -->
         <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
@@ -3962,16 +3969,11 @@ margin: 0 2px !important;
 
         <!-- 5. 메인 인연의 숲 버튼 -->
         <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" 
-        class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all mt-3">
+        class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all my-1">
             <span class="relative z-10 flex items-center gap-1.5">
                 <span>🌳 인연의 숲 자세히 보기</span>
                 <span class="text-emerald-700">▶</span>
             </span>
-        </button>
-            
-        <!-- 6. 닫기 버튼 -->
-        <button onclick="toggleTimelineModal(false)" class="w-full mt-2 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm active:scale-[0.98] transition-transform">
-            닫기
         </button>
 
     </div> 
