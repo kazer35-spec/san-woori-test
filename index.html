@@ -9488,9 +9488,12 @@ let logs = allLogs.filter(l => (l.height || 0) > 0 && (!l.isSpecial || l.isExtra
         // [Case A] 산맥 데이터가 하나라도 잡히는 일반 유저군
         if (logs.length > 0) {
             const heights = logs.map(l => l.height);
-            const maxHeight = Math.max(...heights);
-            const maxLog = logs.find(l => l.height === maxHeight);
-            const myTotalH = heights.reduce((a, b) => a + b, 0);
+const maxHeight = Math.max(...heights);
+const maxLog = logs.find(l => l.height === maxHeight);
+
+// 🏔️ [수정] 100개 제한과 상관없이 회원의 실제 전체 누적 고도 사용
+const myTotalH = memberInfo ? (memberInfo.totalHeight || 0) : heights.reduce((a, b) => a + b, 0);
+
             const globalH = currentData.reduce((acc, m) => acc + (m.totalHeight || 0), 0);
 
             if(document.getElementById('myTotalH')) {
