@@ -28,6 +28,20 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        @keyframes blueGlowPulse {
+    0%, 100% {
+        box-shadow: 0 0 4px rgba(59, 130, 246, 0.6), 0 0 8px rgba(59, 130, 246, 0.3);
+        border-color: #60a5fa;
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.9), 0 0 16px rgba(37, 99, 235, 0.5);
+        border-color: #2563eb;
+    }
+}
+
+.quarter-glow-select {
+    animation: blueGlowPulse 2s infinite ease-in-out;
+}
     
 /* ==========================================
    🏆 100레벨 블랙 & 딥골드 레전더리 테마 (상단 요약 텍스트 컬러 수정본)
@@ -3905,22 +3919,42 @@ margin: 0 2px !important;
         </div>
 
         <!-- 🌱 분기 운동 잔디 타이틀 영역 -->
-        <div class="flex justify-between items-center mb-2.5">
-            <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1">
-                🌱 분기 운동 잔디
-                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
-            </p>
-            
-            <div class="flex items-center gap-1.5">
-                <div id="passionVibeArea"></div>
-                <div class="flex items-center gap-2">
-                    <div id="friendshipPointArea" class="hidden">
-                        <span id="memberFriendshipPoint">0</span>
-                    </div>
-                </div>
+<div class="flex justify-between items-center mb-2.5">
+    <!-- 좌측: 잔디 타이틀 + ℹ️ 안내 버튼 -->
+    <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1">
+        🌱 분기 운동 잔디
+        <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
+    </p>
+    
+    <!-- 우측: [🔥 HOT 배지] + [분기 선택 스크롤] + [인연 포인트] -->
+    <div class="flex items-center gap-1.5">
+        <!-- 🔥 HOT 배지 (분기 선택 스크롤 바로 옆 좌측에 위치) -->
+        <div id="passionVibeArea"></div>
+
+        <!-- 번쩍이는 블루 테두리가 적용된 분기 선택 스크롤 -->
+        <div class="relative">
+            <select id="timelineQuarterSelect" 
+                    onchange="onTimelineQuarterChange(this.value)"
+                    class="quarter-glow-select appearance-none bg-white text-blue-600 font-black text-[10px] py-0.5 pl-2 pr-5 rounded-md border border-blue-400 focus:outline-none cursor-pointer transition-all">
+                <option value="1">1분기</option>
+                <option value="2">2분기</option>
+                <option value="3">3분기</option>
+                <option value="4">4분기</option>
+            </select>
+            <!-- 드롭다운 화살표 -->
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-blue-500 text-[8px]">
+                ▼
             </div>
         </div>
 
+        <!-- 인연 포인트 영역 -->
+        <div class="flex items-center gap-2">
+            <div id="friendshipPointArea" class="hidden">
+                <span id="memberFriendshipPoint">0</span>
+            </div>
+        </div>
+    </div>
+</div>
         <!-- 잔디 보드 -->
         <div id="grassBoard" class="grass-container mb-2"></div>
 
@@ -5843,13 +5877,42 @@ window.toggleVibeModal = (show) => {
 };
 
 // 필터링 처리를 위해 현재 조회 중인 멤버의 로그 목록을 임시 저장할 전역 변수
-let currentMemberLogs = []; 
+// 전역 변수로 현재 띄워진 타임라인의 멤버 정보 저장
+let currentTimelineMember = { id: null, name: "" };
 
+// 분기 선택 변경 이벤트 핸들러
+window.onTimelineQuarterChange = (q) => {
+    selectedQuarter = parseInt(q);
+    
+    // 기존 분기 변경 함수(changeQuarter)가 있다면 선택 상태 유지
+    if (typeof changeQuarter === 'function') {
+        selectedQuarter = parseInt(q);
+        document.querySelectorAll('.q-btn').forEach((btn, idx) => 
+            btn.classList.toggle('active-q', idx + 1 === selectedQuarter)
+        );
+    }
+    
+    // 현재 열려있는 멤버의 타임라인 다시 세팅
+    if (currentTimelineMember.id) {
+        showMemberTimeline(currentTimelineMember.id, currentTimelineMember.name);
+    }
+};
 
-  window.showMemberTimeline = async (mId, mName) => {
+window.showMemberTimeline = async (mId, mName) => {
     toggleTimelineModal(true);
+    
+    // 현재 열린 멤버 ID/이름 저장
+    currentTimelineMember = { id: mId, name: mName };
+
+    // 분기 선택 드롭다운 값 현재 선택된 selectedQuarter로 동기화
+    const qSelect = document.getElementById('timelineQuarterSelect');
+    if (qSelect) {
+        qSelect.value = selectedQuarter || 1;
+    }
+
     const modalContent = document.getElementById('timelineModalContent');
-    modalContent.scrollTop = 0;
+    if(modalContent) modalContent.scrollTop = 0;
+    
     const container = document.getElementById('timelineContent');
     const grassBoard = document.getElementById('grassBoard');
     const vibeArea = document.getElementById('passionVibeArea');
@@ -5865,6 +5928,7 @@ let currentMemberLogs = [];
     grassBoard.innerHTML = vibeArea.innerHTML = "";
     chartBox.className = `chart-container-box chart-bg-q${selectedQuarter}`;
 
+    
     try {
         const start = new Date(selectedYear, (selectedQuarter - 1) * 3, 1);
         const end = new Date(selectedYear, selectedQuarter * 3, 1);
