@@ -3926,12 +3926,12 @@ margin: 0 2px !important;
         <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
     </p>
     
-    <!-- 우측: [🔥 HOT 배지] + [분기 선택 스크롤] 밀착 배치 -->
+    <!-- 우측: [🔥 HOT 배지] + [분기 선택 스크롤] 바로 옆 밀착 배치 -->
     <div class="flex items-center gap-1.5">
-        <!-- 🔥 HOT 배지 (분기 선택 스크롤 바로 좌측 옆) -->
+        <!-- 🔥 HOT 배지 (분기 스크롤 바로 좌측 옆) -->
         <div id="passionVibeArea" class="flex items-center"></div>
 
-        <!-- 높이 18px / 초슬림 분기 선택 스크롤 -->
+        <!-- 번쩍이는 컴팩트 분기 선택 스크롤 -->
         <div class="relative flex items-center h-[18px]">
             <select id="timelineQuarterSelect" 
                     onchange="onTimelineQuarterChange(this.value)"
@@ -3941,10 +3941,15 @@ margin: 0 2px !important;
                 <option value="3">3분기</option>
                 <option value="4">4분기</option>
             </select>
-            <!-- 화살표 아이콘 -->
+            <!-- 드롭다운 화살표 -->
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-blue-500 text-[7px]">
                 ▼
             </div>
+        </div>
+
+        <!-- 인연 포인트 숨김 유지 (DOM 에러 방지용) -->
+        <div id="friendshipPointArea" class="hidden">
+            <span id="memberFriendshipPoint">0</span>
         </div>
     </div>
 </div>
@@ -5869,38 +5874,32 @@ window.toggleVibeModal = (show) => {
   }
 };
 
- // 현재 타임라인 조회 중인 멤버 정보를 저장할 전역 변수
+// 필터링 처리를 위해 현재 조회 중인 멤버의 로그 목록을 임시 저장할 전역 변수
+let currentMemberLogs = []; 
 let currentTimelineMember = { id: null, name: "" };
 
-// 분기 변경 이벤트 핸들러
+// 🎯 분기 스크롤 선택 변경 이벤트 핸들러
 window.onTimelineQuarterChange = (q) => {
     selectedQuarter = parseInt(q);
     
-    // 외부 탭 버튼이 있는 경우 동기화
+    // 메인 페이지 분기 버튼 탭 동기화 (있을 경우)
     if (typeof changeQuarter === 'function') {
         document.querySelectorAll('.q-btn').forEach((btn, idx) => 
             btn.classList.toggle('active-q', idx + 1 === selectedQuarter)
         );
     }
     
-    // 현재 열려있는 멤버 타임라인 데이터 재로드
+    // 현재 타임라인 재조회
     if (currentTimelineMember.id) {
         window.showMemberTimeline(currentTimelineMember.id, currentTimelineMember.name);
     }
 };
 
 window.showMemberTimeline = async (mId, mName) => {
-    toggleTimelineModal(true);
-    
-    // 현재 조회 중인 멤버 정보 세팅
+    // 현재 열린 멤버 정보 저장
     currentTimelineMember = { id: mId, name: mName };
 
-    // 분기 선택 드롭다운 상태를 현재 selectedQuarter 값으로 설정
-    const qSelect = document.getElementById('timelineQuarterSelect');
-    if (qSelect && typeof selectedQuarter !== 'undefined') {
-        qSelect.value = selectedQuarter;
-    }
-
+    toggleTimelineModal(true);
     const modalContent = document.getElementById('timelineModalContent');
     if (modalContent) modalContent.scrollTop = 0;
     
@@ -5909,9 +5908,19 @@ window.showMemberTimeline = async (mId, mName) => {
     const vibeArea = document.getElementById('passionVibeArea');
     const chartBox = document.getElementById('chartBox');
 
-    // 1. 기본 텍스트 세팅
-    const nameElem = document.getElementById('timelineMemberName');
-    if (nameElem) nameElem.innerText = mName;
+    // 1. 기본 텍스트 및 정보 세팅
+    document.getElementById('timelineMemberName').innerText = mName;
+    const memberInfo = (typeof currentData !== 'undefined') ? currentData.find(m => m.id === mId) : null;
+    const friendshipPoint = memberInfo?.friendshipPoint || 0;
+    
+    const pointElem = document.getElementById('memberFriendshipPoint');
+    if (pointElem) pointElem.innerText = friendshipPoint.toLocaleString();
+
+    // 🎯 분기 선택 스크롤을 현재 선택된 분기값으로 맞춤
+    const qSelect = document.getElementById('timelineQuarterSelect');
+    if (qSelect && typeof selectedQuarter !== 'undefined') {
+        qSelect.value = selectedQuarter;
+    }
 
     if (container) container.innerHTML = "<p class='text-center text-xs py-5 text-gray-400'>조회 중...</p>";
     if (grassBoard) grassBoard.innerHTML = "";
@@ -5924,6 +5933,7 @@ window.showMemberTimeline = async (mId, mName) => {
         const totalDaysInQ = Math.floor((end - start) / (1000 * 60 * 60 * 24));
 
         // 2. 데이터 로드 (Firebase)
+        // 1) 이번 분기 데이터만 DB에서 핀포인트로 가져오기
         const qQuarter = query(
             collection(db, `sanwoori/${mId}/logs`),
             where("date", ">=", start),
@@ -5933,6 +5943,7 @@ window.showMemberTimeline = async (mId, mName) => {
         const snapQuarter = await getDocs(qQuarter);
         const logsQuarter = snapQuarter.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
 
+        // 2) 최근 30일 데이터만 핀포인트로 가져오기 (HOT 멤버 판정용)
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         const qRecent = query(
@@ -5943,12 +5954,14 @@ window.showMemberTimeline = async (mId, mName) => {
         const snapRecent = await getDocs(qRecent);
         const logsRecent = snapRecent.docs.map(doc => ({ ...doc.data(), date: doc.data().date.toDate() }));
 
+        // 3) 역대 전체 개수만 DB 카운트 서비스로 받아오기
         const snapCount = await getCountFromServer(collection(db, `sanwoori/${mId}/logs`));
         const totalCount = snapCount.data().count;
 
+        // 필터링용 전역 변수에 저장 (이번 분기 로그 세팅)
         currentMemberLogs = logsQuarter; 
 
-        // 상단 카운트 배지 렌더링
+        // 4. 상단 카운트 배지 렌더링
         const hikeCount = logsQuarter.filter(l => !l.isRunning && !l.isTracking && !l.isWalking && !l.isExtraHike).length;
         const exerciseCount = logsQuarter.length;
 
@@ -5958,13 +5971,12 @@ window.showMemberTimeline = async (mId, mName) => {
         }
 
         // 3. 차트 렌더링
-        if (typeof calculateGrowthData === 'function' && typeof renderGrowthChart === 'function') {
-            const chartData = await calculateGrowthData(mId);
-            renderGrowthChart(chartData);
-        }
+        const chartData = await calculateGrowthData(mId);
+        renderGrowthChart(chartData);
 
         // HOT 멤버 판별 및 배지 표시
         let isHotMember = false; 
+        
         const recentCount = logsRecent.filter(l => !l.isRunning && !l.isTracking).length;
 
         if (recentCount >= 4 && vibeArea) {
@@ -5973,15 +5985,18 @@ window.showMemberTimeline = async (mId, mName) => {
         }
 
         const weeklyCheck = {};
-        const validHikeDays = [];
+        const validHikeDays = []; // 나비가 앉을 수 있는 후보들
 
         logsQuarter.forEach(l => {
             const dayOffset = Math.floor((l.date - start) / (1000 * 60 * 60 * 24));
             const weekIdx = Math.floor(dayOffset / 7);
             
-            if(!l.isRunning && !l.isTracking) {
+            if(!l.isRunning && !l.isTracking) { // 순수 '산행'만 체크
                 weeklyCheck[weekIdx] = true;
-                if (!l.isRegular) validHikeDays.push(dayOffset); 
+                
+                if (!l.isRegular) {
+                    validHikeDays.push(dayOffset); 
+                }
             }
         });
 
@@ -6010,16 +6025,24 @@ window.showMemberTimeline = async (mId, mName) => {
             const key = `${l.date.getFullYear()}-${l.date.getMonth() + 1}-${l.date.getDate()}`;
             
             if(!dateActivities[key]) {
+                // 🎯 seasonIcon 초기 필드 추가
                 dateActivities[key] = { hike: 0, run: 0, trek: 0, walk: 0, extraHike: 0, isRegular: false, seasonIcon: null };
             }
             
-            if (l.seasonIcon) dateActivities[key].seasonIcon = l.seasonIcon;
+            // 🎯 수동 지정된 계절 마크가 있으면 객체에 등록
+            if (l.seasonIcon) {
+                dateActivities[key].seasonIcon = l.seasonIcon;
+            }
 
-            if (l.isExtraHike) dateActivities[key].extraHike++;
-            else if(l.isRunning) dateActivities[key].run++;
-            else if(l.isTracking) dateActivities[key].trek++;
-            else if(l.isWalking) dateActivities[key].walk++;
-            else {
+            if (l.isExtraHike) {
+                dateActivities[key].extraHike++;
+            } else if(l.isRunning) {
+                dateActivities[key].run++;
+            } else if(l.isTracking) {
+                dateActivities[key].trek++;
+            } else if(l.isWalking) { 
+                dateActivities[key].walk++;
+            } else {
                 dateActivities[key].hike++;
                 if(l.isRegular) dateActivities[key].isRegular = true;
             }
@@ -6057,6 +6080,7 @@ window.showMemberTimeline = async (mId, mName) => {
             const month = cur.getMonth() + 1;
 
             if (act) {
+                // --- [로직 A] 정기산행 꽃/마크 피우기 ---
                 if (act.isRegular) {
                     style = `background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0) !important; 
                              border: none !important; 
@@ -6065,6 +6089,7 @@ window.showMemberTimeline = async (mId, mName) => {
                     
                     cl += " grass-regular-premium"; 
 
+                    // 🎯 수동 지정된 seasonIcon이 있으면 해당 이모지 사용, 없으면 월별 자동 지정
                     let qIcon = act.seasonIcon || (
                                 (month >= 3 && month <= 5) ? "🌸" : 
                                 (month >= 6 && month <= 8) ? "🍀" : 
@@ -6073,21 +6098,31 @@ window.showMemberTimeline = async (mId, mName) => {
                     iconTag = `<span style="font-size: 11px; display: flex; align-items: center; justify-content: center; height: 100%; pointer-events: none; position: relative; z-index: 5; text-shadow: 0 0 3px rgba(0,0,0,0.3);">${qIcon}</span>`;
                 }
                 else {
+                    // 1. 상태 판정 변수 생성
+                    const hasHike = act.hike > 0;
+                    const hasExtraHike = act.extraHike > 0;
+                    const hasTrek = act.trek > 0;
+                    const hasWalk = act.walk > 0;
+                    const hasRun = act.run > 0;
+
+                    // 색상 정의
                     const colors = {
-                        hike: "#2ecc71",
-                        extraHike: "#5CE1D6",
-                        walk: "#FFCC80",
-                        trek: "#E0B0FF",
-                        run: "#FFD1DC"
+                        hike: "#2ecc71",      // 등산 기본 (초록)
+                        extraHike: "#5CE1D6", // 번외산행 (민트)
+                        walk: "#FFCC80",      // 산책 (주황)
+                        trek: "#E0B0FF",      // 트레킹 (보라)
+                        run: "#FFD1DC"        // 런닝 (분홍)
                     };
 
+                    // 2. 활성화된 모든 활동을 배열에 추가
                     let activeColors = [];
-                    if (act.hike > 0) activeColors.push(colors.hike);
-                    if (act.extraHike > 0) activeColors.push(colors.extraHike);
-                    if (act.trek > 0) activeColors.push(colors.trek);
-                    if (act.walk > 0) activeColors.push(colors.walk);
-                    if (act.run > 0) activeColors.push(colors.run);
+                    if (hasHike) activeColors.push(colors.hike);
+                    if (hasExtraHike) activeColors.push(colors.extraHike);
+                    if (hasTrek) activeColors.push(colors.trek);
+                    if (hasWalk) activeColors.push(colors.walk);
+                    if (hasRun) activeColors.push(colors.run);
 
+                    // 3. 스타일 결정 로직
                     if (activeColors.length >= 2) {
                         if (activeColors.length === 2) {
                             style = `background: linear-gradient(135deg, ${activeColors[0]} 50%, ${activeColors[1]} 50%);`;
@@ -6096,14 +6131,26 @@ window.showMemberTimeline = async (mId, mName) => {
                         }
                     } 
                     else if (activeColors.length === 1) {
-                        if (act.hike > 0) cl += ` grass-active-${Math.min(act.hike, 4)}`;
-                        else if (act.extraHike > 0) cl += ` grass-extra-active-${Math.min(act.extraHike, 3)}`;
-                        else if (act.trek > 0) cl += ` grass-trek-active-${Math.min(act.trek, 3)}`;
-                        else if (act.walk > 0) cl += ` grass-walk-active-${Math.min(act.walk, 3)}`;
-                        else if (act.run > 0) cl += ` grass-run-active-${Math.min(act.run, 3)}`;
+                        if (hasHike) {
+                            const level = Math.min(act.hike, 4);
+                            cl += ` grass-active-${level}`;
+                        } else if (hasExtraHike) {
+                            const level = Math.min(act.extraHike, 3);
+                            cl += ` grass-extra-active-${level}`;
+                        } else if (hasTrek) {
+                            const level = Math.min(act.trek, 3);
+                            cl += ` grass-trek-active-${level}`;
+                        } else if (hasWalk) {
+                            const level = Math.min(act.walk, 3);
+                            cl += ` grass-walk-active-${level}`;
+                        } else if (hasRun) {
+                            const level = Math.min(act.run, 3);
+                            cl += ` grass-run-active-${level}`;
+                        }
                     }
 
-                    if (isHotMember && (act.hike > 0 || act.run > 0 || act.trek > 0)) {
+                    // HOT 멤버라면 30% 확률로 계절 꽃 추가 (정기산행이 아닐 때만)
+                    if (typeof isHotMember !== 'undefined' && isHotMember && (act.hike > 0 || act.run > 0 || act.trek > 0)) {
                         if (Math.random() < 0.3) {
                             let flowerList = (month >= 3 && month <= 5) ? seasonalFlowers.spring :
                                              (month >= 6 && month <= 8) ? seasonalFlowers.summer :
@@ -6116,6 +6163,7 @@ window.showMemberTimeline = async (mId, mName) => {
                 }
             }
 
+            // --- [로직 B] 팝업 데이터 인코딩 및 HTML 조립 ---
             const encodedAct = act ? btoa(unescape(encodeURIComponent(JSON.stringify({...act})))) : "";
             
             grassHtml += `
@@ -6127,14 +6175,18 @@ window.showMemberTimeline = async (mId, mName) => {
         }
 
         if (grassBoard) grassBoard.innerHTML = grassHtml;
-        if (typeof setupTimelineTabs === 'function') setupTimelineTabs();
+
+        // 6. 동적 탭 컨테이너 삽입 및 초기 리스트 렌더링
+        if (typeof setupTimelineTabs === 'function') {
+            setupTimelineTabs();
+        }
 
     } catch (e) {
         console.error("Timeline Error:", e);
         if (container) container.innerHTML = "<p class='text-center text-xs text-red-400'>데이터 조회 실패</p>";
     }
 };
-                                
+
       
 
 // 🌟 [추가 함수 1] 타임라인 상단 탭 배치 & 초기화
