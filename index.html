@@ -5930,14 +5930,16 @@ window.showMemberTimeline = async (mId, mName) => {
     const fsElem = document.getElementById('memberFriendshipPoint');
     if (fsElem) fsElem.innerText = friendshipPoint.toLocaleString();
 
-    // 2. 💡 '조회 중...' 글자 대신 미리 빈 잔디 틀(스켈레톤)을 채워두어 덜컥거림 방지
+        // 💡 [수정된 부분] 실제 잔디판 비율(CSS)에 딱 맞춘 슬림 스켈레톤
     if (grassBoard) {
         let dummyGrass = '';
-        for (let i = 0; i < 56; i++) {
-            dummyGrass += `<div class="w-3.5 h-3.5 rounded-xs bg-slate-200/50 animate-pulse"></div>`;
+        // 56개가 아닌 실제 한 분기 틀 크기에 맞추고, opacity와 높이를 콤팩트하게 제한
+        for (let i = 0; i < 40; i++) {
+            dummyGrass += `<div class="h-3.5 rounded-xs bg-slate-200/60 animate-pulse"></div>`;
         }
-        grassBoard.innerHTML = `<div class="grid grid-cols-14 gap-1 p-2 bg-slate-100/70 rounded-xl justify-center items-center min-h-[110px]">${dummyGrass}</div>`;
+        grassBoard.innerHTML = `<div class="grid grid-cols-10 gap-1 p-1.5 bg-slate-100/50 rounded-xl justify-center items-center min-h-[80px]">${dummyGrass}</div>`;
     }
+
 
     if (vibeArea) vibeArea.innerHTML = "";
     if (chartBox) chartBox.className = `chart-container-box chart-bg-q${selectedQuarter}`;
