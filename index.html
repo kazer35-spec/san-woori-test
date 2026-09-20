@@ -3894,7 +3894,7 @@ margin: 0 2px !important;
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
         
-        <!-- 상단 헤더 -->
+      <!-- 상단 헤더 -->
 <div class="flex justify-between items-center mb-3">
     <div>
         <h2 class="text-lg font-black text-slate-800">
@@ -3921,12 +3921,12 @@ margin: 0 2px !important;
     </div>
 </div>
 
-<!-- 📍 [추가된 위치] 분기 탭 -->
-<div id="quarterTabs" class="flex gap-2 justify-center mb-2.5">
-    <button id="qBtn1" class="q-btn" onclick="changeQuarter(1)">1분기</button>
-    <button id="qBtn2" class="q-btn" onclick="changeQuarter(2)">2분기</button>
-    <button id="qBtn3" class="q-btn" onclick="changeQuarter(3)">3분기</button>
-    <button id="qBtn4" class="q-btn" onclick="changeQuarter(4)">4분기</button>
+<!-- 📍 [분기 탭 영역] - JS의 window.changeQuarter(q) 와 연결 -->
+<div id="quarterTabs" class="relative z-20">
+    <button id="qBtn1" class="q-btn active-q" onclick="window.changeQuarter(1)">1분기</button>
+    <button id="qBtn2" class="q-btn" onclick="window.changeQuarter(2)">2분기</button>
+    <button id="qBtn3" class="q-btn" onclick="window.changeQuarter(3)">3분기</button>
+    <button id="qBtn4" class="q-btn" onclick="window.changeQuarter(4)">4분기</button>
 </div>
 
 <!-- 잔디 보드 -->
@@ -3962,7 +3962,7 @@ class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex item
         <span class="text-emerald-700">▶</span>
     </span>
 </button>
-
+  
             
         <!-- 닫기 버튼 -->
         <button onclick="toggleTimelineModal(false)" class="w-full mt-2 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm active:scale-[0.98] transition-transform">
