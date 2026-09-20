@@ -28,6 +28,35 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* 일체형 카드를 위한 분기 탭 스타일 */
+#quarterTabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(226, 232, 240, 0.7);
+  padding: 3px;
+  border-radius: 12px;
+}
+
+.q-btn {
+  flex: 1;
+  padding: 6px 0;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 선택된 분기 탭 스타일 */
+.q-btn.active-q {
+  background: #ffffff !important;
+  color: #2563eb !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
     
 /* ==========================================
    🏆 100레벨 블랙 & 딥골드 레전더리 테마 (상단 요약 텍스트 컬러 수정본)
@@ -3894,74 +3923,95 @@ margin: 0 2px !important;
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
         
-      <!-- 상단 헤더 -->
-<div class="flex justify-between items-center mb-3">
-    <div>
-        <h2 class="text-lg font-black text-slate-800">
-            <span id="timelineMemberName" class="text-blue-600"></span> 님
-        </h2>
-    </div>
-    <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
+      <!-- 상단 헤더 (이름 & 전체 카운트) -->
+<div class="flex justify-between items-center mb-3 px-1">
+  <div>
+    <h2 class="text-lg font-black text-slate-800">
+      <span id="timelineMemberName" class="text-blue-600">오즈</span> 님
+    </h2>
+  </div>
+  <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm">
+    산행 27회 / 운동 34회 / 전체 115회
+  </span>
 </div>
 
-<!-- 🌱 분기 운동 잔디 타이틀 영역 -->
-<div class="flex justify-between items-center mb-2.5">
-    <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1">
-        🌱 분기 운동 잔디
-        <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
+<!-- 📦 [분기 탭 + 잔디 일체형 메인 카드] -->
+<div class="bg-gradient-to-b from-slate-50 to-white border border-slate-200/90 rounded-2xl p-3.5 mb-3 shadow-sm">
+  
+  <!-- 1. 타이틀 & HOT / 우정점수 영역 -->
+  <div class="flex justify-between items-center mb-2.5 px-0.5">
+    <p class="text-[11px] font-extrabold text-slate-600 flex items-center gap-1">
+      🌱 분기 운동 잔디
+      <button type="button" class="info-help-btn-timeline text-slate-400 hover:text-slate-600" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
     </p>
     
     <div class="flex items-center gap-1.5">
-        <div id="passionVibeArea"></div>
-        <div class="flex items-center gap-2">
-            <div id="friendshipPointArea" class="hidden">
-                <span id="memberFriendshipPoint">0</span>
-            </div>
-        </div>
+      <div id="passionVibeArea">
+        <span class="hot-vibe flex items-center h-[18px] text-[9px] font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100/80">🔥 HOT</span>
+      </div>
+      <div id="friendshipPointArea" class="hidden">
+        <span id="memberFriendshipPoint" class="text-[10px] font-black text-slate-500">0</span>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- 📍 [분기 탭 영역] - JS의 window.changeQuarter(q) 와 연결 -->
-<div id="quarterTabs" class="relative z-20">
+  <!-- 2. 카드 내부 스며드는 분기 선택 탭 (일체형) -->
+  <div id="quarterTabs" class="relative z-20 mb-3 bg-slate-200/60 p-1 rounded-xl flex gap-1">
     <button id="qBtn1" class="q-btn active-q" onclick="window.changeQuarter(1)">1분기</button>
     <button id="qBtn2" class="q-btn" onclick="window.changeQuarter(2)">2분기</button>
     <button id="qBtn3" class="q-btn" onclick="window.changeQuarter(3)">3분기</button>
     <button id="qBtn4" class="q-btn" onclick="window.changeQuarter(4)">4분기</button>
+  </div>
+
+  <!-- 3. 잔디 보드 영역 -->
+  <div id="grassBoard" class="grass-container min-h-[110px] flex items-center justify-center">
+    <!-- 자바스크립트(showMemberTimeline)에서 그려지는 잔디 영역 -->
+  </div>
+
 </div>
 
-<!-- 잔디 보드 -->
-<div id="grassBoard" class="grass-container mb-2"></div>
-
-<!-- 범례 -->
-<div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
+<!-- 🎨 범례 (카드 바로 밑 배치) -->
+<div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-2 px-3 mb-4 bg-slate-50/70 rounded-xl border border-slate-100 text-[10px] text-slate-500 font-extrabold">
+  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>정기</span>
+  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-300"></span>일정</span>
+  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-300"></span>개인</span>
+  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-300"></span>트레킹</span>
+  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-pink-300"></span>런닝</span>
+  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-300"></span>산책</span>
 </div>
 
 <!-- 📊 분기 성장 추이 영역 -->
 <div id="chartBox" class="chart-container-box mb-4">
-    <div class="chart-header">
-        <div class="chart-title-sub" style="display: flex; align-items: center; gap: 4px;">
-            📊 분기 성장 추이
-            <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrowthInfoModal(event);" title="성장 추이 안내">ℹ️</button>
-        </div>
-        <div class="chart-legend">
-            <div class="legend-item"><span class="dot-bar"></span>횟수</div>
-            <div class="legend-item"><span class="dot-line"></span>고도</div>
-        </div>
+  <div class="chart-header">
+    <div class="chart-title-sub" style="display: flex; align-items: center; gap: 4px;">
+      📊 분기 성장 추이
+      <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrowthInfoModal(event);" title="성장 추이 안내">ℹ️</button>
     </div>
-    <div class="chart-guide-txt">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
-    <div style="height: 120px; position: relative;">
-        <canvas id="growthChart"></canvas>
+    <div class="chart-legend">
+      <div class="legend-item"><span class="dot-bar"></span>횟수</div>
+      <div class="legend-item"><span class="dot-line"></span>고도</div>
     </div>
+  </div>
+  <div class="chart-guide-txt">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
+  <div style="height: 120px; position: relative;">
+    <canvas id="growthChart"></canvas>
+  </div>
 </div>
 
 <!-- 메인 인연의 숲 버튼 -->
 <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" 
 class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all mt-3">
-    <span class="relative z-10 flex items-center gap-1.5">
-        <span>🌳 인연의 숲 자세히 보기</span>
-        <span class="text-emerald-700">▶</span>
-    </span>
+  <span class="relative z-10 flex items-center gap-1.5">
+    <span>🌳 인연의 숲 자세히 보기</span>
+    <span class="text-emerald-700">▶</span>
+  </span>
 </button>
+
+<!-- 닫기 버튼 -->
+<button onclick="toggleTimelineModal(false)" class="w-full mt-2 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm active:scale-[0.98] transition-transform">
+  닫기
+</button>
+
   
             
         <!-- 닫기 버튼 -->
@@ -5855,14 +5905,20 @@ window.toggleVibeModal = (show) => {
 let currentMemberLogs = []; 
 
 
-  window.showMemberTimeline = async (mId, mName) => {
+   window.showMemberTimeline = async (mId, mName) => {
     toggleTimelineModal(true);
     const modalContent = document.getElementById('timelineModalContent');
-    modalContent.scrollTop = 0;
+    if (modalContent) modalContent.scrollTop = 0;
+    
     const container = document.getElementById('timelineContent');
     const grassBoard = document.getElementById('grassBoard');
     const vibeArea = document.getElementById('passionVibeArea');
     const chartBox = document.getElementById('chartBox');
+
+    // 📍 [분기 탭 UI 동기화] 선택된 selectedQuarter 값에 맞춰 버튼에 .active-q 클래스 토글
+    document.querySelectorAll('#quarterTabs .q-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active-q', idx + 1 === selectedQuarter);
+    });
 
     // 1. 기본 텍스트 및 정보 세팅
     document.getElementById('timelineMemberName').innerText = mName;
@@ -6131,6 +6187,7 @@ let currentMemberLogs = [];
         container.innerHTML = "<p class='text-center text-xs text-red-400'>데이터 조회 실패</p>";
     }
 };
+
       
 
 // 🌟 [추가 함수 1] 타임라인 상단 탭 배치 & 초기화
@@ -6140,18 +6197,6 @@ function setupTimelineTabs() {
     // 타임라인 상단에 들어갈 탭 디자인 구성 (Tailwind class 적용)
     const tabsHtml = `
         <div class="flex border-b border-gray-100 mb-4 text-xs font-bold text-gray-400 sticky top-0 bg-white z-10 py-2">
-            <button onclick="window.filterMemberLogs('all')" id="mTab-all" class="flex-1 pb-2 border-b-2 border-sky-500 text-sky-600 transition-all text-center">전체</button>
-            <button onclick="window.filterMemberLogs('hiking')" id="mTab-hiking" class="flex-1 pb-2 border-b-2 border-transparent hover:text-gray-600 transition-all text-center">일정산행</button>
-            <button onclick="window.filterMemberLogs('running')" id="mTab-running" class="flex-1 pb-2 border-b-2 border-transparent hover:text-gray-600 transition-all text-center">개인/기타</button>
-        </div>
-        <div id="filteredTimelineList"></div>
-    `;
-    
-    container.innerHTML = tabsHtml;
-    
-    // 기본 'all' 상태로 리스트 출력
-    window.filterMemberLogs('all');
-}
 
 // 🌟 [추가 함수 2] 탭 클릭 시 클라이언트 사이드 즉시 필터링
 window.filterMemberLogs = (category) => {
@@ -8265,17 +8310,55 @@ window.deleteLog = async (mId, logId, shouldDownLevel) => {
     }
 };
 
-window.changeQuarter = (q) => { selectedQuarter = q; document.querySelectorAll('.q-btn').forEach((btn, idx) => btn.classList.toggle('active-q', idx + 1 === q)); startRealtimeSync(); };
-window.changeYear = () => { selectedYear = parseInt(document.getElementById('yearSelect').value); startRealtimeSync(); };
-window.showView = (v) => {
-    document.querySelectorAll('.view-content').forEach(e => e.classList.add('hidden'));
-    document.getElementById('view'+v.charAt(0).toUpperCase()+v.slice(1)).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
-    if(v === 'status') document.getElementById('tabStatus').classList.add('active-tab');
-    if(v === 'admin' || v === 'login') document.getElementById('tabAdmin').classList.add('active-tab');
-    renderStatusTable();
+// 1. 분기 변경 (선택된 분기 버튼 하이라이트 + 실시간 동기화)
+window.changeQuarter = (q) => { 
+    selectedQuarter = q; 
+    document.querySelectorAll('#quarterTabs .q-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active-q', idx + 1 === q);
+    }); 
+    startRealtimeSync(); 
 };
-window.handleAdminTab = () => isAdminLoggedIn ? showView('admin') : showView('login');
+
+// 2. 연도 변경
+window.changeYear = () => { 
+    selectedYear = parseInt(document.getElementById('yearSelect').value); 
+    startRealtimeSync(); 
+};
+
+// 3. 뷰 화면 전환
+window.showView = (v) => {
+    // 모든 뷰 영역 숨김
+    document.querySelectorAll('.view-content').forEach(e => e.classList.add('hidden'));
+
+    // 대상 뷰 ID 생성 (예: 'status' -> 'viewStatus')
+    const targetId = 'view' + v.charAt(0).toUpperCase() + v.slice(1);
+    const targetView = document.getElementById(targetId);
+    if (targetView) {
+        targetView.classList.remove('hidden');
+    }
+
+    // 탭 버튼 활성화 상태 초기화
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+
+    // 뷰 유형별 탭 하이라이트 적용
+    if (v === 'status') {
+        const tabStatus = document.getElementById('tabStatus');
+        if (tabStatus) tabStatus.classList.add('active-tab');
+    } else if (v === 'admin' || v === 'login') {
+        const tabAdmin = document.getElementById('tabAdmin');
+        if (tabAdmin) tabAdmin.classList.add('active-tab');
+    }
+
+    // 현황 테이블 렌더링 호출
+    if (typeof renderStatusTable === 'function') {
+        renderStatusTable();
+    }
+};
+
+// 4. 관리자 탭 클릭 처리 (로그인 여부에 따른 뷰 분기)
+window.handleAdminTab = () => {
+    isAdminLoggedIn ? showView('admin') : showView('login');
+};
 
 window.loginAdmin = async () => {
     const pw = document.getElementById('adminPassword').value;
