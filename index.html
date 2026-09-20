@@ -5907,12 +5907,13 @@ function refreshTimelineModal() {
 // ==========================================
 // 2. 기존 showMemberTimeline 함수
 // ==========================================
-let currentMemberLogs = []; 
+ let currentMemberLogs = []; 
 
 window.showMemberTimeline = async (mId, mName) => {
     currentTimelineMemberId = mId;
-    toggleTimelineModal(true);
     
+    // 모달 열기 및 스크롤 최상단 리셋
+    toggleTimelineModal(true);
     const modalContent = document.getElementById('timelineModalContent');
     if (modalContent) modalContent.scrollTop = 0;
     
@@ -5921,13 +5922,23 @@ window.showMemberTimeline = async (mId, mName) => {
     const chartBox = document.getElementById('chartBox');
 
     // 1. 기본 텍스트 및 정보 세팅
-    document.getElementById('timelineMemberName').innerText = mName;
+    const nameElem = document.getElementById('timelineMemberName');
+    if (nameElem) nameElem.innerText = mName;
+
     const memberInfo = typeof currentData !== 'undefined' ? currentData.find(m => m.id === mId) : null;
     const friendshipPoint = memberInfo?.friendshipPoint || 0;
     const fsElem = document.getElementById('memberFriendshipPoint');
     if (fsElem) fsElem.innerText = friendshipPoint.toLocaleString();
 
-    if (grassBoard) grassBoard.innerHTML = "<p class='text-center text-xs py-5 text-gray-400 col-span-full'>조회 중...</p>";
+    // 2. 💡 '조회 중...' 글자 대신 미리 빈 잔디 틀(스켈레톤)을 채워두어 덜컥거림 방지
+    if (grassBoard) {
+        let dummyGrass = '';
+        for (let i = 0; i < 56; i++) {
+            dummyGrass += `<div class="w-3.5 h-3.5 rounded-xs bg-slate-200/50 animate-pulse"></div>`;
+        }
+        grassBoard.innerHTML = `<div class="grid grid-cols-14 gap-1 p-2 bg-slate-100/70 rounded-xl justify-center items-center min-h-[110px]">${dummyGrass}</div>`;
+    }
+
     if (vibeArea) vibeArea.innerHTML = "";
     if (chartBox) chartBox.className = `chart-container-box chart-bg-q${selectedQuarter}`;
 
@@ -5938,8 +5949,6 @@ window.showMemberTimeline = async (mId, mName) => {
     updateTimelineQuarterUI(selectedQuarter);
 
     try {
-        // ... (이하 Firebase 데이터 로딩 및 잔디, 차트 렌더링 로직 기존 동일)
-
         const start = new Date(selectedYear, (selectedQuarter - 1) * 3, 1);
         const end = new Date(selectedYear, selectedQuarter * 3, 1);
         const totalDaysInQ = Math.floor((end - start) / (1000 * 60 * 60 * 24));
@@ -5983,15 +5992,17 @@ window.showMemberTimeline = async (mId, mName) => {
         }
 
         // 3. 차트 렌더링
-        const chartData = await calculateGrowthData(mId);
-        renderGrowthChart(chartData);
+        if (typeof calculateGrowthData === 'function' && typeof renderGrowthChart === 'function') {
+            const chartData = await calculateGrowthData(mId);
+            renderGrowthChart(chartData);
+        }
 
         // HOT 멤버 판별 및 배지 표시
         let isHotMember = false; 
         
         const recentCount = logsRecent.filter(l => !l.isRunning && !l.isTracking).length;
 
-        if (recentCount >= 4) {
+        if (recentCount >= 4 && vibeArea) {
             vibeArea.innerHTML = `<span class="hot-vibe flex items-center h-[18px] text-[9px] font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">🔥 HOT</span>`;
             isHotMember = true;
         }
@@ -6041,7 +6052,7 @@ window.showMemberTimeline = async (mId, mName) => {
                 dateActivities[key] = { hike: 0, run: 0, trek: 0, walk: 0, extraHike: 0, isRegular: false, seasonIcon: null };
             }
             
-            // 🎯 수동 지정된 계절 마크가 있으면 객체에 등록
+            // 🎯 수동 지정된 seasonIcon이 있으면 객체에 등록
             if (l.seasonIcon) {
                 dateActivities[key].seasonIcon = l.seasonIcon;
             }
@@ -6186,16 +6197,23 @@ window.showMemberTimeline = async (mId, mName) => {
                      ${butterflyTag}  </div>`;
         }
 
-        grassBoard.innerHTML = grassHtml;
+        // 스켈레톤 잔디판을 지우고 실제 잔디 HTML 렌더링
+        if (grassBoard) grassBoard.innerHTML = grassHtml;
 
         // 6. 동적 탭 컨테이너 삽입 및 초기 리스트 렌더링
-        setupTimelineTabs();
+        if (typeof setupTimelineTabs === 'function') {
+            setupTimelineTabs();
+        }
 
     } catch (e) {
         console.error("Timeline Error:", e);
-        container.innerHTML = "<p class='text-center text-xs text-red-400'>데이터 조회 실패</p>";
+        if (grassBoard) {
+            grassBoard.innerHTML = "<p class='text-center text-xs text-red-400 py-5 col-span-full'>데이터를 불러오는 중 오류가 발생했습니다.</p>";
+        }
     }
 };
+
+                    
       
 
 // 🌟 [추가 함수 1] 타임라인 상단 탭 배치 & 초기화
