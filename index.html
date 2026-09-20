@@ -3894,52 +3894,42 @@ margin: 0 2px !important;
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
         
-        <!-- 상단 헤더 -->
-        <div class="flex justify-between items-center mb-3">
-            <div>
-                <h2 class="text-lg font-black text-slate-800">
-                    <span id="timelineMemberName" class="text-blue-600"></span> 님
-                </h2>
-            </div>
-            <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
-        </div>
-
-        <!-- 🌱 분기 운동 잔디 타이틀 영역 -->
-        <div class="flex justify-between items-center mb-2.5">
-            <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1">
+        <!-- 🟩 연도/분기 탭 & 잔디보드 일체형 카드 컨테이너 -->
+<div class="mb-3 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-2.5 shadow-sm overflow-hidden">
+    
+    <!-- 1. 일체형 상단 헤더 (타이틀 + 연도 셀렉트 + 분기 탭) -->
+    <div class="flex flex-col gap-2 mb-2.5 pb-2 border-b border-slate-200/60">
+        <!-- 타이틀 & 연도 셀렉트 -->
+        <div class="flex items-center justify-between gap-2">
+            <p class="text-xs font-black text-slate-700 flex items-center gap-1 shrink-0">
                 🌱 분기 운동 잔디
                 <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
             </p>
-            
+
             <div class="flex items-center gap-1.5">
                 <div id="passionVibeArea"></div>
-                <div class="flex items-center gap-2">
-                    <div id="friendshipPointArea" class="hidden">
-                        <span id="memberFriendshipPoint">0</span>
-                    </div>
-                </div>
+                <!-- 연도 선택 -->
+                <select id="timelineYearSelect" onchange="handleTimelineYearChange(this.value)" class="bg-white text-[11px] font-extrabold text-slate-700 px-2 py-1 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-xs">
+                    <option value="2026">2026년</option>
+                    <option value="2025">2025년</option>
+                    <option value="2024">2024년</option>
+                </select>
             </div>
         </div>
-<!-- 📅 연도 및 분기 선택 탭 영역 -->
-<div class="flex items-center justify-between gap-2 mb-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-    <!-- 연도 선택 드롭다운 -->
-    <select id="timelineYearSelect" onchange="handleTimelineYearChange(this.value)" class="bg-white text-xs font-black text-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="2026">2026년</option>
-        <option value="2025">2025년</option>
-        <option value="2024">2024년</option>
-    </select>
 
-    <!-- 분기 선택 버튼 그룹 -->
-    <div class="flex items-center gap-1 flex-1 justify-end">
-        <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">1분기</button>
-        <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">2분기</button>
-        <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">3분기</button>
-        <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">4분기</button>
+        <!-- 분기 선택 탭 (1Q ~ 4Q 세련된 세그먼트 버튼) -->
+        <div class="grid grid-cols-4 gap-1 bg-slate-200/60 p-1 rounded-xl">
+            <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">1분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">2분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">3분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">4분기</button>
+        </div>
     </div>
+
+    <!-- 2. 일체형 하단 잔디 보드 본체 -->
+    <div id="grassBoard" class="grass-container"></div>
 </div>
 
-        <!-- 잔디 보드 -->
-        <div id="grassBoard" class="grass-container mb-2"></div>
 
         <!-- 범례 -->
         <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
@@ -5886,15 +5876,17 @@ window.handleTimelineQuarterChange = (q) => {
     refreshTimelineModal();
 };
 
+// 타임라인 모달 분기 버튼 활성화 스타일 업데이트 (일체형 카드용)
 function updateTimelineQuarterUI(q) {
     document.querySelectorAll('.timeline-q-btn').forEach((btn, idx) => {
         if (idx + 1 === q) {
-            btn.className = "timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-blue-600 bg-white shadow-sm border border-slate-200/80";
+            btn.className = "timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-blue-600 bg-white shadow-xs";
         } else {
-            btn.className = "timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60";
+            btn.className = "timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700 bg-transparent";
         }
     });
 }
+
 
 function refreshTimelineModal() {
     if (currentTimelineMemberId) {
