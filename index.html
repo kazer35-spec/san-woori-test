@@ -28,19 +28,19 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        @keyframes blueGlowPulse {
+        @keyframes emeraldGlowPulse {
     0%, 100% {
-        box-shadow: 0 0 3px rgba(59, 130, 246, 0.6), 0 0 6px rgba(59, 130, 246, 0.3);
-        border-color: #60a5fa;
+        box-shadow: 0 0 3px rgba(16, 185, 129, 0.5), 0 0 6px rgba(16, 185, 129, 0.2);
+        border-color: #6ee7b7;
     }
     50% {
-        box-shadow: 0 0 8px rgba(37, 99, 235, 0.8), 0 0 12px rgba(37, 99, 235, 0.4);
-        border-color: #2563eb;
+        box-shadow: 0 0 8px rgba(5, 150, 105, 0.7), 0 0 10px rgba(5, 150, 105, 0.3);
+        border-color: #10b981;
     }
 }
 
 .quarter-glow-select {
-    animation: blueGlowPulse 2s infinite ease-in-out;
+    animation: emeraldGlowPulse 2s infinite ease-in-out;
 }
     
 /* ==========================================
@@ -3926,28 +3926,28 @@ margin: 0 2px !important;
         <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
     </p>
     
-    <!-- 우측: [🔥 HOT 배지] + [분기 선택 스크롤] 바로 옆 밀착 배치 -->
+    <!-- 우측: [🔥 HOT 배지] + [에메랄드 분기 선택 스크롤] -->
     <div class="flex items-center gap-1.5">
-        <!-- 🔥 HOT 배지 (분기 스크롤 바로 좌측 옆) -->
+        <!-- 🔥 HOT 배지 -->
         <div id="passionVibeArea" class="flex items-center"></div>
 
-        <!-- 번쩍이는 컴팩트 분기 선택 스크롤 -->
+        <!-- 은은한 에메랄드 톤 분기 선택 스크롤 -->
         <div class="relative flex items-center h-[18px]">
             <select id="timelineQuarterSelect" 
                     onchange="onTimelineQuarterChange(this.value)"
-                    class="quarter-glow-select appearance-none bg-white text-blue-600 font-black text-[9px] h-[18px] leading-none pl-2 pr-4 rounded-md border border-blue-400 focus:outline-none cursor-pointer transition-all">
-                <option value="1">1분기</option>
-                <option value="2">2분기</option>
-                <option value="3">3분기</option>
-                <option value="4">4분기</option>
+                    class="quarter-glow-select appearance-none bg-emerald-50/80 text-emerald-800 font-extrabold text-[9px] h-[18px] leading-none pl-2 pr-4 rounded-md border border-emerald-300 focus:outline-none cursor-pointer transition-all">
+                <option value="1" class="bg-white text-slate-700">1분기</option>
+                <option value="2" class="bg-white text-slate-700">2분기</option>
+                <option value="3" class="bg-white text-slate-700">3분기</option>
+                <option value="4" class="bg-white text-slate-700">4분기</option>
             </select>
-            <!-- 드롭다운 화살표 -->
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-blue-500 text-[7px]">
+            <!-- 화살표 아이콘 (에메랄드 톤) -->
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-emerald-600 text-[7px]">
                 ▼
             </div>
         </div>
 
-        <!-- 인연 포인트 숨김 유지 (DOM 에러 방지용) -->
+        <!-- DOM 예외 방지용 숨김 처리 -->
         <div id="friendshipPointArea" class="hidden">
             <span id="memberFriendshipPoint">0</span>
         </div>
