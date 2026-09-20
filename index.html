@@ -8314,17 +8314,55 @@ window.deleteLog = async (mId, logId, shouldDownLevel) => {
     }
 };
 
-window.changeQuarter = (q) => { selectedQuarter = q; document.querySelectorAll('.q-btn').forEach((btn, idx) => btn.classList.toggle('active-q', idx + 1 === q)); startRealtimeSync(); };
-window.changeYear = () => { selectedYear = parseInt(document.getElementById('yearSelect').value); startRealtimeSync(); };
-window.showView = (v) => {
-    document.querySelectorAll('.view-content').forEach(e => e.classList.add('hidden'));
-    document.getElementById('view'+v.charAt(0).toUpperCase()+v.slice(1)).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
-    if(v === 'status') document.getElementById('tabStatus').classList.add('active-tab');
-    if(v === 'admin' || v === 'login') document.getElementById('tabAdmin').classList.add('active-tab');
-    renderStatusTable();
+// 1. 분기 변경 (선택된 분기 버튼 하이라이트 + 실시간 동기화)
+window.changeQuarter = (q) => { 
+    selectedQuarter = q; 
+    document.querySelectorAll('#quarterTabs .q-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active-q', idx + 1 === q);
+    }); 
+    startRealtimeSync(); 
 };
-window.handleAdminTab = () => isAdminLoggedIn ? showView('admin') : showView('login');
+
+// 2. 연도 변경
+window.changeYear = () => { 
+    selectedYear = parseInt(document.getElementById('yearSelect').value); 
+    startRealtimeSync(); 
+};
+
+// 3. 뷰 화면 전환
+window.showView = (v) => {
+    // 모든 뷰 영역 숨김
+    document.querySelectorAll('.view-content').forEach(e => e.classList.add('hidden'));
+
+    // 대상 뷰 ID 생성 (예: 'status' -> 'viewStatus')
+    const targetId = 'view' + v.charAt(0).toUpperCase() + v.slice(1);
+    const targetView = document.getElementById(targetId);
+    if (targetView) {
+        targetView.classList.remove('hidden');
+    }
+
+    // 탭 버튼 활성화 상태 초기화
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+
+    // 뷰 유형별 탭 하이라이트 적용
+    if (v === 'status') {
+        const tabStatus = document.getElementById('tabStatus');
+        if (tabStatus) tabStatus.classList.add('active-tab');
+    } else if (v === 'admin' || v === 'login') {
+        const tabAdmin = document.getElementById('tabAdmin');
+        if (tabAdmin) tabAdmin.classList.add('active-tab');
+    }
+
+    // 현황 테이블 렌더링 호출
+    if (typeof renderStatusTable === 'function') {
+        renderStatusTable();
+    }
+};
+
+// 4. 관리자 탭 클릭 처리 (로그인 여부에 따른 뷰 분기)
+window.handleAdminTab = () => {
+    isAdminLoggedIn ? showView('admin') : showView('login');
+};
 
 window.loginAdmin = async () => {
     const pw = document.getElementById('adminPassword').value;
