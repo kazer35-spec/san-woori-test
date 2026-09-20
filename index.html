@@ -3421,7 +3421,7 @@ margin: 0 2px !important;
             </th>
             <th class="w-[18%]">
               활동점수
-              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(잔디:인연의숲)</span>
+              <span class="block text-[8px] font-normal text-gray-400 mt-0.5">(분기운동)</span>
             </th>
             <th class="w-[22%]">
               누적고도
@@ -6649,7 +6649,7 @@ window.openMilkyWayInfoModal = function(event) {
             <li><strong>동행 지수(Synergy):</strong> 동행 지수가 <strong>60% 이상</strong> 달성되면 은은한 배경 별빛과 오로라 효과가 소환됩니다.</li>
             <li><strong>전설의 별빛:</strong> 정기산행 시 탐험 결과에 따라 타오르는 태양 <strong>슈퍼별(🔥)</strong>과 신비로운 <strong>스페셜별(✨)</strong>을 획득할 수 있습니다.</li>
             <li><strong>전설의 프레임 오라:</strong> <strong>슈퍼별</strong> 또는 <strong>스페셜별</strong> 보유 시 모달 최외곽 테두리에 <strong>고유한 그라데이션 빛 효과</strong>가 켜집니다. (신규획득자 생성시 모든 효과 승계)</li>
-            <li><strong>별 가이드 & 획득자:</strong> 우측 상단 <strong>✨ 별 가이드</strong> 버튼에서 별빛 종류별 설명 및 분기별 <strong>슈퍼/스페셜별 획득자 명단</strong>을 확인하실 수 있습니다.</li>
+            <li><strong>전설의 별 획득:</strong> 전분기 <strong>활동점수</strong> 기준으로 <strong>슈퍼별 최대 3% 스페셜별 7%</strong>로 개인별 획득 확률이 달라집니다.</li>
         </ul>
     `;
     window.renderAndShowMwModal(title, body, event);
@@ -6906,38 +6906,72 @@ window.showMemberMap = async (mId, mName) => {
     const top100Map = {};
     const normalMap = {};
 
+    // 💡 대한민국 주요 시/군/구 지역명 목록 (괄호 유지 판단용)
+    const VALID_REGIONS = [
+        "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+        "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주",
+        "남양주", "경주", "삼척", "포천", "가평", "양평", "단양", "영월", "태백",
+        "원주", "강릉", "속초", "인제", "홍천", "평창", "정선", "철원", "화천",
+        "양구", "고성", "양양", "청주", "충주", "제천", "보은", "옥천", "영동",
+        "증평", "진천", "괴산", "음성", "천안", "공주", "보령", "아산", "서산",
+        "논산", "계룡", "당진", "금산", "부여", "서천", "청양", "홍성", "예산",
+        "태안", "전주", "군산", "익산", "정읍", "남원", "김제", "완주", "진안",
+        "무주", "장수", "임실", "순창", "고창", "부안", "목포", "여수", "순천",
+        "나주", "광양", "담양", "곡성", "구례", "고흥", "보성", "화순", "장흥",
+        "강진", "해남", "영암", "무안", "함평", "영광", "장성", "완도", "진도",
+        "신안", "포항", "안동", "구미", "영주", "영천", "상주", "문경", "경산",
+        "군위", "의성", "청송", "영양", "영덕", "청도", "고령", "성주", "칠곡",
+        "예천", "봉화", "울진", "울릉", "창원", "진주", "통영", "사천", "김해",
+        "밀양", "거제", "양산", "의령", "함안", "창녕", "남해", "하동", "산청",
+        "함양", "거창", "합천"
+    ];
 
-        logsData.forEach(log => {
-    totalH += (log.height || 0);
+    logsData.forEach(log => {
+        totalH += (log.height || 0);
 
-    if (log.coords) {
-        validLogsCount++;
-        mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
-        
-        const rName = log.region || getRegionFromCoord(log.coords);
-        regionCounts[rName] = (regionCounts[rName] || 0) + 1;
-
-        if (log.mountain) {
-            const rawName = log.mountain.trim();
-            // 관악산인 경우에만 괄호 내용 제거, 그 외는 원본 이름 유지
-            const cleanMountainName = rawName.startsWith('관악산')
-                ? rawName.replace(/관악산\s*\(.*?\)/g, '관악산').trim()
-                : rawName;
-
-            const targetMap = log.isTop100 ? top100Map : normalMap;
-
-            if (!targetMap[cleanMountainName]) {
-                targetMap[cleanMountainName] = { count: 0, height: log.height || 0 };
-            }
+        if (log.coords) {
+            validLogsCount++;
+            mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
             
-            targetMap[cleanMountainName].count += 1;
-            
-            if (!targetMap[cleanMountainName].height && log.height) {
-                targetMap[cleanMountainName].height = log.height;
+            const rName = log.region || getRegionFromCoord(log.coords);
+            regionCounts[rName] = (regionCounts[rName] || 0) + 1;
+
+            if (log.mountain) {
+                const rawName = log.mountain.trim();
+
+                // 💡 괄호 정제 로직
+                // 괄호 안에 '챌린지', '트레일' 등 비지역성 단어가 섞여 있으면 무조건 제거하고,
+                // 순수 지역명(예: 남양주, 경주 등)만 들어있는 경우에만 괄호를 남깁니다.
+                const cleanMountainName = rawName.replace(/\s*\((.*?)\)/g, (match, content) => {
+                    const trimmedContent = content.trim();
+
+                    // '챌린지', '트레일' 등의 단어가 괄호 안에 포함되어 있다면 필터링 (제거)
+                    if (trimmedContent.includes('챌린지') || trimmedContent.includes('트레일') || trimmedContent.includes('러닝')) {
+                        return '';
+                    }
+
+                    // 순수 지역명 목록에 들어있는 이름인지 검사
+                    const isPureRegion = VALID_REGIONS.some(region => trimmedContent === region || trimmedContent.startsWith(region));
+
+                    return isPureRegion ? match : '';
+                }).trim();
+
+                const targetMap = log.isTop100 ? top100Map : normalMap;
+
+                if (!targetMap[cleanMountainName]) {
+                    targetMap[cleanMountainName] = { count: 0, height: log.height || 0 };
+                }
+                
+                targetMap[cleanMountainName].count += 1;
+                
+                if (!targetMap[cleanMountainName].height && log.height) {
+                    targetMap[cleanMountainName].height = log.height;
+                }
             }
         }
-    }
-});
+    });
+
+    
 
 
     // 💡 지역 점유율 전체 렌더링
