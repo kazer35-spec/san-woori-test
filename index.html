@@ -3920,6 +3920,23 @@ margin: 0 2px !important;
                 </div>
             </div>
         </div>
+<!-- 📅 연도 및 분기 선택 탭 영역 -->
+<div class="flex items-center justify-between gap-2 mb-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+    <!-- 연도 선택 드롭다운 -->
+    <select id="timelineYearSelect" onchange="handleTimelineYearChange(this.value)" class="bg-white text-xs font-black text-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="2026">2026년</option>
+        <option value="2025">2025년</option>
+        <option value="2024">2024년</option>
+    </select>
+
+    <!-- 분기 선택 버튼 그룹 -->
+    <div class="flex items-center gap-1 flex-1 justify-end">
+        <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">1분기</button>
+        <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">2분기</button>
+        <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">3분기</button>
+        <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60">4분기</button>
+    </div>
+</div>
 
         <!-- 잔디 보드 -->
         <div id="grassBoard" class="grass-container mb-2"></div>
@@ -5842,13 +5859,66 @@ window.toggleVibeModal = (show) => {
   }
 };
 
-// 필터링 처리를 위해 현재 조회 중인 멤버의 로그 목록을 임시 저장할 전역 변수
+// ==========================================
+// 1. 타임라인 분기/연도 제어 전역 변수 및 함수 (여기에 배치!)
+// ==========================================
+let currentTimelineMemberId = null;
+
+window.handleTimelineYearChange = (year) => {
+    selectedYear = parseInt(year);
+    const mainSelect = document.getElementById('yearSelect');
+    if (mainSelect) mainSelect.value = year;
+    refreshTimelineModal();
+};
+
+window.handleTimelineQuarterChange = (q) => {
+    selectedQuarter = q;
+    
+    if (typeof changeQuarter === 'function') {
+        changeQuarter(q);
+    } else {
+        document.querySelectorAll('.q-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active-q', idx + 1 === q);
+        });
+    }
+
+    updateTimelineQuarterUI(q);
+    refreshTimelineModal();
+};
+
+function updateTimelineQuarterUI(q) {
+    document.querySelectorAll('.timeline-q-btn').forEach((btn, idx) => {
+        if (idx + 1 === q) {
+            btn.className = "timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-blue-600 bg-white shadow-sm border border-slate-200/80";
+        } else {
+            btn.className = "timeline-q-btn flex-1 py-1.5 text-xs font-extrabold rounded-lg transition-all text-slate-500 bg-transparent hover:bg-white/60";
+        }
+    });
+}
+
+function refreshTimelineModal() {
+    if (currentTimelineMemberId) {
+        const mName = document.getElementById('timelineMemberName')?.innerText || '';
+        window.showMemberTimeline(currentTimelineMemberId, mName);
+    }
+}
+
+
+// ==========================================
+// 2. 기존 showMemberTimeline 함수
+// ==========================================
 let currentMemberLogs = []; 
 
+window.showMemberTimeline = async (mId, mName) => {
+    // 💡 [중요] 모달 진입 시 현재 멤버 ID와 선택된 연도/분기 UI 동기화 추가
+    currentTimelineMemberId = mId;
+    if (document.getElementById('timelineYearSelect')) {
+        document.getElementById('timelineYearSelect').value = selectedYear;
+    }
+    updateTimelineQuarterUI(selectedQuarter);
 
-  window.showMemberTimeline = async (mId, mName) => {
     toggleTimelineModal(true);
-    const modalContent = document.getElementById('timelineModalContent');
+     const modalContent = document.getElementById('timelineModalContent');
     modalContent.scrollTop = 0;
     const container = document.getElementById('timelineContent');
     const grassBoard = document.getElementById('grassBoard');
