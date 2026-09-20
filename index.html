@@ -3904,37 +3904,39 @@ margin: 0 2px !important;
             <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
         </div>
 
-        <!-- 2. 🟩 연도/분기 탭 & 잔디보드 일체형 카드 컨테이너 -->
-        <div class="mb-3 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-2.5 shadow-sm overflow-hidden">
-            
-            <!-- 일체형 상단 헤더 -->
-            <div class="flex flex-col gap-2 mb-2.5 pb-2 border-b border-slate-200/60">
-                <!-- 타이틀 & HOT/우정포인트 배지 & 연도 셀렉트 -->
-                <div class="flex items-center justify-between gap-2">
-                    <p class="text-xs font-black text-slate-700 flex items-center gap-1 shrink-0">
-                        🌱 분기 운동 잔디
-                        <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
-                    </p>
+        <!-- 🟩 일체형 잔디 카드 컨테이너 -->
+<div class="mb-3 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-2.5 shadow-sm overflow-hidden">
+    
+    <!-- 일체형 상단 헤더 -->
+    <div class="flex flex-col gap-1.5 mb-2 pb-1.5 border-b border-slate-200/60">
+        <!-- 타이틀 & HOT/우정포인트 배지 -->
+        <div class="flex items-center justify-between gap-2">
+            <p class="text-xs font-black text-slate-700 flex items-center gap-1 shrink-0">
+                🌱 분기 운동 잔디
+                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
+            </p>
 
-                    <div class="flex items-center gap-1.5">
-                        <div id="passionVibeArea"></div>
-                        <div id="friendshipPointArea" class="hidden">
-                            <span id="memberFriendshipPoint">0</span>
-                        </div>
-                        
-
-                <!-- 분기 선택 탭 -->
-                <div class="grid grid-cols-4 gap-1 bg-slate-200/60 p-1 rounded-xl">
-                    <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">1분기</button>
-                    <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">2분기</button>
-                    <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">3분기</button>
-                    <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">4분기</button>
+            <div class="flex items-center gap-1.5">
+                <div id="passionVibeArea"></div>
+                <div id="friendshipPointArea" class="hidden">
+                    <span id="memberFriendshipPoint">0</span>
                 </div>
             </div>
-
-            <!-- 일체형 잔디 보드 본체 -->
-            <div id="grassBoard" class="grass-container"></div>
         </div>
+
+        <!-- 슬림형 분기 선택 탭 (세로 패딩 py-0.5, 폰트 text-[11px] 적용) -->
+        <div class="grid grid-cols-4 gap-1 bg-slate-200/60 p-0.5 rounded-lg">
+            <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">1분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">2분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">3분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">4분기</button>
+        </div>
+    </div>
+
+    <!-- 일체형 잔디 보드 본체 -->
+    <div id="grassBoard" class="grass-container"></div>
+</div>
+
 
         <!-- 3. 범례 -->
         <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
@@ -5882,13 +5884,13 @@ window.handleTimelineQuarterChange = (q) => {
     refreshTimelineModal();
 };
 
-// 타임라인 모달 분기 버튼 활성화 스타일 업데이트 (일체형 카드용)
+// 슬림형 분기 버튼 활성화 스타일 업데이트
 function updateTimelineQuarterUI(q) {
     document.querySelectorAll('.timeline-q-btn').forEach((btn, idx) => {
         if (idx + 1 === q) {
-            btn.className = "timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-blue-600 bg-white shadow-xs";
+            btn.className = "timeline-q-btn py-0.5 text-[11px] font-extrabold rounded-md transition-all text-blue-600 bg-white shadow-xs";
         } else {
-            btn.className = "timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700 bg-transparent";
+            btn.className = "timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700 bg-transparent";
         }
     });
 }
