@@ -3891,51 +3891,63 @@ margin: 0 2px !important;
 </div>
 </div>
 
-<div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
+ <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
         
-        <!-- 🟩 연도/분기 탭 & 잔디보드 일체형 카드 컨테이너 -->
-<div class="mb-3 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-2.5 shadow-sm overflow-hidden">
-    
-    <!-- 1. 일체형 상단 헤더 (타이틀 + 연도 셀렉트 + 분기 탭) -->
-    <div class="flex flex-col gap-2 mb-2.5 pb-2 border-b border-slate-200/60">
-        <!-- 타이틀 & 연도 셀렉트 -->
-        <div class="flex items-center justify-between gap-2">
-            <p class="text-xs font-black text-slate-700 flex items-center gap-1 shrink-0">
-                🌱 분기 운동 잔디
-                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
-            </p>
-
-            <div class="flex items-center gap-1.5">
-                <div id="passionVibeArea"></div>
-                <!-- 연도 선택 -->
-                <select id="timelineYearSelect" onchange="handleTimelineYearChange(this.value)" class="bg-white text-[11px] font-extrabold text-slate-700 px-2 py-1 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-xs">
-                    <option value="2026">2026년</option>
-                    <option value="2025">2025년</option>
-                    <option value="2024">2024년</option>
-                </select>
+        <!-- 1. 최상단 멤버 이름 & 카운트 배지 영역 (복구 완료) -->
+        <div class="flex justify-between items-center mb-3">
+            <div>
+                <h2 class="text-lg font-black text-slate-800">
+                    <span id="timelineMemberName" class="text-blue-600"></span> 님
+                </h2>
             </div>
+            <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
         </div>
 
-        <!-- 분기 선택 탭 (1Q ~ 4Q 세련된 세그먼트 버튼) -->
-        <div class="grid grid-cols-4 gap-1 bg-slate-200/60 p-1 rounded-xl">
-            <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">1분기</button>
-            <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">2분기</button>
-            <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">3분기</button>
-            <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">4분기</button>
+        <!-- 2. 🟩 연도/분기 탭 & 잔디보드 일체형 카드 컨테이너 -->
+        <div class="mb-3 bg-slate-50/80 rounded-2xl border border-slate-200/80 p-2.5 shadow-sm overflow-hidden">
+            
+            <!-- 일체형 상단 헤더 -->
+            <div class="flex flex-col gap-2 mb-2.5 pb-2 border-b border-slate-200/60">
+                <!-- 타이틀 & HOT/우정포인트 배지 & 연도 셀렉트 -->
+                <div class="flex items-center justify-between gap-2">
+                    <p class="text-xs font-black text-slate-700 flex items-center gap-1 shrink-0">
+                        🌱 분기 운동 잔디
+                        <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
+                    </p>
+
+                    <div class="flex items-center gap-1.5">
+                        <div id="passionVibeArea"></div>
+                        <div id="friendshipPointArea" class="hidden">
+                            <span id="memberFriendshipPoint">0</span>
+                        </div>
+                        <!-- 연도 선택 -->
+                        <select id="timelineYearSelect" onchange="handleTimelineYearChange(this.value)" class="bg-white text-[11px] font-extrabold text-slate-700 px-2 py-1 rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer shadow-xs">
+                            <option value="2026">2026년</option>
+                            <option value="2025">2025년</option>
+                            <option value="2024">2024년</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 분기 선택 탭 -->
+                <div class="grid grid-cols-4 gap-1 bg-slate-200/60 p-1 rounded-xl">
+                    <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">1분기</button>
+                    <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">2분기</button>
+                    <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">3분기</button>
+                    <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-1 text-xs font-black rounded-lg transition-all text-slate-500 hover:text-slate-700">4분기</button>
+                </div>
+            </div>
+
+            <!-- 일체형 잔디 보드 본체 -->
+            <div id="grassBoard" class="grass-container"></div>
         </div>
-    </div>
 
-    <!-- 2. 일체형 하단 잔디 보드 본체 -->
-    <div id="grassBoard" class="grass-container"></div>
-</div>
-
-
-        <!-- 범례 -->
+        <!-- 3. 범례 -->
         <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
         </div>
 
-        <!-- 📊 분기 성장 추이 영역 (원래 클래스 구조로 복구) -->
+        <!-- 4. 📊 분기 성장 추이 영역 -->
         <div id="chartBox" class="chart-container-box mb-4">
             <div class="chart-header">
                 <div class="chart-title-sub" style="display: flex; align-items: center; gap: 4px;">
@@ -3953,22 +3965,23 @@ margin: 0 2px !important;
             </div>
         </div>
 
-        <!-- 메인 인연의 숲 버튼 -->
+        <!-- 5. 메인 인연의 숲 버튼 -->
         <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" 
         class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all mt-3">
-    <span class="relative z-10 flex items-center gap-1.5">
-        <span>🌳 인연의 숲 자세히 보기</span>
-        <span class="text-emerald-700">▶</span>
-    </span>
+            <span class="relative z-10 flex items-center gap-1.5">
+                <span>🌳 인연의 숲 자세히 보기</span>
+                <span class="text-emerald-700">▶</span>
+            </span>
         </button>
             
-        <!-- 닫기 버튼 -->
+        <!-- 6. 닫기 버튼 -->
         <button onclick="toggleTimelineModal(false)" class="w-full mt-2 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm active:scale-[0.98] transition-transform">
             닫기
         </button>
 
     </div> 
 </div>
+
 
 
 
