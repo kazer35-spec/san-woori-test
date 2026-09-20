@@ -3964,10 +3964,76 @@ margin: 0 2px !important;
             <div class="chart-guide-txt">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
             <div style="height: 120px; position: relative;">
                 <canvas id="growthChart"></canvas>
+<div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
+    <!-- relative 클래스로 우측 상단 X 버튼 기준점 확보 -->
+    <div id="timelineModalContent" class="modal-content relative !p-5 !rounded-3xl" onclick="event.stopPropagation()">
+        
+        <!-- ✕ 우측 상단 닫기 버튼 -->
+        <button type="button" onclick="toggleTimelineModal(false)" class="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 active:scale-95 transition-all rounded-full bg-slate-100/60 hover:bg-slate-200/80">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- 1. 최상단 멤버 이름 & 카운트 배지 -->
+        <div class="flex justify-between items-center mb-3 pr-8">
+            <div>
+                <h2 class="text-lg font-black text-slate-800">
+                    <span id="timelineMemberName" class="text-blue-600"></span> 님
+                </h2>
+            </div>
+            <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
+        </div>
+
+        <!-- 2. 🌱 독립된 분기 운동 잔디 타이틀 영역 -->
+        <div class="flex justify-between items-center mb-2">
+            <p class="text-[10px] font-black text-slate-700 flex items-center gap-1">
+                🌱 분기 운동 잔디
+                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
+            </p>
+            
+            <div class="flex items-center gap-1.5">
+                <div id="passionVibeArea"></div>
+                <div id="friendshipPointArea" class="hidden">
+                    <span id="memberFriendshipPoint">0</span>
+                </div>
             </div>
         </div>
 
-        <!-- 5. 메인 인연의 숲 버튼 -->
+        <!-- 3. 독립된 슬림 분기 선택 탭 -->
+        <div class="grid grid-cols-4 gap-0.5 bg-slate-200/60 p-0.5 rounded-lg mb-2">
+            <button type="button" onclick="handleTimelineQuarterChange(1)" class="timeline-q-btn py-0 text-[10px] leading-4 font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">1분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(2)" class="timeline-q-btn py-0 text-[10px] leading-4 font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">2분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(3)" class="timeline-q-btn py-0 text-[10px] leading-4 font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">3분기</button>
+            <button type="button" onclick="handleTimelineQuarterChange(4)" class="timeline-q-btn py-0 text-[10px] leading-4 font-bold rounded-md transition-all text-slate-500 hover:text-slate-700">4분기</button>
+        </div>
+
+        <!-- 4. 독립된 잔디 보드 박스 -->
+        <div id="grassBoard" class="grass-container mb-2"></div>
+
+        <!-- 5. 범례 -->
+        <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
+        </div>
+
+        <!-- 6. 📊 분기 성장 추이 영역 -->
+        <div id="chartBox" class="chart-container-box mb-4">
+            <div class="chart-header">
+                <div class="chart-title-sub" style="display: flex; align-items: center; gap: 4px;">
+                    📊 분기 성장 추이
+                    <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrowthInfoModal(event);" title="성장 추이 안내">ℹ️</button>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item"><span class="dot-bar"></span>횟수</div>
+                    <div class="legend-item"><span class="dot-line"></span>고도</div>
+                </div>
+            </div>
+            <div class="chart-guide-txt">💡 색상 잔디와 그래프를 터치하면 상세 기록 확인 가능</div>
+            <div style="height: 120px; position: relative;">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 7. 메인 인연의 숲 버튼 -->
         <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" 
         class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all my-1">
             <span class="relative z-10 flex items-center gap-1.5">
@@ -5886,16 +5952,17 @@ window.handleTimelineQuarterChange = (q) => {
     refreshTimelineModal();
 };
 
-// 슬림형 분기 버튼 활성화 스타일 업데이트
+// 초슬림 분기 버튼 활성화 스타일 업데이트
 function updateTimelineQuarterUI(q) {
     document.querySelectorAll('.timeline-q-btn').forEach((btn, idx) => {
         if (idx + 1 === q) {
-            btn.className = "timeline-q-btn py-0.5 text-[11px] font-extrabold rounded-md transition-all text-blue-600 bg-white shadow-xs";
+            btn.className = "timeline-q-btn py-0 text-[10px] leading-4 font-extrabold rounded-md transition-all text-blue-600 bg-white shadow-xs";
         } else {
-            btn.className = "timeline-q-btn py-0.5 text-[11px] font-bold rounded-md transition-all text-slate-500 hover:text-slate-700 bg-transparent";
+            btn.className = "timeline-q-btn py-0 text-[10px] leading-4 font-bold rounded-md transition-all text-slate-500 hover:text-slate-700 bg-transparent";
         }
     });
 }
+
 
 
 function refreshTimelineModal() {
