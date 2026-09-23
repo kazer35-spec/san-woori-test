@@ -4886,6 +4886,45 @@ function isMatchName(name, searchKeyword) {
     }
 };       
 
+ // 둘레길 전용 독립 저장 함수 (기록 리포트 저장 X, 지도 표시 전용 O)
+window.addDulegilActivity = async () => {
+    // 1. 선택된 회원 검증
+    const memberCount = selectedMemberIds ? (selectedMemberIds.size || selectedMemberIds.length || 0) : 0;
+    if (memberCount === 0) return alert("대상 회원을 선택해주세요.");
+
+    // 2. 현재 화면에서 알약 버튼으로 선택된 둘레길 구간 목록 (1~60구간)
+    // global 변수인 selectedDulleCourses (Set) 참조
+    const courseList = (typeof selectedDulleCourses !== 'undefined') ? Array.from(selectedDulleCourses).sort((a, b) => a - b) : [];
+
+    if (courseList.length === 0) {
+        return alert("선택된 둘레길 구간이 없습니다. 1~60 구간 중 정복한 구간을 선택해주세요.");
+    }
+
+    try {
+        // 3. 선택된 회원별 메인 문서의 dulleCourses (지도 전용 데이터)만 업데이트
+        for (const id of selectedMemberIds) {
+            const memberRef = doc(db, `sanwoori`, id);
+
+            // logs 컬렉션에 추가하지 않고, 메인 회원의 dulleCourses 데이터만 업데이트합니다.
+            // (이렇게 해야 개인 운동 리포트에는 남지 않고, 지도의 1~60 구간만 정복으로 표시됩니다)
+            await updateDoc(memberRef, {
+                dulleCourses: courseList,  // 지도에서 1~60 구간 판별에 쓰이는 배열
+                updatedAt: new Date()
+            });
+        }
+
+        alert("🍊 둘레길 지도 정복 기록이 저장되었습니다! (인증 지도에서 확인 가능합니다)");
+
+        // 4. 지도 UI 즉시 갱신 (관련 리렌더링 함수가 있다면 실행)
+        if (typeof renderDulleMap === 'function') renderDulleMap();
+        if (typeof startRealtimeSync === 'function') startRealtimeSync();
+
+    } catch (error) {
+        console.error("둘레길 지도 저장 에러:", error);
+        alert("저장 실패: " + error.message);
+    }
+};
+       
 
    // 🎯 계절 영역 토글 펼침/접기
 window.toggleSeasonMarkBox = () => {
@@ -4936,97 +4975,6 @@ window.handleRegularCheckChange = (regularCb) => {
     }
 };
            
-  // 둘레길 전용 독립 저장 함수 (기존 addMultiActivity와 완전 별개)
-window.addDulegilActivity = async () => {
-    // 1. 날짜 및 선택된 회원 검증
-    const dateInput = document.getElementById('activityDate');
-    if (!dateInput || !dateInput.value) return alert("날짜를 선택해주세요.");
-    const dateVal = dateInput.value;
-
-    const memberCount = selectedMemberIds ? (selectedMemberIds.size || selectedMemberIds.length || 0) : 0;
-    if (memberCount === 0) return alert("대상 회원을 선택해주세요.");
-
-    // 2. 날짜 타임스탬프 처리
-    const now = new Date();
-    const [y, m, d] = dateVal.split('-').map(Number);
-    const activityDateObj = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds());
-    
-    const _Timestamp = (typeof Timestamp !== 'undefined') ? Timestamp : { fromDate: (date) => date };
-    const ts = _Timestamp.fromDate(activityDateObj);
-
-    // 3. 둘레길 명칭 및 좌표 확인
-    const rawName = document.getElementById('mountainName')?.value.trim();
-    const dulegilName = rawName || "둘레길";
-
-    const currentTempCoord = typeof tempCoord !== 'undefined' ? tempCoord : window.tempCoord;
-    const safeCoords = (currentTempCoord && currentTempCoord.x !== undefined) ? currentTempCoord : null;
-
-    try {
-        // 4. 선택된 회원별 둘레길 전용 로그 저장 (지도 표시용)
-        for (const id of selectedMemberIds) {
-            const member = (typeof currentData !== 'undefined' && currentData) ? currentData.find(m => m.id === id) : null;
-            const authorName = member ? member.name : "익명";
-
-            const existingLogsRef = collection(db, `sanwoori/${id}/logs`);
-            const existingSnap = await getDocs(existingLogsRef);
-
-            const existingDocIds = new Set();
-            existingSnap.forEach(docSnap => existingDocIds.add(docSnap.id));
-
-            // 문서 ID 중복 방지 (예: 둘레길, 둘레길_1)
-            let logDocId = dulegilName;
-            let seq = 1;
-            while (existingDocIds.has(logDocId)) {
-                logDocId = `${dulegilName}_${seq}`;
-                seq++;
-            }
-
-            // 지도 표시 전용 둘레길 기록 데이터
-            const dulegilPayload = {
-                date: ts,
-                createdAt: new Date(),
-                mountain: dulegilName,
-                height: 0,
-                coords: safeCoords,
-                author: authorName,
-                isDulegil: true,      // 둘레길 전용 태그
-                isSpecial: true,      // 기존 산행 수/레벨 통계 제외
-                isWalking: true       // 지도 아이콘/표시용
-            };
-
-            await setDoc(doc(db, `sanwoori/${id}/logs`, logDocId), dulegilPayload);
-        }
-
-        alert("둘레길 기록 저장 완료! ✅ (지도에 표시됩니다)");
-
-        // 5. 폼 및 선택 초기화
-        if (selectedMemberIds && typeof selectedMemberIds.clear === 'function') {
-            selectedMemberIds.clear();
-        } else {
-            window.selectedMemberIds = new Set();
-        }
-        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false);
-
-        const nameInput = document.getElementById('mountainName');
-        if (nameInput) nameInput.value = '';
-
-        if (typeof tempCoord !== 'undefined') tempCoord = null;
-        window.tempCoord = null;
-
-        const marker = document.getElementById('adminMapMarker');
-        if (marker) marker.classList.add('hidden');
-
-        const display = document.getElementById('coordDisplay');
-        if (display) display.innerText = '좌표: 없음 (지도 클릭)';
-
-        if (typeof startRealtimeSync === 'function') startRealtimeSync();
-
-    } catch (error) {
-        console.error("둘레길 저장 에러:", error);
-        alert("저장 실패: " + error.message);
-    }
-};
-          
 
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
