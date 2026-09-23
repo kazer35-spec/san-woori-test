@@ -4576,9 +4576,12 @@ window.loadMemberDulleCourses = function(memberData) {
 
 // 5. 둘레길 지도 요소에 주황색 칠하기
 window.renderDulleMap = function(userDulleCourses = []) {
+    // 1. 숫자로 구성된 Set으로 변환 ([1, 2, 3])
     const completedSet = new Set(userDulleCourses.map(Number));
 
+    // 2. 1~60 구간 지도 요소 제어
     for (let i = 1; i <= 60; i++) {
+        // SVG 내의 path, g, circle 등 구간 ID 검색
         const courseEl = document.getElementById(`dulle_course_${i}`) || 
                          document.getElementById(`course_${i}`) ||
                          document.querySelector(`[data-course="${i}"]`);
@@ -4586,17 +4589,22 @@ window.renderDulleMap = function(userDulleCourses = []) {
         if (!courseEl) continue;
 
         if (completedSet.has(i)) {
+            // 🟧 정복 구간: 주황색 적용
             courseEl.style.stroke = '#f97316';
             courseEl.style.fill = '#f97316';
             courseEl.setAttribute('stroke', '#f97316');
+            courseEl.setAttribute('fill', '#f97316');
             courseEl.classList.add('active');
         } else {
+            // ⚪ 미정복 구간: 원래 색상
             courseEl.style.stroke = '#cbd5e1';
             courseEl.style.fill = 'none';
+            courseEl.setAttribute('stroke', '#cbd5e1');
             courseEl.classList.remove('active');
         }
     }
 };
+
 
 // 6. 둘레길 누적 저장 함수 (arrayUnion 사용)
 window.addDulegilActivity = async () => {
@@ -4941,9 +4949,8 @@ function isMatchName(name, searchKeyword) {
     }
 };       
 
-// 🍊 둘레길 기록 누적 저장 및 지도 즉시 반영 함수
+// 🍊 1. 둘레길 누적 저장 함수 (저장 후에도 주황색 알약 유지)
 window.addDulegilActivity = async () => {
-    // 1. 선택된 회원 ID 수집
     let selectedMembers = [];
     if (typeof selectedMemberIds !== 'undefined' && selectedMemberIds && selectedMemberIds.size > 0) {
         selectedMembers = Array.from(selectedMemberIds);
@@ -4955,14 +4962,13 @@ window.addDulegilActivity = async () => {
     }
 
     if (selectedMembers.length === 0) {
-        return alert("⚠️ 먼저 상단에서 대상 회원을 선택해주세요.");
+        return alert("⚠️ 먼저 관리자 화면 상단에서 대상 회원을 선택해주세요.");
     }
 
-    // 2. 선택된 구간 (숫자 타입)
     const newCourses = Array.from(window.selectedDulleCourses).map(Number);
 
     if (newCourses.length === 0) {
-        return alert("선택된 둘레길 구간이 없습니다. 1~60 구간 중 정복한 구간을 선택해주세요.");
+        return alert("선택된 둘레길 구간이 없습니다. 1~60 구간 중 정복한 구간을 클릭하여 선택해주세요.");
     }
 
     try {
@@ -4971,26 +4977,39 @@ window.addDulegilActivity = async () => {
         for (const id of selectedMembers) {
             const memberRef = doc(firestoreDb, "sanwoori", id);
 
-            // 💡 arrayUnion을 사용하여 기존 dulleCourses 배열에 덮어쓰지 않고 '누적 합체'
+            // arrayUnion으로 Firestore 배열에 누적 추가
             await updateDoc(memberRef, {
                 dulleCourses: arrayUnion(...newCourses),
                 updatedAt: new Date()
             });
         }
 
-        alert(`🍊 선택 회원의 둘레길 구간(${newCourses.join(', ')}번)이 누적 저장되었습니다!`);
+        alert(`🍊 선택 회원의 둘레길 구간(${newCourses.join(', ')}번)이 저장되었습니다!`);
 
-        // 선택 초기화 및 버튼 UI 갱신
-        window.selectedDulleCourses.clear();
+        // 💡 [수정] clear()를 제거하여 주황색 선택 상태를 그대로 유지
         if (typeof renderDullePillState === 'function') renderDullePillState();
 
-        // 🗺️ 지도 즉시 새로고침
-        if (typeof renderDulleMap === 'function') renderDulleMap();
+        // 실시간 동기화 및 지도 업데이트
         if (typeof startRealtimeSync === 'function') startRealtimeSync();
 
     } catch (error) {
         console.error("둘레길 저장 에러:", error);
         alert("저장 실패: " + error.message);
+    }
+};
+
+// 🗺️ 2. 지도 모달을 켤 때 회원의 dulleCourses 데이터를 전달하는 함수
+window.openDulleMapModal = function(memberData) {
+    // 지도 모달 표시
+    const modal = document.getElementById('dulleMapModal'); // 지도 모달 ID
+    if (modal) modal.classList.remove('hidden');
+
+    // 해당 회원의 dulleCourses 배열 전달 (예: [1, 2, 3])
+    const completedCourses = (memberData && Array.isArray(memberData.dulleCourses)) ? memberData.dulleCourses : [];
+    
+    // 지도 렌더링 실행
+    if (typeof renderDulleMap === 'function') {
+        renderDulleMap(completedCourses);
     }
 };
 
