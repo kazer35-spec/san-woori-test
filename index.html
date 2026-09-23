@@ -3794,16 +3794,17 @@ margin: 0 2px !important;
     </div>
 
 <div class="card" style="background-color: #fffaf0; border: 1.5px solid #ffedd5; margin-bottom: 15px;">
-  <!-- 🍊 상단 헤더: 지도 보기 버튼 추가 -->
+<!-- 🍊 관리자 카드 영역 (기존 카드의 상단 헤더 부분 수정) -->
+<div class="card" style="background-color: #fffaf0; border: 1.5px solid #ffedd5; margin-bottom: 15px;">
   <div class="card-title text-orange-600 font-bold flex justify-between items-center mb-2">
     <span class="flex items-center gap-1.5">🍊 둘레길 구간 정복 관리</span>
     
     <div class="flex items-center gap-1.5">
-      <!-- 🗺️ 경기 둘레길 지도 보기 버튼 추가 -->
+      <!-- 📍 관리자 전용 좌표 설정 모달 열기 버튼 -->
       <button type="button" 
-              onclick="openCertImageModal(currentMemberData, '지도이미지경로.png')" 
-              class="text-[10px] bg-slate-700 hover:bg-slate-800 text-white px-2 py-0.5 rounded-md font-bold shadow-sm transition-all flex items-center gap-1">
-        🗺️ 지도 보기
+              onclick="openAdminCoordModal()" 
+              class="text-[10px] bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded-md font-bold shadow-sm transition-all flex items-center gap-1">
+        📍 지도 좌표 등록
       </button>
 
       <span id="dulleSelectedBadge" class="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-md font-bold shadow-sm">
@@ -3818,9 +3819,7 @@ margin: 0 2px !important;
   </p>
 
   <!-- 둘레길 구간 알약 버튼 그리드 (1~60구간) -->
-  <div id="dullePillGrid" class="grid grid-cols-5 sm:grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-1 bg-white/60 rounded-xl border border-orange-100">
-    <!-- JS에서 1~60구간 알약 버튼이 동적으로 생성됩니다 -->
-  </div>
+  <div id="dullePillGrid" class="grid grid-cols-5 sm:grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-1 bg-white/60 rounded-xl border border-orange-100"></div>
 
   <!-- 둘레길 기록 저장 버튼 -->
   <button type="button" 
@@ -3828,6 +3827,50 @@ margin: 0 2px !important;
           class="btn-submit w-full py-2.5 rounded-xl bg-orange-500 text-white font-bold mt-3 shadow-md hover:bg-orange-600 active:scale-[0.98] transition-all text-sm">
     🍊 둘레길 기록 저장
   </button>
+</div>
+
+
+<!-- 🗺️ [관리자 전용] 좌표 등록 지도 모달 -->
+<div id="adminCoordModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+  <div class="bg-slate-900 rounded-2xl overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-amber-500/40">
+    
+    <!-- 모달 상단 컨트롤러 -->
+    <div class="flex items-center justify-between px-3.5 py-2.5 bg-slate-800 border-b border-slate-700 shrink-0 gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-amber-400">📍 좌표 설정 구간:</span>
+        <!-- 구간 선택 드롭다운 -->
+        <select id="adminCourseSelect" onchange="onAdminCourseChange()" class="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded border border-slate-600 focus:outline-none focus:border-amber-400">
+          <!-- JS에서 1~60구간 옵션이 자동 생성됩니다 -->
+        </select>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="saveAdminCoords()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2.5 py-1 rounded-md font-bold transition-all shadow-sm">
+          💾 좌표 전체 저장
+        </button>
+        <button onclick="closeAdminCoordModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-slate-700 text-slate-300 hover:text-white text-sm font-bold">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- 클릭 위치 안내 바 -->
+    <div class="bg-slate-950 px-3 py-1.5 text-[11px] text-slate-300 border-b border-slate-800 flex justify-between items-center shrink-0">
+      <span>👉 지도를 클릭하면 선택한 구간의 위치 핀이 찍힙니다.</span>
+      <span id="currentCoordText" class="font-mono text-amber-400 font-bold">선택 좌표: 없음</span>
+    </div>
+
+    <!-- 지도 및 터치/클릭 레이어 -->
+    <div class="p-0 overflow-y-auto flex-1 flex items-start justify-center bg-slate-950 relative w-full">
+      <div id="adminMapContainer" class="relative w-full inline-block cursor-crosshair">
+        <img id="adminModalImage" src="" alt="둘레길 지도" class="w-full h-auto object-contain block select-none" />
+        
+        <!-- 지도 클릭 오버레이 -->
+        <div id="adminMapOverlay" onclick="handleAdminMapClick(event)" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 
@@ -4517,199 +4560,133 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 };
 
 
+
+  // ==========================================
+// 📍 관리자 지도 좌표 찍기 & 위치 설정 시스템
 // ==========================================
-// 🍊 둘레길 구간 & 지도 좌표 핀 관리 (최종 통합)
-// ==========================================
 
-window.selectedDulleCourses = window.selectedDulleCourses || new Set();
-const TOTAL_DULLE_COURSES = 60;
+// 기본 구간별 좌표 객체 (기존 등록 저장값 불러오기)
+window.DULLE_COURSE_POSITIONS = JSON.parse(localStorage.getItem('DULLE_COURSE_POSITIONS')) || {};
 
-// 💡 1~60 구간별 지도 위 좌표 정의 (x: 가로 %, y: 세로 %)
-// 필요 시 지도의 실제 코스 위치에 맞게 % 수치를 조절하시면 됩니다.
-const DULLE_COURSE_POSITIONS = {
-  1: { x: 75, y: 15 },
-  2: { x: 78, y: 20 },
-  3: { x: 80, y: 26 },
-  4: { x: 82, y: 32 },
-  5: { x: 85, y: 38 },
-  // ... 6~60번까지 좌표 등록 가능
-};
+let selectedAdminCourse = 1; // 현재 좌표를 찍을 구간 번호
 
-// 1. 알약 버튼 생성
-function initDullePills() {
-  const grid = document.getElementById('dullePillGrid');
-  if (!grid) return;
+// 1. 관리자 좌표 등록 모달 열기
+window.openAdminCoordModal = function(mapImgSrc) {
+  const modal = document.getElementById('adminCoordModal');
+  const imgEl = document.getElementById('adminModalImage');
+  const selectEl = document.getElementById('adminCourseSelect');
 
-  let html = '';
-  for (let i = 1; i <= TOTAL_DULLE_COURSES; i++) {
-    html += `
-      <button type="button" 
-              id="dullePill_${i}" 
-              onclick="toggleDullePill(${i})" 
-              class="dulle-pill-btn h-8 rounded-full border border-gray-200 bg-white text-gray-600 text-[11px] font-bold transition-all flex items-center justify-center shadow-sm">
-        ${i}구간
-      </button>
-    `;
-  }
-  grid.innerHTML = html;
-  renderDullePillState();
-}
+  if (!modal) return;
 
-// 2. 알약 선택 상태 렌더링
-function renderDullePillState() {
-  for (let i = 1; i <= TOTAL_DULLE_COURSES; i++) {
-    const pillBtn = document.getElementById(`dullePill_${i}`);
-    if (!pillBtn) continue;
+  // 이미지 경로 지정 (전달받은 이미지가 없으면 기본 지정 경로)
+  if (imgEl && mapImgSrc) imgEl.src = mapImgSrc;
 
-    if (window.selectedDulleCourses.has(i)) {
-      pillBtn.style.backgroundColor = '#f97316';
-      pillBtn.style.color = '#ffffff';
-      pillBtn.style.borderColor = '#ea580c';
-      pillBtn.style.fontWeight = '900';
-    } else {
-      pillBtn.style.backgroundColor = '#ffffff';
-      pillBtn.style.color = '#4b5563';
-      pillBtn.style.borderColor = '#e5e7eb';
-      pillBtn.style.fontWeight = '700';
+  // 1~60 구간 셀렉트 박스 옵션 생성
+  if (selectEl && selectEl.options.length === 0) {
+    let optionsHtml = '';
+    for (let i = 1; i <= 60; i++) {
+      optionsHtml += `<option value="${i}">${i}구간</option>`;
     }
+    selectEl.innerHTML = optionsHtml;
   }
 
-  const countEl = document.getElementById('dulleCountNum');
-  if (countEl) countEl.innerText = window.selectedDulleCourses.size;
-}
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
 
-// 3. 알약 토글
-window.toggleDullePill = function(courseNum) {
-  if (window.selectedDulleCourses.has(courseNum)) {
-    window.selectedDulleCourses.delete(courseNum);
-  } else {
-    window.selectedDulleCourses.add(courseNum);
-  }
-  renderDullePillState();
+  renderAdminAllPins();
 };
 
-// 4. 회원 데이터 불러오기
-window.loadMemberDulleCourses = function(memberData) {
-  window.selectedDulleCourses.clear();
-  if (memberData && Array.isArray(memberData.dulleCourses)) {
-    memberData.dulleCourses.forEach(num => window.selectedDulleCourses.add(Number(num)));
-  }
-  renderDullePillState();
-};
-
-// 📍 5. 지도 위에 좌표(%) 기반 주황색 핀 찍기 함수
-window.renderDulleMap = function(userDulleCourses = []) {
-  const overlay = document.getElementById('dulleMapOverlay');
-  if (!overlay) return;
-
-  // 기존 핀 삭제
-  overlay.innerHTML = '';
-
-  const completedSet = new Set(userDulleCourses.map(Number));
-  if (completedSet.size === 0) return;
-
-  completedSet.forEach(courseNum => {
-    const pos = DULLE_COURSE_POSITIONS[courseNum];
-
-    // 주황색 핀 요소 생성
-    const pin = document.createElement('div');
-    pin.className = 'absolute -translate-x-1/2 -translate-y-1/2 bg-orange-500 text-white font-black text-[10px] w-6 h-6 rounded-full flex items-center justify-center shadow-lg border-2 border-white z-10 animate-bounce';
-    pin.innerText = courseNum;
-
-    if (pos) {
-      // 등록된 좌표가 있으면 지도 위에 정확히 배치
-      pin.style.left = `${pos.x}%`;
-      pin.style.top = `${pos.y}%`;
-    } else {
-      // 좌표가 지정 안 된 코스는 상단에 순서대로 표시
-      pin.style.position = 'relative';
-      pin.style.display = 'inline-flex';
-      pin.style.margin = '2px';
-      pin.style.transform = 'none';
-    }
-
-    overlay.appendChild(pin);
-  });
-};
-
-// 🍊 6. 경기 둘레길 인증 지도 모달 열기
-window.openCertImageModal = function(memberData, mapImgSrc) {
-  try {
-    const imgEl = document.getElementById('certModalImage');
-    if (imgEl && mapImgSrc) {
-      imgEl.src = mapImgSrc;
-    }
-
-    const modal = document.getElementById('certImageModal') || document.getElementById('dulleMapModal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      modal.style.display = 'flex';
-    }
-
-    const completedCourses = (memberData && Array.isArray(memberData.dulleCourses)) ? memberData.dulleCourses : [];
-    window.renderDulleMap(completedCourses);
-  } catch (err) {
-    console.error("지도 모달 열기 에러:", err);
-  }
-};
-
-// ✕ 7. 지도 모달 닫기
-window.closeCertImageModal = function() {
-  const modal = document.getElementById('certImageModal') || document.getElementById('dulleMapModal');
+// 2. 모달 닫기
+window.closeAdminCoordModal = function() {
+  const modal = document.getElementById('adminCoordModal');
   if (modal) {
     modal.classList.add('hidden');
     modal.style.display = 'none';
   }
 };
 
-window.openDulleMapModal = window.openCertImageModal;
-
-// 8. 둘레길 누적 저장
-window.addDulegilActivity = async () => {
-  let selectedMembers = [];
-  if (typeof selectedMemberIds !== 'undefined' && selectedMemberIds && selectedMemberIds.size > 0) {
-    selectedMembers = Array.from(selectedMemberIds);
-  } else {
-    const editSelect = document.getElementById('memberSelectEdit');
-    const manageSelect = document.getElementById('memberSelectManage');
-    if (editSelect && editSelect.value) selectedMembers.push(editSelect.value);
-    else if (manageSelect && manageSelect.value) selectedMembers.push(manageSelect.value);
-  }
-
-  if (selectedMembers.length === 0) {
-    return alert("⚠️ 먼저 관리자 화면 상단에서 대상 회원을 선택해주세요.");
-  }
-
-  const newCourses = Array.from(window.selectedDulleCourses).map(Number);
-  if (newCourses.length === 0) {
-    return alert("선택된 둘레길 구간이 없습니다. 1~60 구간 중 정복한 구간을 클릭하여 선택해주세요.");
-  }
-
-  try {
-    const firestoreDb = window.db || db;
-    for (const id of selectedMembers) {
-      const memberRef = doc(firestoreDb, "sanwoori", id);
-      await updateDoc(memberRef, {
-        dulleCourses: arrayUnion(...newCourses),
-        updatedAt: new Date()
-      });
-    }
-
-    alert(`🍊 선택 회원의 둘레길 구간(${newCourses.join(', ')}번)이 정상적으로 누적 저장되었습니다!`);
-    renderDullePillState();
-    if (typeof startRealtimeSync === 'function') startRealtimeSync();
-  } catch (error) {
-    console.error("둘레길 저장 에러:", error);
-    alert("저장 실패: " + error.message);
+// 3. 셀렉트 박스에서 구간 변경 시
+window.onAdminCourseChange = function() {
+  const selectEl = document.getElementById('adminCourseSelect');
+  if (selectEl) {
+    selectedAdminCourse = Number(selectEl.value);
+    updateCoordTextDisplay();
   }
 };
 
-// 9. 초기화
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDullePills);
-} else {
-  initDullePills();
+// 4. 지도 클릭 시 해당 구간의 좌표 설정
+window.handleAdminMapClick = function(event) {
+  const overlay = document.getElementById('adminMapOverlay');
+  if (!overlay) return;
+
+  const rect = overlay.getBoundingClientRect();
+  const xPercent = Number(((event.clientX - rect.left) / rect.width * 100).toFixed(1));
+  const yPercent = Number(((event.clientY - rect.top) / rect.height * 100).toFixed(1));
+
+  // 선택된 구간에 좌표 저장
+  window.DULLE_COURSE_POSITIONS[selectedAdminCourse] = { x: xPercent, y: yPercent };
+
+  updateCoordTextDisplay();
+  renderAdminAllPins();
+};
+
+// 선택 좌표 문구 업데이트
+function updateCoordTextDisplay() {
+  const textEl = document.getElementById('currentCoordText');
+  const pos = window.DULLE_COURSE_POSITIONS[selectedAdminCourse];
+  if (textEl) {
+    if (pos) {
+      textEl.innerText = `${selectedAdminCourse}구간 좌표 ➔ X: ${pos.x}%, Y: ${pos.y}%`;
+    } else {
+      textEl.innerText = `${selectedAdminCourse}구간 좌표: 미설정 (지도를 클릭하세요)`;
+    }
+  }
 }
+
+// 지도 위 모든 등록 좌표 핀 렌더링
+function renderAdminAllPins() {
+  const overlay = document.getElementById('adminMapOverlay');
+  if (!overlay) return;
+
+  overlay.innerHTML = '';
+
+  Object.keys(window.DULLE_COURSE_POSITIONS).forEach(courseNum => {
+    const pos = window.DULLE_COURSE_POSITIONS[courseNum];
+    if (!pos) return;
+
+    const isCurrentTarget = Number(courseNum) === selectedAdminCourse;
+
+    const pin = document.createElement('div');
+    pin.className = `absolute -translate-x-1/2 -translate-y-1/2 font-black text-[10px] w-6 h-6 rounded-full flex items-center justify-center shadow-lg border-2 border-white pointer-events-none transition-all ${
+      isCurrentTarget ? 'bg-amber-500 scale-125 z-20 ring-4 ring-amber-300 animate-bounce' : 'bg-slate-700 text-white z-10 opacity-80'
+    }`;
+    pin.style.left = `${pos.x}%`;
+    pin.style.top = `${pos.y}%`;
+    pin.innerText = courseNum;
+
+    overlay.appendChild(pin);
+  });
+}
+
+// 5. 설정한 좌표 로컬스토리지 및 데이터베이스 저장
+window.saveAdminCoords = async function() {
+  try {
+    // 1) 브라우저 로컬 저장
+    localStorage.setItem('DULLE_COURSE_POSITIONS', JSON.stringify(window.DULLE_COURSE_POSITIONS));
+
+    // 2) Firestore DB 저장 (설정 문서가 존재하는 경우)
+    if (window.db) {
+      const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+      await setDoc(doc(window.db, "config", "dulleMapPositions"), window.DULLE_COURSE_POSITIONS, { merge: true });
+    }
+
+    alert("🎉 둘레길 구간별 지도 좌표가 성공적으로 저장되었습니다!");
+  } catch (err) {
+    console.error("좌표 저장 중 오류:", err);
+    alert("로컬 스토리지에 좌표가 저장되었습니다.");
+  }
+};
+
 
         
 
