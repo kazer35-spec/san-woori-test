@@ -4574,33 +4574,36 @@ window.loadMemberDulleCourses = function(memberData) {
   renderDullePillState();
 };
 
-// 5. 둘레길 지도 요소에 주황색 칠하기
+// 🍊 둘레길 지도 배지 색상 업데이트 함수
 window.renderDulleMap = function(userDulleCourses = []) {
-    // 1. 숫자로 구성된 Set으로 변환 ([1, 2, 3])
+    // 1. 전달받은 코스 배열을 숫자 Set으로 변환 ([1, 2, 3])
     const completedSet = new Set(userDulleCourses.map(Number));
 
-    // 2. 1~60 구간 지도 요소 제어
+    // 2. 1~60 코스 배지 요소 탐색 및 스타일 변경
     for (let i = 1; i <= 60; i++) {
-        // SVG 내의 path, g, circle 등 구간 ID 검색
-        const courseEl = document.getElementById(`dulle_course_${i}`) || 
-                         document.getElementById(`course_${i}`) ||
-                         document.querySelector(`[data-course="${i}"]`);
+        // 배지 요소 ID 찾기 (프로젝트의 실제 ID 규칙에 맞춰 자동 탐색)
+        const badgeEl = document.getElementById(`dulle_map_course_${i}`) || 
+                        document.getElementById(`dulle_badge_${i}`) ||
+                        document.getElementById(`course_badge_${i}`) ||
+                        document.querySelector(`[data-dulle-course="${i}"]`) ||
+                        document.querySelector(`[data-course="${i}"]`);
 
-        if (!courseEl) continue;
+        if (!badgeEl) continue;
 
         if (completedSet.has(i)) {
-            // 🟧 정복 구간: 주황색 적용
-            courseEl.style.stroke = '#f97316';
-            courseEl.style.fill = '#f97316';
-            courseEl.setAttribute('stroke', '#f97316');
-            courseEl.setAttribute('fill', '#f97316');
-            courseEl.classList.add('active');
+            // 🟧 정복한 코스: 주황색 배경 + 흰색 글씨 + 또렷한 테두리
+            badgeEl.style.backgroundColor = '#f97316';
+            badgeEl.style.color = '#ffffff';
+            badgeEl.style.borderColor = '#ea580c';
+            badgeEl.style.fontWeight = 'bold';
+            badgeEl.classList.add('active');
         } else {
-            // ⚪ 미정복 구간: 원래 색상
-            courseEl.style.stroke = '#cbd5e1';
-            courseEl.style.fill = 'none';
-            courseEl.setAttribute('stroke', '#cbd5e1');
-            courseEl.classList.remove('active');
+            // ⚪ 미정복 코스: 기본 흰색 배경 + 회색 글씨
+            badgeEl.style.backgroundColor = '#ffffff';
+            badgeEl.style.color = '#374151';
+            badgeEl.style.borderColor = '#d1d5db';
+            badgeEl.style.fontWeight = 'normal';
+            badgeEl.classList.remove('active');
         }
     }
 };
