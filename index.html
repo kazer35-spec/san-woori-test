@@ -3793,13 +3793,23 @@ margin: 0 2px !important;
       </div>
     </div>
 
-<!-- 🥾 둘레길 구간 정복 관리 카드 -->
 <div class="card" style="background-color: #fffaf0; border: 1.5px solid #ffedd5; margin-bottom: 15px;">
+  <!-- 🍊 상단 헤더: 지도 보기 버튼 추가 -->
   <div class="card-title text-orange-600 font-bold flex justify-between items-center mb-2">
     <span class="flex items-center gap-1.5">🍊 둘레길 구간 정복 관리</span>
-    <span id="dulleSelectedBadge" class="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-md font-bold shadow-sm">
-      정복 <span id="dulleCountNum">0</span>/60 구간
-    </span>
+    
+    <div class="flex items-center gap-1.5">
+      <!-- 🗺️ 경기 둘레길 지도 보기 버튼 추가 -->
+      <button type="button" 
+              onclick="openCertImageModal(currentMemberData, '지도이미지경로.png')" 
+              class="text-[10px] bg-slate-700 hover:bg-slate-800 text-white px-2 py-0.5 rounded-md font-bold shadow-sm transition-all flex items-center gap-1">
+        🗺️ 지도 보기
+      </button>
+
+      <span id="dulleSelectedBadge" class="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-md font-bold shadow-sm">
+        정복 <span id="dulleCountNum">0</span>/60 구간
+      </span>
+    </div>
   </div>
 
   <p class="text-[10px] text-gray-500 mb-3 leading-tight">
@@ -3812,13 +3822,14 @@ margin: 0 2px !important;
     <!-- JS에서 1~60구간 알약 버튼이 동적으로 생성됩니다 -->
   </div>
 
-  <!-- 👇 여기에 요청하신 버튼을 스타일 적용하여 위치시킵니다 👇 -->
+  <!-- 둘레길 기록 저장 버튼 -->
   <button type="button" 
           onclick="addDulegilActivity()" 
           class="btn-submit w-full py-2.5 rounded-xl bg-orange-500 text-white font-bold mt-3 shadow-md hover:bg-orange-600 active:scale-[0.98] transition-all text-sm">
     🍊 둘레길 기록 저장
   </button>
 </div>
+
 
           
     <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
