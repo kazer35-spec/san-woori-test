@@ -3812,11 +3812,14 @@ margin: 0 2px !important;
     <!-- JS에서 1~60구간 알약 버튼이 동적으로 생성됩니다 -->
   </div>
 
-  <!-- 둘레길 정복 저장 버튼 -->
-  <button onclick="saveDulleCourseProgress()" class="btn-submit bg-orange-500 text-white font-bold mt-3 shadow-md hover:bg-orange-600 active:scale-[0.98] transition-all">
-    🍊 선택 회원 둘레길 기록 저장하기
+  <!-- 👇 여기에 요청하신 버튼을 스타일 적용하여 위치시킵니다 👇 -->
+  <button type="button" 
+          onclick="addDulegilActivity()" 
+          class="btn-submit w-full py-2.5 rounded-xl bg-orange-500 text-white font-bold mt-3 shadow-md hover:bg-orange-600 active:scale-[0.98] transition-all text-sm">
+    🍊 둘레길 기록 저장
   </button>
 </div>
+
           
     <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
       <button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
@@ -4933,7 +4936,97 @@ window.handleRegularCheckChange = (regularCb) => {
     }
 };
            
-            
+  // 둘레길 전용 독립 저장 함수 (기존 addMultiActivity와 완전 별개)
+window.addDulegilActivity = async () => {
+    // 1. 날짜 및 선택된 회원 검증
+    const dateInput = document.getElementById('activityDate');
+    if (!dateInput || !dateInput.value) return alert("날짜를 선택해주세요.");
+    const dateVal = dateInput.value;
+
+    const memberCount = selectedMemberIds ? (selectedMemberIds.size || selectedMemberIds.length || 0) : 0;
+    if (memberCount === 0) return alert("대상 회원을 선택해주세요.");
+
+    // 2. 날짜 타임스탬프 처리
+    const now = new Date();
+    const [y, m, d] = dateVal.split('-').map(Number);
+    const activityDateObj = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds());
+    
+    const _Timestamp = (typeof Timestamp !== 'undefined') ? Timestamp : { fromDate: (date) => date };
+    const ts = _Timestamp.fromDate(activityDateObj);
+
+    // 3. 둘레길 명칭 및 좌표 확인
+    const rawName = document.getElementById('mountainName')?.value.trim();
+    const dulegilName = rawName || "둘레길";
+
+    const currentTempCoord = typeof tempCoord !== 'undefined' ? tempCoord : window.tempCoord;
+    const safeCoords = (currentTempCoord && currentTempCoord.x !== undefined) ? currentTempCoord : null;
+
+    try {
+        // 4. 선택된 회원별 둘레길 전용 로그 저장 (지도 표시용)
+        for (const id of selectedMemberIds) {
+            const member = (typeof currentData !== 'undefined' && currentData) ? currentData.find(m => m.id === id) : null;
+            const authorName = member ? member.name : "익명";
+
+            const existingLogsRef = collection(db, `sanwoori/${id}/logs`);
+            const existingSnap = await getDocs(existingLogsRef);
+
+            const existingDocIds = new Set();
+            existingSnap.forEach(docSnap => existingDocIds.add(docSnap.id));
+
+            // 문서 ID 중복 방지 (예: 둘레길, 둘레길_1)
+            let logDocId = dulegilName;
+            let seq = 1;
+            while (existingDocIds.has(logDocId)) {
+                logDocId = `${dulegilName}_${seq}`;
+                seq++;
+            }
+
+            // 지도 표시 전용 둘레길 기록 데이터
+            const dulegilPayload = {
+                date: ts,
+                createdAt: new Date(),
+                mountain: dulegilName,
+                height: 0,
+                coords: safeCoords,
+                author: authorName,
+                isDulegil: true,      // 둘레길 전용 태그
+                isSpecial: true,      // 기존 산행 수/레벨 통계 제외
+                isWalking: true       // 지도 아이콘/표시용
+            };
+
+            await setDoc(doc(db, `sanwoori/${id}/logs`, logDocId), dulegilPayload);
+        }
+
+        alert("둘레길 기록 저장 완료! ✅ (지도에 표시됩니다)");
+
+        // 5. 폼 및 선택 초기화
+        if (selectedMemberIds && typeof selectedMemberIds.clear === 'function') {
+            selectedMemberIds.clear();
+        } else {
+            window.selectedMemberIds = new Set();
+        }
+        document.querySelectorAll('.member-checkbox, .member-card-select').forEach(cb => cb.checked = false);
+
+        const nameInput = document.getElementById('mountainName');
+        if (nameInput) nameInput.value = '';
+
+        if (typeof tempCoord !== 'undefined') tempCoord = null;
+        window.tempCoord = null;
+
+        const marker = document.getElementById('adminMapMarker');
+        if (marker) marker.classList.add('hidden');
+
+        const display = document.getElementById('coordDisplay');
+        if (display) display.innerText = '좌표: 없음 (지도 클릭)';
+
+        if (typeof startRealtimeSync === 'function') startRealtimeSync();
+
+    } catch (error) {
+        console.error("둘레길 저장 에러:", error);
+        alert("저장 실패: " + error.message);
+    }
+};
+          
 
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
