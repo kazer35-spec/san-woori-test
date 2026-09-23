@@ -3793,47 +3793,54 @@ margin: 0 2px !important;
       </div>
     </div>
 
-<div class="card" style="background-color: #fffaf0; border: 1.5px solid #ffedd5; margin-bottom: 15px;">
-<!-- 🍊 관리자 카드 영역 (기존 카드의 상단 헤더 부분 수정) -->
-<div class="card" style="background-color: #fffaf0; border: 1.5px solid #ffedd5; margin-bottom: 15px;">
-  <div class="card-title text-orange-600 font-bold flex justify-between items-center mb-2">
-    <span class="flex items-center gap-1.5">🍊 둘레길 구간 정복 관리</span>
-    
-    <div class="flex items-center gap-1.5">
-      <!-- 📍 관리자 전용 좌표 설정 모달 열기 버튼 -->
-      <button type="button" 
-              onclick="openAdminCoordModal()" 
-              class="text-[10px] bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded-md font-bold shadow-sm transition-all flex items-center gap-1">
-        📍 지도 좌표 등록
-      </button>
-
-      <span id="dulleSelectedBadge" class="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-md font-bold shadow-sm">
-        정복 <span id="dulleCountNum">0</span>/60 구간
-      </span>
-    </div>
-  </div>
-
-  <p class="text-[10px] text-gray-500 mb-3 leading-tight">
-    ※ 상단 [등산 기록 관리]에서 선택된 회원에게 적용됩니다.<br>
-    ※ 버튼을 클릭하여 정복 여부를 토글(주황색=완료)하세요.
-  </p>
-
-  <!-- 둘레길 구간 알약 버튼 그리드 (1~60구간) -->
-  <div id="dullePillGrid" class="grid grid-cols-5 sm:grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-1 bg-white/60 rounded-xl border border-orange-100"></div>
-
-  <!-- 둘레길 기록 저장 버튼 -->
-  <button type="button" 
-          onclick="addDulegilActivity()" 
-          class="btn-submit w-full py-2.5 rounded-xl bg-orange-500 text-white font-bold mt-3 shadow-md hover:bg-orange-600 active:scale-[0.98] transition-all text-sm">
-    🍊 둘레길 기록 저장
-  </button>
-</div>
-
-
-<!-- 🗺️ [관리자 전용] 좌표 등록 지도 모달 -->
+<!-- ========================================== -->
+<!-- 🗺️ [관리자 전용] 둘레길 지도 좌표 등록 모달 -->
+<!-- ========================================== -->
 <div id="adminCoordModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
   <div class="bg-slate-900 rounded-2xl overflow-hidden max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-amber-500/40">
     
+    <!-- 모달 상단 컨트롤러 -->
+    <div class="flex items-center justify-between px-3.5 py-2.5 bg-slate-800 border-b border-slate-700 shrink-0 gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-amber-400">📍 좌표 설정 구간:</span>
+        <!-- 1~60구간 선택 드롭다운 -->
+        <select id="adminCourseSelect" onchange="onAdminCourseChange()" class="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded border border-slate-600 focus:outline-none focus:border-amber-400">
+        </select>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button onclick="saveAdminCoords()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2.5 py-1 rounded-md font-bold transition-all shadow-sm flex items-center gap-1">
+          💾 좌표 전체 저장
+        </button>
+        <button onclick="closeAdminCoordModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-slate-700 text-slate-300 hover:text-white text-sm font-bold">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- 클릭 위치 안내 바 -->
+    <div class="bg-slate-950 px-3 py-1.5 text-[11px] text-slate-300 border-b border-slate-800 flex justify-between items-center shrink-0">
+      <span>👉 지도를 클릭하면 해당 구간 위치에 주황색 핀이 찍힙니다.</span>
+      <span id="currentCoordText" class="font-mono text-amber-400 font-bold">선택 좌표: 없음</span>
+    </div>
+
+    <!-- 지도 및 클릭 레이어 -->
+    <div class="p-0 overflow-y-auto flex-1 flex items-start justify-center bg-slate-950 relative w-full">
+      <div id="adminMapContainer" class="relative w-full inline-block cursor-crosshair">
+        <!-- 🍊 제공해주신 지도 이미지 URL을 기본 src로 직접 설정했습니다 -->
+        <img id="adminModalImage" 
+             src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" 
+             alt="경기 둘레길 지도" 
+             class="w-full h-auto object-contain block select-none" />
+        
+        <!-- 지도 클릭 오버레이 -->
+        <div id="adminMapOverlay" onclick="handleAdminMapClick(event)" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+          
     <!-- 모달 상단 컨트롤러 -->
     <div class="flex items-center justify-between px-3.5 py-2.5 bg-slate-800 border-b border-slate-700 shrink-0 gap-2">
       <div class="flex items-center gap-2">
