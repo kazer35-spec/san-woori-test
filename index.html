@@ -4501,106 +4501,77 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 // 🍊 둘레길 구간 관리 전용 글로벌 상태 및 함수
 // ==========================================
 
-// 현재 선택된 둘레길 구간들을 담는 Set (중복 방지)
-let selectedDulleCourses = new Set();
-const TOTAL_DULLE_COURSES = 60; // 둘레길 총 구간 수 (필요에 따라 조절 가능)
+ // 1. 전역 객체(window)에 둘레길 선택 Set을 확실하게 등록
+window.selectedDulleCourses = window.selectedDulleCourses || new Set();
+const TOTAL_DULLE_COURSES = 60;
 
-// 1. 둘레길 알약 버튼 초기화 생성 함수 (페이지 로드 시 1회 실행)
-function initDullePills() {
-  const grid = document.getElementById('dullePillGrid');
-  if (!grid) return;
-
-  let html = '';
-  for (let i = 1; i <= TOTAL_DULLE_COURSES; i++) {
-    html += `
-      <button type="button" 
-              id="dullePill_${i}" 
-              onclick="toggleDullePill(${i})" 
-              class="dulle-pill-btn h-8 rounded-full border text-[11px] font-bold transition-all flex items-center justify-center bg-white text-gray-600 border-gray-200 hover:border-orange-300 shadow-sm">
-        ${i}구간
-      </button>
-    `;
-  }
-  grid.innerHTML = html;
-  updateDulleBadge();
-}
-
-// 2. 알약 클릭 시 토글 (주황색 ↔ 흰색)
+// 2. 알약 클릭 시 전역 Set(window.selectedDulleCourses)에 저장하도록 수정
 function toggleDullePill(courseNum) {
   const pillBtn = document.getElementById(`dullePill_${courseNum}`);
   if (!pillBtn) return;
 
-  if (selectedDulleCourses.has(courseNum)) {
-    // ⚪ 해제: 흰색 상태로 변경
-    selectedDulleCourses.delete(courseNum);
+  if (window.selectedDulleCourses.has(courseNum)) {
+    // ⚪ 해제
+    window.selectedDulleCourses.delete(courseNum);
     pillBtn.className = "dulle-pill-btn h-8 rounded-full border text-[11px] font-bold transition-all flex items-center justify-center bg-white text-gray-600 border-gray-200 hover:border-orange-300 shadow-sm";
   } else {
-    // 🟠 선택: 주황색 활성화 상태로 변경
-    selectedDulleCourses.add(courseNum);
+    // 🟠 선택
+    window.selectedDulleCourses.add(courseNum);
     pillBtn.className = "dulle-pill-btn h-8 rounded-full border text-[11px] font-black transition-all flex items-center justify-center bg-orange-500 text-white border-orange-600 shadow-md transform scale-[1.02]";
   }
 
   updateDulleBadge();
 }
 
-// 3. 정복 구간 수 카운트 뱃지 업데이트
+// 3. 뱃지 카운트 업데이트 함수
 function updateDulleBadge() {
   const countEl = document.getElementById('dulleCountNum');
-  if (countEl) {
-    countEl.innerText = selectedDulleCourses.size;
+  if (countEl && window.selectedDulleCourses) {
+    countEl.innerText = window.selectedDulleCourses.size;
   }
 }
 
-// 4. 특정 회원의 기존 둘레길 기록 로드 (회원 선택 이벤트와 연동용)
-function loadUserDulleProgress(completedArray = []) {
-  // 초기화
-  selectedDulleCourses.clear();
-  
-  for (let i = 1; i <= TOTAL_DULLE_COURSES; i++) {
-    const pillBtn = document.getElementById(`dullePill_${i}`);
-    if (!pillBtn) continue;
+// 4. 둘레길 전용 독립 저장 함수 (지도 전용 반영)
+window.addDulegilActivity = async () => {
+    // 선택된 회원 검증 (기존 회원 선택 Set/Array 지원)
+    const selectedMembers = (typeof selectedMemberIds !== 'undefined' && selectedMemberIds) 
+        ? Array.from(selectedMemberIds) 
+        : ((typeof getSelectedAdminMembers === 'function') ? getSelectedAdminMembers() : []);
 
-    if (completedArray.includes(i)) {
-      selectedDulleCourses.add(i);
-      pillBtn.className = "dulle-pill-btn h-8 rounded-full border text-[11px] font-black transition-all flex items-center justify-center bg-orange-500 text-white border-orange-600 shadow-md transform scale-[1.02]";
-    } else {
-      pillBtn.className = "dulle-pill-btn h-8 rounded-full border text-[11px] font-bold transition-all flex items-center justify-center bg-white text-gray-600 border-gray-200 hover:border-orange-300 shadow-sm";
+    if (!selectedMembers || selectedMembers.length === 0) {
+        return alert("⚠️ 대상 회원을 선택해주세요.");
     }
-  }
-  updateDulleBadge();
-}
 
-// 5. 둘레길 정복 기록 저장 (Firestore / DB 연동)
-async function saveDulleCourseProgress() {
-  // 기존 회원 선택 로직의 선택된 회원 ID 가져오기 (예시: getSelectedMembers())
-  const selectedMembers = typeof getSelectedAdminMembers === 'function' ? getSelectedAdminMembers() : [];
-  
-  if (selectedMembers.length === 0) {
-    alert("⚠️ 먼저 상단 [회원 목록]에서 기록을 적용할 회원을 선택해 주세요.");
-    return;
-  }
+    // 전역 Set에서 현재 선택된 구간 번호 배열 추출
+    const courseList = window.selectedDulleCourses ? Array.from(window.selectedDulleCourses).sort((a, b) => a - b) : [];
 
-  const courseList = Array.from(selectedDulleCourses).sort((a, b) => a - b);
-
-  try {
-    // Firebase Firestore 저장 로직 예시
-    for (const memberId of selectedMembers) {
-      await updateDoc(doc(db, `sanwoori/${memberId}`), {
-        dulleCourses: courseList,
-        updatedAt: new Date()
-      });
+    if (courseList.length === 0) {
+        return alert("선택된 둘레길 구간이 없습니다. 1~60 구간 중 정복한 구간을 선택해주세요.");
     }
-    alert(`🍊 선택한 ${selectedMembers.length}명 회원의 둘레길 기록(${courseList.length}개 구간)이 저장되었습니다!`);
-  } catch (error) {
-    console.error("둘레길 저장 오류:", error);
-    alert("저장 중 오류가 발생했습니다. (콘솔 확인)");
-  }
-}
 
-// DOM 로드 완료 후 실행
-document.addEventListener('DOMContentLoaded', () => {
-  initDullePills();
-});
+    try {
+        // 선택된 회원의 메인 문서 dulleCourses 배열만 업데이트
+        for (const id of selectedMembers) {
+            const memberRef = doc(db, "sanwoori", id);
+
+            await updateDoc(memberRef, {
+                dulleCourses: courseList,  // 지도 전용 1~60 구간 배열
+                updatedAt: new Date()
+            });
+        }
+
+        alert(`🍊 선택 회원의 둘레길 지도 정복 구간(${courseList.length}개 구간)이 저장되었습니다!`);
+
+        // 지도 UI 새로고침
+        if (typeof renderDulleMap === 'function') renderDulleMap();
+        if (typeof startRealtimeSync === 'function') startRealtimeSync();
+
+    } catch (error) {
+        console.error("둘레길 지도 저장 에러:", error);
+        alert("저장 실패: " + error.message);
+    }
+};
+
         
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
