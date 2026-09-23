@@ -7143,19 +7143,20 @@ window.showMemberMap = async (mId, mName) => {
   // 🟢 2. 데이터 세팅 완료 후 스크롤 리셋
   resetMapScrolls();
 
-  // 🟢 3. 지도 상단 미니 배지 수치 및 클릭 시 이미지 팝업 이벤트 부여
-  const top100Count = top100FullList.length;
-  const miniBadge = document.getElementById('miniTop100Badge');
+  // 🟢 지도 상단 미니 배지 수치 및 클릭 시 이미지 팝업 이벤트
+const top100Count = top100FullList.length;
+const miniBadge = document.getElementById('miniTop100Badge');
 
-  if (miniBadge) {
-    miniBadge.innerText = `${top100Count}/100`;
-    miniBadge.style.cursor = 'pointer'; // 클릭 가능한 손가락 모양 커서
-    
-    // 클릭 시 ImgBB Direct 링크를 모달로 호출
-    miniBadge.onclick = () => {
-      openCertImageModal('https://i.ibb.co/V0R7rxm8/image.png');
-    };
-  }
+if (miniBadge) {
+  miniBadge.innerText = `${top100Count}/100`;
+  miniBadge.style.cursor = 'pointer';
+  
+  miniBadge.onclick = () => {
+    // 따끈따끈하게 새로 올리신 원본 이미지 직접 링크 연결
+    openCertImageModal('https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg');
+  };
+}
+
 
   document.getElementById('mapTotalHeight').innerText = totalH.toLocaleString();
   pointsBoard.innerHTML = mapHtml;
