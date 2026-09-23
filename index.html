@@ -4501,21 +4501,48 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 // 🍊 둘레길 구간 관리 전용 글로벌 상태 및 함수
 // ==========================================
 
- // 1. 전역 객체(window)에 둘레길 선택 Set을 확실하게 등록
+ 현재 선택된 구간 번호 배열 추출
+ // ==========================================
+// 🍊 둘레길 구간 관리 전용 (전역 변수 및 함수)
+// ==========================================
+
 window.selectedDulleCourses = window.selectedDulleCourses || new Set();
 const TOTAL_DULLE_COURSES = 60;
 
-// 2. 알약 클릭 시 전역 Set(window.selectedDulleCourses)에 저장하도록 수정
+// 1. 둘레길 1~60구간 알약 버튼 생성 함수
+function initDullePills() {
+  const grid = document.getElementById('dullePillGrid');
+  if (!grid) return;
+
+  let html = '';
+  for (let i = 1; i <= TOTAL_DULLE_COURSES; i++) {
+    const isSelected = window.selectedDulleCourses.has(i);
+    const btnClass = isSelected
+      ? "dulle-pill-btn h-8 rounded-full border text-[11px] font-black transition-all flex items-center justify-center bg-orange-500 text-white border-orange-600 shadow-md transform scale-[1.02]"
+      : "dulle-pill-btn h-8 rounded-full border text-[11px] font-bold transition-all flex items-center justify-center bg-white text-gray-600 border-gray-200 hover:border-orange-300 shadow-sm";
+
+    html += `
+      <button type="button" 
+              id="dullePill_${i}" 
+              onclick="toggleDullePill(${i})" 
+              class="${btnClass}">
+        ${i}구간
+      </button>
+    `;
+  }
+  grid.innerHTML = html;
+  updateDulleBadge();
+}
+
+// 2. 알약 토글 클릭 함수
 function toggleDullePill(courseNum) {
   const pillBtn = document.getElementById(`dullePill_${courseNum}`);
   if (!pillBtn) return;
 
   if (window.selectedDulleCourses.has(courseNum)) {
-    // ⚪ 해제
     window.selectedDulleCourses.delete(courseNum);
     pillBtn.className = "dulle-pill-btn h-8 rounded-full border text-[11px] font-bold transition-all flex items-center justify-center bg-white text-gray-600 border-gray-200 hover:border-orange-300 shadow-sm";
   } else {
-    // 🟠 선택
     window.selectedDulleCourses.add(courseNum);
     pillBtn.className = "dulle-pill-btn h-8 rounded-full border text-[11px] font-black transition-all flex items-center justify-center bg-orange-500 text-white border-orange-600 shadow-md transform scale-[1.02]";
   }
@@ -4523,7 +4550,7 @@ function toggleDullePill(courseNum) {
   updateDulleBadge();
 }
 
-// 3. 뱃지 카운트 업데이트 함수
+// 3. 뱃지 업데이트 함수
 function updateDulleBadge() {
   const countEl = document.getElementById('dulleCountNum');
   if (countEl && window.selectedDulleCourses) {
@@ -4531,9 +4558,8 @@ function updateDulleBadge() {
   }
 }
 
-// 4. 둘레길 전용 독립 저장 함수 (지도 전용 반영)
+// 4. 둘레길 지도 전용 독립 저장 함수
 window.addDulegilActivity = async () => {
-    // 선택된 회원 검증 (기존 회원 선택 Set/Array 지원)
     const selectedMembers = (typeof selectedMemberIds !== 'undefined' && selectedMemberIds) 
         ? Array.from(selectedMemberIds) 
         : ((typeof getSelectedAdminMembers === 'function') ? getSelectedAdminMembers() : []);
@@ -4542,7 +4568,6 @@ window.addDulegilActivity = async () => {
         return alert("⚠️ 대상 회원을 선택해주세요.");
     }
 
-    // 전역 Set에서 현재 선택된 구간 번호 배열 추출
     const courseList = window.selectedDulleCourses ? Array.from(window.selectedDulleCourses).sort((a, b) => a - b) : [];
 
     if (courseList.length === 0) {
@@ -4550,19 +4575,17 @@ window.addDulegilActivity = async () => {
     }
 
     try {
-        // 선택된 회원의 메인 문서 dulleCourses 배열만 업데이트
         for (const id of selectedMembers) {
             const memberRef = doc(db, "sanwoori", id);
 
             await updateDoc(memberRef, {
-                dulleCourses: courseList,  // 지도 전용 1~60 구간 배열
+                dulleCourses: courseList,
                 updatedAt: new Date()
             });
         }
 
         alert(`🍊 선택 회원의 둘레길 지도 정복 구간(${courseList.length}개 구간)이 저장되었습니다!`);
 
-        // 지도 UI 새로고침
         if (typeof renderDulleMap === 'function') renderDulleMap();
         if (typeof startRealtimeSync === 'function') startRealtimeSync();
 
@@ -4571,6 +4594,14 @@ window.addDulegilActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
+
+// 5. 페이지 로드 완료 시 알약 버튼 즉시 생성 (★ 핵심)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDullePills);
+} else {
+  initDullePills();
+}
+
 
         
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
