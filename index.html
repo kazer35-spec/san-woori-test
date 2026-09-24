@@ -42,38 +42,7 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .quarter-glow-select {
     animation: emeraldGlowPulse 2s infinite ease-in-out;
 }
-
-        /* 기본 공통 알약 마커 스타일 */
-.dulegil-pill-marker {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: 800;
-  border-radius: 9999px; /* 알약 형태 */
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  user-select: none;
-  z-index: 10;
-}
-
-/* [미완주] 기본 하얀 알약 마커 */
-.dulegil-pill-marker.uncompleted {
-  background-color: #ffffff;
-  color: #64748b; /* slate-500 */
-  border: 1.5px solid #cbd5e1; /* slate-300 */
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* [완주/좌표등록] 주황색 알약 마커 */
-.dulegil-pill-marker.completed {
-  background-color: #f97316; /* orange-500 */
-  color: #ffffff;
-  border: 1.5px solid #ffffff;
-  box-shadow: 0 2px 5px rgba(249, 115, 22, 0.4);
-  z-index: 20;
-}
-
+    
 /* ==========================================
    🏆 100레벨 블랙 & 딥골드 레전더리 테마 (상단 요약 텍스트 컬러 수정본)
    ========================================== */
@@ -3753,25 +3722,6 @@ margin: 0 2px !important;
   </div>
 </div>
 
-          <!-- [관리자 설정 탭 내부] -->
-<div class="flex items-center justify-between mb-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-    <label class="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-        <input type="checkbox" id="useDulegilMapCheck" onchange="toggleAdminMapType()" class="rounded text-amber-500 focus:ring-amber-400 w-4 h-4">
-        <span>🥾 경기둘레길 전용 지도 전환</span>
-    </label>
-    <div id="coordDisplay" class="text-[11px] font-bold text-sky-600 bg-sky-50 px-2.5 py-1 rounded-lg border border-sky-100">
-        좌표 (전국): X: 0%, Y: 0%
-    </div>
-</div>
-
-<!-- 단일 관리자 지도 박스 -->
-<div id="adminMapBoxContainer" class="relative w-full max-w-[400px] mx-auto cursor-crosshair overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-slate-50" onclick="setAdminCoordinate(event)">
-    <img id="adminMapImg" src="YOUR_MAIN_MAP_IMAGE_URL.png" class="w-full h-auto block select-none" alt="관리자 지도" />
-    
-    <!-- 클릭 마커 -->
-    <div id="adminMapMarker" class="absolute w-4 h-4 bg-rose-500 border-2 border-white rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1/2 hidden z-20"></div>
-</div>
-
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
       <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
@@ -3844,7 +3794,6 @@ margin: 0 2px !important;
     </div>
 
 
-
     <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
       <button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
         💾 전체 데이터 원클릭 백업 (JSON 다운로드)
@@ -3853,7 +3802,6 @@ margin: 0 2px !important;
         ※ 클릭 시 전체 멤버와 산행 기록이 파일로 저장됩니다.
       </p>
     </div>
-
 
           <div class="p-4 text-center">
       <button onclick="logoutAdmin()" class="text-gray-400 underline font-bold text-xs">로그아웃</button>
@@ -4055,37 +4003,6 @@ margin: 0 2px !important;
         <div id="timelineContent"></div>
     </div>
 </div>
-
-<!-- 🟢 [100대 명산 / 둘레길 인증 지도 이미지 모달 (화면 꽉 차게)] -->
-<div id="certImageModal" class="fixed inset-0 z-[9999] hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 transition-opacity" onclick="if(event.target === this) closeCertImageModal()">
-  <!-- 모달 박스: 너비를 98vw로 늘리고 패딩 제거 -->
-  <div class="relative w-[98vw] max-w-lg bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 flex flex-col max-h-[92vh]">
-    
-    
-    <!-- 상단 헤더 -->
-    <div class="flex items-center justify-between px-3.5 py-2.5 bg-slate-800/90 border-b border-slate-700/60 shrink-0">
-      <h3 class="text-xs font-bold text-sky-400 flex items-center gap-1.5">
-        <span>🗺️</span> 경기 둘레길 인증 지도
-      </h3>
-      <button onclick="closeCertImageModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-slate-700/60 text-slate-300 hover:text-white hover:bg-slate-700 text-sm font-bold transition-all">
-        ✕
-      </button>
-    </div>
-    
-    <!-- 🍊 지도 이미지 & 좌표 오버레이 레이어 -->
-    <div class="p-0 overflow-y-auto flex-1 flex items-start justify-center bg-slate-950 relative w-full">
-      <div class="relative w-full inline-block">
-        <img id="certModalImage" src="" alt="인증 지도" class="w-full h-auto object-contain block" />
-        
-        <!-- 📍 주황색 좌표 핀이 들어가는 오버레이 -->
-        <div id="dulleMapOverlay" class="absolute inset-0 w-full h-full pointer-events-none"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
 
 
   
@@ -4529,7 +4446,6 @@ if (!nextActive) { msg = ""; msgInput.value = ""; }
 await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: msg }, { merge: true });
 };
 
-        
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
 // ==========================================
@@ -4864,6 +4780,7 @@ window.handleRegularCheckChange = (regularCb) => {
     }
 };
            
+            
 
     
 // ⭐ 이름을 화면에서 긁어오지 않고, 클릭한 대상의 이름과 ID를 직접 매개변수로
@@ -6842,511 +6759,365 @@ window.openMountainInfoModal = function(type, event) {
 
 
 
-// ==========================================
-// 🟢 글로벌 설정, 이미지 경로 및 상태 변수
-// ==========================================
-const MAP_CACHE_EXPIRY = 5 * 60 * 1000; // 캐시 유효 시간 (5분)
+    
 
-// 이미지 URL (실제 프로젝트에서 사용하는 경로로 수정)
-const MAIN_MAP_IMAGE_URL = "YOUR_MAIN_MAP_IMAGE_URL.png"; 
-const DULEGIL_MAP_IMAGE_URL = "YOUR_DULEGIL_MAP_IMAGE_URL.png";
+         // 캐시 유효 시간 (5분)
+const MAP_CACHE_EXPIRY = 5 * 60 * 1000;
 
+// 글로벌 상태 변수 (100대 명산 / 일반 산)
 let top100FullList = [];
 let top100DisplayCount = 20;
 
 let normalFullList = [];
 let normalDisplayCount = 20;
 
-// 경기둘레길 및 관리자 상태 변수
-let selectedCoordType = 'main'; // 'main' 또는 'dulegil'
-let currentAdminCoords = null;
-
-// 🥾 경기둘레길 1~60구간 좌표 Master 목록 (예시 좌표 구조)
-// 관리자 페이지에서 클릭하여 구축하거나 아래 목록에 좌표(%)를 세팅해두면 자동 작동합니다.
-window.DULEGIL_MASTER_COORDS = window.DULEGIL_MASTER_COORDS || [
-    { course: '1구간', x: 22.5, y: 15.2 },
-    { course: '2구간', x: 25.1, y: 18.4 },
-    { course: '3구간', x: 28.3, y: 22.0 },
-    // ... 60구간까지 등록 가능
-];
-
-// ==========================================
-// 🟢 모달 및 화면 제어 함수
-// ==========================================
-window.openCertImageModal = (imageUrl) => {
-  const modal = document.getElementById('certImageModal');
-  const imgEl = document.getElementById('certModalImage');
-  if (!modal || !imgEl) return;
-  imgEl.src = imageUrl;
-  modal.classList.remove('hidden');
-};
-
-window.closeCertImageModal = () => {
-  const modal = document.getElementById('certImageModal');
-  if (!modal) return;
-  modal.classList.add('hidden');
-};
-
-// 🥾 경기둘레길 모달 제어
-window.openDulegilFullMapModal = () => {
-    const modal = document.getElementById('dulegilFullMapModal');
-    if (modal) modal.classList.remove('hidden');
-};
-
-window.closeDulegilFullMapModal = () => {
-    const modal = document.getElementById('dulegilFullMapModal');
-    if (modal) modal.classList.add('hidden');
-};
-
-// 🟢 스크롤 안전 초기화
+// 🟢 [안전한 스크롤 초기화 함수] 다른 팝업에 영향을 주지 않도록 내부 스크롤 요소만 지정
 const resetMapScrolls = () => {
-  setTimeout(() => {
-    const top100Scroll = document.querySelector('#top100ListBox > div');
-    const normalScroll = document.querySelector('#normalListBox > div');
-    const regionScroll = document.getElementById('conquerRegionGrid');
+    setTimeout(() => {
+        const top100Scroll = document.querySelector('#top100ListBox > div');
+        const normalScroll = document.querySelector('#normalListBox > div');
+        const regionScroll = document.getElementById('conquerRegionGrid');
 
-    if (top100Scroll) top100Scroll.scrollTop = 0;
-    if (normalScroll) normalScroll.scrollTop = 0;
-    if (regionScroll) regionScroll.scrollTop = 0;
-  }, 10);
+        if (top100Scroll) top100Scroll.scrollTop = 0;
+        if (normalScroll) normalScroll.scrollTop = 0;
+        if (regionScroll) regionScroll.scrollTop = 0;
+    }, 10);
 };
 
-// ==========================================
-// 🟢 관리자 지도 제어 (이미지 1개로 단일화)
-// ==========================================
-window.toggleAdminMapType = () => {
-    const isDulegil = document.getElementById('useDulegilMapCheck')?.checked;
-    const adminImg = document.getElementById('adminMapImg');
-    const marker = document.getElementById('adminMapMarker');
-    const display = document.getElementById('coordDisplay');
-
-    if (isDulegil) {
-        selectedCoordType = 'dulegil';
-        if (adminImg) adminImg.src = DULEGIL_MAP_IMAGE_URL;
-    } else {
-        selectedCoordType = 'main';
-        if (adminImg) adminImg.src = MAIN_MAP_IMAGE_URL;
-    }
-
-    if (marker) marker.classList.add('hidden');
-    currentAdminCoords = null;
-    if (display) {
-        display.innerText = `좌표 (${isDulegil ? '둘레길' : '전국'}): 클릭 대기 중`;
-    }
-};
-
-window.setAdminCoordinate = (event) => {
-    if (document.getElementById('disableCoordCheck')?.checked) return;
-
-    const mapBox = document.getElementById('adminMapBoxContainer');
-    const marker = document.getElementById('adminMapMarker');
-
-    if (!mapBox || !marker) return;
-
-    const rect = mapBox.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const clickY = event.clientY - rect.top;
-
-    const xPercent = ((clickX / rect.width) * 100).toFixed(2);
-    const yPercent = ((clickY / rect.height) * 100).toFixed(2);
-
-    currentAdminCoords = { x: parseFloat(xPercent), y: parseFloat(yPercent), mapType: selectedCoordType };
-
-    marker.style.left = `${xPercent}%`;
-    marker.style.top = `${yPercent}%`;
-    marker.classList.remove('hidden');
-
-    const display = document.getElementById('coordDisplay');
-    if (display) {
-        display.innerText = `좌표 (${selectedCoordType === 'dulegil' ? '둘레길' : '전국'}): X: ${xPercent}%, Y: ${yPercent}%`;
-    }
-};
-
-// ==========================================
 // [1] 모달 뷰 전환 및 탭 전환 함수
-// ==========================================
 window.toggleMapView = (viewType) => {
-  const main = document.getElementById('mapViewMain');
-  const stats = document.getElementById('mapViewStats');
-  if (!main || !stats) return;
+    const main = document.getElementById('mapViewMain');
+    const stats = document.getElementById('mapViewStats');
+    if (!main || !stats) return;
 
-  if (viewType === 'stats') {
-    main.classList.add('hidden-view');
-    stats.classList.remove('hidden-view');
-    switchStatsTab('top100');
-  } else {
-    main.classList.remove('hidden-view');
-    stats.classList.add('hidden-view');
-  }
+    if (viewType === 'stats') {
+        main.classList.add('hidden-view');
+        stats.classList.remove('hidden-view');
+        // 🟢 상세통계로 들어올 때 항상 '100대 명산' 탭을 첫번째로 보여줌
+        switchStatsTab('top100');
+    } else {
+        main.classList.remove('hidden-view');
+        stats.classList.add('hidden-view');
+    }
 };
 
 window.switchStatsTab = (tabName) => {
-  const regionBox = document.getElementById('regionStatsBox');
-  const top100Box = document.getElementById('top100ListBox');
-  const normalBox = document.getElementById('normalListBox');
+    const regionBox = document.getElementById('regionStatsBox');
+    const top100Box = document.getElementById('top100ListBox');
+    const normalBox = document.getElementById('normalListBox');
+    
+    const tabRegion = document.getElementById('tabBtnRegion');
+    const tabTop100 = document.getElementById('tabBtnTop100');
+    const tabNormal = document.getElementById('tabBtnNormal');
 
-  const tabRegion = document.getElementById('tabBtnRegion');
-  const tabTop100 = document.getElementById('tabBtnTop100');
-  const tabNormal = document.getElementById('tabBtnNormal');
+    const dotTop100 = document.getElementById('dotTop100');
+    const dotNormal = document.getElementById('dotNormal');
 
-  const dotTop100 = document.getElementById('dotTop100');
-  const dotNormal = document.getElementById('dotNormal');
+    if(!regionBox || !top100Box || !normalBox) return;
 
-  if (!regionBox || !top100Box || !normalBox) return;
+    regionBox.classList.add('hidden');
+    top100Box.classList.add('hidden');
+    normalBox.classList.add('hidden');
 
-  regionBox.classList.add('hidden');
-  top100Box.classList.add('hidden');
-  normalBox.classList.add('hidden');
+    const activeBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap";
+    const inactiveBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap";
 
-  const activeBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap";
-  const inactiveBase = "py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap";
+    // 초기화 (기본 상태: 흰색 배경)
+    if(tabRegion) tabRegion.className = inactiveBase;
+    if(tabTop100) tabTop100.className = inactiveBase + " flex items-center gap-1";
+    if(tabNormal) tabNormal.className = inactiveBase + " flex items-center gap-1";
 
-  if (tabRegion) tabRegion.className = inactiveBase;
-  if (tabTop100) tabTop100.className = inactiveBase + " flex items-center gap-1";
-  if (tabNormal) tabNormal.className = inactiveBase + " flex items-center gap-1";
+    // 점 색상 기본값 (비활성화 상태일 때는 원래 제 색상)
+    if(dotTop100) dotTop100.className = "w-1.5 h-1.5 rounded-full bg-sky-500 inline-block";
+    if(dotNormal) dotNormal.className = "w-1.5 h-1.5 rounded-full bg-rose-500 inline-block";
 
-  if (dotTop100) dotTop100.className = "w-1.5 h-1.5 rounded-full bg-sky-500 inline-block";
-  if (dotNormal) dotNormal.className = "w-1.5 h-1.5 rounded-full bg-rose-500 inline-block";
+    if (tabName === 'top100') {
+        top100Box.classList.remove('hidden');
+        if(tabTop100) tabTop100.className = activeBase + " flex items-center gap-1";
+        // 🟢 활성화되었을 때만 점을 흰색으로 변경
+        if(dotTop100) dotTop100.className = "w-1.5 h-1.5 rounded-full bg-white inline-block";
+    } else if (tabName === 'normal') {
+        normalBox.classList.remove('hidden');
+        if(tabNormal) tabNormal.className = activeBase + " flex items-center gap-1";
+        // 🟢 활성화되었을 때만 점을 흰색으로 변경
+        if(dotNormal) dotNormal.className = "w-1.5 h-1.5 rounded-full bg-white inline-block";
+    } else {
+        regionBox.classList.remove('hidden');
+        if(tabRegion) tabRegion.className = activeBase;
+    }
 
-  if (tabName === 'top100') {
-    top100Box.classList.remove('hidden');
-    if (tabTop100) tabTop100.className = activeBase + " flex items-center gap-1";
-    if (dotTop100) dotTop100.className = "w-1.5 h-1.5 rounded-full bg-white inline-block";
-  } else if (tabName === 'normal') {
-    normalBox.classList.remove('hidden');
-    if (tabNormal) tabNormal.className = activeBase + " flex items-center gap-1";
-    if (dotNormal) dotNormal.className = "w-1.5 h-1.5 rounded-full bg-white inline-block";
-  } else {
-    regionBox.classList.remove('hidden');
-    if (tabRegion) tabRegion.className = activeBase;
-  }
-
-  resetMapScrolls();
+    // 🟢 탭 전환 시 스크롤 안전 초기화
+    resetMapScrolls();
 };
 
-// ==========================================
-// [2] 100대 명산 및 일반 산 더보기 렌더링
-// ==========================================
+// [2-1] 100대 명산 20개씩 더보기 렌더링
 window.renderMoreTop100 = () => {
-  const listBoard = document.getElementById('top100MountainGrid');
-  const moreBtn = document.getElementById('top100MoreBtn');
-
-  const targetSlice = top100FullList.slice(0, top100DisplayCount);
-
-  if (targetSlice.length === 0) {
-    listBoard.innerHTML = "<p class='text-center text-xs py-8 text-slate-400'>좌표 등록된 100대 명산이 없습니다.</p>";
-    if (moreBtn) moreBtn.classList.add('hidden');
-    return;
-  }
-
-  listBoard.innerHTML = targetSlice.map((item, idx) => `
-    <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
-      <div class="flex items-center gap-2">
-        <span class="text-[10px] font-black text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">${idx + 1}</span>
-        <span class="text-xs font-bold text-slate-800">${item.name}</span>
-      </div>
-      <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
-    </div>
-  `).join('');
-
-  if (top100DisplayCount >= top100FullList.length) {
-    if (moreBtn) moreBtn.classList.add('hidden');
-  } else {
-    if (moreBtn) {
-      moreBtn.classList.remove('hidden');
-      moreBtn.innerText = `더보기 (${top100DisplayCount}/${top100FullList.length})`;
+    const listBoard = document.getElementById('top100MountainGrid');
+    const moreBtn = document.getElementById('top100MoreBtn');
+    
+    const targetSlice = top100FullList.slice(0, top100DisplayCount);
+    
+    if (targetSlice.length === 0) {
+        listBoard.innerHTML = "<p class='text-center text-xs py-8 text-slate-400'>좌표 등록된 100대 명산이 없습니다.</p>";
+        if(moreBtn) moreBtn.classList.add('hidden');
+        return;
     }
-  }
+
+    listBoard.innerHTML = targetSlice.map((item, idx) => `
+        <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-black text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">${idx + 1}</span>
+                <span class="text-xs font-bold text-slate-800">${item.name}</span>
+            </div>
+            <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
+        </div>
+    `).join('');
+
+    if (top100DisplayCount >= top100FullList.length) {
+        if(moreBtn) moreBtn.classList.add('hidden');
+    } else {
+        if(moreBtn) {
+            moreBtn.classList.remove('hidden');
+            moreBtn.innerText = `더보기 (${top100DisplayCount}/${top100FullList.length})`;
+        }
+    }
 };
 
 window.loadNext20Top100 = () => {
-  top100DisplayCount += 20;
-  renderMoreTop100();
+    top100DisplayCount += 20;
+    renderMoreTop100();
 };
 
+// [2-2] 정복한 산 (일반 산) 20개씩 더보기 렌더링
 window.renderMoreNormal = () => {
-  const listBoard = document.getElementById('normalMountainGrid');
-  const moreBtn = document.getElementById('normalMoreBtn');
-
-  const targetSlice = normalFullList.slice(0, normalDisplayCount);
-
-  if (targetSlice.length === 0) {
-    listBoard.innerHTML = "<p class='text-center text-xs py-8 text-slate-400'>좌표 등록된 일반 산이 없습니다.</p>";
-    if (moreBtn) moreBtn.classList.add('hidden');
-    return;
-  }
-
-  listBoard.innerHTML = targetSlice.map((item, idx) => `
-    <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
-      <div class="flex items-center gap-2">
-        <span class="text-[10px] font-black text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${idx + 1}</span>
-        <span class="text-xs font-bold text-slate-800">${item.name}</span>
-      </div>
-      <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
-    </div>
-  `).join('');
-
-  if (normalDisplayCount >= normalFullList.length) {
-    if (moreBtn) moreBtn.classList.add('hidden');
-  } else {
-    if (moreBtn) {
-      moreBtn.classList.remove('hidden');
-      moreBtn.innerText = `더보기 (${normalDisplayCount}/${normalFullList.length})`;
+    const listBoard = document.getElementById('normalMountainGrid');
+    const moreBtn = document.getElementById('normalMoreBtn');
+    
+    const targetSlice = normalFullList.slice(0, normalDisplayCount);
+    
+    if (targetSlice.length === 0) {
+        listBoard.innerHTML = "<p class='text-center text-xs py-8 text-slate-400'>좌표 등록된 일반 산이 없습니다.</p>";
+        if(moreBtn) moreBtn.classList.add('hidden');
+        return;
     }
-  }
+
+    listBoard.innerHTML = targetSlice.map((item, idx) => `
+        <div class="flex justify-between items-center p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-black text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${idx + 1}</span>
+                <span class="text-xs font-bold text-slate-800">${item.name}</span>
+            </div>
+            <span class="text-[10px] text-slate-400">${item.height ? item.height + 'm' : ''} (${item.count}회 방문)</span>
+        </div>
+    `).join('');
+
+    if (normalDisplayCount >= normalFullList.length) {
+        if(moreBtn) moreBtn.classList.add('hidden');
+    } else {
+        if(moreBtn) {
+            moreBtn.classList.remove('hidden');
+            moreBtn.innerText = `더보기 (${normalDisplayCount}/${normalFullList.length})`;
+        }
+    }
 };
 
 window.loadNext20Normal = () => {
-  normalDisplayCount += 20;
-  renderMoreNormal();
+    normalDisplayCount += 20;
+    renderMoreNormal();
 };
 
-// ==========================================
-// 🥾 경기둘레길 알약 마커 렌더링 함수
-// ==========================================
-window.renderDulegilPoints = (logsData) => {
-    const dulegilPointsBoard = document.getElementById('dulegilMapPoints');
-    if (!dulegilPointsBoard) return;
+// [3] 메인 지도 및 데이터 로드
+window.showMemberMap = async (mId, mName) => {
+    // 🟢 1. 무조건 보여줄 개수를 20개로 초기화
+    top100DisplayCount = 20;
+    normalDisplayCount = 20;
 
-    // 완주한 둘레길 구간/산 이름 세트
-    const completedSet = new Set();
-    const completedCoordsMap = {};
+    toggleMapModal(true);
+    document.getElementById('mapModalContent').scrollTop = 0;
+    toggleMapView('main');
+    switchStatsTab('top100'); // 기본 탭을 100대 명산으로 설정
+    document.getElementById('mapMemberName').innerText = mName;
+
+    const pointsBoard = document.getElementById('conquerMapPoints');
+    const regionBoard = document.getElementById('conquerRegionGrid');
+    pointsBoard.innerHTML = regionBoard.innerHTML = "";
+
+    // ⚡ 캐시 확인 (Local Storage)
+    const cacheKey = `sanwoori_map_cache_${mId}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    const nowTime = Date.now();
+    let logsData = [];
+
+    if (cachedData) {
+        const parsed = JSON.parse(cachedData);
+        if (nowTime - parsed.timestamp < MAP_CACHE_EXPIRY) {
+            logsData = parsed.logs;
+            console.log("⚡ [캐시 로드] 데이터 트래픽 절약 완료");
+        }
+    }
+
+    if (logsData.length === 0) {
+        const snapAll = await getDocs(collection(db, `sanwoori/${mId}/logs`));
+        snapAll.forEach(doc => logsData.push(doc.data()));
+        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: nowTime, logs: logsData }));
+        console.log("🔥 [DB 로드] 신규 데이터 저장 완료");
+    }
+
+    let totalH = 0;
+    let mapHtml = "";
+    let regionCounts = {};
+    let validLogsCount = 0;
+    
+    const top100Map = {};
+    const normalMap = {};
+
+    // 💡 대한민국 주요 시/군/구 지역명 목록 (괄호 유지 판단용)
+    const VALID_REGIONS = [
+        "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+        "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주",
+        "남양주", "경주", "삼척", "포천", "가평", "양평", "단양", "영월", "태백",
+        "원주", "강릉", "속초", "인제", "홍천", "평창", "정선", "철원", "화천",
+        "양구", "고성", "양양", "청주", "충주", "제천", "보은", "옥천", "영동",
+        "증평", "진천", "괴산", "음성", "천안", "공주", "보령", "아산", "서산",
+        "논산", "계룡", "당진", "금산", "부여", "서천", "청양", "홍성", "예산",
+        "태안", "전주", "군산", "익산", "정읍", "남원", "김제", "완주", "진안",
+        "무주", "장수", "임실", "순창", "고창", "부안", "목포", "여수", "순천",
+        "나주", "광양", "담양", "곡성", "구례", "고흥", "보성", "화순", "장흥",
+        "강진", "해남", "영암", "무안", "함평", "영광", "장성", "완도", "진도",
+        "신안", "포항", "안동", "구미", "영주", "영천", "상주", "문경", "경산",
+        "군위", "의성", "청송", "영양", "영덕", "청도", "고령", "성주", "칠곡",
+        "예천", "봉화", "울진", "울릉", "창원", "진주", "통영", "사천", "김해",
+        "밀양", "거제", "양산", "의령", "함안", "창녕", "남해", "하동", "산청",
+        "함양", "거창", "합천"
+    ];
 
     logsData.forEach(log => {
-        if (log.coords && log.coords.mapType === 'dulegil') {
-            const courseName = log.courseNum || log.mountain;
-            if (courseName) completedSet.add(courseName.trim());
-            completedCoordsMap[courseName.trim()] = log.coords;
+        totalH += (log.height || 0);
+
+        if (log.coords) {
+            validLogsCount++;
+            mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
+            
+            const rName = log.region || getRegionFromCoord(log.coords);
+            regionCounts[rName] = (regionCounts[rName] || 0) + 1;
+
+            if (log.mountain) {
+                const rawName = log.mountain.trim();
+
+                // 💡 괄호 정제 로직
+                // 괄호 안에 '챌린지', '트레일' 등 비지역성 단어가 섞여 있으면 무조건 제거하고,
+                // 순수 지역명(예: 남양주, 경주 등)만 들어있는 경우에만 괄호를 남깁니다.
+                const cleanMountainName = rawName.replace(/\s*\((.*?)\)/g, (match, content) => {
+                    const trimmedContent = content.trim();
+
+                    // '챌린지', '트레일' 등의 단어가 괄호 안에 포함되어 있다면 필터링 (제거)
+                    if (trimmedContent.includes('챌린지') || trimmedContent.includes('트레일') || trimmedContent.includes('러닝')) {
+                        return '';
+                    }
+
+                    // 순수 지역명 목록에 들어있는 이름인지 검사
+                    const isPureRegion = VALID_REGIONS.some(region => trimmedContent === region || trimmedContent.startsWith(region));
+
+                    return isPureRegion ? match : '';
+                }).trim();
+
+                const targetMap = log.isTop100 ? top100Map : normalMap;
+
+                if (!targetMap[cleanMountainName]) {
+                    targetMap[cleanMountainName] = { count: 0, height: log.height || 0 };
+                }
+                
+                targetMap[cleanMountainName].count += 1;
+                
+                if (!targetMap[cleanMountainName].height && log.height) {
+                    targetMap[cleanMountainName].height = log.height;
+                }
+            }
         }
     });
 
-    let html = "";
-    const masterList = window.DULEGIL_MASTER_COORDS || [];
-
-    if (masterList.length > 0) {
-        // Master 목록 기준: 기본은 하얀 알약, 완주 시 주황색 알약
-        masterList.forEach(item => {
-            const isDone = completedSet.has(item.course);
-            const statusClass = isDone ? 'completed' : 'uncompleted';
-
-            html += `
-                <div class="dulegil-pill-marker ${statusClass}" style="left:${item.x}%; top:${item.y}%;">
-                    ${item.course}
-                </div>
-            `;
-        });
-    } else {
-        // 저장된 둘레길 기록을 알약 형태로 출력
-        logsData.forEach(log => {
-            if (log.coords && log.coords.mapType === 'dulegil') {
-                const label = log.mountain || log.courseNum || '완주';
-                html += `
-                    <div class="dulegil-pill-marker completed" style="left:${log.coords.x}%; top:${log.coords.y}%;">
-                        ${label}
-                    </div>
-                `;
-            }
-        });
-    }
-
-    dulegilPointsBoard.innerHTML = html;
-};
-
-// ==========================================
-// [3] 메인 지도 및 데이터 로드 (showMemberMap)
-// ==========================================
-window.showMemberMap = async (mId, mName) => {
-  top100DisplayCount = 20;
-  normalDisplayCount = 20;
-
-  toggleMapModal(true);
-  document.getElementById('mapModalContent').scrollTop = 0;
-  toggleMapView('main');
-  switchStatsTab('top100');
-  document.getElementById('mapMemberName').innerText = mName;
-
-  const pointsBoard = document.getElementById('conquerMapPoints');
-  const regionBoard = document.getElementById('conquerRegionGrid');
-  pointsBoard.innerHTML = regionBoard.innerHTML = "";
-
-  // 캐시 확인
-  const cacheKey = `sanwoori_map_cache_${mId}`;
-  const cachedData = localStorage.getItem(cacheKey);
-  const nowTime = Date.now();
-  let logsData = [];
-
-  if (cachedData) {
-    const parsed = JSON.parse(cachedData);
-    if (nowTime - parsed.timestamp < MAP_CACHE_EXPIRY) {
-      logsData = parsed.logs;
-      console.log("⚡ [캐시 로드] 데이터 트래픽 절약 완료");
-    }
-  }
-
-  if (logsData.length === 0) {
-    const snapAll = await getDocs(collection(db, `sanwoori/${mId}/logs`));
-    snapAll.forEach(doc => logsData.push(doc.data()));
-    localStorage.setItem(cacheKey, JSON.stringify({ timestamp: nowTime, logs: logsData }));
-    console.log("🔥 [DB 로드] 신규 데이터 저장 완료");
-  }
-
-  let totalH = 0;
-  let mapHtml = "";
-  let regionCounts = {};
-  let validLogsCount = 0;
-
-  const top100Map = {};
-  const normalMap = {};
-
-  const VALID_REGIONS = [
-    "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
-    "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주",
-    "남양주", "경주", "삼척", "포천", "가평", "양평", "단양", "영월", "태백",
-    "원주", "강릉", "속초", "인제", "홍천", "평창", "정선", "철원", "화천",
-    "양구", "고성", "양양", "청주", "충주", "제천", "보은", "옥천", "영동",
-    "증평", "진천", "괴산", "음성", "천안", "공주", "보령", "아산", "서산",
-    "논산", "계룡", "당진", "금산", "부여", "서천", "청양", "홍성", "예산",
-    "태안", "전주", "군산", "익산", "정읍", "남원", "김제", "완주", "진안",
-    "무주", "장수", "임실", "순창", "고창", "부안", "목포", "여수", "순천",
-    "나주", "광양", "담양", "곡성", "구례", "고흥", "보성", "화순", "장흥",
-    "강진", "해남", "영암", "무안", "함평", "영광", "장성", "완도", "진도",
-    "신안", "포항", "안동", "구미", "영주", "영천", "상주", "문경", "경산",
-    "군위", "의성", "청송", "영양", "영덕", "청도", "고령", "성주", "칠곡",
-    "예천", "봉화", "울진", "울릉", "창원", "진주", "통영", "사천", "김해",
-    "밀양", "거제", "양산", "의령", "함안", "창녕", "남해", "하동", "산청",
-    "함양", "거창", "합천"
-  ];
-
-  logsData.forEach(log => {
-    totalH += (log.height || 0);
-
-    // 전국 지도 좌표만 메인 지점으로 렌더링
-    if (log.coords && (!log.coords.mapType || log.coords.mapType === 'main')) {
-      validLogsCount++;
-      mapHtml += `<div class="map-point ${log.isTop100 ? 'top-100' : ''}" style="left:${log.coords.x}%; top:${log.coords.y}%;"></div>`;
-
-      const rName = log.region || getRegionFromCoord(log.coords);
-      regionCounts[rName] = (regionCounts[rName] || 0) + 1;
-
-      if (log.mountain) {
-        const rawName = log.mountain.trim();
-
-        const cleanMountainName = rawName.replace(/\s*\((.*?)\)/g, (match, content) => {
-          const trimmedContent = content.trim();
-
-          if (trimmedContent.includes('챌린지') || trimmedContent.includes('트레일') || trimmedContent.includes('러닝')) {
-            return '';
-          }
-
-          const isPureRegion = VALID_REGIONS.some(region => trimmedContent === region || trimmedContent.startsWith(region));
-
-          return isPureRegion ? match : '';
-        }).trim();
-
-        const targetMap = log.isTop100 ? top100Map : normalMap;
-
-        if (!targetMap[cleanMountainName]) {
-          targetMap[cleanMountainName] = { count: 0, height: log.height || 0 };
-        }
-
-        targetMap[cleanMountainName].count += 1;
-
-        if (!targetMap[cleanMountainName].height && log.height) {
-          targetMap[cleanMountainName].height = log.height;
-        }
-      }
-    }
-  });
-
-  // 지역 점유율 렌더링
-  const sortedRegions = Object.entries(regionCounts).sort((a, b) => b[1] - a[1]);
-  if (sortedRegions.length === 0) {
-    regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
-  } else {
-    regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
-      const percent = ((count / validLogsCount) * 100).toFixed(1);
-      return `
-        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 mb-2 shadow-sm">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-xs font-bold text-slate-800">${name} <span class="text-[10px] text-sky-600 font-normal ml-1">(${count}회)</span></span>
-            <span class="text-xs font-black text-sky-600">${percent}%</span>
-          </div>
-          <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-            <div class="bg-gradient-to-r from-sky-400 to-emerald-400 h-1.5 rounded-full" style="width:${percent}%"></div>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  const isNormalChar = (str) => /^[가-힣a-zA-Z0-9]/.test(str);
-
-  // 100대 명산 정렬
-  top100FullList = Object.keys(top100Map)
-    .sort((a, b) => {
-      const aIsNormal = isNormalChar(a);
-      const bIsNormal = isNormalChar(b);
-      if (aIsNormal && !bIsNormal) return -1;
-      if (!aIsNormal && bIsNormal) return 1;
-      return a.localeCompare(b, 'ko');
-    })
-    .map(mName => ({
-      name: mName,
-      count: top100Map[mName].count,
-      height: top100Map[mName].height
-    }));
-
-  // 정복한 산 정렬
-  normalFullList = Object.keys(normalMap)
-    .sort((a, b) => {
-      const aIsNormal = isNormalChar(a);
-      const bIsNormal = isNormalChar(b);
-      if (aIsNormal && !bIsNormal) return -1;
-      if (!aIsNormal && bIsNormal) return 1;
-      return a.localeCompare(b, 'ko');
-    })
-    .map(mName => ({
-      name: mName,
-      count: normalMap[mName].count,
-      height: normalMap[mName].height
-    }));
-
-  renderMoreTop100();
-  renderMoreNormal();
-  resetMapScrolls();
-
-  // 지도 상단 미니 배지 수치 갱신 (클릭 시 둘레길 모달 오픈)
-  const top100Count = top100FullList.length;
-  const miniBadge = document.getElementById('miniTop100Badge');
-
-  if (miniBadge) {
-    miniBadge.innerText = `${top100Count}/100`;
-    miniBadge.style.cursor = 'pointer';
-    miniBadge.onclick = () => {
-      openDulegilFullMapModal();
-    };
-  }
-
-  document.getElementById('mapTotalHeight').innerText = totalH.toLocaleString();
-  pointsBoard.innerHTML = mapHtml;
-
-  // 🥾 경기둘레길 전용 알약 마커 렌더링 호출
-  renderDulegilPoints(logsData);
-
-  // 에베레스트 글로벌 통계
-  const globalTotalH = currentData.reduce((acc, m) => acc + (m.totalHeight || 0), 0);
-  document.getElementById('mapGlobalTotalHeight').innerText = globalTotalH.toLocaleString();
-  const conquestCount = (globalTotalH / 8848).toFixed(1);
-  document.getElementById('everestCount').innerText = conquestCount;
-  document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
-};
-
-   
-
-        
     
 
-         
 
+    // 💡 지역 점유율 전체 렌더링
+    const sortedRegions = Object.entries(regionCounts).sort((a,b) => b[1] - a[1]);
+    if (sortedRegions.length === 0) {
+        regionBoard.innerHTML = "<p class='text-center text-xs py-10 text-slate-400'>좌표 기록 없음</p>";
+    } else {
+        regionBoard.innerHTML = sortedRegions.map(([name, count]) => {
+            const percent = ((count / validLogsCount) * 100).toFixed(1);
+            return `
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 mb-2 shadow-sm">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-slate-800">${name} <span class="text-[10px] text-sky-600 font-normal ml-1">(${count}회)</span></span>
+                    <span class="text-xs font-black text-sky-600">${percent}%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-gradient-to-r from-sky-400 to-emerald-400 h-1.5 rounded-full" style="width:${percent}%"></div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // 🟢 한글/영문/숫자로 시작하는지 확인하는 함수 (특수문자 구분용)
+const isNormalChar = (str) => /^[가-힣a-zA-Z0-9]/.test(str);
+
+// ㄱㄴㄷ 순 정렬 (특수문자는 맨 뒤로) - 100대 명산
+top100FullList = Object.keys(top100Map)
+    .sort((a, b) => {
+        const aIsNormal = isNormalChar(a);
+        const bIsNormal = isNormalChar(b);
+
+        // 둘 중 하나만 특수문자로 시작할 경우, 일반 문자를 앞으로 배치
+        if (aIsNormal && !bIsNormal) return -1;
+        if (!aIsNormal && bIsNormal) return 1;
+
+        // 둘 다 일반 문적이거나 둘 다 특수문자인 경우 ㄱㄴㄷ 순 정렬
+        return a.localeCompare(b, 'ko');
+    })
+    .map(mName => ({
+        name: mName,
+        count: top100Map[mName].count,
+        height: top100Map[mName].height
+    }));
+
+// ㄱㄴㄷ 순 정렬 (특수문자는 맨 뒤로) - 정복한 산
+normalFullList = Object.keys(normalMap)
+    .sort((a, b) => {
+        const aIsNormal = isNormalChar(a);
+        const bIsNormal = isNormalChar(b);
+
+        if (aIsNormal && !bIsNormal) return -1;
+        if (!aIsNormal && bIsNormal) return 1;
+
+        return a.localeCompare(b, 'ko');
+    })
+    .map(mName => ({
+        name: mName,
+        count: normalMap[mName].count,
+        height: normalMap[mName].height
+    }));
+
+    renderMoreTop100();
+    renderMoreNormal();
+
+    // 🟢 2. 데이터 세팅 완료 후 스크롤 리셋
+    resetMapScrolls();
+
+    // 지도 상단 미니 배지 수치 업데이트
+    const top100Count = top100FullList.length;
+    document.getElementById('miniTop100Badge').innerText = `${top100Count}/100`;
+
+    document.getElementById('mapTotalHeight').innerText = totalH.toLocaleString();
+    pointsBoard.innerHTML = mapHtml;
+
+    // 에베레스트 글로벌 통계
+    const globalTotalH = currentData.reduce((acc, m) => acc + (m.totalHeight || 0), 0);
+    document.getElementById('mapGlobalTotalHeight').innerText = globalTotalH.toLocaleString();
+    const conquestCount = (globalTotalH / 8848).toFixed(1);
+    document.getElementById('everestCount').innerText = conquestCount;
+    document.getElementById('everestProgressBar').style.width = `${(conquestCount % 1) * 100}%`;
+};
 
 window.toggleTimelineModal = (show) => {
     const modal = document.getElementById('timelineModal');
@@ -8067,29 +7838,33 @@ window.addMultiActivity = async () => {
         } 
 
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
-            const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
-            const cleanDate = dateVal.trim();
-            let bondingDocId = `${cleanMountain}_${cleanDate}`;
+    const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
+    const cleanDate = dateVal.trim();
+    let bondingDocId = `${cleanMountain}_${cleanDate}`;
 
-            let bondingRef = doc(db, "bondingForest", bondingDocId);
-            let checkSnap = await getDoc(bondingRef);
-            let dupSeq = 2;
-            while (checkSnap.exists()) {
-                bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-                bondingRef = doc(doc, "bondingForest", bondingDocId);
-                checkSnap = await getDoc(bondingRef);
-                dupSeq++;
-            }
+    let bondingRef = doc(db, "bondingForest", bondingDocId);
+    let checkSnap = await getDoc(bondingRef);
+    let dupSeq = 2;
+    while (checkSnap.exists()) {
+        bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
+        
+        // 🎯 doc(doc, ...) -> doc(db, ...) 로 수정!
+        bondingRef = doc(db, "bondingForest", bondingDocId); 
+        
+        checkSnap = await getDoc(bondingRef);
+        dupSeq++;
+    }
 
-            await setDoc(bondingRef, {
-                mountain: cleanMountain, 
-                members: selectedNames, 
-                memberCount: selectedNames.length, 
-                date: cleanDate, 
-                type: "정식", 
-                createdAt: new Date()
-            });
-        }
+    await setDoc(bondingRef, {
+        mountain: cleanMountain, 
+        members: selectedNames, 
+        memberCount: selectedNames.length, 
+        date: cleanDate, 
+        type: "정식", 
+        createdAt: new Date()
+    });
+}
+
 
         if (typeof pendingLevelUpCards !== 'undefined' && pendingLevelUpCards.length > 0 && typeof showCombinedLevelUpAlert === 'function') {
             showCombinedLevelUpAlert();
