@@ -3844,36 +3844,7 @@ margin: 0 2px !important;
     </div>
 
 
-      <div class="flex items-center gap-1.5">
-        <button onclick="saveAdminCoords()" class="text-xs bg-orange-500 hover:bg-orange-600 text-white px-2.5 py-1 rounded-md font-bold transition-all shadow-sm flex items-center gap-1">
-          💾 좌표 전체 저장
-        </button>
-        <button onclick="closeAdminCoordModal()" class="w-7 h-7 flex items-center justify-center rounded-full bg-slate-700 text-slate-300 hover:text-white text-sm font-bold">
-          ✕
-        </button>
-      </div>
-    </div>
 
-    <!-- 클릭 위치 안내 바 -->
-    <div class="bg-slate-950 px-3 py-1.5 text-[11px] text-slate-300 border-b border-slate-800 flex justify-between items-center shrink-0">
-      <span>👉 지도를 클릭하면 선택한 구간의 위치 핀이 찍힙니다.</span>
-      <span id="currentCoordText" class="font-mono text-amber-400 font-bold">선택 좌표: 없음</span>
-    </div>
-
-    <!-- 지도 및 터치/클릭 레이어 -->
-    <div class="p-0 overflow-y-auto flex-1 flex items-start justify-center bg-slate-950 relative w-full">
-      <div id="adminMapContainer" class="relative w-full inline-block cursor-crosshair">
-        <img id="adminModalImage" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" alt="둘레길 지도" class="w-full h-auto object-contain block select-none" />
-        
-        <!-- 지도 클릭 오버레이 -->
-        <div id="adminMapOverlay" onclick="handleAdminMapClick(event)" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-          
     <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
       <button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
         💾 전체 데이터 원클릭 백업 (JSON 다운로드)
