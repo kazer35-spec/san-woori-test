@@ -7190,6 +7190,14 @@ window.showMemberMap = async (mId, mName) => {
     const regionBoard = document.getElementById('conquerRegionGrid');
     pointsBoard.innerHTML = regionBoard.innerHTML = "";
 
+        const mainMapImg = document.querySelector('#conquerMapContainer img') || document.getElementById('conquerMapImg');
+    if (mainMapImg) {
+        // 경기둘레길 지도로 보여주고 싶을 때:
+        mainMapImg.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
+        
+        // (만약 기본이 100대 명산 지도라면 100대 명산 주소를 넣으시면 됩니다)
+    }
+        
     // ⚡ 캐시 확인 (Local Storage)
     const cacheKey = `sanwoori_map_cache_${mId}`;
     const cachedData = localStorage.getItem(cacheKey);
