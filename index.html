@@ -4339,59 +4339,7 @@ function renderGyeonggiTrailPills() {
   }
 }
 
-// 🎯 코스 선택 핸들러 (좌표 찍기 & 지도 마커 및 스크롤 연동)
-function selectGyeonggiCourse(courseNo) {
-  selectedGyeonggiCourseNo = courseNo;
-  const badge = document.getElementById('selectedTrailBadge');
-  if (badge) badge.innerText = `${courseNo}코스 선택됨`;
-
-  // 알약 버튼 활성화 스타일 업데이트
-  document.querySelectorAll('.trail-pill-btn').forEach(btn => {
-    const cNum = parseInt(btn.dataset.course);
-    if (cNum === courseNo) {
-      btn.classList.add('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105', 'font-black');
-    } else {
-      btn.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105');
-    }
-  });
-
-  // 해당 코스의 좌표 가져와서 임시 좌표(tempCoord) 세팅
-  const targetCoord = GYEONGGI_TRAIL_COORDS[courseNo];
-  if (targetCoord) {
-    tempCoord = { x: targetCoord.x, y: targetCoord.y };
-    
-    // 관리자 지도 마커 위치 업데이트
-    const marker = document.getElementById('adminMapMarker');
-    const display = document.getElementById('coordDisplay');
-    
-    if (marker) {
-      marker.style.left = `${targetCoord.x}%`;
-      marker.style.top = `${targetCoord.y}%`;
-      marker.classList.remove('hidden');
-    }
-    if (display) {
-      display.innerText = `좌표: 경기도 둘레길 ${courseNo}코스 (X: ${targetCoord.x}%, Y: ${targetCoord.y}%)`;
-    }
-
-    // 산 이름 입력창 자동 입력 (입력창이 비어있을 경우)
-    const mInput = document.getElementById('mountainName');
-    if (mInput && !mInput.value.trim()) {
-      mInput.value = `경기도 둘레길 ${courseNo}코스`;
-    }
-  }
-}
-
-// 🎯 트래킹 체크박스 상태 변경 이벤트 처리 (숨김/노출 & 자동 스크롤)
-document.addEventListener('DOMContentLoaded', () => {
-  renderGyeonggiTrailPills();
-
-  const trackingCb = document.getElementById('isTrackingCheck');
-  const trailBox = document.getElementById('gyeonggiTrailBox');
-  const adminMapImg = document.getElementById('adminMapImg');
-
-  if (trackingCb) {
-    trackingCb.addEventListener('change', (e) => {
-  // 🎯 코스 선택 핸들러 (알약 클릭 시 좌표 설정 + 아래 지도 화면으로 스크롤)
+    // 🎯 코스 선택 핸들러 (알약 클릭 시 좌표 설정 + 아래 지도 화면으로 스크롤)
   function selectGyeonggiCourse(courseNo) {
     selectedGyeonggiCourseNo = courseNo;
     const badge = document.getElementById('selectedTrailBadge');
@@ -4464,6 +4412,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   });
+    
 
         
 // ==========================================
