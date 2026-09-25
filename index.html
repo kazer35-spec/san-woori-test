@@ -7926,45 +7926,37 @@ window.addMultiActivity = async () => {
 
                 
     // 🎯 [4-B] 경기도 둘레길 체크박스 및 코스 번호 선택 값 추출
-    const isGyeonggiDule = document.getElementById('isGyeonggiDuleCheck')?.checked || false;
-    const ggCourseNumber = document.getElementById('ggCourseNumber')?.value || null;
+    // [4-B] addMultiActivity() 함수 내부 logPayload 객체에 추가할 필드
+const isGyeonggiDule = document.getElementById('isGyeonggiDuleCheck')?.checked || false;
+const ggCourseNumber = document.getElementById('ggCourseNumber')?.value || null;
 
-    // 둘레길 선택 시 코스 번호 입력 검증 (필요 시)
-    if (isGyeonggiDule && !ggCourseNumber) {
-        alert("경기도 둘레길 코스 번호를 선택해 주세요.");
-        return;
-    }
+const logPayload = {
+    date: ts,
+    createdAt: new Date(), 
+    mountain: isGyeonggiDule ? `경기도 둘레길 ${ggCourseNumber}코스` : baseDocId, 
+    height, 
+    coords: safeCoords,
+    isNationalPark,
+    isTop100, 
+    isBAC, 
+    isRegular,   
+    isSchedule,  
+    isRunning, 
+    isTracking, 
+    isWalking, 
+    isExtraHike, 
+    isOnlyLog, 
+    region,
+    // 🎯 경기도 둘레길 기록 필드 저장
+    isGyeonggiDule: isGyeonggiDule,
+    ggCourseNumber: ggCourseNumber,
+    starType, 
+    author: member.name,
+    seasonIcon: selectedSeasonMark,
+    isSpecial: isSpecialTracking ? false : isSpecial,
+    pRock, pForest, pValley
+};
 
-    // 🎯 Firestore 저장용 Payload 객체 구성
-    const logPayload = {
-        date: ts,
-        createdAt: new Date(), 
-        // 둘레길 선택 시 산 이름 대신 '경기도 둘레길 N코스'로 저장
-        mountain: isGyeonggiDule ? `경기도 둘레길 ${ggCourseNumber}코스` : baseDocId, 
-        height, 
-        coords: safeCoords,
-        isNationalPark,
-        isTop100, 
-        isBAC, 
-        isRegular,   
-        isSchedule,  
-        isRunning, 
-        isTracking, 
-        isWalking, 
-        isExtraHike, 
-        isOnlyLog, 
-        region,
-        // 🎯 경기도 둘레길 전용 데이터 필드 추가
-        isGyeonggiDule: isGyeonggiDule,
-        ggCourseNumber: ggCourseNumber,
-        starType, 
-        author: member.name,
-        seasonIcon: selectedSeasonMark,
-        isSpecial: isSpecialTracking ? false : isSpecial,
-        pRock, 
-        pForest, 
-        pValley
-    };
 
 
 
