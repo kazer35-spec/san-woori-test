@@ -3722,34 +3722,9 @@ margin: 0 2px !important;
   </div>
 </div>
 
-          <!-- [2-A] 관리자 산 정보 카드 타이틀 영역 (지도 전환 버튼 추가) -->
-<div class="flex justify-between items-center mb-2">
-  <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-  <button type="button" onclick="toggleAdminMapMode()" id="adminMapToggleBtn" class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md border border-emerald-300">
-    🥾 경기도 둘레길 지도 보기
-  </button>
-</div>
-
-<!-- [2-B] 관리자 지도 이미지 태그 (id="adminMapImg" 추가) -->
-<div class="map-container relative overflow-auto max-h-[350px]" onclick="setAdminCoordinate(event)">
-  <img id="adminMapImg" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" class="map-image w-full h-auto block" alt="정복지도">
-  <div id="adminMapMarker" class="map-point hidden"></div>
-</div>
-
-<!-- [2-C] 활동 체크박스 영역 하단에 삽입할 경기도 둘레길 코스 선택 드롭다운 -->
-<div id="ggCourseSelectBox" class="my-2 p-2 bg-emerald-50 rounded-lg border border-emerald-200 flex items-center justify-between">
-  <label class="text-[10px] font-bold text-emerald-800 flex items-center gap-1">
-    <input type="checkbox" id="isGyeonggiDuleCheck" class="w-3.5 h-3.5 accent-emerald-600">
-    <span>🥾 경기도 둘레길 선택</span>
-  </label>
-  <select id="ggCourseNumber" class="h-7 text-[10px] font-bold border border-emerald-300 rounded px-1 bg-white">
-    <option value="">코스 선택 (1~60)</option>
-  </select>
-</div>
-
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
-      <img src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" class="map-image" alt="정복지도">
+      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
       <div id="adminMapMarker" class="map-point hidden"></div>
     </div>
     <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
@@ -4029,7 +4004,9 @@ margin: 0 2px !important;
     </div>
 </div>
 
-<!-- 🟢 변경 후 (hidden 추가) -->
+
+  
+              <!-- 🟢 변경 후 (hidden 추가) -->
 <div id="mapModal" class="modal-overlay fixed inset-0 z-50 p-4 hidden items-center justify-center overflow-y-auto bg-black/50" onclick="toggleMapModal(false)">
 
   <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-y-auto max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
@@ -4058,8 +4035,8 @@ margin: 0 2px !important;
       <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3">
         <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl">
         
-        <!-- [1-A] 🌲 지도 우측 상단 미니 배지 (클릭 시 둘레길 지도 뷰로 이동) -->
-        <div onclick="toggleMapView('gyeonggi')" class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 cursor-pointer hover:bg-emerald-50 transition-colors">
+        <!-- 🌲 지도 우측 상단 미니 배지 -->
+        <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
           <span class="text-[10px]">🌲</span>
           <span id="miniTop100Badge" class="tracking-tight">0/100</span>
         </div>
@@ -4083,22 +4060,6 @@ margin: 0 2px !important;
       <div class="hidden">
         <span id="mapTotalHeight">0</span>
         <span id="mapGlobalTotalHeight">0</span>
-      </div>
-    </div>
-
-    <!-- [1-B] 경기도 둘레길 전용 지도 뷰 (mapViewMain 바로 아래 위치) -->
-    <div id="mapViewGyeonggi" class="hidden-view">
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-xs font-black text-slate-800">🥾 경기도 둘레길 (1~60코스)</span>
-        <button onclick="toggleMapView('main')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded-lg font-bold">
-          ← 메인 지도
-        </button>
-      </div>
-      
-      <!-- 둘레길 지도 스크롤 컨테이너 -->
-      <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm overflow-auto max-h-[60vh]">
-        <img src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" class="w-full h-auto min-w-[600px] block rounded-2xl" alt="경기도 둘레길">
-        <div id="gyeonggiMapPoints" class="absolute inset-0"></div>
       </div>
     </div>
 
@@ -4168,8 +4129,10 @@ margin: 0 2px !important;
   </div>
 </div>
 
-  
-              
+      
+
+          
+      
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
 <div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
@@ -4485,70 +4448,6 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
-
-// 🟢 1. 둘레길 코스별 구간 색상 반환 함수 (알약 스타일링)
-function getGyeonggiCourseColor(courseNum) {
-    const num = parseInt(courseNum);
-    if (num >= 1 && num <= 11) return { bg: '#ef4444', text: '#ffffff' };   // 1~11: 빨강
-    if (num >= 12 && num <= 31) return { bg: '#f97316', text: '#ffffff' };  // 12~31: 주황
-    if (num >= 32 && num <= 43) return { bg: '#10b981', text: '#ffffff' };  // 32~43: 초록
-    if (num >= 44 && num <= 60) return { bg: '#3b82f6', text: '#ffffff' };  // 44~60: 파랑
-    return { bg: '#6b7280', text: '#ffffff' };
-}
-
-// 🟢 2. 모달 뷰 전환 함수 업데이트 (gyeonggi 뷰 포함)
-window.toggleMapView = (viewType) => {
-    const main = document.getElementById('mapViewMain');
-    const stats = document.getElementById('mapViewStats');
-    const gyeonggi = document.getElementById('mapViewGyeonggi');
-    if (!main || !stats || !gyeonggi) return;
-
-    main.classList.add('hidden-view');
-    stats.classList.add('hidden-view');
-    gyeonggi.classList.add('hidden-view');
-
-    if (viewType === 'stats') {
-        stats.classList.remove('hidden-view');
-        switchStatsTab('top100');
-    } else if (viewType === 'gyeonggi') {
-        gyeonggi.classList.remove('hidden-view');
-    } else {
-        main.classList.remove('hidden-view');
-    }
-};
-
-// 🟢 3. 관리자 모드 지도 이미지 토글 전환
-let isAdminGyeonggiMode = false;
-window.toggleAdminMapMode = () => {
-    isAdminGyeonggiMode = !isAdminGyeonggiMode;
-    const img = document.getElementById('adminMapImg');
-    const btn = document.getElementById('adminMapToggleBtn');
-    
-    if (isAdminGyeonggiMode) {
-        img.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
-        btn.innerText = "⛰️ 기본 산행 지도 보기";
-        btn.className = "text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md border border-blue-300";
-    } else {
-        img.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
-        btn.innerText = "🥾 경기도 둘레길 지도 보기";
-        btn.className = "text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md border border-emerald-300";
-    }
-};
-
-// 🟢 4. 페이지 로드 시 1~60코스 드롭다운 옵션 자동 생성
-document.addEventListener("DOMContentLoaded", () => {
-    const select = document.getElementById('ggCourseNumber');
-    if (select && select.options.length <= 1) {
-        for (let i = 1; i <= 60; i++) {
-            const opt = document.createElement('option');
-            opt.value = i;
-            opt.textContent = `${i}코스`;
-            select.appendChild(opt);
-        }
-    }
-});
-
-        
 // ==========================================
 // 📌 회원 선택 수 & 벙주 체크박스 실시간 감지
 // ==========================================
