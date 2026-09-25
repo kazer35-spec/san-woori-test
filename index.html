@@ -4031,13 +4031,15 @@ margin: 0 2px !important;
 
     
 
+
+
 <!-- Main Map View -->
 <div id="mapViewMain">
-  <!-- 지도 컨테이너 (지도 이미지를 아래로 내리기 위해 pt-8 및 overflow 설정 추가) -->
-  <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3 pt-8 pb-2 overflow-hidden bg-slate-50/50">
+  <!-- 지도 컨테이너 (ID 추가 및 기본 패딩 초기화) -->
+  <div id="mapContainer" class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3 transition-all duration-300">
     
     <!-- 🖼️ 메인 지도 이미지 -->
-    <img id="mainMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl transition-opacity duration-300">
+    <img id="mainMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl transition-all duration-300">
     
     <!-- 🌲/🚶 지도 우측 상단 미니 배지 (클릭 시 스위칭) -->
     <button type="button" onclick="toggleMapType()" class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 cursor-pointer hover:bg-emerald-50 transition-colors">
@@ -4052,7 +4054,7 @@ margin: 0 2px !important;
 
     <div id="conquerMapPoints"></div>
     
-    <!-- 💡 출처 텍스트: 이전 코드 스타일(범례 아래 우측, 투명도 동일)로 원복 -->
+    <!-- 💡 출처 텍스트: 기존 위치/투명도 그대로 유지 -->
     <div id="mapSourceTxt" class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">
       출처: 산림청
     </div>
@@ -4142,11 +4144,12 @@ margin: 0 2px !important;
 <script>
   let isGyeonggiTrailMode = false;
   
-  // 데이터 관리용 변수 (관리자 모드 연동용)
+  // 정복 수 관리 변수
   let currentTop100Count = 0;  // 100대 명산 정복 완료 수
   let currentTrailCount = 0;   // 둘레길 정복 완료 코스 수 (총 60코스)
 
   function toggleMapType() {
+    const mapContainer = document.getElementById('mapContainer');
     const mapImg = document.getElementById('mainMapImage');
     const titleBadge = document.getElementById('mapTitleBadge');
     const sourceTxt = document.getElementById('mapSourceTxt');
@@ -4157,43 +4160,45 @@ margin: 0 2px !important;
     isGyeonggiTrailMode = !isGyeonggiTrailMode;
 
     if (isGyeonggiTrailMode) {
-      // 1. 경기도 둘레길 지도 변경
+      // 1. 경기둘레길 모드: 지도를 아래로 크게 내림 (상단 여백 pt-14 부여 및 배경 살짝 변경)
+      mapContainer.classList.add('pt-14', 'pb-3', 'bg-slate-50/60');
       mapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
       
-      // 2. 제목 '경기도 둘레길' 표시
+      // 2. 제목 '경기도 둘레길' 노출
       titleBadge.classList.remove('hidden');
       titleBadge.classList.add('flex');
       
-      // 3. 출처 텍스트 변경
+      // 3. 출처 변경
       sourceTxt.innerText = '출처: 경기도 둘레길';
       
-      // 4. 우측 상단 미니 배지 아이콘 및 둘레길 코스 카운팅 (0/60) 표시
+      // 4. 우측 상단 배지 둘레길 카운트(0/60)로 변경
       miniBadgeIcon.innerText = '🚶';
       miniBadgeText.innerText = `${currentTrailCount}/60`;
       
-      // 5. 핀 포인트 숨기기 (필요 시)
+      // 5. 핀 포인트 숨김
       if (mapPoints) mapPoints.style.display = 'none';
     } else {
-      // 1. 100대 명산 지도 복원
+      // 1. 100대 명산 모드: 지도를 원래 위치(상단 붙음)로 복원
+      mapContainer.classList.remove('pt-14', 'pb-3', 'bg-slate-50/60');
       mapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
       
       // 2. 제목 숨김
       titleBadge.classList.add('hidden');
       titleBadge.classList.remove('flex');
       
-      // 3. 출처 원복
+      // 3. 출처 복원
       sourceTxt.innerText = '출처: 산림청';
       
-      // 4. 명산 카운트(0/100) 복원
+      // 4. 배지 명산 카운트(0/100)로 원복
       miniBadgeIcon.innerText = '🌲';
       miniBadgeText.innerText = `${currentTop100Count}/100`;
       
-      // 5. 핀 포인트 표시
+      // 5. 핀 포인트 다시 표시
       if (mapPoints) mapPoints.style.display = 'block';
     }
   }
 
-  // 💡 관리자 모드 등 외부에서 둘레길 코스 정복 수를 업데이트할 때 호출할 함수
+  // 💡 관리자 모드용 둘레길 카운트 업데이트 함수
   function updateTrailCount(count) {
     currentTrailCount = count;
     if (isGyeonggiTrailMode) {
@@ -4201,7 +4206,7 @@ margin: 0 2px !important;
     }
   }
 
-  // 💡 관리자 모드 등 외부에서 100대 명산 정복 수를 업데이트할 때 호출할 함수
+  // 💡 관리자 모드용 100대 명산 카운트 업데이트 함수
   function updateTop100Count(count) {
     currentTop100Count = count;
     if (!isGyeonggiTrailMode) {
@@ -4209,6 +4214,7 @@ margin: 0 2px !important;
     }
   }
 </script>
+
 
           
 
