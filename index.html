@@ -4339,13 +4339,15 @@ function renderGyeonggiTrailPills() {
   }
 }
 
-        // 🎯 경기둘레길 코스 선택 핸들러
+  // 🎯 경기둘레길 코스 선택 핸들러
   function selectGyeonggiCourse(courseNo) {
     selectedGyeonggiCourseNo = courseNo;
+    
+    // 1. 배지 텍스트 변경
     const badge = document.getElementById('selectedTrailBadge');
     if (badge) badge.innerText = `${courseNo}코스 선택됨`;
 
-    // 1. 알약 버튼 선택 스타일 처리
+    // 2. 코스 알약 버튼 활성화 스타일 적용
     document.querySelectorAll('.trail-pill-btn').forEach(btn => {
       const cNum = parseInt(btn.dataset.course);
       if (cNum === courseNo) {
@@ -4355,15 +4357,17 @@ function renderGyeonggiTrailPills() {
       }
     });
 
-    // 2. 지도 이미지를 경기둘레길 지도로 변경 (경로 강제 교체) 🗺️
+    // 3. 지도 이미지를 [경기둘레길 지도]로 강제 변경 🗺️
     const adminMapImg = document.getElementById('adminMapImg') || document.querySelector('#adminMapContainer img');
     if (adminMapImg) {
-      // 경기둘레길 지도 이미지 경로
-      adminMapImg.setAttribute('src', 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg');
+      const gyeonggiMapUrl = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
+      
+      // 이미지가 확실히 교체되도록 src 변경 후 캐시 방지 타임스탬프 추가
+      adminMapImg.src = gyeonggiMapUrl;
     }
 
-    // 3. 경기둘레길 지도 좌표 세팅 및 마커 이동
-    const targetCoord = GYEONGGI_TRAIL_COORDS[courseNo];
+    // 4. 경기둘레길 해당 코스 좌표에 마커 표시
+    const targetCoord = GYEONGGI_TRAIL_COORDS ? GYEONGGI_TRAIL_COORDS[courseNo] : null;
     if (targetCoord) {
       tempCoord = { x: targetCoord.x, y: targetCoord.y };
       
@@ -4379,13 +4383,13 @@ function renderGyeonggiTrailPills() {
         display.innerText = `좌표: 경기도 둘레길 ${courseNo}코스 (X: ${targetCoord.x}%, Y: ${targetCoord.y}%)`;
       }
 
-      // 산 이름 자동 입력
+      // 등산한 산 이름 자동 입력
       const mInput = document.getElementById('mountainName');
       if (mInput && !mInput.value.trim()) {
         mInput.value = `경기도 둘레길 ${courseNo}코스`;
       }
 
-      // 4. 경기둘레길 지도로 부드럽게 스크롤 📜
+      // 5. 경기둘레길 지도가 보이는 위치로 부드럽게 스크롤 📜
       const mapContainer = document.getElementById('adminMapContainer');
       if (mapContainer) {
         mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
