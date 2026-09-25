@@ -4485,6 +4485,70 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
 
+
+// 🟢 1. 둘레길 코스별 구간 색상 반환 함수 (알약 스타일링)
+function getGyeonggiCourseColor(courseNum) {
+    const num = parseInt(courseNum);
+    if (num >= 1 && num <= 11) return { bg: '#ef4444', text: '#ffffff' };   // 1~11: 빨강
+    if (num >= 12 && num <= 31) return { bg: '#f97316', text: '#ffffff' };  // 12~31: 주황
+    if (num >= 32 && num <= 43) return { bg: '#10b981', text: '#ffffff' };  // 32~43: 초록
+    if (num >= 44 && num <= 60) return { bg: '#3b82f6', text: '#ffffff' };  // 44~60: 파랑
+    return { bg: '#6b7280', text: '#ffffff' };
+}
+
+// 🟢 2. 모달 뷰 전환 함수 업데이트 (gyeonggi 뷰 포함)
+window.toggleMapView = (viewType) => {
+    const main = document.getElementById('mapViewMain');
+    const stats = document.getElementById('mapViewStats');
+    const gyeonggi = document.getElementById('mapViewGyeonggi');
+    if (!main || !stats || !gyeonggi) return;
+
+    main.classList.add('hidden-view');
+    stats.classList.add('hidden-view');
+    gyeonggi.classList.add('hidden-view');
+
+    if (viewType === 'stats') {
+        stats.classList.remove('hidden-view');
+        switchStatsTab('top100');
+    } else if (viewType === 'gyeonggi') {
+        gyeonggi.classList.remove('hidden-view');
+    } else {
+        main.classList.remove('hidden-view');
+    }
+};
+
+// 🟢 3. 관리자 모드 지도 이미지 토글 전환
+let isAdminGyeonggiMode = false;
+window.toggleAdminMapMode = () => {
+    isAdminGyeonggiMode = !isAdminGyeonggiMode;
+    const img = document.getElementById('adminMapImg');
+    const btn = document.getElementById('adminMapToggleBtn');
+    
+    if (isAdminGyeonggiMode) {
+        img.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
+        btn.innerText = "⛰️ 기본 산행 지도 보기";
+        btn.className = "text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md border border-blue-300";
+    } else {
+        img.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
+        btn.innerText = "🥾 경기도 둘레길 지도 보기";
+        btn.className = "text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md border border-emerald-300";
+    }
+};
+
+// 🟢 4. 페이지 로드 시 1~60코스 드롭다운 옵션 자동 생성
+document.addEventListener("DOMContentLoaded", () => {
+    const select = document.getElementById('ggCourseNumber');
+    if (select && select.options.length <= 1) {
+        for (let i = 1; i <= 60; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `${i}코스`;
+            select.appendChild(opt);
+        }
+    }
+});
+
+        
 // ==========================================
 // 📌 회원 선택 수 & 벙주 체크박스 실시간 감지
 // ==========================================
