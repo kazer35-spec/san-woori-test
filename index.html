@@ -3722,38 +3722,23 @@ margin: 0 2px !important;
   </div>
 </div>
 
-              <!-- 🗺️ 경기도 둘레길 코스 좌표 선택 영역 (기본 숨김) -->
-    <div id="gyeonggiTrailBox" class="hidden my-2 p-3 bg-amber-50/80 rounded-2xl border border-amber-200 transition-all duration-300">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-black text-amber-800 flex items-center gap-1">
-          <span>🚶‍♂️</span> 경기도 둘레길 코스 선택 (1~60코스)
-        </span>
-        <span id="selectedTrailBadge" class="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
-          미선택
-        </span>
+              <!-- 📍 [위치 수정] 빨간 선 위치: 🚶‍♂️ 경기도 둘레길 코스 선택 영역 (트래킹 체크 시 노출) -->
+      <div id="gyeonggiTrailBox" class="hidden my-2 p-3 bg-amber-50/80 rounded-2xl border border-amber-200 transition-all duration-300">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-black text-amber-800 flex items-center gap-1">
+            <span>🚶‍♂️</span> 경기도 둘레길 코스 선택 (1~60코스)
+          </span>
+          <span id="selectedTrailBadge" class="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+            미선택
+          </span>
+        </div>
+
+        <div id="trailPillGrid" class="grid grid-cols-6 gap-1 max-h-40 overflow-y-auto pr-1 p-1 bg-white/70 rounded-xl border border-amber-100"></div>
+        <p class="text-[9px] text-amber-600/80 mt-1.5 font-medium text-center">
+          ※ 코스를 클릭하면 아래 지도 위치로 스크롤되며 좌표가 세팅됩니다.
+        </p>
       </div>
-
-      <!-- 60개 코스 알약(Pill) 그리드 버튼 -->
-      <div id="trailPillGrid" class="grid grid-cols-6 gap-1 max-h-40 overflow-y-auto pr-1 p-1 bg-white/70 rounded-xl border border-amber-100">
-        <!-- JS로 1~60번 코스 알약 버튼이 동적 생성됩니다 -->
-      </div>
-      <p class="text-[9px] text-amber-600/80 mt-1.5 font-medium text-center">
-        ※ 코스를 클릭하면 지도 위 해당 코스 좌표가 자동 세팅되며, 아래 '기록 저장하기' 클릭 시 적용됩니다.
-      </p>
-    </div>
-
-    <!-- 지도 영역 (원래 있던 영역) -->
-    <div id="adminMapContainer" class="map-container relative cursor-pointer" onclick="setAdminCoordinate(event)">
-      <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image rounded-xl w-full h-auto" alt="정복지도">
-      <div id="adminMapMarker" class="map-point hidden"></div>
-    </div>
-    <div id="coordDisplay" class="coordinate-display mt-1 text-[11px] text-gray-500 font-bold">좌표: 없음 (지도 클릭)</div>
-  </div>
-
-  <input type="date" id="activityDate" class="input-gap">
-  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-2">기록 저장하기</button>
-</div>
-
+          
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
       <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
@@ -4406,29 +4391,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (trackingCb) {
     trackingCb.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        // 1. 둘레길 선택 박스 노출
-        if (trailBox) trailBox.classList.remove('hidden');
-        
-        // 2. 관리자 지도 이미지를 경기도 둘레길 지도로 교체
-        if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
-        
-        // 3. 둘레길 위치로 부드럽게 스크롤
-        setTimeout(() => {
-          trailBox?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+  // 🎯 코스 선택 핸들러 (알약 클릭 시 좌표 설정 + 아래 지도 화면으로 스크롤)
+  function selectGyeonggiCourse(courseNo) {
+    selectedGyeonggiCourseNo = courseNo;
+    const badge = document.getElementById('selectedTrailBadge');
+    if (badge) badge.innerText = `${courseNo}코스 선택됨`;
+
+    document.querySelectorAll('.trail-pill-btn').forEach(btn => {
+      const cNum = parseInt(btn.dataset.course);
+      if (cNum === courseNo) {
+        btn.classList.add('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105', 'font-black');
       } else {
-        // 원래 100대 명산 모드로 복원
-        if (trailBox) trailBox.classList.add('hidden');
-        if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
-        selectedGyeonggiCourseNo = null;
-        
-        const badge = document.getElementById('selectedTrailBadge');
-        if (badge) badge.innerText = '미선택';
+        btn.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105');
       }
     });
+
+    const targetCoord = GYEONGGI_TRAIL_COORDS[courseNo];
+    if (targetCoord) {
+      tempCoord = { x: targetCoord.x, y: targetCoord.y };
+      
+      const marker = document.getElementById('adminMapMarker');
+      const display = document.getElementById('coordDisplay');
+      
+      if (marker) {
+        marker.style.left = `${targetCoord.x}%`;
+        marker.style.top = `${targetCoord.y}%`;
+        marker.classList.remove('hidden');
+      }
+      if (display) {
+        display.innerText = `좌표: 경기도 둘레길 ${courseNo}코스 (X: ${targetCoord.x}%, Y: ${targetCoord.y}%)`;
+      }
+
+      const mInput = document.getElementById('mountainName');
+      if (mInput && !mInput.value.trim()) {
+        mInput.value = `경기도 둘레길 ${courseNo}코스`;
+      }
+
+      // 🎯 코스 클릭 시 아래 지도로 부드럽게 스크롤
+      const mapContainer = document.getElementById('adminMapContainer');
+      if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   }
-});
+
+  // 🎯 트래킹 체크박스 상태 변경 이벤트 처리
+  document.addEventListener('DOMContentLoaded', () => {
+    renderGyeonggiTrailPills();
+
+    const trackingCb = document.getElementById('isTrackingCheck');
+    const trailBox = document.getElementById('gyeonggiTrailBox');
+    const adminMapImg = document.getElementById('adminMapImg');
+
+    if (trackingCb) {
+      trackingCb.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          if (trailBox) trailBox.classList.remove('hidden');
+          if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
+          
+          // 트래킹 체크 시 둘레길 선택창으로 부드럽게 스크롤
+          setTimeout(() => {
+            trailBox?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        } else {
+          if (trailBox) trailBox.classList.add('hidden');
+          if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
+          selectedGyeonggiCourseNo = null;
+          
+          const badge = document.getElementById('selectedTrailBadge');
+          if (badge) badge.innerText = '미선택';
+        }
+      });
+    }
+  });
 
         
 // ==========================================
