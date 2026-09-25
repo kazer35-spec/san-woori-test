@@ -4339,7 +4339,7 @@ function renderGyeonggiTrailPills() {
   }
 }
 
-      // 🎯 경기둘레길 코스 선택 핸들러
+        // 🎯 경기둘레길 코스 선택 핸들러
   function selectGyeonggiCourse(courseNo) {
     selectedGyeonggiCourseNo = courseNo;
     const badge = document.getElementById('selectedTrailBadge');
@@ -4355,10 +4355,11 @@ function renderGyeonggiTrailPills() {
       }
     });
 
-    // 2. 지도 이미지를 경기둘레길 지도로 즉시 교체 🗺️
-    const adminMapImg = document.getElementById('adminMapImg');
+    // 2. 지도 이미지를 경기둘레길 지도로 변경 (경로 강제 교체) 🗺️
+    const adminMapImg = document.getElementById('adminMapImg') || document.querySelector('#adminMapContainer img');
     if (adminMapImg) {
-      adminMapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
+      // 경기둘레길 지도 이미지 경로
+      adminMapImg.setAttribute('src', 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg');
     }
 
     // 3. 경기둘레길 지도 좌표 세팅 및 마커 이동
@@ -4391,6 +4392,7 @@ function renderGyeonggiTrailPills() {
       }
     }
   }
+
 
 
   // 🎯 트래킹 체크박스 상태 변경 이벤트 처리
