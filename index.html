@@ -3722,6 +3722,31 @@ margin: 0 2px !important;
   </div>
 </div>
 
+          <!-- [2-A] 관리자 산 정보 카드 타이틀 영역 (지도 전환 버튼 추가) -->
+<div class="flex justify-between items-center mb-2">
+  <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+  <button type="button" onclick="toggleAdminMapMode()" id="adminMapToggleBtn" class="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md border border-emerald-300">
+    🥾 경기도 둘레길 지도 보기
+  </button>
+</div>
+
+<!-- [2-B] 관리자 지도 이미지 태그 (id="adminMapImg" 추가) -->
+<div class="map-container relative overflow-auto max-h-[350px]" onclick="setAdminCoordinate(event)">
+  <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block" alt="정복지도">
+  <div id="adminMapMarker" class="map-point hidden"></div>
+</div>
+
+<!-- [2-C] 활동 체크박스 영역 하단에 삽입할 경기도 둘레길 코스 선택 드롭다운 -->
+<div id="ggCourseSelectBox" class="my-2 p-2 bg-emerald-50 rounded-lg border border-emerald-200 flex items-center justify-between">
+  <label class="text-[10px] font-bold text-emerald-800 flex items-center gap-1">
+    <input type="checkbox" id="isGyeonggiDuleCheck" class="w-3.5 h-3.5 accent-emerald-600">
+    <span>🥾 경기도 둘레길 선택</span>
+  </label>
+  <select id="ggCourseNumber" class="h-7 text-[10px] font-bold border border-emerald-300 rounded px-1 bg-white">
+    <option value="">코스 선택 (1~60)</option>
+  </select>
+</div>
+
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
       <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
