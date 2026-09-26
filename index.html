@@ -29,25 +29,25 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 
-  /* 지도 컨테이너 설정 */
+   /* 지도의 좌표 기준점 설정 */
   .map-container {
-    position: relative; /* 마커가 지도 안에서 움직이도록 기준 설정 */
-    display: inline-block;
+    position: relative !important;
+    display: block;
     width: 100%;
   }
 
-  /* 클릭 시 찍힐 마커 점 스타일 */
+  /* 클릭했을 때 지도 위에 찍히는 빨간점 마커 */
   .map-point {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    background-color: #ef4444; /* 빨간색 점 */
-    border: 2px solid #ffffff;
+    position: absolute !important;
+    width: 16px;
+    height: 16px;
+    background-color: #ef4444 !important; /* 빨간색 */
+    border: 2.5px solid #ffffff;
     border-radius: 50%;
-    transform: translate(-50%, -50%); /* 정확히 클릭 위치 중앙에 오도록 조정 */
-    pointer-events: none; /* 클릭 이벤트가 마커 때문에 막히지 않도록 설정 */
-    z-index: 20;
-    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    transform: translate(-50%, -50%); /* 정확한 터치 중앙 맞춤 */
+    pointer-events: none; /* 클릭 막힘 방지 */
+    z-index: 99;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
   }
 
 
@@ -3762,22 +3762,26 @@ margin: 0 2px !important;
         </p>
       </div>
           
-            <!-- 지도 영역 -->
-        <!-- 🟢 1. 경기둘레길 전용 지도 (기본은 숨김: hidden) -->
-        <div id="gyeonggiMapContainer" class="map-container hidden mb-3" onclick="setAdminMapCoord(event)">
-            <img id="gyeonggiMapImg" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" alt="경기둘레길 지도" />
-            <div id="gyeonggiMapMarker" class="map-point hidden"></div>
-        </div>
+            <!-- 🟢 1. 경기둘레길 전용 지도 (트래킹 체크 시 노출) -->
+<div id="gyeonggiMapContainer" class="map-container hidden mb-3 cursor-pointer" onclick="setAdminMapCoord(event)">
+  <img id="gyeonggiMapImg" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" alt="경기둘레길 지도" class="w-full h-auto block rounded-2xl" />
+  <div id="gyeonggiMapMarker" class="map-point hidden"></div>
+</div>
 
-        <!-- 🔵 2. 기존 100대 명산 지도 (그대로 유지) -->
-        <div id="adminMapContainer" class="map-container" onclick="setAdminMapCoord(event)">
-            <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" alt="100대명산 지도" />
-            <div id="adminMapMarker" class="map-point hidden"></div>
-        </div>
+<!-- 🔵 2. 기존 100대 명산 지도 -->
+<div id="adminMapContainer" class="map-container cursor-pointer mb-3" onclick="setAdminMapCoord(event)">
+  <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" alt="100대명산 지도" class="w-full h-auto block rounded-2xl" />
+  <div id="adminMapMarker" class="map-point hidden"></div>
+</div>
 
-  <input type="date" id="activityDate" class="input-gap">
-  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-  </div>
+<!-- 📍 선택된 좌표 표시 영역 -->
+<div class="flex items-center justify-between my-2 p-2.5 bg-slate-100 rounded-xl border border-slate-200">
+  <span id="coordDisplay" class="text-xs font-bold text-slate-700">좌표: 없음 (지도 클릭)</span>
+</div>
+
+<input type="date" id="activityDate" class="input-gap mt-2">
+<button type="button" onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-2">기록 저장하기</button>
+
 
     <!-- 기록 수정 및 레벨 관리 -->
     <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
