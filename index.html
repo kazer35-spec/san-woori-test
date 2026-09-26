@@ -3603,8 +3603,9 @@ margin: 0 2px !important;
         <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
       </label>
       <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-  <input type="checkbox" id="isTrackingCheck" onchange="toggleTrackingMapBox(this)" class="w-3.5 h-3.5"> 트래킹👟
-      </label>
+  <input type="checkbox" id="isTrackingCheck" onchange="toggleTrackingMap(this)" class="w-3.5 h-3.5"> 트래킹👟
+</label>
+
       <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
       </label>
@@ -4278,13 +4279,14 @@ function toggleTrackingMap(checkbox) {
   if (!mapImage) return;
 
   if (checkbox.checked) {
-    // 트래킹 체크 시 경기둘레길 지도로 전환
+    // 트래킹 체크 시 둘레길 지도로 교체
     mapImage.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
   } else {
-    // 트래킹 체크 해제 시 원래 정복지도로 복원
+    // 체크 해제 시 원래 산 지도로 복원
     mapImage.src = "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
   }
 }
+
 
 /**
  * 경기둘레길 지도 클릭 시 좌표 찍기 함수
