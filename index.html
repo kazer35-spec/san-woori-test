@@ -4295,8 +4295,7 @@ let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
 
-
- // 📍 경기도 둘레길 1~60 코스별 이미지 좌표 데이터 (x, y % 비율)
+// 📍 경기도 둘레길 1~60 코스별 이미지 좌표 데이터 (x, y % 비율)
 const GYEONGGI_TRAIL_COORDS = {
   1: { x: 42.5, y: 15.2 }, 2: { x: 44.1, y: 16.8 }, 3: { x: 46.2, y: 18.0 }, 4: { x: 48.0, y: 19.5 }, 5: { x: 50.1, y: 21.0 },
   6: { x: 52.3, y: 22.8 }, 7: { x: 54.0, y: 24.1 }, 8: { x: 56.2, y: 25.9 }, 9: { x: 58.0, y: 27.5 }, 10: { x: 60.1, y: 29.0 },
@@ -4315,7 +4314,7 @@ const GYEONGGI_TRAIL_COORDS = {
 window.selectedGyeonggiCourseNo = null;
 window.tempCoord = { x: 0, y: 0 };
 
-// 🎯 알약(Pill) 버튼 생성
+// 🎯 둘레길 코스 알약 생성
 function renderGyeonggiTrailPills() {
   const container = document.getElementById('trailPillGrid');
   if (!container) return;
@@ -4345,7 +4344,7 @@ function renderGyeonggiTrailPills() {
   }
 }
 
-// 📍 마커 위치 이동 및 좌표 표시 공통 함수
+// 📍 마커 위치 설정 (마커 중심 보정 translate 포함)
 function updateMapMarker(x, y, courseLabel = null) {
   window.tempCoord = { x, y };
 
@@ -4354,10 +4353,10 @@ function updateMapMarker(x, y, courseLabel = null) {
   const mInput = document.getElementById('mountainName');
 
   if (marker) {
-    // 💡 마커가 클릭을 방해하지 않도록 pointer-events-none 적용
     marker.classList.add('pointer-events-none');
     marker.style.left = `${x}%`;
     marker.style.top = `${y}%`;
+    marker.style.transform = 'translate(-50%, -50%)'; // 중심점 정렬
     marker.classList.remove('hidden');
   }
 
@@ -4372,7 +4371,7 @@ function updateMapMarker(x, y, courseLabel = null) {
   }
 }
 
-// 🎯 경기둘레길 코스 선택 핸들러
+// 🎯 알약 선택 이벤트 핸들러
 function selectGyeonggiCourse(courseNo) {
   window.selectedGyeonggiCourseNo = courseNo;
 
@@ -4399,9 +4398,9 @@ function selectGyeonggiCourse(courseNo) {
   }
 }
 
-// 🎯 수동 지도 클릭 핸들러 (이미지 또는 지도 영역 클릭 시)
-function handleMapClick(e, mapElement) {
-  const rect = mapElement.getBoundingClientRect();
+// 🎯 지도 수동 클릭 위치 계산 (이미지 기준 % 정확도 적용)
+function handleMapClick(e, mapImg) {
+  const rect = mapImg.getBoundingClientRect();
   if (rect.width === 0 || rect.height === 0) return;
 
   const clickX = e.clientX - rect.left;
@@ -4410,7 +4409,6 @@ function handleMapClick(e, mapElement) {
   const percentX = parseFloat(((clickX / rect.width) * 100).toFixed(1));
   const percentY = parseFloat(((clickY / rect.height) * 100).toFixed(1));
 
-  // 알약 선택 상태 해제
   window.selectedGyeonggiCourseNo = null;
   const badge = document.getElementById('selectedTrailBadge');
   if (badge) badge.innerText = '수동 지정됨';
@@ -4422,54 +4420,59 @@ function handleMapClick(e, mapElement) {
   updateMapMarker(percentX, percentY);
 }
 
-// 🎯 이벤트 바인딩
+// 🎯 이벤트 바인딩 및 관리자 지도 프레임 여백(pt-14) 자동 동기화
 document.addEventListener('DOMContentLoaded', () => {
   renderGyeonggiTrailPills();
 
-  // 지도 영역(이미지 또는 감싸는 Container) 클릭 감지
+  // 지도 영역 클릭 이벤트
   document.addEventListener('click', (e) => {
-    // 1. 이미지 클릭 시
     const mapImg = e.target.closest('#adminMapImg') || e.target.closest('#gyeonggiMapImg');
     if (mapImg) {
       handleMapClick(e, mapImg);
-      return;
-    }
-
-    // 2. 지도 컨테이너 영역 클릭 시 (이미지가 이벤트를 받지 못할 경우 대비)
-    const mapContainer = e.target.closest('#adminMapContainer') || e.target.closest('#gyeonggiMapContainer');
-    if (mapContainer && !e.target.closest('.trail-pill-btn')) {
-      const imgInContainer = mapContainer.querySelector('img');
-      if (imgInContainer) {
-        handleMapClick(e, imgInContainer);
-      }
     }
   });
 
-  // 트래킹 체크박스 상태 변경 처리
+  // 관리자 모드 트래킹 체크박스 상태 변경 처리
   const trackingCb = document.getElementById('isTrackingCheck');
   const trailBox = document.getElementById('gyeonggiTrailBox');
   const adminMapImg = document.getElementById('adminMapImg');
+  const adminMapContainer = document.getElementById('adminMapContainer'); // 관리자 지도 컨테이너
 
   if (trackingCb) {
     trackingCb.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (trailBox) trailBox.classList.remove('hidden');
-        if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
+        
+        // 💡 [핵심] 둘레길 모드 실행 시 메인 지도와 동일하게 상단 여백(pt-14) 추가
+        if (adminMapContainer) {
+          adminMapContainer.classList.add('pt-14', 'pb-3', 'bg-slate-50/60');
+        }
+        if (adminMapImg) {
+          adminMapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
+        }
         
         setTimeout(() => {
           trailBox?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
       } else {
         if (trailBox) trailBox.classList.add('hidden');
-        if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
-        window.selectedGyeonggiCourseNo = null;
         
+        // 💡 일반 100대 명산 모드 원복 시 상단 여백 제거
+        if (adminMapContainer) {
+          adminMapContainer.classList.remove('pt-14', 'pb-3', 'bg-slate-50/60');
+        }
+        if (adminMapImg) {
+          adminMapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
+        }
+        
+        window.selectedGyeonggiCourseNo = null;
         const badge = document.getElementById('selectedTrailBadge');
         if (badge) badge.innerText = '미선택';
       }
     });
   }
 });
+
 
 
 
