@@ -3721,6 +3721,17 @@ margin: 0 2px !important;
     </div>
   </div>
 </div>
+<!-- 트래킹 체크박스에 onchange 이벤트 추가 -->
+<label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+  <input type="checkbox" id="isTrackingCheck" onchange="toggleAdminMapByTracking()" class="w-3.5 h-3.5"> 트래킹👟
+</label>
+
+<!-- 지도 이미지에 id="adminMapImage" 추가 -->
+<div class="map-container" onclick="setAdminCoordinate(event)">
+  <img id="adminMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+  <div id="adminMapMarker" class="map-point hidden"></div>
+</div>
+<div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
 
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
@@ -4213,6 +4224,74 @@ margin: 0 2px !important;
       document.getElementById('miniTop100Badge').innerText = `${currentTop100Count}/100`;
     }
   }
+
+ // 글로벌 이미지 주소 정의
+const MAP_URL_DEFAULT = "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
+const MAP_URL_GYEONGGI = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
+
+// 1. 트래킹 체크박스 토글 시 지도 이미지 자동 전환
+function toggleAdminMapByTracking() {
+    const isTracking = document.getElementById('isTrackingCheck')?.checked;
+    const adminMapImg = document.getElementById('adminMapImage');
+    
+    if (adminMapImg) {
+        if (isTracking) {
+            adminMapImg.src = MAP_URL_GYEONGGI;
+        } else {
+            adminMapImg.src = MAP_URL_DEFAULT;
+        }
+    }
+}
+
+// 2. 관리자 지도 클릭 시 좌표 계산 및 코스 추정 함수
+function setAdminCoordinate(event) {
+    if (document.getElementById('disableCoordCheck')?.checked) return;
+
+    const container = event.currentTarget;
+    const rect = container.getBoundingClientRect();
+    
+    // 클릭한 상대 비율 좌표 계산 (%)
+    const x = parseFloat((((event.clientX - rect.left) / rect.width) * 100).toFixed(1));
+    const y = parseFloat((((event.clientY - rect.top) / rect.height) * 100).toFixed(1));
+    
+    tempCoord = { x, y };
+
+    // 마커 위치 업데이트
+    const marker = document.getElementById('adminMapMarker');
+    if (marker) {
+        marker.style.left = `${x}%`;
+        marker.style.top = `${y}%`;
+        marker.classList.remove('hidden');
+    }
+
+    const isTracking = document.getElementById('isTrackingCheck')?.checked;
+    const display = document.getElementById('coordDisplay');
+
+    if (isTracking && typeof GYEONGGI_TRAIL_COORDS !== 'undefined') {
+        // GYEONGGI_TRAIL_COORDS 중에서 가장 가까운 둘레길 코스 번호 계산
+        let closestCourse = null;
+        let minDistance = Infinity;
+
+        Object.keys(GYEONGGI_TRAIL_COORDS).forEach(courseNum => {
+            const c = GYEONGGI_TRAIL_COORDS[courseNum];
+            const dist = Math.hypot(c.x - x, c.y - y);
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestCourse = courseNum;
+            }
+        });
+
+        tempCoord.dulleCourse = closestCourse ? parseInt(closestCourse) : null;
+        if (display) {
+            display.innerText = `좌표: X ${x}%, Y ${y}% [경기둘레길 ${closestCourse || '?'}코스 추정]`;
+        }
+    } else {
+        if (display) {
+            display.innerText = `좌표: X ${x}%, Y ${y}%`;
+        }
+    }
+}
+       
 </script>
 
 
@@ -7635,7 +7714,7 @@ window.toggleDisableCoord = () => {
 };
 
 
-window.addMultiActivity = async () => {
+  window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
     
@@ -7669,25 +7748,21 @@ window.addMultiActivity = async () => {
     
     const isRegularRaw = document.getElementById('isRegularCheck')?.checked || false;
     
-    // 기존 활동 체크박스 상태
     let isSchedule = document.getElementById('isScheduleCheck')?.checked || false;
     let isRunning = document.getElementById('isRunningCheck')?.checked || false;
     let isTracking = document.getElementById('isTrackingCheck')?.checked || false;
     let isWalking = document.getElementById('isWalkingCheck')?.checked || false; 
     const isOnlyLog = document.getElementById('isOnlyLog')?.checked || false; 
 
-    // 단축 체크박스 확인
     const isExtraHikeCheck = document.getElementById('isExtraHikeCheck')?.checked || false;
     const isSpecialTrackingCheck = document.getElementById('isSpecialTrackingCheck')?.checked || false;
 
-    // 🎯 계절 이모지 수동 선택 값 확인
     const selectedSeasonMark = 
         document.getElementById('isSpringMarkCheck')?.checked ? "🌸" :
         document.getElementById('isSummerMarkCheck')?.checked ? "🍀" :
         document.getElementById('isFallMarkCheck')?.checked ? "🍁" :
         document.getElementById('isWinterMarkCheck')?.checked ? "❄️" : null;
 
-    // 단축 체크박스 선택 시 값 강제 적용
     if (isExtraHikeCheck) {
         isRunning = true;
         isTracking = true;
@@ -7697,7 +7772,6 @@ window.addMultiActivity = async () => {
         isSchedule = true;
     }
 
-    // 🎯 좌표 OFF 체크 여부 확인 (번외산행인 경우 강제 true)
     let disableCoord = document.getElementById('disableCoordCheck')?.checked || false;
     if (isExtraHikeCheck) {
         disableCoord = true;
@@ -7710,7 +7784,6 @@ window.addMultiActivity = async () => {
     const pForest = parseInt(document.getElementById('pForest')?.value) || 0;
     const pValley = parseInt(document.getElementById('pValley')?.value) || 0;
     
-    // 산행 조건 판별
     const isExtraHike = isExtraHikeCheck || (isRunning && isTracking); 
     const isSpecialTracking = isSpecialTrackingCheck || (isTracking && isWalking);
 
@@ -7723,13 +7796,12 @@ window.addMultiActivity = async () => {
 
     if(!selectedMemberIds || selectedMemberIds.size === 0 || !dateVal) return alert("대상과 날짜를 확인해주세요.");
 
-    // 🎯 0업 선택 허용 (선택된 게 없으면 기본값 0으로 간주)
     const upElement = document.querySelector('input[name="upAmount"]:checked');
     const up = upElement ? parseInt(upElement.value) : 0;
 
     const selectedNames = [];
     
-    // 좌표 OFF가 켜져있으면 tempCoord 무시하고 unconditional null 처리
+    // 수동 클릭 좌표 사용
     const safeCoords = (!disableCoord && typeof tempCoord !== 'undefined' && tempCoord && tempCoord.x !== undefined) ? tempCoord : null;
 
     try {
@@ -7769,6 +7841,13 @@ window.addMultiActivity = async () => {
 
             let updateData = {}; 
 
+            // 🎯 [추가] 트래킹 모드 시 선택된 경기둘레길 코스 번호(dulleCourse)를 회원의 dulleCourses 배열에 추가
+            if (isTracking && safeCoords && safeCoords.dulleCourse) {
+                const courseNum = parseInt(safeCoords.dulleCourse);
+                const _arrayUnion = (typeof arrayUnion !== 'undefined') ? arrayUnion : (val) => val;
+                updateData.dulleCourses = _arrayUnion(courseNum);
+            }
+
             if (!member.quarterlyStats) {
                 const pastCount = member.qCount || member.count || 0;
                 updateData["quarterlyStats.2025_q4"] = { hike: pastCount, total: pastCount };
@@ -7776,16 +7855,12 @@ window.addMultiActivity = async () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
-            // 1) 레벨업 & 실시간 획득 업수 계산
-            const hikeUpAmount = up;
-            const activityUpAmount = up;
             const realUpAmount = isRealHike ? up : 0;
             const oldLevel = member.level || 0;
             const newLevel = oldLevel + realUpAmount;
 
             updateData.level = newLevel;
 
-            // 🎯 100레벨 최초 달성 시 DB에 날짜/산행지/분기 저장
             if (oldLevel < 100 && newLevel >= 100) {
                 await checkAndSaveLv100ToMember(
                     id, 
@@ -7802,7 +7877,6 @@ window.addMultiActivity = async () => {
             }
             selectedNames.push(member.name);
 
-            // 2) 로그 루프 카운트 선언 및 고도 계산
             const finalLogLoopCount = (isRegular || isSpecial || isQuarterOnlyOne || realUpAmount === 0) ? 1 : realUpAmount;
             const finalHeightIncrement = height * finalLogLoopCount;
 
@@ -7858,7 +7932,6 @@ window.addMultiActivity = async () => {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
             
-            // 3) 개인 로그 생성 및 별/계절마크 획득 처리
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
             const baseDocId = rawMountainName || (isSpecialTracking ? "인정 트레킹" : (isWalking ? "동네 산책" : (isExtraHike ? "번외 산행" : (isRunning ? "러닝 활동" : "트레킹 활동"))));
 
@@ -7871,12 +7944,10 @@ window.addMultiActivity = async () => {
             for (let i = 0; i < finalLogLoopCount; i++) {
                 let starType = null;
                 
-                // 🎯 [수정된 핵심 로직] 정기산행일 경우 전분기 점수 반영 추첨 실행
                 if (isRegular) {
                     if (typeof window.drawRegularHikeStar === 'function') {
                         starType = window.drawRegularHikeStar(member, currentYear, currentQuarter);
                     } else {
-                        // Fallback: 함수를 찾을 수 없을 때의 기본 가중치 적용
                         const rand = Math.random() * 100;
                         if (rand <= 3) starType = "super";
                         else if (rand <= 10) starType = "special";
@@ -7884,7 +7955,6 @@ window.addMultiActivity = async () => {
                     }
                 }
 
-                // 🎯 별(슈퍼/스페셜) 획득 시 DB 저장
                 if (starType === "super" || starType === "special") {
                     const defaultQuarter = `${currentQuarter}분기`;
                     await saveSpecialStarToMember(
@@ -7911,7 +7981,9 @@ window.addMultiActivity = async () => {
                     starType, author: member.name,
                     seasonIcon: selectedSeasonMark,
                     isSpecial: isSpecialTracking ? false : isSpecial,
-                    pRock, pForest, pValley
+                    pRock, pForest, pValley,
+                    // 🎯 [추가] 트래킹 모드 시 선택된 경기둘레길 코스 저장
+                    dulleCourse: (isTracking && safeCoords) ? (safeCoords.dulleCourse || null) : null
                 };
 
                 let customLogDocId = baseDocId;
@@ -7927,33 +7999,29 @@ window.addMultiActivity = async () => {
         } 
 
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
-    const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
-    const cleanDate = dateVal.trim();
-    let bondingDocId = `${cleanMountain}_${cleanDate}`;
+            const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
+            const cleanDate = dateVal.trim();
+            let bondingDocId = `${cleanMountain}_${cleanDate}`;
 
-    let bondingRef = doc(db, "bondingForest", bondingDocId);
-    let checkSnap = await getDoc(bondingRef);
-    let dupSeq = 2;
-    while (checkSnap.exists()) {
-        bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-        
-        // 🎯 doc(doc, ...) -> doc(db, ...) 로 수정!
-        bondingRef = doc(db, "bondingForest", bondingDocId); 
-        
-        checkSnap = await getDoc(bondingRef);
-        dupSeq++;
-    }
+            let bondingRef = doc(db, "bondingForest", bondingDocId);
+            let checkSnap = await getDoc(bondingRef);
+            let dupSeq = 2;
+            while (checkSnap.exists()) {
+                bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
+                bondingRef = doc(doc(db, "bondingForest", bondingDocId)); 
+                checkSnap = await getDoc(bondingRef);
+                dupSeq++;
+            }
 
-    await setDoc(bondingRef, {
-        mountain: cleanMountain, 
-        members: selectedNames, 
-        memberCount: selectedNames.length, 
-        date: cleanDate, 
-        type: "정식", 
-        createdAt: new Date()
-    });
-}
-
+            await setDoc(bondingRef, {
+                mountain: cleanMountain, 
+                members: selectedNames, 
+                memberCount: selectedNames.length, 
+                date: cleanDate, 
+                type: "정식", 
+                createdAt: new Date()
+            });
+        }
 
         if (typeof pendingLevelUpCards !== 'undefined' && pendingLevelUpCards.length > 0 && typeof showCombinedLevelUpAlert === 'function') {
             showCombinedLevelUpAlert();
@@ -7961,7 +8029,7 @@ window.addMultiActivity = async () => {
         
         alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // 폼 초기화
+        // 폼 및 좌표 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
@@ -7989,16 +8057,25 @@ window.addMultiActivity = async () => {
             if (cb) cb.checked = false;
         });
 
-        // 🎯 1번 라디오 버튼 기본 재선택
-        const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
-        if (defaultRadio) defaultRadio.checked = true;
+        // 🎯 지도 및 스위칭 초기화
+        const adminMapImg = document.getElementById('adminMapImage');
+        if (adminMapImg) {
+            adminMapImg.src = (typeof MAP_URL_DEFAULT !== 'undefined') ? MAP_URL_DEFAULT : "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
+        }
+
+        const gyeonggiMap = document.getElementById('gyeonggiMapContainer');
+        const adminMap = document.getElementById('adminMapContainer');
+        if (gyeonggiMap) gyeonggiMap.classList.add('hidden');
+        if (adminMap) adminMap.classList.remove('hidden');
 
         tempCoord = null; 
-        const marker = document.getElementById('adminMapMarker');
-        if (marker) marker.classList.add('hidden');
+        document.querySelectorAll('.map-point').forEach(marker => marker.classList.add('hidden'));
         
         const display = document.getElementById('coordDisplay');
         if (display) display.innerText = '좌표: 없음 (지도 클릭)';
+
+        const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
+        if (defaultRadio) defaultRadio.checked = true;
 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
@@ -8011,11 +8088,8 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
- 
-                 
-            
-            
-                    
+          
+        
 
 // 📌 [신규 회원 등록 함수]
 window.addMember = async () => {
