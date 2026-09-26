@@ -29,25 +29,26 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
 
-  /* 지도 컨테이너 설정 */
+ /* 지도 컨테이너 설정 (마커의 상대 기준) */
   .map-container {
-    position: relative; /* 마커가 지도 안에서 움직이도록 기준 설정 */
-    display: inline-block;
+    position: relative !important;
+    display: block;
     width: 100%;
+    overflow: hidden;
   }
 
-  /* 클릭 시 찍힐 마커 점 스타일 */
+  /* 빨간색 좌표 마커 점 */
   .map-point {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    background-color: #ef4444; /* 빨간색 점 */
+    position: absolute !important;
+    width: 16px;
+    height: 16px;
+    background-color: #ef4444 !important; /* Tailwind red-500 */
     border: 2px solid #ffffff;
     border-radius: 50%;
-    transform: translate(-50%, -50%); /* 정확히 클릭 위치 중앙에 오도록 조정 */
-    pointer-events: none; /* 클릭 이벤트가 마커 때문에 막히지 않도록 설정 */
-    z-index: 20;
-    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none; /* 클릭 이벤트가 지도로 통과되도록 */
+    z-index: 50;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
   }
 
 
@@ -3745,7 +3746,7 @@ margin: 0 2px !important;
   </div>
 </div>
 
-              <!-- 📍 [위치 수정] 빨간 선 위치: 🚶‍♂️ 경기도 둘레길 코스 선택 영역 (트래킹 체크 시 노출) -->
+              <!-- 📍 [위치 수정] 경기도 둘레길 코스 선택 영역 (트래킹 체크 시 노출) -->
 <div id="gyeonggiTrailBox" class="hidden my-2 p-3 bg-amber-50/80 rounded-2xl border border-amber-200 transition-all duration-300">
   <div class="flex items-center justify-between mb-2">
     <span class="text-xs font-black text-amber-800 flex items-center gap-1">
@@ -3765,24 +3766,23 @@ margin: 0 2px !important;
 <!-- 지도 영역 -->
 <!-- 🟢 1. 경기둘레길 전용 지도 -->
 <div id="gyeonggiMapContainer" class="map-container hidden mb-3 cursor-pointer" onclick="setAdminMapCoord(event)">
-    <img id="gyeonggiMapImg" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" alt="경기둘레길 지도" class="w-full h-auto block rounded-2xl" />
-    <div id="gyeonggiMapMarker" class="map-point hidden"></div>
+  <img id="gyeonggiMapImg" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" alt="경기둘레길 지도" class="w-full h-auto block rounded-2xl" />
+  <div id="gyeonggiMapMarker" class="map-point hidden"></div>
 </div>
 
 <!-- 🔵 2. 기존 100대 명산 지도 -->
-<div id="adminMapContainer" class="map-container cursor-pointer" onclick="setAdminMapCoord(event)">
-    <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" alt="100대명산 지도" class="w-full h-auto block rounded-2xl" />
-    <div id="adminMapMarker" class="map-point hidden"></div>
+<div id="adminMapContainer" class="map-container cursor-pointer mb-3" onclick="setAdminMapCoord(event)">
+  <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" alt="100대명산 지도" class="w-full h-auto block rounded-2xl" />
+  <div id="adminMapMarker" class="map-point hidden"></div>
 </div>
 
 <!-- 📍 클릭한 좌표 텍스트 표시 영역 -->
-<div class="flex items-center justify-between my-2">
+<div class="flex items-center justify-between my-2 p-2 bg-slate-50 rounded-xl border border-slate-200">
   <span id="coordDisplay" class="text-xs font-semibold text-slate-600">좌표: 없음 (지도 클릭)</span>
 </div>
 
 <input type="date" id="activityDate" class="input-gap">
-<button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-
+<button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-2">기록 저장하기</button>
 
 
 
@@ -4323,41 +4323,46 @@ let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
 
-// 🟢 지도 직접 클릭 시 수동 좌표 지정 함수
-// 🟢 지도 직접 클릭/터치 시 수동 좌표 지정 함수
-function setAdminMapCoord(event) {
-  // 클릭된 element가 img나 marker여도 부모인 .map-container를 찾음
-  const container = event.currentTarget || event.target.closest('.map-container');
+// 전역 변수 선언 확인 (상단에 없으면 추가)
+let tempCoord = null;
+
+// 🟢 지도 클릭/터치 좌표 지정 함수
+function setAdminMapCoord(e) {
+  if (!e) return;
+  
+  // 클릭된 대상이 img인 경우를 위해 부모 .map-container 찾기
+  const container = e.currentTarget || e.target.closest('.map-container');
   if (!container) return;
 
   const rect = container.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
 
-  // PC 클릭 및 모바일 터치 좌표 구하기
-  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+  // PC 클릭 및 모바일 터치 대응
+  const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
 
-  // 클릭 위치 비율(%) 계산
+  // 좌표 비율(%) 계산
   const xPercent = Math.round(((clientX - rect.left) / rect.width) * 1000) / 10;
   const yPercent = Math.round(((clientY - rect.top) / rect.height) * 1000) / 10;
 
-  // 전역 좌표 변수 저장
   tempCoord = { x: xPercent, y: yPercent };
 
-  // 클릭된 지도 안의 마커(.map-point) 찾기
+  // 마커 업데이트
   const marker = container.querySelector('.map-point');
   if (marker) {
-    marker.style.left = `${xPercent}%`;
-    marker.style.top = `${yPercent}%`;
+    marker.style.left = xPercent + '%';
+    marker.style.top = yPercent + '%';
     marker.classList.remove('hidden');
-    marker.style.display = 'block'; // hidden 클래스 해제 확실하게 처리
+    marker.style.display = 'block';
   }
 
-  // 좌표 표출 텍스트 업데이트
+  // 좌표 안내 텍스트 변경
   const display = document.getElementById('coordDisplay');
   if (display) {
     display.innerText = `선택된 좌표 (X: ${xPercent}%, Y: ${yPercent}%)`;
   }
 }
+
 
 
 // 🎯 DOM 로드 시 트래킹 체크박스 이벤트 및 지도 전환
