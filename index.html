@@ -4033,34 +4033,34 @@ margin: 0 2px !important;
 
 <!-- Main Map View -->
 <div id="mapViewMain">
-  <!-- 지도 컨테이너 (상단여백 제거 및 relative 구조 유지) -->
+  <!-- 지도 컨테이너 -->
   <div id="mapContainer" class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3 transition-all duration-300">
     
-    <!-- 🖼️ 메인 지도 이미지 (위로 밀착) -->
+    <!-- 🖼️ 메인 지도 이미지 -->
     <img id="mainMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl transition-all duration-300">
     
-    <!-- 🌲/🚶 지도 우측 상단 미니 배지 (100대 명산 모드용) -->
+    <!-- 🌲 지도 우측 상단 미니 배지 (100대 명산 모드용) -->
     <button type="button" id="miniBadgeBtn" onclick="toggleMapType()" class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 cursor-pointer hover:bg-emerald-50 transition-colors">
       <span id="miniBadgeIcon" class="text-[10px]">🌲</span>
       <span id="miniTop100Badge" class="tracking-tight">0/100</span>
     </button>
 
+    <!-- 🚶 경기도 둘레길 전용 정보 바 (지도 내부 하단 - 노란선 영역) -->
+    <div id="trailInfoBar" class="hidden absolute bottom-7 left-3 right-3 justify-between items-center bg-white/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-200/80 shadow-md z-20">
+      <div class="flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
+        <span>🚶</span> 경기도 둘레길
+      </div>
+      <div class="bg-emerald-50 border border-emerald-500/30 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-black shadow-xs flex items-center gap-1.5">
+        <span>🚶</span>
+        <span id="trailBadgeText" class="tracking-tight">0/60</span>
+      </div>
+    </div>
+
     <div id="conquerMapPoints"></div>
     
     <!-- 💡 출처 텍스트 -->
-    <div id="mapSourceTxt" class="map-source-txt absolute bottom-2 right-3 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">
+    <div id="mapSourceTxt" class="map-source-txt absolute bottom-1.5 right-3 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">
       출처: 산림청
-    </div>
-  </div>
-
-  <!-- 🚶 경기도 둘레길 전용 정보 바 (지도 아래에 위치) -->
-  <div id="trailInfoBar" class="hidden justify-between items-center bg-slate-100/80 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-200/80 mb-3 shadow-sm">
-    <div class="flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
-      <span>🚶</span> 경기도 둘레길
-    </div>
-    <div class="bg-white border border-emerald-500/30 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-black shadow-xs flex items-center gap-1.5">
-      <span>🚶</span>
-      <span id="trailBadgeText" class="tracking-tight">0/60</span>
     </div>
   </div>
 
@@ -4165,35 +4165,35 @@ margin: 0 2px !important;
     isGyeonggiTrailMode = !isGyeonggiTrailMode;
 
     if (isGyeonggiTrailMode) {
-      // 1. 경기둘레길 모드: 지도 상단 여백 없이 이미지를 올림
+      // 1. 경기둘레길 모드: 지도 이미지 교체
       mapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
       
-      // 2. 지도 우측 상단 뱃지 대신 지도 아래 '둘레길 정보 바' 노출
+      // 2. 지도 우측 상단 배지 숨기고 지도 내부 하단 바(노란선 위치) 표시
       miniBadgeBtn.classList.add('hidden');
       trailInfoBar.classList.remove('hidden');
       trailInfoBar.classList.add('flex');
       
-      // 3. 출처 및 둘레길 카운트 업데이트
+      // 3. 출처 및 카운트
       sourceTxt.innerText = '출처: 경기도 둘레길';
       if (trailBadgeText) trailBadgeText.innerText = `${currentTrailCount}/60`;
       
       // 4. 핀 포인트 숨김
       if (mapPoints) mapPoints.style.display = 'none';
     } else {
-      // 1. 100대 명산 모드: 이미지 복원
+      // 1. 100대 명산 모드: 지도 복원
       mapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
       
-      // 2. 지도 아래 바 숨기고 지도 상단 배지 노출
+      // 2. 지도 내부 하단 바 숨기고 우측 상단 배지 노출
       trailInfoBar.classList.add('hidden');
       trailInfoBar.classList.remove('flex');
       miniBadgeBtn.classList.remove('hidden');
       
-      // 3. 출처 및 100대 명산 카운트 복원
+      // 3. 출처 및 카운트 복원
       sourceTxt.innerText = '출처: 산림청';
       miniBadgeIcon.innerText = '🌲';
       miniBadgeText.innerText = `${currentTop100Count}/100`;
       
-      // 4. 핀 포인트 다시 표시
+      // 4. 핀 포인트 표시
       if (mapPoints) mapPoints.style.display = 'block';
     }
   }
@@ -4216,11 +4216,7 @@ margin: 0 2px !important;
   }
 </script>
 
-
-
-
-
-
+       
           
 
       
