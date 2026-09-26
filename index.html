@@ -4294,181 +4294,58 @@ const now = new Date();
 let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
- // 📍 경기도 둘레길 1~60 코스별 이미지 좌표 데이터 (x, y % 비율)
-const GYEONGGI_TRAIL_COORDS = {
-  1: { x: 42.5, y: 15.2 }, 2: { x: 44.1, y: 16.8 }, 3: { x: 46.2, y: 18.0 }, 4: { x: 48.0, y: 19.5 }, 5: { x: 50.1, y: 21.0 },
-  6: { x: 52.3, y: 22.8 }, 7: { x: 54.0, y: 24.1 }, 8: { x: 56.2, y: 25.9 }, 9: { x: 58.0, y: 27.5 }, 10: { x: 60.1, y: 29.0 },
-  11: { x: 61.8, y: 31.2 }, 12: { x: 63.5, y: 33.0 }, 13: { x: 65.0, y: 35.1 }, 14: { x: 66.8, y: 37.2 }, 15: { x: 68.2, y: 39.0 },
-  16: { x: 69.5, y: 41.5 }, 17: { x: 71.0, y: 43.2 }, 18: { x: 72.8, y: 45.0 }, 19: { x: 74.2, y: 47.1 }, 20: { x: 75.8, y: 49.3 },
-  21: { x: 77.0, y: 51.5 }, 22: { x: 78.5, y: 53.8 }, 23: { x: 80.1, y: 56.0 }, 24: { x: 81.2, y: 58.2 }, 25: { x: 82.5, y: 60.5 },
-  26: { x: 83.8, y: 62.8 }, 27: { x: 85.0, y: 65.0 }, 28: { x: 86.2, y: 67.2 }, 29: { x: 87.5, y: 69.5 }, 30: { x: 88.8, y: 71.8 },
-  31: { x: 90.0, y: 74.0 }, 32: { x: 88.0, y: 76.2 }, 33: { x: 85.5, y: 78.0 }, 34: { x: 83.0, y: 79.8 }, 35: { x: 80.5, y: 81.5 },
-  36: { x: 78.0, y: 83.0 }, 37: { x: 75.2, y: 84.8 }, 38: { x: 72.5, y: 86.2 }, 39: { x: 69.8, y: 87.8 }, 40: { x: 67.0, y: 89.2 },
-  41: { x: 64.2, y: 90.8 }, 42: { x: 61.5, y: 92.0 }, 43: { x: 58.8, y: 93.5 }, 44: { x: 55.0, y: 91.2 }, 45: { x: 52.2, y: 88.5 },
-  46: { x: 49.5, y: 85.8 }, 47: { x: 46.8, y: 83.2 }, 48: { x: 44.0, y: 80.5 }, 49: { x: 41.2, y: 77.8 }, 50: { x: 38.5, y: 75.0 },
-  51: { x: 35.8, y: 72.2 }, 52: { x: 33.0, y: 69.5 }, 53: { x: 30.2, y: 66.8 }, 54: { x: 27.5, y: 64.0 }, 55: { x: 24.8, y: 61.2 },
-  56: { x: 22.0, y: 58.5 }, 57: { x: 19.2, y: 55.8 }, 58: { x: 16.5, y: 53.0 }, 59: { x: 13.8, y: 50.2 }, 60: { x: 11.0, y: 47.5 }
-};
 
-let selectedGyeonggiCourseNo = null;
+// 🟢 지도 직접 클릭 시 수동 좌표 지정 함수
+function setAdminMapCoord(event) {
+  const container = event.currentTarget;
+  const rect = container.getBoundingClientRect();
 
-// 🎯 알약(Pill) 생성 및 구역별 색상 지정 함수
-function renderGyeonggiTrailPills() {
-  const container = document.getElementById('trailPillGrid');
-  if (!container) return;
-  container.innerHTML = '';
+  // 클릭 위치 비율(%) 계산
+  const xPercent = Math.round(((event.clientX - rect.left) / rect.width) * 1000) / 10;
+  const yPercent = Math.round(((event.clientY - rect.top) / rect.height) * 1000) / 10;
 
-  for (let i = 1; i <= 60; i++) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.dataset.course = i;
-    
-    // 구간별 지정 색상 클래스 설정
-    // 1~11: 빨강 / 12~31: 주황 / 32~43: 초록 / 44~60: 파랑
-    let baseColorClass = "";
-    if (i >= 1 && i <= 11) {
-      baseColorClass = "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-500 hover:text-white";
-    } else if (i >= 12 && i <= 31) {
-      baseColorClass = "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-500 hover:text-white";
-    } else if (i >= 32 && i <= 43) {
-      baseColorClass = "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-500 hover:text-white";
-    } else {
-      baseColorClass = "bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-500 hover:text-white";
-    }
+  tempCoord = { x: xPercent, y: yPercent };
 
-    btn.className = `trail-pill-btn py-1 px-1.5 text-[10px] font-black rounded-full border transition-all cursor-pointer text-center ${baseColorClass}`;
-    btn.innerText = `${i}코스`;
-    
-    btn.onclick = () => selectGyeonggiCourse(i);
-    container.appendChild(btn);
+  // 클릭된 지도 내부 마커 좌표 및 노출 처리
+  const marker = container.querySelector('.map-point');
+  if (marker) {
+    marker.style.left = `${xPercent}%`;
+    marker.style.top = `${yPercent}%`;
+    marker.classList.remove('hidden');
+  }
+
+  // 좌표 텍스트 업데이트
+  const display = document.getElementById('coordDisplay');
+  if (display) {
+    display.innerText = `선택된 좌표 (X: ${xPercent}%, Y: ${yPercent}%)`;
   }
 }
 
-  // 🎯 경기둘레길 코스 선택 핸들러
-  function selectGyeonggiCourse(courseNo) {
-    selectedGyeonggiCourseNo = courseNo;
-    
-    // 1. 배지 텍스트 변경
-    const badge = document.getElementById('selectedTrailBadge');
-    if (badge) badge.innerText = `${courseNo}코스 선택됨`;
+// 🎯 DOM 로드 시 트래킹 체크박스 이벤트 및 지도 전환
+document.addEventListener('DOMContentLoaded', () => {
+  const trackingCb = document.getElementById('isTrackingCheck');
+  const gyeonggiMap = document.getElementById('gyeonggiMapContainer');
+  const adminMap = document.getElementById('adminMapContainer');
 
-    // 2. 코스 알약 버튼 활성화 스타일 적용
-    document.querySelectorAll('.trail-pill-btn').forEach(btn => {
-      const cNum = parseInt(btn.dataset.course);
-      if (cNum === courseNo) {
-        btn.classList.add('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105', 'font-black');
+  if (trackingCb) {
+    trackingCb.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        // 트래킹 체크 시 경기둘레길 지도 노출 & 스크롤
+        if (gyeonggiMap) gyeonggiMap.classList.remove('hidden');
+        if (adminMap) adminMap.classList.add('hidden');
+        
+        setTimeout(() => {
+          gyeonggiMap?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
       } else {
-        btn.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105');
+        // 트래킹 해제 시 100대 명산 지도 복원
+        if (gyeonggiMap) gyeonggiMap.classList.add('hidden');
+        if (adminMap) adminMap.classList.remove('hidden');
       }
     });
-
-    // 🎯 경기둘레길 코스 선택 핸들러
-function selectGyeonggiCourse(courseNo) {
-    selectedGyeonggiCourseNo = courseNo;
-
-    // 1. 배지 텍스트 변경
-    const badge = document.getElementById('selectedTrailBadge');
-    if (badge) badge.innerText = `${courseNo}코스 선택됨`;
-
-    // 2. 코스 알약 버튼 활성화 스타일 적용
-    document.querySelectorAll('.trail-pill-btn').forEach(btn => {
-        const cNum = parseInt(btn.dataset.course);
-        if (cNum === courseNo) {
-            btn.classList.add('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105', 'font-black');
-        } else {
-            btn.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105', 'font-black');
-        }
-    });
-
-    // 3. 경기둘레길 전용 지도 위의 마커 위치 이동 및 표시
-    const targetCoord = GYEONGGI_TRAIL_COORDS ? GYEONGGI_TRAIL_COORDS[courseNo] : null;
-    if (targetCoord) {
-        tempCoord = { x: targetCoord.x, y: targetCoord.y };
-
-        // 🟢 경기둘레길 지도 마커에 좌표 설정
-        const gMarker = document.getElementById('gyeonggiMapMarker');
-        if (gMarker) {
-            gMarker.style.left = `${targetCoord.x}%`;
-            gMarker.style.top = `${targetCoord.y}%`;
-            gMarker.classList.remove('hidden');
-        }
-
-        // 산/코스 이름 자동 입력
-        const mInput = document.getElementById('mountainName');
-        if (mInput && !mInput.value.trim()) {
-            mInput.value = `경기도 둘레길 ${courseNo}코스`;
-        }
-
-        // 둘레길 지도로 부드럽게 스크롤
-        const gMap = document.getElementById('gyeonggiMapContainer');
-        if (gMap) gMap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}
-
-
-    // 4. 경기둘레길 해당 코스 좌표에 마커 표시
-    const targetCoord = GYEONGGI_TRAIL_COORDS ? GYEONGGI_TRAIL_COORDS[courseNo] : null;
-    if (targetCoord) {
-      tempCoord = { x: targetCoord.x, y: targetCoord.y };
-      
-      const marker = document.getElementById('adminMapMarker');
-      const display = document.getElementById('coordDisplay');
-      
-      if (marker) {
-        marker.style.left = `${targetCoord.x}%`;
-        marker.style.top = `${targetCoord.y}%`;
-        marker.classList.remove('hidden');
-      }
-      if (display) {
-        display.innerText = `좌표: 경기도 둘레길 ${courseNo}코스 (X: ${targetCoord.x}%, Y: ${targetCoord.y}%)`;
-      }
-
-      // 등산한 산 이름 자동 입력
-      const mInput = document.getElementById('mountainName');
-      if (mInput && !mInput.value.trim()) {
-        mInput.value = `경기도 둘레길 ${courseNo}코스`;
-      }
-
-      // 5. 경기둘레길 지도가 보이는 위치로 부드럽게 스크롤 📜
-      const mapContainer = document.getElementById('adminMapContainer');
-      if (mapContainer) {
-        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
   }
+});
 
-
-
-  // 🎯 트래킹 체크박스 상태 변경 이벤트 처리
-  document.addEventListener('DOMContentLoaded', () => {
-    renderGyeonggiTrailPills();
-
-    const trackingCb = document.getElementById('isTrackingCheck');
-    const trailBox = document.getElementById('gyeonggiTrailBox');
-    const adminMapImg = document.getElementById('adminMapImg');
-
-    if (trackingCb) {
-      trackingCb.addEventListener('change', (e) => {
-        if (e.target.checked) {
-          if (trailBox) trailBox.classList.remove('hidden');
-          if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
-          
-          // 트래킹 체크 시 둘레길 선택창으로 부드럽게 스크롤
-          setTimeout(() => {
-            trailBox?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 100);
-        } else {
-          if (trailBox) trailBox.classList.add('hidden');
-          if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
-          selectedGyeonggiCourseNo = null;
-          
-          const badge = document.getElementById('selectedTrailBadge');
-          if (badge) badge.innerText = '미선택';
-        }
-      });
-    }
-  });
-    
 
         
 // ==========================================
@@ -7842,6 +7719,7 @@ window.toggleDisableCoord = () => {
 };
 
 
+
 window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
@@ -7905,10 +7783,6 @@ window.addMultiActivity = async () => {
         disableCoord = true;
     }
 
-    // 🚶‍♂️ 경기도 둘레길 전용 상태 확인
-    const isGyeonggiTrail = isTracking && selectedGyeonggiCourseNo !== null;
-    const gyeonggiCourseNo = isGyeonggiTrail ? selectedGyeonggiCourseNo : null;
-
     const region = document.getElementById('adminManualRegionSelect')?.value || "";
     const isQuarterOnlyOne = document.getElementById('isQuarterCheck')?.checked || false;
     
@@ -7933,6 +7807,7 @@ window.addMultiActivity = async () => {
 
     const selectedNames = [];
     
+    // 수동 클릭 좌표 사용
     const safeCoords = (!disableCoord && typeof tempCoord !== 'undefined' && tempCoord && tempCoord.x !== undefined) ? tempCoord : null;
 
     try {
@@ -7979,8 +7854,6 @@ window.addMultiActivity = async () => {
                 updateData["quarterlyStats.2026_q2"] = { hike: pastCount, total: pastCount };
             }
 
-            const hikeUpAmount = up;
-            const activityUpAmount = up;
             const realUpAmount = isRealHike ? up : 0;
             const oldLevel = member.level || 0;
             const newLevel = oldLevel + realUpAmount;
@@ -8107,10 +7980,7 @@ window.addMultiActivity = async () => {
                     starType, author: member.name,
                     seasonIcon: selectedSeasonMark,
                     isSpecial: isSpecialTracking ? false : isSpecial,
-                    pRock, pForest, pValley,
-                    // 🚶‍♂️ 경기도 둘레길 전용 데이터 저장
-                    isGyeonggiTrail: isGyeonggiTrail,
-                    gyeonggiCourseNo: gyeonggiCourseNo
+                    pRock, pForest, pValley
                 };
 
                 let customLogDocId = baseDocId;
@@ -8156,7 +8026,7 @@ window.addMultiActivity = async () => {
         
         alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // 폼 초기화
+        // 폼 및 좌표 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
@@ -8184,30 +8054,20 @@ window.addMultiActivity = async () => {
             if (cb) cb.checked = false;
         });
 
-        // 🎯 둘레길 선택창 및 이미지 초기화
-        selectedGyeonggiCourseNo = null;
-        const trailBox = document.getElementById('gyeonggiTrailBox');
-        if (trailBox) trailBox.classList.add('hidden');
-
-        const adminMapImg = document.getElementById('adminMapImg');
-        if (adminMapImg) adminMapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
-
-        const trailBadge = document.getElementById('selectedTrailBadge');
-        if (trailBadge) trailBadge.innerText = '미선택';
-
-        document.querySelectorAll('.trail-pill-btn').forEach(btn => {
-            btn.classList.remove('ring-2', 'ring-offset-1', 'ring-slate-800', 'scale-105');
-        });
-
-        const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
-        if (defaultRadio) defaultRadio.checked = true;
+        // 🎯 지도 초기화
+        const gyeonggiMap = document.getElementById('gyeonggiMapContainer');
+        const adminMap = document.getElementById('adminMapContainer');
+        if (gyeonggiMap) gyeonggiMap.classList.add('hidden');
+        if (adminMap) adminMap.classList.remove('hidden');
 
         tempCoord = null; 
-        const marker = document.getElementById('adminMapMarker');
-        if (marker) marker.classList.add('hidden');
+        document.querySelectorAll('.map-point').forEach(marker => marker.classList.add('hidden'));
         
         const display = document.getElementById('coordDisplay');
         if (display) display.innerText = '좌표: 없음 (지도 클릭)';
+
+        const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
+        if (defaultRadio) defaultRadio.checked = true;
 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
@@ -8219,9 +8079,9 @@ window.addMultiActivity = async () => {
         console.error("Error 상세:", error);
         alert("저장 실패: " + error.message);
     }
-  };            
-        
-            
+};
+
+
             
                     
 
