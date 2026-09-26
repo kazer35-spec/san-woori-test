@@ -4030,46 +4030,25 @@ margin: 0 2px !important;
     </div>
 
     
-<!-- Main Map View -->
 <div id="mapViewMain">
-  
-  <!-- 📦 지도가 상단에 배치되고, 정보 바가 바로 아래 붙는 통합 카드 컨테이너 -->
-  <div id="integratedMapCard" class="bg-slate-50 border border-slate-200/80 rounded-2xl p-2.5 mb-3 shadow-sm transition-all duration-300">
+  <div id="mapContainer" class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3 transition-all duration-300">
     
-    <!-- 🗺️ 지도 프레임 컨테이너 -->
-    <div id="mapContainer" class="map-container relative rounded-xl overflow-hidden transition-all duration-300">
-      
-      <!-- 🖼️ 메인 지도 이미지 -->
-      <img id="mainMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-xl transition-all duration-300">
-      
-      <!-- 🌲 지도 우측 상단 미니 배지 (100대 명산 모드용) -->
-      <button type="button" id="miniBadgeBtn" onclick="toggleMapType()" class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 cursor-pointer hover:bg-emerald-50 transition-colors">
-        <span id="miniBadgeIcon" class="text-[10px]">🌲</span>
-        <span id="miniTop100Badge" class="tracking-tight">0/100</span>
-      </button>
+    <img id="mainMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl transition-all duration-300">
+    
+    <button type="button" onclick="toggleMapType()" class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 cursor-pointer hover:bg-emerald-50 transition-colors">
+      <span id="miniBadgeIcon" class="text-[10px]">🌲</span>
+      <span id="miniTop100Badge" class="tracking-tight">0/100</span>
+    </button>
 
-      <div id="conquerMapPoints"></div>
-      
-      <!-- 💡 출처 텍스트 -->
-      <div id="mapSourceTxt" class="map-source-txt absolute bottom-1 right-2.5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">
-        출처: 산림청
-      </div>
+    <div id="mapTitleBadge" class="hidden absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] font-extrabold shadow-sm z-20 items-center gap-1.5">
+      <span>🚶</span> 경기도 둘레길
     </div>
 
-    <!-- 🚶 경기도 둘레길 정보 바 (지도 아래쪽에 일체형 배치) -->
-    <div id="trailHeader" class="hidden justify-between items-center bg-white px-3.5 py-2.5 rounded-xl border border-slate-200/60 mt-2.5 shadow-xs">
-      <div class="flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
-        <span>🚶</span> 경기도 둘레길
-      </div>
-      <div class="bg-emerald-50 border border-emerald-500/30 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-black shadow-xs flex items-center gap-1.5">
-        <span>🚶</span>
-        <span id="trailBadgeText" class="tracking-tight">0/60</span>
-      </div>
-    </div>
+    <div id="conquerMapPoints"></div>
+    
+    <div id="mapSourceTxt" class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
+  </div>
 
-  </div> <!-- 👈 감싸는 닫는 태그 누락 수정 완료 -->
-
-  <!-- 상세 통계 전환 버튼 -->
   <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
     <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
       <span>🎖️</span> 정복 통계 및 산림청 100대 목록
@@ -4086,22 +4065,17 @@ margin: 0 2px !important;
   </div>
 </div>
 
-<!-- Detailed Stats View (통계 3종 탭) -->
 <div id="mapViewStats" class="hidden-view">
   <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col justify-between">
     
-    <!-- Header & Tab Navigation -->
     <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
       <div class="flex gap-1 overflow-x-auto no-scrollbar">
-        <!-- 🔵 100대 명산 탭 -->
         <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
           <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
         </button>
-        <!-- 🔴 기타 명산 탭 -->
         <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
           <span id="dotNormal" class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 기타 명산
         </button>
-        <!-- 지역 점유율 탭 -->
         <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
           지역 점유율
         </button>
@@ -4111,9 +4085,7 @@ margin: 0 2px !important;
       </button>
     </div>
 
-    <!-- Tab Contents -->
     <div class="flex-1 flex flex-col min-h-0">
-      <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
       <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
         <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
           <div id="top100MountainGrid" class="space-y-1.5"></div>
@@ -4123,7 +4095,6 @@ margin: 0 2px !important;
         </div>
       </div>
 
-      <!-- Tab 2: 일반 정복한 산 목록 -->
       <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
         <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
           <div id="normalMountainGrid" class="space-y-1.5"></div>
@@ -4133,7 +4104,6 @@ margin: 0 2px !important;
         </div>
       </div>
 
-      <!-- Tab 3: 지역별 점유율 -->
       <div id="regionStatsBox" class="flex-1 min-h-0 hidden">
         <div id="conquerRegionGrid" class="h-[280px] overflow-y-auto pr-1"></div>
       </div>
@@ -4142,14 +4112,12 @@ margin: 0 2px !important;
   </div>
 </div>
 
-<!-- 하단 닫기 버튼 -->
 <div class="flex-shrink-0 pt-3">
   <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
     닫기
   </button>
 </div>
 
-<!-- ⚙️ 스크립트 -->
 <script>
   let isGyeonggiTrailMode = false;
   
@@ -4157,44 +4125,44 @@ margin: 0 2px !important;
   let currentTrailCount = 0;
 
   function toggleMapType() {
+    const mapContainer = document.getElementById('mapContainer');
     const mapImg = document.getElementById('mainMapImage');
-    const miniBadgeBtn = document.getElementById('miniBadgeBtn');
-    const trailHeader = document.getElementById('trailHeader');
+    const titleBadge = document.getElementById('mapTitleBadge');
     const sourceTxt = document.getElementById('mapSourceTxt');
     const miniBadgeIcon = document.getElementById('miniBadgeIcon');
     const miniBadgeText = document.getElementById('miniTop100Badge');
-    const trailBadgeText = document.getElementById('trailBadgeText');
     const mapPoints = document.getElementById('conquerMapPoints');
 
     isGyeonggiTrailMode = !isGyeonggiTrailMode;
 
     if (isGyeonggiTrailMode) {
       // 1. 경기둘레길 모드
-      mapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
+      if (mapContainer) mapContainer.classList.add('pt-12', 'pb-2');
+      if (mapImg) mapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
       
-      miniBadgeBtn.classList.add('hidden');
-      if (trailHeader) {
-        trailHeader.classList.remove('hidden');
-        trailHeader.classList.add('flex');
+      if (titleBadge) {
+        titleBadge.classList.remove('hidden');
+        titleBadge.classList.add('flex');
       }
       
-      sourceTxt.innerText = '출처: 경기도 둘레길';
-      if (trailBadgeText) trailBadgeText.innerText = `${currentTrailCount}/60`;
+      if (sourceTxt) sourceTxt.innerText = '출처: 경기도 둘레길';
+      if (miniBadgeIcon) miniBadgeIcon.innerText = '🚶';
+      if (miniBadgeText) miniBadgeText.innerText = `${currentTrailCount}/60`;
       
       if (mapPoints) mapPoints.style.display = 'none';
     } else {
       // 2. 100대 명산 모드
-      mapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
+      if (mapContainer) mapContainer.classList.remove('pt-12', 'pb-2');
+      if (mapImg) mapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
       
-      if (trailHeader) {
-        trailHeader.classList.add('hidden');
-        trailHeader.classList.remove('flex');
+      if (titleBadge) {
+        titleBadge.classList.add('hidden');
+        titleBadge.classList.remove('flex');
       }
-      miniBadgeBtn.classList.remove('hidden');
       
-      sourceTxt.innerText = '출처: 산림청';
-      miniBadgeIcon.innerText = '🌲';
-      miniBadgeText.innerText = `${currentTop100Count}/100`;
+      if (sourceTxt) sourceTxt.innerText = '출처: 산림청';
+      if (miniBadgeIcon) miniBadgeIcon.innerText = '🌲';
+      if (miniBadgeText) miniBadgeText.innerText = `${currentTop100Count}/100`;
       
       if (mapPoints) mapPoints.style.display = 'block';
     }
@@ -4202,23 +4170,22 @@ margin: 0 2px !important;
 
   function updateTrailCount(count) {
     currentTrailCount = count;
-    const trailBadgeText = document.getElementById('trailBadgeText');
-    if (trailBadgeText) {
-      trailBadgeText.innerText = `${currentTrailCount}/60`;
+    if (isGyeonggiTrailMode) {
+      const miniBadgeText = document.getElementById('miniTop100Badge');
+      if (miniBadgeText) miniBadgeText.innerText = `${currentTrailCount}/60`;
     }
   }
 
   function updateTop100Count(count) {
     currentTop100Count = count;
     if (!isGyeonggiTrailMode) {
-      document.getElementById('miniTop100Badge').innerText = `${currentTop100Count}/100`;
+      const miniBadgeText = document.getElementById('miniTop100Badge');
+      if (miniBadgeText) miniBadgeText.innerText = `${currentTop100Count}/100`;
     }
   }
 </script>
 
-
-
-
+    
       
       
 
