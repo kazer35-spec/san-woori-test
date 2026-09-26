@@ -3603,7 +3603,7 @@ margin: 0 2px !important;
         <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
       </label>
       <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
+  <input type="checkbox" id="isTrackingCheck" onchange="toggleMapImage(this)" class="w-3.5 h-3.5"> 트래킹👟
       </label>
       <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
         <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
@@ -3722,6 +3722,12 @@ margin: 0 2px !important;
   </div>
 </div>
 
+          <!-- 2. 지도 이미지 태그에 id="mapImage" 추가 -->
+<div class="map-container" onclick="setAdminCoordinate(event)">
+  <img id="mapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+  <div id="adminMapMarker" class="map-point hidden"></div>
+</div>
+          
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
       <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
@@ -4536,6 +4542,26 @@ await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: ms
 };
 
 window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
+
+// 지도 이미지 URL 정의
+const DEFAULT_MAP_URL = "https://i.ibb.co/bMLmRYRJ/2-1.jpg"; // 기존 100대명산/정복지도
+const TRACKING_MAP_URL = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg"; // 경기둘레길 지도
+
+/**
+ * 트래킹 체크박스 상태에 따라 지도 이미지를 전환하는 함수
+ */
+function toggleMapImage(checkbox) {
+  const mapImage = document.getElementById('mapImage');
+  if (!mapImage) return;
+
+  if (checkbox.checked) {
+    // 트래킹 체크 시 경기둘레길 지도로 변경
+    mapImage.src = TRACKING_MAP_URL;
+  } else {
+    // 체크 해제 시 기존 지도로 복원
+    mapImage.src = DEFAULT_MAP_URL;
+  }
+}
 
 // ==========================================
 // 📌 회원 선택 수 & 벙주 체크박스 실시간 감지
