@@ -3722,37 +3722,15 @@ margin: 0 2px !important;
   </div>
 </div>
 
-          <!-- 2. 기존 100대 명산 지도 영역 (기존 코드 그대로 유지) -->
+          <!-- 🎯 단 하나의 통합 지도 영역 -->
 <div class="map-container" onclick="setAdminCoordinate(event)">
-  <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+  <img id="mapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
   <div id="adminMapMarker" class="map-point hidden"></div>
 </div>
 <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
 
-
-<!-- 3. 경기둘레길 전용 지도 영역 (평소에는 hidden으로 숨김) -->
-<div id="trackingMapBox" class="hidden mt-3 pt-3 border-t border-gray-200">
-  <div class="text-[11px] font-bold text-teal-600 mb-1 flex items-center gap-1">
-    <span>👟 경기둘레길 지도 (좌표 지정)</span>
-  </div>
-  <div class="map-container" onclick="setTrackingCoordinate(event)">
-    <img src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" class="map-image" alt="경기둘레길 지도">
-    <div id="trackingMapMarker" class="map-point hidden"></div>
-  </div>
-  <div id="trackingCoordDisplay" class="coordinate-display">둘레길 좌표: 없음 (지도 클릭)</div>
-</div>
-          
-    <!-- 지도 영역 -->
-    <div class="map-container" onclick="setAdminCoordinate(event)">
-      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
-      <div id="adminMapMarker" class="map-point hidden"></div>
-    </div>
-    <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
-  </div>
-
-  <input type="date" id="activityDate" class="input-gap">
-  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-</div>
+<input type="date" id="activityDate" class="input-gap mt-2">
+<button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-2">기록 저장하기</button>
 
 
 
@@ -4293,18 +4271,18 @@ let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
         /**
- * 트래킹 체크박스 선택 시 경기둘레길 지도 영역 표시/숨김 토글
+ * 트래킹 체크박스 상태에 따라 지도를 경기둘레길 지도로 전환하는 함수
  */
-function toggleTrackingMapBox(checkbox) {
-  const trackingBox = document.getElementById('trackingMapBox');
-  if (!trackingBox) return;
+function toggleTrackingMap(checkbox) {
+  const mapImage = document.getElementById('mapImage');
+  if (!mapImage) return;
 
   if (checkbox.checked) {
-    // 트래킹 체크 시 경기둘레길 지도 영역을 보여줌
-    trackingBox.classList.remove('hidden');
+    // 트래킹 체크 시 경기둘레길 지도로 전환
+    mapImage.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
   } else {
-    // 체크 해제 시 경기둘레길 지도 영역을 숨김
-    trackingBox.classList.add('hidden');
+    // 트래킹 체크 해제 시 원래 정복지도로 복원
+    mapImage.src = "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
   }
 }
 
