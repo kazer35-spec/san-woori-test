@@ -3721,17 +3721,15 @@ margin: 0 2px !important;
     </div>
   </div>
 </div>
-<!-- 트래킹 체크박스에 onchange 이벤트 추가 -->
-<label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-  <input type="checkbox" id="isTrackingCheck" onchange="toggleAdminMapByTracking()" class="w-3.5 h-3.5"> 트래킹👟
-</label>
 
-<!-- 지도 이미지에 id="adminMapImage" 추가 -->
+          <!-- 기존 트래킹 체크박스에 onchange 이벤트 추가 -->
+<input type="checkbox" id="isTrackingCheck" onchange="toggleAdminMapByTracking()" class="w-3.5 h-3.5"> 트래킹👟
+
+<!-- 관리자 지도 이미지 (id="adminMapImage" 확인) -->
 <div class="map-container" onclick="setAdminCoordinate(event)">
   <img id="adminMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
   <div id="adminMapMarker" class="map-point hidden"></div>
 </div>
-<div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
 
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
@@ -4224,83 +4222,8 @@ margin: 0 2px !important;
       document.getElementById('miniTop100Badge').innerText = `${currentTop100Count}/100`;
     }
   }
-
- // 글로벌 이미지 주소 정의
-const MAP_URL_DEFAULT = "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
-const MAP_URL_GYEONGGI = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
-
-// 1. 트래킹 체크박스 토글 시 지도 이미지 자동 전환
-function toggleAdminMapByTracking() {
-    const isTracking = document.getElementById('isTrackingCheck')?.checked;
-    const adminMapImg = document.getElementById('adminMapImage');
-    
-    if (adminMapImg) {
-        if (isTracking) {
-            adminMapImg.src = MAP_URL_GYEONGGI;
-        } else {
-            adminMapImg.src = MAP_URL_DEFAULT;
-        }
-    }
-}
-
-// 2. 관리자 지도 클릭 시 좌표 계산 및 코스 추정 함수
-function setAdminCoordinate(event) {
-    if (document.getElementById('disableCoordCheck')?.checked) return;
-
-    const container = event.currentTarget;
-    const rect = container.getBoundingClientRect();
-    
-    // 클릭한 상대 비율 좌표 계산 (%)
-    const x = parseFloat((((event.clientX - rect.left) / rect.width) * 100).toFixed(1));
-    const y = parseFloat((((event.clientY - rect.top) / rect.height) * 100).toFixed(1));
-    
-    tempCoord = { x, y };
-
-    // 마커 위치 업데이트
-    const marker = document.getElementById('adminMapMarker');
-    if (marker) {
-        marker.style.left = `${x}%`;
-        marker.style.top = `${y}%`;
-        marker.classList.remove('hidden');
-    }
-
-    const isTracking = document.getElementById('isTrackingCheck')?.checked;
-    const display = document.getElementById('coordDisplay');
-
-    if (isTracking && typeof GYEONGGI_TRAIL_COORDS !== 'undefined') {
-        // GYEONGGI_TRAIL_COORDS 중에서 가장 가까운 둘레길 코스 번호 계산
-        let closestCourse = null;
-        let minDistance = Infinity;
-
-        Object.keys(GYEONGGI_TRAIL_COORDS).forEach(courseNum => {
-            const c = GYEONGGI_TRAIL_COORDS[courseNum];
-            const dist = Math.hypot(c.x - x, c.y - y);
-            if (dist < minDistance) {
-                minDistance = dist;
-                closestCourse = courseNum;
-            }
-        });
-
-        tempCoord.dulleCourse = closestCourse ? parseInt(closestCourse) : null;
-        if (display) {
-            display.innerText = `좌표: X ${x}%, Y ${y}% [경기둘레길 ${closestCourse || '?'}코스 추정]`;
-        }
-    } else {
-        if (display) {
-            display.innerText = `좌표: X ${x}%, Y ${y}%`;
-        }
-    }
-}
-       
 </script>
-
-
-          
-
-      
-
-          
-      
+   
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
 <div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
@@ -4351,6 +4274,71 @@ const now = new Date();
 let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
+ // 1. 기존 트래킹 체크박스 클릭 시 지도 이미지 전환 함수
+function toggleAdminMapByTracking() {
+    const isTracking = document.getElementById('isTrackingCheck')?.checked;
+    const adminMapImg = document.getElementById('adminMapImage');
+    
+    if (adminMapImg) {
+        if (isTracking) {
+            // 트래킹 체크 시 경기둘레길 지도로 교체
+            adminMapImg.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
+        } else {
+            // 체크 해제 시 기본 100대명산 지도로 복구
+            adminMapImg.src = "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
+        }
+    }
+}
+
+// 2. 지도 클릭 시 좌표 및 경기둘레길 코스 계산 함수
+function setAdminCoordinate(event) {
+    if (document.getElementById('disableCoordCheck')?.checked) return;
+
+    const container = event.currentTarget;
+    const rect = container.getBoundingClientRect();
+    
+    // 클릭한 위치 % 좌표 계산
+    const x = parseFloat((((event.clientX - rect.left) / rect.width) * 100).toFixed(1));
+    const y = parseFloat((((event.clientY - rect.top) / rect.height) * 100).toFixed(1));
+    
+    tempCoord = { x, y };
+
+    // 마커 표시
+    const marker = document.getElementById('adminMapMarker');
+    if (marker) {
+        marker.style.left = `${x}%`;
+        marker.style.top = `${y}%`;
+        marker.classList.remove('hidden');
+    }
+
+    const isTracking = document.getElementById('isTrackingCheck')?.checked;
+    const display = document.getElementById('coordDisplay');
+
+    // 트래킹 상태일 때 경기둘레길 코스 좌표 자동매핑
+    if (isTracking && typeof GYEONGGI_TRAIL_COORDS !== 'undefined') {
+        let closestCourse = null;
+        let minDistance = Infinity;
+
+        Object.keys(GYEONGGI_TRAIL_COORDS).forEach(courseNum => {
+            const c = GYEONGGI_TRAIL_COORDS[courseNum];
+            const dist = Math.hypot(c.x - x, c.y - y);
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestCourse = courseNum;
+            }
+        });
+
+        tempCoord.dulleCourse = closestCourse ? parseInt(closestCourse) : null;
+        if (display) {
+            display.innerText = `좌표: X ${x}%, Y ${y}% [경기둘레길 ${closestCourse || '?'}코스 추정]`;
+        }
+    } else {
+        if (display) {
+            display.innerText = `좌표: X ${x}%, Y ${y}%`;
+        }
+    }
+}
+       
 // ==========================================
 // 📌 [신규 회원 저장 함수]
 // ==========================================
