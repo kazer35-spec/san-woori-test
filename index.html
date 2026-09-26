@@ -4301,70 +4301,188 @@ const now = new Date();
 let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
- // 1. 기존 트래킹 체크박스 클릭 시 지도 이미지 전환 함수
-function toggleAdminMapByTracking() {
-    const isTracking = document.getElementById('isTrackingCheck')?.checked;
-    const adminMapImg = document.getElementById('adminMapImage');
-    
-    if (adminMapImg) {
-        if (isTracking) {
-            // 트래킹 체크 시 경기둘레길 지도로 교체
-            adminMapImg.src = "https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg";
-        } else {
-            // 체크 해제 시 기본 100대명산 지도로 복구
-            adminMapImg.src = "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
-        }
+ // 전역 변수
+let tempCoord = null;
+let selectedDulleCourse = null;
+
+// DOM 로드 시 둘레길 코스 버튼 grid 생성
+document.addEventListener('DOMContentLoaded', () => {
+    initGyeonggiTrailGrid();
+});
+
+// 1. 경기둘레길 1~60 코스 버튼(Pill) 자동 생성
+function initGyeonggiTrailGrid() {
+    const grid = document.getElementById('trailPillGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    for (let i = 1; i <= 60; i++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `trail-pill-btn text-[10px] font-bold py-1 px-0.5 rounded-lg border transition-all text-center ${
+            selectedDulleCourse === i 
+                ? 'bg-amber-500 text-white border-amber-600 shadow-sm' 
+                : 'bg-amber-100/70 text-amber-800 border-amber-200 hover:bg-amber-200'
+        }`;
+        btn.innerText = `${i}코스`;
+        btn.onclick = () => selectGyeonggiCourse(i);
+        grid.appendChild(btn);
     }
 }
 
-// 2. 지도 클릭 시 좌표 및 경기둘레길 코스 계산 함수
-function setAdminCoordinate(event) {
+// 2. 둘레길 코스 버튼 클릭 시 처리
+function selectGyeonggiCourse(courseNum) {
+    selectedDulleCourse = courseNum;
+    
+    // 배지 텍스트 변경
+    const badge = document.getElementById('selectedTrailBadge');
+    if (badge) badge.innerText = `${courseNum}코스`;
+
+    // 버튼 선택 상태 UI 리셋
+    initGyeonggiTrailGrid();
+
+    // 경기둘레길 좌표 데이터(GYEONGGI_TRAIL_COORDS)가 지정되어 있을 때 좌표 자동 세팅
+    if (typeof GYEONGGI_TRAIL_COORDS !== 'undefined' && GYEONGGI_TRAIL_COORDS[courseNum]) {
+        const coord = GYEONGGI_TRAIL_COORDS[courseNum];
+        tempCoord = { x: coord.x, y: coord.y, dulleCourse: courseNum };
+
+        const marker = document.getElementById('gyeonggiMapMarker');
+        if (marker) {
+            marker.style.left = `${coord.x}%`;
+            marker.style.top = `${coord.y}%`;
+            marker.classList.remove('hidden');
+        }
+
+        const display = document.getElementById('coordDisplay');
+        if (display) {
+            display.innerText = `좌표: [경기둘레길 ${courseNum}코스] X ${coord.x}%, Y ${coord.y}%`;
+        }
+    }
+
+    // 경기둘레길 지도 위치로 자동 스크롤
+    const gyeonggiMap = document.getElementById('gyeonggiMapContainer');
+    if (gyeonggiMap) {
+        gyeonggiMap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+// 3. 트래킹 체크박스 변경 시 지도/박스 토글 함수
+function toggleAdminMapByTracking() {
+    const isTracking = document.getElementById('isTrackingCheck')?.checked;
+
+    const trailBox = document.getElementById('gyeonggiTrailBox');
+    const gyeonggiMap = document.getElementById('gyeonggiMapContainer');
+    const adminMap = document.getElementById('adminMapContainer');
+
+    // 상태 및 마커 초기화
+    tempCoord = null;
+    selectedDulleCourse = null;
+    document.querySelectorAll('.map-point').forEach(m => m.classList.add('hidden'));
+
+    const badge = document.getElementById('selectedTrailBadge');
+    if (badge) badge.innerText = '미선택';
+
+    const display = document.getElementById('coordDisplay');
+    if (display) display.innerText = '좌표: 없음 (지도 클릭)';
+
+    if (isTracking) {
+        if (trailBox) trailBox.classList.remove('hidden');
+        if (gyeonggiMap) gyeonggiMap.classList.remove('hidden');
+        if (adminMap) adminMap.classList.add('hidden');
+    } else {
+        if (trailBox) trailBox.classList.add('hidden');
+        if (gyeonggiMap) gyeonggiMap.classList.add('hidden');
+        if (adminMap) adminMap.classList.remove('hidden');
+    }
+}
+
+// 4. 지도 직접 클릭 시 좌표 수집 함수
+function setAdminMapCoord(event) {
     if (document.getElementById('disableCoordCheck')?.checked) return;
 
     const container = event.currentTarget;
     const rect = container.getBoundingClientRect();
-    
-    // 클릭한 위치 % 좌표 계산
+
     const x = parseFloat((((event.clientX - rect.left) / rect.width) * 100).toFixed(1));
     const y = parseFloat((((event.clientY - rect.top) / rect.height) * 100).toFixed(1));
-    
-    tempCoord = { x, y };
-
-    // 마커 표시
-    const marker = document.getElementById('adminMapMarker');
-    if (marker) {
-        marker.style.left = `${x}%`;
-        marker.style.top = `${y}%`;
-        marker.classList.remove('hidden');
-    }
 
     const isTracking = document.getElementById('isTrackingCheck')?.checked;
-    const display = document.getElementById('coordDisplay');
 
-    // 트래킹 상태일 때 경기둘레길 코스 좌표 자동매핑
-    if (isTracking && typeof GYEONGGI_TRAIL_COORDS !== 'undefined') {
-        let closestCourse = null;
-        let minDistance = Infinity;
+    if (isTracking) {
+        // 가장 가까운 경기둘레길 코스 찾기 계산
+        let closestCourse = selectedDulleCourse;
+        if (typeof GYEONGGI_TRAIL_COORDS !== 'undefined') {
+            let minDistance = Infinity;
+            Object.keys(GYEONGGI_TRAIL_COORDS).forEach(num => {
+                const c = GYEONGGI_TRAIL_COORDS[num];
+                const dist = Math.hypot(c.x - x, c.y - y);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestCourse = parseInt(num);
+                }
+            });
+        }
 
-        Object.keys(GYEONGGI_TRAIL_COORDS).forEach(courseNum => {
-            const c = GYEONGGI_TRAIL_COORDS[courseNum];
-            const dist = Math.hypot(c.x - x, c.y - y);
-            if (dist < minDistance) {
-                minDistance = dist;
-                closestCourse = courseNum;
-            }
-        });
+        selectedDulleCourse = closestCourse;
+        tempCoord = { x, y, dulleCourse: closestCourse };
 
-        tempCoord.dulleCourse = closestCourse ? parseInt(closestCourse) : null;
+        const marker = document.getElementById('gyeonggiMapMarker');
+        if (marker) {
+            marker.style.left = `${x}%`;
+            marker.style.top = `${y}%`;
+            marker.classList.remove('hidden');
+        }
+
+        const badge = document.getElementById('selectedTrailBadge');
+        if (badge && closestCourse) badge.innerText = `${closestCourse}코스`;
+
+        const display = document.getElementById('coordDisplay');
         if (display) {
-            display.innerText = `좌표: X ${x}%, Y ${y}% [경기둘레길 ${closestCourse || '?'}코스 추정]`;
+            display.innerText = `좌표: X ${x}%, Y ${y}% [경기둘레길 ${closestCourse || '?'}코스]`;
         }
     } else {
+        // 100대 명산 지도 클릭
+        tempCoord = { x, y };
+
+        const marker = document.getElementById('adminMapMarker');
+        if (marker) {
+            marker.style.left = `${x}%`;
+            marker.style.top = `${y}%`;
+            marker.classList.remove('hidden');
+        }
+
+        const display = document.getElementById('coordDisplay');
         if (display) {
             display.innerText = `좌표: X ${x}%, Y ${y}%`;
         }
     }
 }
+
+// 5. 기록 저장 후 폼 리셋 부분
+function resetAdminFormUI() {
+    const trailBox = document.getElementById('gyeonggiTrailBox');
+    const gyeonggiMap = document.getElementById('gyeonggiMapContainer');
+    const adminMap = document.getElementById('adminMapContainer');
+
+    // 둘레길 박스 숨김 & 기본 명산 지도로 복구
+    if (trailBox) trailBox.classList.add('hidden');
+    if (gyeonggiMap) gyeonggiMap.classList.add('hidden');
+    if (adminMap) adminMap.classList.remove('hidden');
+
+    tempCoord = null;
+    selectedDulleCourse = null;
+    
+    document.querySelectorAll('.map-point').forEach(marker => marker.classList.add('hidden'));
+
+    const badge = document.getElementById('selectedTrailBadge');
+    if (badge) badge.innerText = '미선택';
+
+    const display = document.getElementById('coordDisplay');
+    if (display) display.innerText = '좌표: 없음 (지도 클릭)';
+
+    initGyeonggiTrailGrid();
+}
+
        
 // ==========================================
 // 📌 [신규 회원 저장 함수]
@@ -7815,8 +7933,6 @@ window.toggleDisableCoord = () => {
     const up = upElement ? parseInt(upElement.value) : 0;
 
     const selectedNames = [];
-    
-    // 수동 클릭 좌표 사용
     const safeCoords = (!disableCoord && typeof tempCoord !== 'undefined' && tempCoord && tempCoord.x !== undefined) ? tempCoord : null;
 
     try {
@@ -7856,7 +7972,7 @@ window.toggleDisableCoord = () => {
 
             let updateData = {}; 
 
-            // 🎯 [추가] 트래킹 모드 시 선택된 경기둘레길 코스 번호(dulleCourse)를 회원의 dulleCourses 배열에 추가
+            // 🎯 트래킹 상태일 때 선택된 경기둘레길 코스 dulleCourses 배열에 추가
             if (isTracking && safeCoords && safeCoords.dulleCourse) {
                 const courseNum = parseInt(safeCoords.dulleCourse);
                 const _arrayUnion = (typeof arrayUnion !== 'undefined') ? arrayUnion : (val) => val;
@@ -7997,7 +8113,7 @@ window.toggleDisableCoord = () => {
                     seasonIcon: selectedSeasonMark,
                     isSpecial: isSpecialTracking ? false : isSpecial,
                     pRock, pForest, pValley,
-                    // 🎯 [추가] 트래킹 모드 시 선택된 경기둘레길 코스 저장
+                    // 🎯 logs 문서에 dulleCourse 저장
                     dulleCourse: (isTracking && safeCoords) ? (safeCoords.dulleCourse || null) : null
                 };
 
@@ -8023,7 +8139,7 @@ window.toggleDisableCoord = () => {
             let dupSeq = 2;
             while (checkSnap.exists()) {
                 bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-                bondingRef = doc(doc(db, "bondingForest", bondingDocId)); 
+                bondingRef = doc(db, "bondingForest", bondingDocId); 
                 checkSnap = await getDoc(bondingRef);
                 dupSeq++;
             }
@@ -8044,7 +8160,7 @@ window.toggleDisableCoord = () => {
         
         alert((isRealHike && !isExtraHike) ? (isSpecialTracking ? "인정 트레킹 기록 완료! 🥾 (순수산행 동일 적용)" : "순수산행 기록 완료! ✅") : (isExtraHike ? "번외산행 기록 완료! 🌲" : "일반 활동(러닝/트레킹/산책) 기록 완료! 🏃"));
         
-        // 폼 및 좌표 초기화
+        // 폼 초기화
         selectedMemberIds.clear();
         window.selectedHostIds = [];
         document.querySelectorAll('.host-checkbox').forEach(cb => cb.checked = false);
@@ -8072,20 +8188,22 @@ window.toggleDisableCoord = () => {
             if (cb) cb.checked = false;
         });
 
-        // 🎯 지도 및 스위칭 초기화
-        const adminMapImg = document.getElementById('adminMapImage');
-        if (adminMapImg) {
-            adminMapImg.src = (typeof MAP_URL_DEFAULT !== 'undefined') ? MAP_URL_DEFAULT : "https://i.ibb.co/bMLmRYRJ/2-1.jpg";
-        }
-
+        // 🎯 저장 완료 후 지도 및 UI 초기화 (100대 명산 지도로 복구)
+        const trailBox = document.getElementById('gyeonggiTrailBox');
         const gyeonggiMap = document.getElementById('gyeonggiMapContainer');
         const adminMap = document.getElementById('adminMapContainer');
+
+        if (trailBox) trailBox.classList.add('hidden');
         if (gyeonggiMap) gyeonggiMap.classList.add('hidden');
         if (adminMap) adminMap.classList.remove('hidden');
 
         tempCoord = null; 
+        selectedDulleCourse = null;
         document.querySelectorAll('.map-point').forEach(marker => marker.classList.add('hidden'));
         
+        const badge = document.getElementById('selectedTrailBadge');
+        if (badge) badge.innerText = '미선택';
+
         const display = document.getElementById('coordDisplay');
         if (display) display.innerText = '좌표: 없음 (지도 클릭)';
 
@@ -8097,13 +8215,17 @@ window.toggleDisableCoord = () => {
             dateInput.value = kstDate.toISOString().split('T')[0];
         }
         
+        initGyeonggiTrailGrid(); // 둘레길 선택 상태 리셋
         if (typeof startRealtimeSync === 'function') startRealtimeSync(); 
     } catch (error) {
         console.error("Error 상세:", error);
         alert("저장 실패: " + error.message);
     }
 };
-          
+
+
+            
+                      
         
 
 // 📌 [신규 회원 등록 함수]
