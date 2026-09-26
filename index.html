@@ -4237,6 +4237,135 @@ margin: 0 2px !important;
   }
 </script>
 
+<script>
+  // 1. 전역 변수 선언
+  let isGyeonggiTrailMode = false;
+  let currentTop100Count = 0;  // 100대 명산 정복 수
+  let currentTrailCount = 0;   // 둘레길 정복 코스 수
+  
+  window.selectedGyeonggiCourseNo = null;
+  window.tempCoord = { x: 0, y: 0 };
+  
+  // 🎯 개인 정복 목록 데이터 배열 (저장된 좌표들이 들어가는 공간)
+  let userConquerList = [];
+
+
+  // 2. 🎯 메인 지도에 핀을 그려주는 핵심 함수
+  function renderUserMapPoints() {
+    const mapPointsContainer = document.getElementById('conquerMapPoints');
+    if (!mapPointsContainer) return;
+
+    // 기존 찍혀있던 핀들 초기화
+    mapPointsContainer.innerHTML = '';
+
+    userConquerList.forEach(item => {
+      // 경기 둘레길 모드일 때는 둘레길 핀만, 100대 명산 모드일 때는 명산 핀만 표시
+      if (isGyeonggiTrailMode && !item.isTrail) return;
+      if (!isGyeonggiTrailMode && item.isTrail) return;
+
+      const pin = document.createElement('div');
+      pin.className = 'absolute pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-transform hover:scale-125';
+      
+      pin.style.left = `${item.x}%`;
+      pin.style.top = `${item.y}%`;
+
+      // 빨간색 깜빡이는 핀 마커 디자인
+      pin.innerHTML = `
+        <div class="relative flex items-center justify-center">
+          <span class="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-600 border-2 border-white shadow-md"></span>
+        </div>
+      `;
+
+      pin.title = item.name;
+      mapPointsContainer.appendChild(pin);
+    });
+  }
+
+
+  // 3. 메인 지도 모드 전환 함수 (100대 명산 <-> 경기도 둘레길)
+  function toggleMapType() {
+    const mapContainer = document.getElementById('mapContainer');
+    const mapImg = document.getElementById('mainMapImage');
+    const titleBadge = document.getElementById('mapTitleBadge');
+    const sourceTxt = document.getElementById('mapSourceTxt');
+    const miniBadgeIcon = document.getElementById('miniBadgeIcon');
+    const miniBadgeText = document.getElementById('miniTop100Badge');
+
+    isGyeonggiTrailMode = !isGyeonggiTrailMode;
+
+    if (isGyeonggiTrailMode) {
+      // 경기둘레길 모드: 지도를 아래로 내림 (pt-14 적용)
+      mapContainer.classList.add('pt-14', 'pb-3', 'bg-slate-50/60');
+      mapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
+      
+      titleBadge.classList.remove('hidden');
+      titleBadge.classList.add('flex');
+      sourceTxt.innerText = '출처: 경기도 둘레길';
+      miniBadgeIcon.innerText = '🚶';
+      miniBadgeText.innerText = `${currentTrailCount}/60`;
+    } else {
+      // 100대 명산 모드 복원
+      mapContainer.classList.remove('pt-14', 'pb-3', 'bg-slate-50/60');
+      mapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
+      
+      titleBadge.classList.add('hidden');
+      titleBadge.classList.remove('flex');
+      sourceTxt.innerText = '출처: 산림청';
+      miniBadgeIcon.innerText = '🌲';
+      miniBadgeText.innerText = `${currentTop100Count}/100`;
+    }
+
+    // 모드 전환 후 핀 다시 그려주기
+    renderUserMapPoints();
+  }
+
+
+  // 4. 관리자 모드에서 [저장] 누르면 실행되는 함수
+  function saveGyeonggiTrailRecord() {
+    const mInput = document.getElementById('mountainName');
+    const mountainName = mInput ? mInput.value.trim() : '경기도 둘레길';
+
+    // 좌표 정보 저장
+    const newRecord = {
+      id: Date.now(),
+      name: mountainName,
+      courseNo: window.selectedGyeonggiCourseNo,
+      x: window.tempCoord.x,
+      y: window.tempCoord.y,
+      isTrail: true
+    };
+
+    userConquerList.push(newRecord);
+
+    // 둘레길 정복 카운트 업데이트
+    const trailRecords = userConquerList.filter(item => item.isTrail);
+    updateTrailCount(trailRecords.length);
+
+    // 🎯 지도 위 핀 그리기 실행
+    renderUserMapPoints();
+
+    alert(`${mountainName} 정복 기록이 저장되었습니다!`);
+  }
+
+
+  // 5. 카운트 업데이트 보조 함수
+  function updateTrailCount(count) {
+    currentTrailCount = count;
+    if (isGyeonggiTrailMode) {
+      const badge = document.getElementById('miniTop100Badge');
+      if (badge) badge.innerText = `${currentTrailCount}/60`;
+    }
+  }
+
+  function updateTop100Count(count) {
+    currentTop100Count = count;
+    if (!isGyeonggiTrailMode) {
+      const badge = document.getElementById('miniTop100Badge');
+      if (badge) badge.innerText = `${currentTop100Count}/100`;
+    }
+  }
+</script>
 
           
 
