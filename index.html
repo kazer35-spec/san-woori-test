@@ -3741,26 +3741,17 @@ margin: 0 2px !important;
         </p>
       </div>
           
-            <!-- 🟢 1. 경기둘레길 전용 지도 (트래킹 체크 시 노출) -->
-<div id="gyeonggiMapContainer" class="map-container hidden mb-3 cursor-pointer" onclick="setAdminMapCoord(event)">
-  <img id="gyeonggiMapImg" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" alt="경기둘레길 지도" class="w-full h-auto block rounded-2xl" />
-  <div id="gyeonggiMapMarker" class="map-point hidden"></div>
+    <!-- 지도 영역 -->
+    <div class="map-container" onclick="setAdminCoordinate(event)">
+      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+      <div id="adminMapMarker" class="map-point hidden"></div>
+    </div>
+    <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
+  </div>
+
+  <input type="date" id="activityDate" class="input-gap">
+  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
 </div>
-
-<!-- 🔵 2. 기존 100대 명산 지도 -->
-<div id="adminMapContainer" class="map-container cursor-pointer mb-3" onclick="setAdminMapCoord(event)">
-  <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" alt="100대명산 지도" class="w-full h-auto block rounded-2xl" />
-  <div id="adminMapMarker" class="map-point hidden"></div>
-</div>
-
-<!-- 📍 선택된 좌표 표시 영역 -->
-<div class="flex items-center justify-between my-2 p-2.5 bg-slate-100 rounded-xl border border-slate-200">
-  <span id="coordDisplay" class="text-xs font-bold text-slate-700">좌표: 없음 (지도 클릭)</span>
-</div>
-
-<input type="date" id="activityDate" class="input-gap mt-2">
-<button type="button" onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-2">기록 저장하기</button>
-
 
 
 
