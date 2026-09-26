@@ -3722,15 +3722,42 @@ margin: 0 2px !important;
   </div>
 </div>
 
-          <!-- 기존 트래킹 체크박스에 onchange 이벤트 추가 -->
-<input type="checkbox" id="isTrackingCheck" onchange="toggleAdminMapByTracking()" class="w-3.5 h-3.5"> 트래킹👟
+            <!-- 📍 [위치] 🚶‍♂️ 경기도 둘레길 코스 선택 영역 (트래킹 체크 시 노출) -->
+  <div id="gyeonggiTrailBox" class="hidden my-2 p-3 bg-amber-50/80 rounded-2xl border border-amber-200 transition-all duration-300">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-black text-amber-800 flex items-center gap-1">
+        <span>🚶‍♂️</span> 경기도 둘레길 코스 선택 (1~60코스)
+      </span>
+      <span id="selectedTrailBadge" class="text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">
+        미선택
+      </span>
+    </div>
 
-<!-- 관리자 지도 이미지 (id="adminMapImage" 확인) -->
-<div class="map-container" onclick="setAdminCoordinate(event)">
-  <img id="adminMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
-  <div id="adminMapMarker" class="map-point hidden"></div>
-</div>
+    <div id="trailPillGrid" class="grid grid-cols-6 gap-1 max-h-40 overflow-y-auto pr-1 p-1 bg-white/70 rounded-xl border border-amber-100"></div>
+    <p class="text-[9px] text-amber-600/80 mt-1.5 font-medium text-center">
+      ※ 코스를 클릭하면 아래 지도 위치로 스크롤되며 좌표가 세팅됩니다.
+    </p>
+  </div>
+      
+  <!-- 🟢 1. 경기둘레길 전용 지도 (트래킹 체크 시 노출) -->
+  <div id="gyeonggiMapContainer" class="map-container relative hidden mb-3 cursor-pointer" onclick="setAdminMapCoord(event)">
+    <img id="gyeonggiMapImg" src="https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg" alt="경기둘레길 지도" class="w-full h-auto block rounded-2xl" />
+    <div id="gyeonggiMapMarker" class="map-point hidden absolute w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-md"></div>
+  </div>
 
+  <!-- 🔵 2. 기존 100대 명산 지도 -->
+  <div id="adminMapContainer" class="map-container relative cursor-pointer mb-3" onclick="setAdminMapCoord(event)">
+    <img id="adminMapImg" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" alt="100대명산 지도" class="w-full h-auto block rounded-2xl" />
+    <div id="adminMapMarker" class="map-point hidden absolute w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-md"></div>
+  </div>
+
+  <!-- 📍 선택된 좌표 표시 영역 -->
+  <div class="flex items-center justify-between my-2 p-2.5 bg-slate-100 rounded-xl border border-slate-200">
+    <span id="coordDisplay" class="text-xs font-bold text-slate-700">좌표: 없음 (지도 클릭)</span>
+  </div>
+
+    <button type="button" onclick="addMultiActivity()" class="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+      
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
       <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
