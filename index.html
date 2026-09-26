@@ -28,6 +28,29 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+
+  /* 지도 컨테이너 설정 */
+  .map-container {
+    position: relative; /* 마커가 지도 안에서 움직이도록 기준 설정 */
+    display: inline-block;
+    width: 100%;
+  }
+
+  /* 클릭 시 찍힐 마커 점 스타일 */
+  .map-point {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background-color: #ef4444; /* 빨간색 점 */
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%); /* 정확히 클릭 위치 중앙에 오도록 조정 */
+    pointer-events: none; /* 클릭 이벤트가 마커 때문에 막히지 않도록 설정 */
+    z-index: 20;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  }
+
+
         @keyframes emeraldGlowPulse {
     0%, 100% {
         box-shadow: 0 0 3px rgba(16, 185, 129, 0.5), 0 0 6px rgba(16, 185, 129, 0.2);
