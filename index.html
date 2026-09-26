@@ -4031,32 +4031,36 @@ margin: 0 2px !important;
 
     
 
-
-
 <!-- Main Map View -->
 <div id="mapViewMain">
-  <!-- 지도 컨테이너 (ID 추가 및 기본 패딩 초기화) -->
+  <!-- 지도 컨테이너 (상단여백 제거 및 relative 구조 유지) -->
   <div id="mapContainer" class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3 transition-all duration-300">
     
-    <!-- 🖼️ 메인 지도 이미지 -->
+    <!-- 🖼️ 메인 지도 이미지 (위로 밀착) -->
     <img id="mainMapImage" src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl transition-all duration-300">
     
-    <!-- 🌲/🚶 지도 우측 상단 미니 배지 (클릭 시 스위칭) -->
-    <button type="button" onclick="toggleMapType()" class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 cursor-pointer hover:bg-emerald-50 transition-colors">
+    <!-- 🌲/🚶 지도 우측 상단 미니 배지 (100대 명산 모드용) -->
+    <button type="button" id="miniBadgeBtn" onclick="toggleMapType()" class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 cursor-pointer hover:bg-emerald-50 transition-colors">
       <span id="miniBadgeIcon" class="text-[10px]">🌲</span>
       <span id="miniTop100Badge" class="tracking-tight">0/100</span>
     </button>
 
-    <!-- 🗺️ 지도 좌측 상단 제목 뱃지 (경기도 둘레길 전환 시 표시) -->
-    <div id="mapTitleBadge" class="hidden absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] font-extrabold shadow-sm z-20 items-center gap-1.5">
-      <span>🚶</span> 경기도 둘레길
-    </div>
-
     <div id="conquerMapPoints"></div>
     
-    <!-- 💡 출처 텍스트: 기존 위치/투명도 그대로 유지 -->
-    <div id="mapSourceTxt" class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">
+    <!-- 💡 출처 텍스트 -->
+    <div id="mapSourceTxt" class="map-source-txt absolute bottom-2 right-3 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">
       출처: 산림청
+    </div>
+  </div>
+
+  <!-- 🚶 경기도 둘레길 전용 정보 바 (지도 아래에 위치) -->
+  <div id="trailInfoBar" class="hidden justify-between items-center bg-slate-100/80 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-slate-200/80 mb-3 shadow-sm">
+    <div class="flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
+      <span>🚶</span> 경기도 둘레길
+    </div>
+    <div class="bg-white border border-emerald-500/30 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-black shadow-xs flex items-center gap-1.5">
+      <span>🚶</span>
+      <span id="trailBadgeText" class="tracking-tight">0/60</span>
     </div>
   </div>
 
@@ -4149,51 +4153,47 @@ margin: 0 2px !important;
   let currentTrailCount = 0;   // 둘레길 정복 완료 코스 수 (총 60코스)
 
   function toggleMapType() {
-    const mapContainer = document.getElementById('mapContainer');
     const mapImg = document.getElementById('mainMapImage');
-    const titleBadge = document.getElementById('mapTitleBadge');
+    const miniBadgeBtn = document.getElementById('miniBadgeBtn');
+    const trailInfoBar = document.getElementById('trailInfoBar');
     const sourceTxt = document.getElementById('mapSourceTxt');
     const miniBadgeIcon = document.getElementById('miniBadgeIcon');
     const miniBadgeText = document.getElementById('miniTop100Badge');
+    const trailBadgeText = document.getElementById('trailBadgeText');
     const mapPoints = document.getElementById('conquerMapPoints');
 
     isGyeonggiTrailMode = !isGyeonggiTrailMode;
 
     if (isGyeonggiTrailMode) {
-      // 1. 경기둘레길 모드: 지도를 아래로 크게 내림 (상단 여백 pt-14 부여 및 배경 살짝 변경)
-      mapContainer.classList.add('pt-14', 'pb-3', 'bg-slate-50/60');
+      // 1. 경기둘레길 모드: 지도 상단 여백 없이 이미지를 올림
       mapImg.src = 'https://i.ibb.co/352DGvzH/Screenshot-20260923-210747-Chrome-1.jpg';
       
-      // 2. 제목 '경기도 둘레길' 노출
-      titleBadge.classList.remove('hidden');
-      titleBadge.classList.add('flex');
+      // 2. 지도 우측 상단 뱃지 대신 지도 아래 '둘레길 정보 바' 노출
+      miniBadgeBtn.classList.add('hidden');
+      trailInfoBar.classList.remove('hidden');
+      trailInfoBar.classList.add('flex');
       
-      // 3. 출처 변경
+      // 3. 출처 및 둘레길 카운트 업데이트
       sourceTxt.innerText = '출처: 경기도 둘레길';
+      if (trailBadgeText) trailBadgeText.innerText = `${currentTrailCount}/60`;
       
-      // 4. 우측 상단 배지 둘레길 카운트(0/60)로 변경
-      miniBadgeIcon.innerText = '🚶';
-      miniBadgeText.innerText = `${currentTrailCount}/60`;
-      
-      // 5. 핀 포인트 숨김
+      // 4. 핀 포인트 숨김
       if (mapPoints) mapPoints.style.display = 'none';
     } else {
-      // 1. 100대 명산 모드: 지도를 원래 위치(상단 붙음)로 복원
-      mapContainer.classList.remove('pt-14', 'pb-3', 'bg-slate-50/60');
+      // 1. 100대 명산 모드: 이미지 복원
       mapImg.src = 'https://i.ibb.co/bMLmRYRJ/2-1.jpg';
       
-      // 2. 제목 숨김
-      titleBadge.classList.add('hidden');
-      titleBadge.classList.remove('flex');
+      // 2. 지도 아래 바 숨기고 지도 상단 배지 노출
+      trailInfoBar.classList.add('hidden');
+      trailInfoBar.classList.remove('flex');
+      miniBadgeBtn.classList.remove('hidden');
       
-      // 3. 출처 복원
+      // 3. 출처 및 100대 명산 카운트 복원
       sourceTxt.innerText = '출처: 산림청';
-      
-      // 4. 배지 명산 카운트(0/100)로 원복
       miniBadgeIcon.innerText = '🌲';
       miniBadgeText.innerText = `${currentTop100Count}/100`;
       
-      // 5. 핀 포인트 다시 표시
+      // 4. 핀 포인트 다시 표시
       if (mapPoints) mapPoints.style.display = 'block';
     }
   }
@@ -4201,8 +4201,9 @@ margin: 0 2px !important;
   // 💡 관리자 모드용 둘레길 카운트 업데이트 함수
   function updateTrailCount(count) {
     currentTrailCount = count;
-    if (isGyeonggiTrailMode) {
-      document.getElementById('miniTop100Badge').innerText = `${currentTrailCount}/60`;
+    const trailBadgeText = document.getElementById('trailBadgeText');
+    if (trailBadgeText) {
+      trailBadgeText.innerText = `${currentTrailCount}/60`;
     }
   }
 
@@ -4214,6 +4215,10 @@ margin: 0 2px !important;
     }
   }
 </script>
+
+
+
+
 
 
           
