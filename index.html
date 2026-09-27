@@ -4239,16 +4239,20 @@ window.closeGyeonggiTrailModal = function() {
   if (modal) modal.style.display = 'none';
 };
 
-// 🎯 개인 둘레길 모달 레포트 렌더링
+// 🎯 개인 둘레길 모달 레포트 렌더링 (문자열 좌표 자동 변환 보완)
 function renderPersonalDulleReport(userData) {
   const dulleArray = userData.dulleCourses || [];
   
   const completedList = dulleArray.map(item => {
     if (typeof item === 'object' && item !== null) {
+      // x, y가 문자열("65.45")이든 숫자(65.45)이든 상관없이 parseFloat로 강제 숫자 변환
+      const parsedX = parseFloat(item.x);
+      const parsedY = parseFloat(item.y);
+
       return {
         course: parseInt(item.course, 10),
-        x: (item.x !== undefined && item.x !== "*") ? parseFloat(item.x) : null,
-        y: (item.y !== undefined && item.y !== "*") ? parseFloat(item.y) : null
+        x: (!isNaN(parsedX) && isFinite(parsedX)) ? parsedX : null,
+        y: (!isNaN(parsedY) && isFinite(parsedY)) ? parsedY : null
       };
     }
     return { course: parseInt(item, 10), x: null, y: null };
@@ -4275,7 +4279,8 @@ function renderPersonalDulleReport(userData) {
     markerContainer.innerHTML = '';
 
     uniqueCourses.forEach(item => {
-      if (item.x !== null && item.y !== null && !isNaN(item.x) && !isNaN(item.y)) {
+      // 숫자 검증 성공 시 마커 생성
+      if (item.x !== null && item.y !== null) {
         const color = getDulleCourseColor(item.course);
         const markerEl = document.createElement('div');
         markerEl.className = 'dulle-modal-marker';
@@ -4306,6 +4311,7 @@ function renderPersonalDulleReport(userData) {
     }
   }
 }
+
 
 
         
