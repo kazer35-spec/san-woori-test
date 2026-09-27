@@ -4229,7 +4229,7 @@ window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = nul
   }
 };
 
-// 🎯 경기둘레길 모달 열기 함수 (유저 문서의 dulleCourses 배열 읽기)
+// 🎯 경기둘레길 모달 열기 함수
 window.openGyeonggiTrailModal = async function() {
     const trailModal = document.getElementById('gyeonggiTrailModal');
     if (!trailModal) return;
@@ -4249,13 +4249,21 @@ window.openGyeonggiTrailModal = async function() {
 
     if (!currentMemberId) {
         if (countBadge) countBadge.textContent = '0/60';
-        if (badgeListContainer) badgeListContainer.innerHTML = '<span style="font-size:11px; color:#94a3b8;">회원 정보를 찾을 수 없습니다.</span>';
+        if (badgeListContainer) badgeListContainer.innerHTML = '<span style="font-size:11px; color:#94a3b8;">회원 선택 정보를 찾을 수 없습니다.</span>';
         return;
     }
 
     try {
-        // 🎯 서브컬렉션이 아닌, 유저 문서 자체를 조회
-        const userDocRef = doc(db, "sanwoori", currentMemberId);
+        // 1. db 변수 전역/로컬 안전하게 확보
+        const firestoreDb = window.db || db; 
+        if (!firestoreDb) {
+            console.error("Firestore db 객체를 찾을 수 없습니다.");
+            if (badgeListContainer) badgeListContainer.innerHTML = `<span style="font-size:11px; color:#ef4444;">DB 연결 실패</span>`;
+            return;
+        }
+
+        // 2. 유저 문서 읽기
+        const userDocRef = doc(firestoreDb, "sanwoori", currentMemberId);
         const userSnap = await getDoc(userDocRef);
 
         if (!userSnap.exists()) {
@@ -4264,18 +4272,18 @@ window.openGyeonggiTrailModal = async function() {
         }
 
         const userData = userSnap.data();
-        // dulleCourses 배열 가져오기 (없으면 빈 배열)
+        // dulleCourses 배열 추출 (없으면 빈 배열)
         const dulleArray = userData.dulleCourses || [];
 
         const completedCount = dulleArray.length;
         const totalCount = 60;
 
-        // 1. 카운트 배지 갱신
+        // 3. 카운트 배지 갱신 (예: 12/60)
         if (countBadge) {
             countBadge.textContent = `${completedCount}/${totalCount}`;
         }
 
-        // 2. 지도 위 마커 생성 및 하단 뱃지 생성
+        // 4. 완주 목록 및 마커 처리
         if (completedCount === 0) {
             if (badgeListContainer) {
                 badgeListContainer.innerHTML = `<span style="font-size: 11px; color: #94a3b8;">완주한 코스가 없습니다.</span>`;
@@ -4285,32 +4293,32 @@ window.openGyeonggiTrailModal = async function() {
             let badgeHtml = '';
 
             dulleArray.forEach(item => {
-                // 숫자 또는 객체 형태 모두 대응
                 let courseName = '';
-                let x = null;
-                let y = null;
+                let parsedX = null;
+                let parsedY = null;
 
+                // DB 데이터 타입 처리 (숫자 1, 2 또는 객체 {course: 7, x: "...", y: "..."})[span_1](start_span)[span_1](end_span)
                 if (typeof item === 'object' && item !== null) {
                     courseName = item.course ? `${item.course}코스` : '코스';
-                    x = parseFloat(item.x);
-                    y = parseFloat(item.y);
+                    if (item.x !== undefined && item.x !== null) parsedX = parseFloat(item.x);
+                    if (item.y !== undefined && item.y !== null) parsedY = parseFloat(item.y);
                 } else {
                     courseName = `${item}코스`;
                 }
 
-                // 좌표가 존재하는 경우 지도상 마커 추가
-                if (!isNaN(x) && !isNaN(y) && x !== null && y !== null) {
+                // 좌표(x, y)가 정상인 경우 지도 위 점 마커 생성
+                if (!isNaN(parsedX) && !isNaN(parsedY) && parsedX !== null && parsedY !== null) {
                     markerHtml += `
                         <div class="dulle-modal-marker" 
-                             style="left: ${x}%; top: ${y}%; background-color: #0284c7; position: absolute; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.4);" 
+                             style="left: ${parsedX}%; top: ${parsedY}%; position: absolute; width: 10px; height: 10px; background-color: #0284c7; border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.4); z-index: 10;" 
                              title="${courseName}">
                         </div>
                     `;
                 }
 
-                // 하단 완주 뱃지 추가
+                // 하단 코스 뱃지 생성
                 badgeHtml += `
-                    <span style="background: #e0f2fe; color: #0284c7; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 12px; border: 1px solid #bae6fd;">
+                    <span style="background: #e0f2fe; color: #0284c7; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 12px; border: 1px solid #bae6fd; display: inline-block; margin: 2px;">
                         ${courseName}
                     </span>
                 `;
@@ -4321,19 +4329,20 @@ window.openGyeonggiTrailModal = async function() {
         }
 
     } catch (error) {
-        console.error("둘레길 데이터 로딩 오류:", error);
+        console.error("경기둘레길 불러오기 에러:", error);
         if (badgeListContainer) {
-            badgeListContainer.innerHTML = `<span style="font-size:11px; color:#ef4444;">데이터 로드 실패</span>`;
+            badgeListContainer.innerHTML = `<span style="font-size:11px; color:#ef4444;">불러오기 중 에러가 발생했습니다.</span>`;
         }
     }
 
-    // 외부 클릭 시 닫기
+    // 모달 오버레이 클릭 시 닫기
     trailModal.onclick = (e) => {
         if (e.target === trailModal) {
             window.closeGyeonggiTrailModal();
         }
     };
 };
+
 
 
 
