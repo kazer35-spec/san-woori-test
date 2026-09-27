@@ -4110,7 +4110,7 @@ let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
   
 // =========================================================
-// 🎯 경기둘레길 DB 마스터 좌표 자동 매핑 & 완주 처리 스크립트
+// 🎯 경기둘레길 DB 마스터 좌표 자동 매핑 & 완주 처리 통합 스크립트
 // =========================================================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -4290,7 +4290,6 @@ window.toggleDulleMoreRows = function() {
   }
 };
 
-
 // 🎯 팝업(prompt)으로 코스 번호를 입력받아 [등산한 산 이름] 자동 채우기 & 지도 좌표 미리보기 설정
 window.saveDulleByPrompt = async function() {
   const inputVal = prompt("등록할 경기둘레길 코스 번호를 입력하세요 (1~60):");
@@ -4344,7 +4343,7 @@ window.saveDulleByPrompt = async function() {
       markerEl.classList.remove('hidden');
     }
 
-    // dataset 또는 전역 변수에 선택된 코스 좌표값 임시 저장 (필요시 저장 버튼 클릭 때 참조 가능)
+    // dataset 또는 전역 변수에 선택된 코스 좌표값 임시 저장
     if (dulleContainer) {
       dulleContainer.dataset.selectedCourse = courseNum;
       dulleContainer.dataset.coordX = targetX;
@@ -4359,6 +4358,47 @@ window.saveDulleByPrompt = async function() {
   }
 };
 
+// 🎯 🔥 [신규 추가] 운동 저장 시 경기둘레길 dulleCourses 동기화 함수
+// (기존의 저장 처리 함수 내부에서 호출해주거나, 저장 버튼 클릭 시 함께 실행해주세요)
+window.syncDulleCourseToUserDoc = async function(targetMemberId, mountainNameVal) {
+  if (!mountainNameVal) return;
+
+  const dulleMatch = mountainNameVal.match(/경기둘레길\s*(\d+)코스/);
+  if (!dulleMatch || !dulleMatch[1]) return;
+
+  const courseNum = parseInt(dulleMatch[1], 10);
+  const firestoreDb = window.db || db;
+  const userRef = doc(firestoreDb, "sanwoori", targetMemberId);
+
+  try {
+    const masterSnap = await getDoc(doc(firestoreDb, "settings", "dulleMaster"));
+    let targetX = 50.0;
+    let targetY = 50.0;
+
+    if (masterSnap.exists() && masterSnap.data()[`course_${courseNum}`]) {
+      const masterData = masterSnap.data()[`course_${courseNum}`];
+      targetX = parseFloat(masterData.x);
+      targetY = parseFloat(masterData.y);
+    }
+
+    const dulleObject = {
+      course: courseNum,
+      title: `경기둘레길 ${courseNum}코스`,
+      x: targetX,
+      y: targetY
+    };
+
+    // Firebase DB의 dulleCourses 배열에 신규 코스 정보 자동 추가
+    await updateDoc(userRef, {
+      dulleCourses: arrayUnion(dulleObject)
+    });
+
+    console.log(`✅ [${courseNum}코스] 정복 현황(dulleCourses) 등록 완료`);
+
+  } catch (e) {
+    console.error("❌ 경기둘레길 정복 현황 업데이트 에러:", e);
+  }
+};
 
 // 🎯 경기둘레길 모달 열기 함수
 window.openGyeonggiTrailModal = async function(targetMemberId) {
@@ -4417,8 +4457,6 @@ window.closeGyeonggiTrailModal = function() {
   const modal = document.getElementById('gyeonggiTrailModal');
   if (modal) modal.style.display = 'none';
 };
-
-
 
 
         
