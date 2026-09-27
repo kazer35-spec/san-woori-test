@@ -10449,7 +10449,39 @@ window.scrollPagination = {
     currentPageSize: 6
 };
 
-      window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
+// 🎯 경기둘레길 모달 열기 함수
+window.openGyeonggiTrailModal = function() {
+    const trailModal = document.getElementById('gyeonggiTrailModal');
+    if (!trailModal) return;
+
+    // 카운팅 로직 (필요시 window.currentScrollLogs 등을 이용하여 실제 완료 코스 수 계산 가능)
+    const completedCount = 0; 
+    const totalCount = 60;
+    
+    const countBadge = document.getElementById('trailCountBadge');
+    if (countBadge) {
+        countBadge.textContent = `${completedCount}/${totalCount}`;
+    }
+
+    trailModal.style.display = 'flex';
+
+    // 외부 클릭 시 닫기
+    trailModal.onclick = (e) => {
+        if (e.target === trailModal) {
+            window.closeGyeonggiTrailModal();
+        }
+    };
+};
+
+// 🎯 경기둘레길 모달 닫기 함수
+window.closeGyeonggiTrailModal = function() {
+    const trailModal = document.getElementById('gyeonggiTrailModal');
+    if (trailModal) {
+        trailModal.style.display = 'none';
+    }
+};
+
+window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
     const modal = document.getElementById('scrollModal');
     const content = document.getElementById('scrollContent');
     const scrollWrap = document.querySelector('.fading-scroll'); 
@@ -10462,7 +10494,6 @@ window.scrollPagination = {
         return;
     }
 
-    // 🎯 100레벨 판정 및 모달 부모(#scrollModal)에 is-lv100 부여
     const memberInfo = (typeof currentData !== 'undefined' && currentData) 
         ? currentData.find(m => String(m.id) === String(safeMemberId) || (m.name && m.name === safeMemberId)) 
         : null;
@@ -10554,7 +10585,8 @@ window.scrollPagination = {
             <div class="user-report-summary-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 14px; margin: 6px 0 12px 0;">
                 
                 <div class="user-status-row-bar" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;">
-                    <div class="dday-count-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px;">
+                    <!-- 🎯 D-Day 버튼에 클릭 이벤트(openGyeonggiTrailModal) 부여 -->
+                    <div class="dday-count-badge" onclick="window.openGyeonggiTrailModal()" style="background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px; cursor: pointer; user-select: none; transition: transform 0.1s ease;">
                         D-Day ${dday !== undefined ? dday : 0}
                     </div>
                     <div class="origin-membership-info-mini" style="font-size: 11px; color: #64748b;">
@@ -10641,11 +10673,10 @@ window.closeScrollModal = function() {
     const modal = document.getElementById('scrollModal');
     if (modal) {
         modal.style.display = 'none';
-        modal.classList.remove('is-lv100'); // 모달 닫을 때 테마 클래스 제거
+        modal.classList.remove('is-lv100');
     }
 };
-          
-    
+
 window.switchScrollTab = (category) => {
     if (window.scrollPagination.currentCategory === category) return;
     
@@ -10671,7 +10702,6 @@ window.switchScrollTab = (category) => {
     window.loadScrollLogsPage(true);
 };
 
-// 🌟 스크롤 모달 목록 페이징 렌더링
 window.loadScrollLogsPage = (isFirstPage = false) => {
     const NATIONAL_PARKS = [
       '가야산', '지리산', '설악산', '한라산', '북한산', '내장산', '덕유산', 
@@ -10732,7 +10762,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
             const isPureRegularHike = log.isRegular && !isKmActivity; 
 
-            // 도트 색상
             let dotStyle = "";
             const colors = { hike: "#2ecc71", extraHike: "#5CE1D6", walk: "#FFCC80", trek: "#E0B0FF", run: "#FFD1DC" };
             
@@ -10752,7 +10781,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const unit = (isKmActivity && !log.isExtraHike && heightVal < 50) ? 'km' : 'm';
             const rawMountain = log.mountain || (log.isExtraHike ? "개인 산행" : "활동 기록");
             
-            // 🎯 사각박스 뱃지 렌더링 (순서: 국 -> 산 -> BAC)
             const isNationalParkLog = log.isNationalPark === true || 
                           log.isNationalPark === 'true' || 
                           log.isNationalPark == 1 ||
@@ -10760,7 +10788,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
             const isTop100Log = log.isTop100 === true || log.isTop100 === 'true' || log.isTop100 == 1;
 
-            // 🎯 3개 다 해당하는지 체크
             const isAllThree = isNationalParkLog && isTop100Log && log.isBAC;
             const npText = isAllThree ? '국' : '국공';
             const top100Text = isAllThree ? '산' : '산림';
@@ -10771,7 +10798,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
             const badgeGroup = `${npTag}${top100Tag}${bacTag}`;
 
-            // 아이콘 태그 (★ / ✔)
             let starTag = '';
             if (isTop100Log) {
                 starTag = '<span style="color: #f59e0b; font-size: 12px; margin-left: 2px;">★</span>';
@@ -10793,7 +10819,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             const showScheduleBadge = (currentCategory === 'running' || currentCategory === 'all' || currentCategory === 'hiking') && isScheduleGroupExercise;
             
             const scheduleBadge = showScheduleBadge 
-                ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
+                ? `<span class="schedule-tag-badge" style="margin-left: auto; background: ${badgeBg}; color: ${badgeColor}; border: 1px solid${badgeBorder}; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0;">일정</span>` 
                 : '';
 
             let seasonEmoji = '';
@@ -10819,7 +10845,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                 ? `<span style="margin-left: auto; background: linear-gradient(135deg, rgba(255, 105, 180, 0.15), rgba(160, 32, 240, 0.15)); color: #7e22ce; border: 1px solid rgba(160, 32, 240, 0.35); font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 20px; display: inline-flex; align-items: center; line-height: 1; flex-shrink: 0;">정기산행</span>`
                 : '';
 
-            // 🎯 100대 명산(산림청) 블루 텍스트 처리
             let mountainHtml = '';
             if (isPureRegularHike) {
                 mountainHtml = `${seasonEmoji ? `<span style="font-size: 12px; margin-right: 3px;">${seasonEmoji}</span>` : ''}<span style="${rainbowTextStyle}">${textBody} (${heightVal}${unit})</span>${regularSparkle}`;
@@ -10841,8 +10866,7 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
                             </span>
                             ${starTag}
                         </div>
-                        ${regularBadge}
-                        ${scheduleBadge}
+                        ${regularBadge}${scheduleBadge}
                     </div>
                 </div>
             `;
@@ -10872,13 +10896,8 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     }
 };
 
-                    
-    
-         
+            
         
-
-                 
-                
 
                              </script>
 
@@ -10947,12 +10966,12 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
 
 <!-- [모던 산우리 운동 리포트 모달 레이어] -->
+<!-- [모던 산우리 운동 리포트 모달 레이어] -->
 <div id="scrollModal" class="scroll-overlay" style="display: none;">
     <div class="fading-scroll">
 
         <!-- 헤더 영역 -->
         <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center;">
-            <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
             <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
             <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
             <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
@@ -10966,6 +10985,32 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
             <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()"></button>
         </div>
         
+    </div>
+</div>
+
+<!-- 🎯 [경기둘레길 모달 레이어 추가] -->
+<div id="gyeonggiTrailModal" class="scroll-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; padding: 16px;">
+    <div style="background: #ffffff; width: 100%; max-width: 480px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); animation: modalFadeUp 0.25s ease-out;">
+        
+        <!-- 헤더: 좌측 제목, 우측 0/60 카운팅 배지 & 닫기 버튼 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f1f5f9; background: #ffffff;">
+            <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">경기둘레길</h3>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <!-- 0/60 카운트 알약형 배지 -->
+                <span id="trailCountBadge" style="background: #0284c7; color: #ffffff; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;">
+                    0/60
+                </span>
+                <!-- 닫기 버튼 -->
+                <button type="button" onclick="window.closeGyeonggiTrailModal()" style="background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
+            </div>
+        </div>
+
+        <!-- 바디: 경기둘레길 코스 이미지 영역 (스크롤 지원) -->
+        <div style="padding: 12px; overflow-y: auto; text-align: center; background: #f8fafc; flex: 1;">
+            <img src="https://i.ibb.co/jPtcDXF2/image.png" alt="경기둘레길 지도" style="width: 100%; height: auto; border-radius: 12px; display: block; border: 1px solid #e2e8f0;">
+        </div>
+
     </div>
 </div>
 
