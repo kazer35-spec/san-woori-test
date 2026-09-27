@@ -3365,8 +3365,7 @@ margin: 0 2px !important;
 
          
        
-        
-<div id="levelUpCardModal" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md hidden items-center justify-center p-5">
+  <div id="levelUpCardModal" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md hidden items-center justify-center p-5">
 <div class="w-full max-w-[400px] text-center">
 <h2 id="modalTitle" class="text-2xl font-black mb-1 text-white">LEVEL UP!</h2>
 <p class="text-slate-400 text-[10px] italic mb-5">레벨업 축하합니다 🎉</p>
@@ -3553,240 +3552,217 @@ margin: 0 2px !important;
       <div id="adminSubRoomList" class="admin-subroom-grid"></div>
     </div>
 
-          <!-- 신규 회원 등록 -->
-<div class="card">
-  <div class="card-title text-green-600 font-bold">🆕 신규 회원 등록</div>
-  <input type="text" id="newName" placeholder="회원 이름" class="input-gap">
-  <div class="gender-select-group">
-    <label><input type="radio" name="newGender" value="남" checked> 남성</label>
-    <label><input type="radio" name="newGender" value="여"> 여성</label>
-  </div>
-  <input type="date" id="regDate" class="input-gap">
-  <button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
-</div>
-          
-<!-- 등산 기록 및 좌표 정복 관리 카드의 시작 -->
-<!-- 등산 기록 및 좌표 정복 관리 카드의 시작 -->
-<div class="card">
-  <!-- 🎯 변경된 카드 타이틀 영역 (우측에 로그아웃 버튼 추가) -->
-  <div class="card-title text-blue-600 font-bold flex justify-between items-center mb-3">
-    <span>📅 등산 기록 및 좌표 정복 관리</span>
-    <button onclick="logoutAdmin()" class="px-2.5 py-1 text-[11px] font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 transition-colors">
-      🚪 로그아웃
-    </button>
-  </div>
-
-
-<!-- 회원 검색 입력창 및 우측 인원수/경고 표시 영역 -->
-<div class="relative w-full mb-2">
-  <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 pl-4 pr-36 rounded-xl w-full text-xs bg-blue-50 border-blue-100 outline-none border">
-  
-  <!-- 🎯 검색창 우측 안쪽: 인원수 뱃지 + 벙주 경고 뱃지 -->
-  <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-    <!-- 벙주 미선택 경고 -->
-    <span id="leaderWarningBadge" class="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-md font-bold hidden">
-      ⚠️ 벙주 미선택
-    </span>
-    <!-- 선택 인원수 카운트 -->
-    <span id="selectedMemberBadge" class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-md font-black shadow-sm hidden">
-      선택 <span id="memberCountNum">0</span>명
-    </span>
-  </div>
-</div>
-
-  <!-- 회원 목록 그리드 -->
-  <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
-
-  <!-- 산 정보 및 좌표 설정 영역 -->
-  <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
-    <div class="flex items-center justify-between mb-2">
-      <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
-      <div class="flex gap-2">
-        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-          <input type="checkbox" id="isNationalParkCheck" class="w-3.5 h-3.5">
-          <span class="text-[10px] font-black text-emerald-600">국립</span>
-        </label>
-        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-          <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
-          <span class="text-[10px] font-black text-blue-600">산림청</span>
-        </label>
-        <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
-          <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
-          <span class="text-[10px] font-black text-red-500">BAC</span>
-        </label>
+    <!-- 신규 회원 등록 -->
+    <div class="card">
+      <div class="card-title text-green-600 font-bold">🆕 신규 회원 등록</div>
+      <input type="text" id="newName" placeholder="회원 이름" class="input-gap">
+      <div class="gender-select-group">
+        <label><input type="radio" name="newGender" value="남" checked> 남성</label>
+        <label><input type="radio" name="newGender" value="여"> 여성</label>
       </div>
+      <input type="date" id="regDate" class="input-gap">
+      <button onclick="addMember()" class="btn-submit bg-green-500">등록 완료</button>
     </div>
-
-    <!-- 활동 유형 선택 -->
-    <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
-      <!-- 기존 정기산행 체크박스 수정 -->
-<label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-  <input type="checkbox" id="isRegularCheck" onchange="handleRegularCheckChange(this)" class="w-3.5 h-3.5"> 정기🚩
-</label>
-
-      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
-      </label>
-      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
-      </label>
-      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
-      </label>
-      <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
-        <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
-      </label>
-    </div>
-
           
-    <!-- 속성 포인트 및 계절 선택 영역 -->
-<div class="mb-2 py-1.5 px-2 border-t border-b border-gray-100 bg-gray-50/50 rounded-lg">
-  <div class="flex items-center gap-1.5">
-    <div class="flex-1 flex items-center gap-1">
-      <span class="text-[9px] text-gray-400 shrink-0">🪨</span>
-      <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
+    <!-- 등산 기록 및 좌표 정복 관리 카드의 시작 -->
+    <div class="card">
+      <div class="card-title text-blue-600 font-bold flex justify-between items-center mb-3">
+        <span>📅 등산 기록 및 좌표 정복 관리</span>
+        <button onclick="logoutAdmin()" class="px-2.5 py-1 text-[11px] font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 transition-colors">
+          🚪 로그아웃
+        </button>
+      </div>
+
+      <!-- 회원 검색 입력창 및 우측 인원수/경고 표시 영역 -->
+      <div class="relative w-full mb-2">
+        <input type="text" id="adminSearchInput" onkeyup="filterAdminMemberList()" placeholder="🔍 회원 검색..." class="h-9 pl-4 pr-36 rounded-xl w-full text-xs bg-blue-50 border-blue-100 outline-none border">
+        
+        <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          <span id="leaderWarningBadge" class="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-md font-bold hidden">
+            ⚠️ 벙주 미선택
+          </span>
+          <span id="selectedMemberBadge" class="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-md font-black shadow-sm hidden">
+            선택 <span id="memberCountNum">0</span>명
+          </span>
+        </div>
+      </div>
+
+      <!-- 회원 목록 그리드 -->
+      <div id="multiMemberList" class="member-grid max-h-48 overflow-y-auto mb-3 p-1"></div>
+
+      <!-- 산 정보 및 좌표 설정 영역 -->
+      <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100 mb-2">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-[10px] font-black text-indigo-400">⛰️ 산 정보 및 좌표 설정</p>
+          <div class="flex gap-2">
+            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+              <input type="checkbox" id="isNationalParkCheck" class="w-3.5 h-3.5">
+              <span class="text-[10px] font-black text-emerald-600">국립</span>
+            </label>
+            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+              <input type="checkbox" id="isTop100Check" onchange="toggleMarkerStyle()" class="w-3.5 h-3.5">
+              <span class="text-[10px] font-black text-blue-600">산림청</span>
+            </label>
+            <label class="flex items-center gap-1 cursor-pointer whitespace-nowrap">
+              <input type="checkbox" id="isBACCheck" class="w-3.5 h-3.5">
+              <span class="text-[10px] font-black text-red-500">BAC</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 활동 유형 선택 -->
+        <div class="flex items-center justify-between mt-2 py-1.5 border-t border-gray-100 overflow-x-auto">
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isRegularCheck" onchange="handleRegularCheckChange(this)" class="w-3.5 h-3.5"> 정기🚩
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isScheduleCheck" class="w-3.5 h-3.5"> <span class="text-emerald-600 font-bold">일정🗓️</span>
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isRunningCheck" class="w-3.5 h-3.5"> 런닝🏃
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isTrackingCheck" class="w-3.5 h-3.5"> 트래킹👟
+          </label>
+          <label class="text-[10px] flex items-center gap-1 shrink-0 cursor-pointer whitespace-nowrap">
+            <input type="checkbox" id="isWalkingCheck" class="w-3.5 h-3.5"> 산책🚶‍♂️
+          </label>
+        </div>
+
+        <!-- 속성 포인트 및 계절 선택 영역 -->
+        <div class="mb-2 py-1.5 px-2 border-t border-b border-gray-100 bg-gray-50/50 rounded-lg">
+          <div class="flex items-center gap-1.5">
+            <div class="flex-1 flex items-center gap-1">
+              <span class="text-[9px] text-gray-400 shrink-0">🪨</span>
+              <input type="number" id="pRock" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
+            </div>
+            <div class="flex-1 flex items-center gap-1">
+              <span class="text-[9px] text-gray-400 shrink-0">🌳</span>
+              <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
+            </div>
+            <div class="flex-1 flex items-center gap-1">
+              <span class="text-[9px] text-gray-400 shrink-0">🌊</span>
+              <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
+            </div>
+            
+            <button type="button" onclick="toggleSeasonMarkBox()" class="h-7 px-2 text-[10px] font-bold text-pink-600 bg-pink-50 border border-pink-200 rounded-md shrink-0 hover:bg-pink-100 transition-colors flex items-center gap-0.5">
+              🎨 계절 <span id="seasonArrow">▼</span>
+            </button>
+          </div>
+
+          <div id="seasonMarkBox" class="hidden mt-2 pt-1.5 border-t border-pink-100/60 flex items-center justify-around bg-white/80 p-1.5 rounded-md shadow-inner">
+            <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-pink-600 whitespace-nowrap">
+              <input type="checkbox" id="isSpringMarkCheck" onchange="selectOnlyOneSeason('isSpringMarkCheck')" class="w-3.5 h-3.5 accent-pink-500">
+              <span>🌸 봄</span>
+            </label>
+            <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-emerald-600 whitespace-nowrap">
+              <input type="checkbox" id="isSummerMarkCheck" onchange="selectOnlyOneSeason('isSummerMarkCheck')" class="w-3.5 h-3.5 accent-emerald-500">
+              <span>🍀 여름</span>
+            </label>
+            <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-amber-600 whitespace-nowrap">
+              <input type="checkbox" id="isFallMarkCheck" onchange="selectOnlyOneSeason('isFallMarkCheck')" class="w-3.5 h-3.5 accent-amber-500">
+              <span>🍁 가을</span>
+            </label>
+            <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-sky-600 whitespace-nowrap">
+              <input type="checkbox" id="isWinterMarkCheck" onchange="selectOnlyOneSeason('isWinterMarkCheck')" class="w-3.5 h-3.5 accent-sky-500">
+              <span>❄️ 겨울</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 산 이름 및 단축 체크박스 영역 -->
+        <div class="flex gap-2 mb-2 items-center w-full">
+          <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white min-w-0">
+          <div class="w-[155px] shrink-0 bg-white px-1.5 h-9 flex items-center justify-between border border-gray-200 rounded-lg">
+            <label class="flex items-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-amber-600">
+              <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲번외산행
+            </label>
+            <label class="flex items-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-teal-600">
+              <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾인트레킹
+            </label>
+          </div>
+        </div>
+              
+        <!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 -->
+        <div class="flex gap-2 mb-2 items-center w-full">
+          <select id="adminManualRegionSelect" class="flex-1 h-9 text-[10px] font-black rounded-lg border border-blue-500 text-blue-600 outline-none bg-white min-w-0" style="text-align: left !important; padding-left: 8px !important;">
+            <option value="기타">📍 지역 선택 (선택 안함)</option>
+            <option value="서울특별시">서울특별시</option>
+            <option value="인천광역시">인천광역시</option>
+            <option value="경기도">경기도</option>
+            <option value="강원도">강원도</option>
+            <option value="충청북도">충청북도</option>
+            <option value="충청남도">충청남도</option>
+            <option value="대전/세종">대전/세종</option>
+            <option value="전라북도">전라북도</option>
+            <option value="전라남도">전라남도</option>
+            <option value="광주광역시">광주광역시</option>
+            <option value="경상북도">경상북도</option>
+            <option value="경상남도">경상남도</option>
+            <option value="대구광역시">대구광역시</option>
+            <option value="울산광역시">울산광역시</option>
+            <option value="부산광역시">부산광역시</option>
+            <option value="제주도">제주도</option>
+          </select>
+          
+          <div class="w-[155px] shrink-0 flex gap-1">
+            <button onclick="globalSyncMountainInfo()" class="flex-1 h-9 px-1 text-[10px] bg-red-50 text-red-600 border border-red-200 rounded-lg font-black hover:bg-red-100 transition-colors flex items-center justify-center gap-0.5 whitespace-nowrap">
+              ⛰️일괄수정
+            </button>
+
+            <label class="h-9 px-2 flex items-center justify-start gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
+              <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
+            </label>
+          </div>
+        </div>
+
+        <!-- 높이 및 UP 수량 설정 -->
+        <div class="flex gap-2 mb-2 items-center w-full">
+          <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white min-w-0">
+          <div class="w-[155px] shrink-0 h-9 flex items-center justify-between bg-white px-1.5 rounded-lg border border-gray-200">
+            <span class="text-[9px] font-bold text-gray-400">UP:</span>
+            <div class="up-amount-group !mb-0 !h-[30px] !p-0 border-none flex items-center gap-1">
+              <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="0">0</label>
+              <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="1" checked>1</label>
+              <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="2">2</label>
+              <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="3">3</label>
+              <label class="cursor-pointer flex items-center ml-0.5">
+                <input type="checkbox" id="isQuarterCheck" class="w-3.5 h-3.5 accent-red-500">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 둘레길 지도 영역 -->
+        <div id="dulleMapContainer" class="hidden mb-2">
+          <div id="dulleMapWrapper" 
+               onclick="setDulleCoordinate(event)"
+               class="relative max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30 cursor-pointer">
+            
+            <img src="https://i.ibb.co/20xSks4z/1.png" 
+                 id="dulleMapImage"
+                 class="max-h-[350px] w-auto max-w-full object-contain rounded-xl pointer-events-none block" 
+                 alt="둘레길 지도">
+            
+            <div id="dulleMapMarker" class="hidden absolute w-3.5 h-3.5 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10 pointer-events-none"></div>
+          </div>
+          
+          <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
+            둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
+          </div>
+        </div>
+
+        <!-- 지도 영역 -->
+        <div class="map-container" onclick="setAdminCoordinate(event)">
+          <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+          <div id="adminMapMarker" class="map-point hidden"></div>
+        </div>
+        <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
+      </div>
+
+      <input type="date" id="activityDate" class="input-gap">
+      <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
     </div>
-    <div class="flex-1 flex items-center gap-1">
-      <span class="text-[9px] text-gray-400 shrink-0">🌳</span>
-      <input type="number" id="pForest" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
-    </div>
-    <div class="flex-1 flex items-center gap-1">
-      <span class="text-[9px] text-gray-400 shrink-0">🌊</span>
-      <input type="number" id="pValley" placeholder="0" class="w-full h-7 text-[10px] border border-gray-200 rounded px-1 text-center bg-white">
-    </div>
-    
-    <!-- 🎯 계절 선택 토글 버튼 -->
-    <button type="button" onclick="toggleSeasonMarkBox()" class="h-7 px-2 text-[10px] font-bold text-pink-600 bg-pink-50 border border-pink-200 rounded-md shrink-0 hover:bg-pink-100 transition-colors flex items-center gap-0.5">
-      🎨 계절 <span id="seasonArrow">▼</span>
-    </button>
-  </div>
-
-  <!-- 🎯 한 줄로 깔끔하게 정렬되는 계절 선택 영역 -->
-<div id="seasonMarkBox" class="hidden mt-2 pt-1.5 border-t border-pink-100/60 flex items-center justify-around bg-white/80 p-1.5 rounded-md shadow-inner">
-  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-pink-600 whitespace-nowrap">
-    <input type="checkbox" id="isSpringMarkCheck" onchange="selectOnlyOneSeason('isSpringMarkCheck')" class="w-3.5 h-3.5 accent-pink-500">
-    <span>🌸 봄</span>
-  </label>
-  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-emerald-600 whitespace-nowrap">
-    <input type="checkbox" id="isSummerMarkCheck" onchange="selectOnlyOneSeason('isSummerMarkCheck')" class="w-3.5 h-3.5 accent-emerald-500">
-    <span>🍀 여름</span>
-  </label>
-  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-amber-600 whitespace-nowrap">
-    <input type="checkbox" id="isFallMarkCheck" onchange="selectOnlyOneSeason('isFallMarkCheck')" class="w-3.5 h-3.5 accent-amber-500">
-    <span>🍁 가을</span>
-  </label>
-  <label class="text-[10px] flex items-center gap-0.5 cursor-pointer font-bold text-sky-600 whitespace-nowrap">
-    <input type="checkbox" id="isWinterMarkCheck" onchange="selectOnlyOneSeason('isWinterMarkCheck')" class="w-3.5 h-3.5 accent-sky-500">
-    <span>❄️ 겨울</span>
-  </label>
-</div>
-</div>
-
-
-    <!-- 산 이름 및 단축 체크박스 영역 -->
-<div class="flex gap-2 mb-2 items-center w-full">
-  <input type="text" id="mountainName" onblur="autoFindCoords(); autoFindMountainStats();" placeholder="등산한 산 이름" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white min-w-0">
-  <div class="w-[155px] shrink-0 bg-white px-1.5 h-9 flex items-center justify-between border border-gray-200 rounded-lg">
-    <label class="flex items-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-amber-600">
-      <input type="checkbox" id="isExtraHikeCheck" onchange="syncActivityCheckboxes('extra')" class="w-3.5 h-3.5 accent-amber-500"> 🌲번외산행
-    </label>
-    <label class="flex items-center gap-0.5 cursor-pointer whitespace-nowrap text-[10px] font-bold text-teal-600">
-      <input type="checkbox" id="isSpecialTrackingCheck" onchange="syncActivityCheckboxes('special')" class="w-3.5 h-3.5 accent-teal-500"> 🥾인트레킹
-    </label>
-  </div>
-</div>
-      
-<!-- 지역 선택, 일괄수정, 좌표 OFF 버튼 영역 -->
-<div class="flex gap-2 mb-2 items-center w-full">
-  <!-- 1. 수동 지역 선택 -->
-  <select id="adminManualRegionSelect" class="flex-1 h-9 text-[10px] font-black rounded-lg border border-blue-500 text-blue-600 outline-none bg-white min-w-0" style="text-align: left !important; padding-left: 8px !important;">
-    <option value="기타">📍 지역 선택 (선택 안함)</option>
-    <option value="서울특별시">서울특별시</option>
-    <option value="인천광역시">인천광역시</option>
-    <option value="경기도">경기도</option>
-    <option value="강원도">강원도</option>
-    <option value="충청북도">충청북도</option>
-    <option value="충청남도">충청남도</option>
-    <option value="대전/세종">대전/세종</option>
-    <option value="전라북도">전라북도</option>
-    <option value="전라남도">전라남도</option>
-    <option value="광주광역시">광주광역시</option>
-    <option value="경상북도">경상북도</option>
-    <option value="경상남도">경상남도</option>
-    <option value="대구광역시">대구광역시</option>
-    <option value="울산광역시">울산광역시</option>
-    <option value="부산광역시">부산광역시</option>
-    <option value="제주도">제주도</option>
-  </select>
-  
-  <!-- 오른쪽 버튼 그룹 (w-[155px] 고정) -->
-  <div class="w-[155px] shrink-0 flex gap-1">
-    <!-- 2. 일괄수정 버튼 -->
-    <button onclick="globalSyncMountainInfo()" class="flex-1 h-9 px-1 text-[10px] bg-red-50 text-red-600 border border-red-200 rounded-lg font-black hover:bg-red-100 transition-colors flex items-center justify-center gap-0.5 whitespace-nowrap">
-      ⛰️일괄수정
-    </button>
-
-    <!-- 3. 좌표 OFF 체크박스 (왼쪽 정렬 justify-start 및 px-2 적용) -->
-    <label class="h-9 px-2 flex items-center justify-start gap-1 cursor-pointer whitespace-nowrap text-[10px] font-bold text-red-500 bg-white border border-red-200 rounded-lg shrink-0">
-      <input type="checkbox" id="disableCoordCheck" onchange="toggleDisableCoord()" class="w-3.5 h-3.5 accent-red-500"> 좌표 OFF
-    </label>
-  </div>
-</div>
-
-<!-- 높이 및 UP 수량 설정 -->
-<div class="flex gap-2 mb-2 items-center w-full">
-  <input type="number" id="mountainHeight" placeholder="높이(m) 예: 629" class="h-9 text-xs flex-1 border border-gray-200 rounded-lg px-2 outline-none bg-white min-w-0">
-  <div class="w-[155px] shrink-0 h-9 flex items-center justify-between bg-white px-1.5 rounded-lg border border-gray-200">
-    <span class="text-[9px] font-bold text-gray-400">UP:</span>
-    <div class="up-amount-group !mb-0 !h-[30px] !p-0 border-none flex items-center gap-1">
-      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="0">0</label>
-      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="1" checked>1</label>
-      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="2">2</label>
-      <label class="!text-[9px] cursor-pointer"><input type="radio" name="upAmount" value="3">3</label>
-      <label class="cursor-pointer flex items-center ml-0.5">
-        <input type="checkbox" id="isQuarterCheck" class="w-3.5 h-3.5 accent-red-500">
-      </label>
-    </div>
-  </div>
-</div>
-
-      <!-- 🎯 둘레길 지도 영역 (평상시 숨김: hidden) -->
-<div id="dulleMapContainer" class="hidden mb-2">
-  <!-- 마커의 기준점이 되는 상대위치 상자 -->
-  <div id="dulleMapWrapper" 
-       onclick="setDulleCoordinate(event)"
-       class="relative max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30 cursor-pointer">
-    
-    <!-- 지도 이미지 (pointer-events-none을 두어 클릭 이벤트가 부모 상자로 전달되게 함) -->
-    <img src="https://i.ibb.co/20xSks4z/1.png" 
-         id="dulleMapImage"
-         class="max-h-[350px] w-auto max-w-full object-contain rounded-xl pointer-events-none block" 
-         alt="둘레길 지도">
-    
-    <!-- 동적으로 위치 이동할 마커 -->
-    <div id="dulleMapMarker" class="hidden absolute w-3.5 h-3.5 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10 pointer-events-none"></div>
-  </div>
-  
-  <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
-    둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
-  </div>
-</div>
-
-
-
-    <!-- 지도 영역 -->
-    <div class="map-container" onclick="setAdminCoordinate(event)">
-      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
-      <div id="adminMapMarker" class="map-point hidden"></div>
-    </div>
-    <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
-  </div>
-
-  <input type="date" id="activityDate" class="input-gap">
-  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-</div>
-
-
 
     <!-- 기록 수정 및 레벨 관리 -->
     <div class="card" style="background-color: #fffdf0; border-color: #fef3c7; margin-bottom: 15px;">
@@ -3807,18 +3783,15 @@ margin: 0 2px !important;
         <button onclick="window.updateManualQCount()" class="bg-indigo-500 text-white h-9 rounded-xl text-xs font-bold shadow-sm active:bg-indigo-600">횟수 적용</button>
       </div>
 
-          <!-- 기존 기록 수정 및 레벨 관리 카드 내 하단부 -->
-    <hr class="my-3 border-amber-200">
-    <div id="logListArea" class="log-grid"></div>
+      <hr class="my-3 border-amber-200">
+      <div id="logListArea" class="log-grid"></div>
 
-    <!-- 🔽 추가된 20개 더보기 버튼 영역 -->
-    <div id="moreLogBtnArea" class="mt-2 text-center hidden">
-      <button onclick="loadMoreMemberLogs()" class="w-full py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold rounded-xl border border-amber-300 transition-colors">
-        ➕ 기록 20개 더보기
-      </button>
+      <div id="moreLogBtnArea" class="mt-2 text-center hidden">
+        <button onclick="loadMoreMemberLogs()" class="w-full py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-bold rounded-xl border border-amber-300 transition-colors">
+          ➕ 기록 20개 더보기
+        </button>
+      </div>
     </div>
-  </div>
-
 
     <!-- 회원 상태 및 보너스 관리 -->
     <div class="card" style="background-color: #fff5f5; border: 1px solid #ffe3e3;">
@@ -3845,9 +3818,8 @@ margin: 0 2px !important;
       </div>
     </div>
 
-
     <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed #ccc;">
-      <button onclick="exportAllData()" style="width: 100%; py: 15px; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+      <button onclick="exportAllData()" style="width: 100%; padding: 15px 0; background-color: #333; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
         💾 전체 데이터 원클릭 백업 (JSON 다운로드)
       </button>
       <p style="text-align: center; font-size: 11px; color: #888; margin-top: 8px;">
@@ -3855,112 +3827,54 @@ margin: 0 2px !important;
       </p>
     </div>
 
-          <div class="p-4 text-center">
+    <div class="p-4 text-center">
       <button onclick="logoutAdmin()" class="text-gray-400 underline font-bold text-xs">로그아웃</button>
-          </div>
- </div> <!-- viewAdmin 닫힘 -->
+    </div>
+  </div> <!-- viewAdmin 닫힘 -->
 </div> <!-- main-container 닫힘 -->
 
 <div id="levelModal" class="modal-overlay" onclick="toggleModal(false)">
   <div class="modal-content !p-4 max-w-[320px] w-full text-center" onclick="event.stopPropagation()">
-    
-    <h2 class="text-base font-black text-slate-800">
-      📊 산:우리 등급 체계
-    </h2>
-
-    <p class="text-[9px] font-black tracking-widest text-emerald-600/80 uppercase mt-0.5 mb-2.5">
-      SANWOORI HONOR SYSTEM
-    </p>
-    
+    <h2 class="text-base font-black text-slate-800">📊 산:우리 등급 체계</h2>
+    <p class="text-[9px] font-black tracking-widest text-emerald-600/80 uppercase mt-0.5 mb-2.5">SANWOORI HONOR SYSTEM</p>
     <div id="levelGuideGrid" class="guide-grid"></div>
-    
-    <button onclick="toggleModal(false)" class="w-full mt-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs">
-      닫기
-    </button>
+    <button onclick="toggleModal(false)" class="w-full mt-3 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs">닫기</button>
   </div>
 </div>
-
 
 <!-- 📜 San:Woori History 통합 모달 -->
 <div id="vibeModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[9990] flex items-center justify-center p-4" onclick="toggleVibeModal(false)">
   <div class="modal-content bg-white w-full max-w-sm rounded-3xl !p-4 max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    
-    <!-- San:Woori History 영역 (레전드 스타 / 누적고도 / 100레벨) -->
     <div id="vibeHallOfFame"></div>
-
-    <!-- 하단 확인 버튼 -->
-    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">
-      확인
-    </button>
+    <button onclick="toggleVibeModal(false)" class="w-full mt-4 py-3 bg-[#1E293B] text-white rounded-xl font-black text-sm active:scale-98 transition-all">확인</button>
   </div>
 </div>
 
 <!-- 📜 History 상세보기 팝업 모달 -->
 <div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
   <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    <!-- 모달 헤더 -->
     <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
-      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        <!-- JS로 타이틀 주입 -->
-      </h3>
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1"></h3>
       <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
     </div>
-
-    <!-- 모달 본문 -->
-    <div id="historyDetailBody" class="py-1">
-      <!-- JS로 상세 목록 주입 -->
-    </div>
-
-    <!-- 하단 닫기 버튼 -->
-    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
-      닫기
-    </button>
+    <div id="historyDetailBody" class="py-1"></div>
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">닫기</button>
   </div>
 </div>
-
-
-        <!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단에 배치) -->
-<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
-  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
-    
-    <!-- 모달 헤더 -->
-    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
-      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
-        <!-- JS로 타이틀 주입 -->
-      </h3>
-      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
-    </div>
-
-    <!-- 모달 본문 -->
-    <div id="historyDetailBody" class="py-1">
-      <!-- JS로 상세 목록 주입 -->
-    </div>
-
-    <!-- 하단 닫기 버튼 -->
-    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
-      닫기
-    </button>
-  </div>
-</div>
-
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
-<div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
-<div class="text-center mb-2">
-<h2 class="text-xl font-black text-slate-800 flex items-center justify-center gap-2">
-🏆 명예의 전당
-</h2>
-<p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Hall of Fame - San:Woori</p>
-</div>
-<div id="hallListArea" class="hall-scroll-area"></div>
-<button onclick="toggleHallModal(false)" class="w-full mt-4 py-3 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm">닫기</button>
-</div>
+  <div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
+    <div class="text-center mb-2">
+      <h2 class="text-xl font-black text-slate-800 flex items-center justify-center gap-2">🏆 명예의 전당</h2>
+      <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Hall of Fame - San:Woori</p>
+    </div>
+    <div id="hallListArea" class="hall-scroll-area"></div>
+    <button onclick="toggleHallModal(false)" class="w-full mt-4 py-3 bg-gray-100 text-gray-600 rounded-2xl font-black text-sm">닫기</button>
+  </div>
 </div>
 
 <div id="timelineModal" class="modal-overlay" onclick="toggleTimelineModal(false)">
     <div id="timelineModalContent" class="modal-content !p-5 !rounded-3xl" onclick="event.stopPropagation()">
-        
-        <!-- 상단 헤더 -->
         <div class="flex justify-between items-center mb-3">
             <div>
                 <h2 class="text-lg font-black text-slate-800">
@@ -3970,49 +3884,35 @@ margin: 0 2px !important;
             <span id="timelineCountBadge" class="bg-blue-100 text-blue-600 text-[10px] font-black px-2 py-1 rounded-full"></span>
         </div>
 
-        <!-- 🌱 분기 운동 잔디 타이틀 영역 -->
-<div class="flex justify-between items-center mb-2.5">
-    <!-- 좌측: 잔디 타이틀 + ℹ️ 안내 버튼 -->
-    <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1 m-0">
-        🌱 분기 운동 잔디
-        <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
-    </p>
-    
-    <!-- 우측: [🔥 HOT 배지] + [에메랄드 분기 선택 스크롤] -->
-    <div class="flex items-center gap-1.5">
-        <!-- 🔥 HOT 배지 -->
-        <div id="passionVibeArea" class="flex items-center"></div>
+        <div class="flex justify-between items-center mb-2.5">
+            <p class="text-[10px] font-extrabold text-slate-500 flex items-center gap-1 m-0">
+                🌱 분기 운동 잔디
+                <button type="button" class="info-help-btn-timeline" onclick="event.stopPropagation(); openGrassInfoModal(event);" title="운동 잔디 안내">ℹ️</button>
+            </p>
+            
+            <div class="flex items-center gap-1.5">
+                <div id="passionVibeArea" class="flex items-center"></div>
+                <div class="relative flex items-center h-[18px]">
+                    <select id="timelineQuarterSelect" 
+                            onchange="onTimelineQuarterChange(this.value)"
+                            class="quarter-glow-select appearance-none bg-emerald-50/80 text-emerald-800 font-extrabold text-[9px] h-[18px] leading-none pl-2 pr-4 rounded-md border border-emerald-300 focus:outline-none cursor-pointer transition-all">
+                        <option value="1" class="bg-white text-slate-700">1분기</option>
+                        <option value="2" class="bg-white text-slate-700">2분기</option>
+                        <option value="3" class="bg-white text-slate-700">3분기</option>
+                        <option value="4" class="bg-white text-slate-700">4분기</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-emerald-600 text-[7px]">▼</div>
+                </div>
 
-        <!-- 은은한 에메랄드 톤 분기 선택 스크롤 -->
-        <div class="relative flex items-center h-[18px]">
-            <select id="timelineQuarterSelect" 
-                    onchange="onTimelineQuarterChange(this.value)"
-                    class="quarter-glow-select appearance-none bg-emerald-50/80 text-emerald-800 font-extrabold text-[9px] h-[18px] leading-none pl-2 pr-4 rounded-md border border-emerald-300 focus:outline-none cursor-pointer transition-all">
-                <option value="1" class="bg-white text-slate-700">1분기</option>
-                <option value="2" class="bg-white text-slate-700">2분기</option>
-                <option value="3" class="bg-white text-slate-700">3분기</option>
-                <option value="4" class="bg-white text-slate-700">4분기</option>
-            </select>
-            <!-- 화살표 아이콘 (에메랄드 톤) -->
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-emerald-600 text-[7px]">
-                ▼
+                <div id="friendshipPointArea" class="hidden">
+                    <span id="memberFriendshipPoint">0</span>
+                </div>
             </div>
         </div>
 
-        <!-- DOM 예외 방지용 숨김 처리 -->
-        <div id="friendshipPointArea" class="hidden">
-            <span id="memberFriendshipPoint">0</span>
-        </div>
-    </div>
-</div>
-        <!-- 잔디 보드 -->
         <div id="grassBoard" class="grass-container mb-2"></div>
+        <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100"></div>
 
-        <!-- 범례 -->
-        <div id="timelineLegend" class="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-3 py-1.5 px-3 mt-1.5 mb-1.5 bg-slate-50/60 rounded-xl border border-slate-100">
-        </div>
-
-        <!-- 📊 분기 성장 추이 영역 (원래 클래스 구조로 복구) -->
         <div id="chartBox" class="chart-container-box mb-4">
             <div class="chart-header">
                 <div class="chart-title-sub" style="display: flex; align-items: center; gap: 4px;">
@@ -4030,47 +3930,35 @@ margin: 0 2px !important;
             </div>
         </div>
 
-        <!-- 메인 인연의 숲 버튼 -->
         <button onclick="showBondingForestModal(document.getElementById('timelineMemberName')?.innerText || '')" 
         class="soft-notice-btn w-full py-3.5 rounded-xl font-extrabold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98] transition-all mt-3">
-    <span class="relative z-10 flex items-center gap-1.5">
-        <span>🌳 인연의 숲 자세히 보기</span>
-        <span class="text-emerald-700">▶</span>
-    </span>
+          <span class="relative z-10 flex items-center gap-1.5">
+              <span>🌳 인연의 숲 자세히 보기</span>
+              <span class="text-emerald-700">▶</span>
+          </span>
         </button>
             
-        <!-- 닫기 버튼 -->
         <button onclick="toggleTimelineModal(false)" class="w-full mt-2 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm active:scale-[0.98] transition-transform">
             닫기
         </button>
-
     </div> 
 </div>
 
-
-
-<!-- JS 크래시 방지용 더미 데이터 존 (숨겨짐) -->
+<!-- JS 크래시 방지용 더미 데이터 존 -->
 <div id="logPopup" style="display: none !important;">
     <div id="timelineScrollContainer">
         <div id="timelineContent"></div>
     </div>
 </div>
 
-
-  
-              <!-- 🟢 변경 후 (hidden 추가) -->
 <div id="mapModal" class="modal-overlay fixed inset-0 z-50 p-4 hidden items-center justify-center overflow-y-auto bg-black/50" onclick="toggleMapModal(false)">
-
   <div id="mapModalContent" class="modal-content !p-5 !rounded-[32px] max-w-md w-full bg-white text-slate-800 shadow-2xl border border-slate-100 overflow-y-auto max-h-[85vh] flex flex-col" onclick="event.stopPropagation()">
-    
-    <!-- Header Zone + 에베레스트 정복 창 -->
     <div class="flex justify-between items-center mb-4 gap-3 flex-shrink-0">
       <div class="flex-shrink-0">
         <h2 class="text-lg font-black text-slate-900"><span id="mapMemberName" class="text-emerald-600"></span> 님</h2>
         <p class="text-[10px] font-bold text-slate-400">Conquest Map</p>
       </div>
 
-      <!-- 🏔️ 에베레스트 정복 미니 카드 -->
       <div class="everest-card-mini flex-1 bg-sky-50/80 p-2.5 rounded-2xl border border-sky-100/80">
         <div id="everestTextLine" class="everest-count-mini text-[10px] font-bold text-sky-900 text-center mb-1.5">
           우리는 🏔️ 에베레스트를 <span id="everestCount" class="text-sky-600 font-extrabold">0.0</span>회 정복하였습니다
@@ -4081,24 +3969,18 @@ margin: 0 2px !important;
       </div>
     </div>
 
-    <!-- Main Map View -->
     <div id="mapViewMain">
-      <!-- 지도 컨테이너 -->
       <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3">
         <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl">
-        
-        <!-- 🌲 지도 우측 상단 미니 배지 -->
         <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
           <span class="text-[10px]">🌲</span>
           <span id="miniTop100Badge" class="tracking-tight">0/100</span>
         </div>
 
         <div id="conquerMapPoints"></div>
-        <!-- 💡 출처 텍스트: 범례 아래 우측 위치 -->
         <div class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
       </div>
 
-      <!-- 상세 통계 전환 버튼 -->
       <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
         <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
           <span>🎖️</span> 정복 통계 및 산림청 100대 목록
@@ -4115,22 +3997,16 @@ margin: 0 2px !important;
       </div>
     </div>
 
-    <!-- Detailed Stats View (통계 3종 탭) -->
     <div id="mapViewStats" class="hidden-view">
       <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col justify-between">
-        
-        <!-- Header & Tab Navigation -->
         <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
           <div class="flex gap-1 overflow-x-auto no-scrollbar">
-            <!-- 🔵 100대 명산 탭 (초기 파란 배경 + 흰 점) -->
             <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
               <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
             </button>
-            <!-- 🔴 기타 명산 탭 -->
             <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
               <span id="dotNormal" class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 기타 명산
             </button>
-            <!-- 지역 점유율 탭 -->
             <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
               지역 점유율
             </button>
@@ -4140,9 +4016,7 @@ margin: 0 2px !important;
           </button>
         </div>
 
-        <!-- Tab Contents -->
         <div class="flex-1 flex flex-col min-h-0">
-          <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
           <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
             <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
               <div id="top100MountainGrid" class="space-y-1.5"></div>
@@ -4152,7 +4026,6 @@ margin: 0 2px !important;
             </div>
           </div>
 
-          <!-- Tab 2: 일반 정복한 산 목록 -->
           <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
             <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
               <div id="normalMountainGrid" class="space-y-1.5"></div>
@@ -4162,48 +4035,37 @@ margin: 0 2px !important;
             </div>
           </div>
 
-          <!-- Tab 3: 지역별 점유율 -->
           <div id="regionStatsBox" class="flex-1 min-h-0 hidden">
             <div id="conquerRegionGrid" class="h-[280px] overflow-y-auto pr-1"></div>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- 하단 닫기 버튼 (항상 노출 및 고정 위치 감싸기) -->
     <div class="flex-shrink-0 pt-3">
       <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
         닫기
       </button>
     </div>
-
   </div>
 </div>
 
-      
+<div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
+  <div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
+    <button onclick="document.getElementById('milkyWayModal').style.display='none'" class="absolute top-5 right-5 z-10 text-white/50 text-2xl">&times;</button>
 
-          
-      
+    <div class="p-6 text-center">
+      <h3 class="text-blue-400 text-xs font-black tracking-widest uppercase mb-1">My Milky Way</h3>
+      <h2 id="mwMemberName" class="text-white text-xl font-black mb-6">산행 성좌</h2>
 
-    <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
-<div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
-<button onclick="document.getElementById('milkyWayModal').style.display='none'" class="absolute top-5 right-5 z-10 text-white/50 text-2xl">&times;</button>
+      <div id="constellationBoard" class="relative w-full h-[350px] bg-slate-950/50 rounded-2xl border border-white/5 overflow-hidden"></div>
 
-<div class="p-6 text-center">
-<h3 class="text-blue-400 text-xs font-black tracking-widest uppercase mb-1">My Milky Way</h3>
-<h2 id="mwMemberName" class="text-white text-xl font-black mb-6">산행 성좌</h2>
-
-<div id="constellationBoard" class="relative w-full h-[350px] bg-slate-950/50 rounded-2xl border border-white/5 overflow-hidden">
+      <p class="mt-6 text-white/40 text-[10px] leading-relaxed">
+        걸어온 궤적은 선이 되고, 마침내 밤하늘의 길이 됩니다.
+      </p>
+    </div>
+  </div>
 </div>
-
-<p class="mt-6 text-white/40 text-[10px] leading-relaxed">
-걸어온 궤적은 선이 되고, 마침내 밤하늘의 길이 됩니다.
-</p>
-</div>
-</div>
-</div>
-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -4236,13 +4098,10 @@ let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
 // =========================================================
-// 🎯 경기둘레길 관련 통합 스크립트 (토글, 지도 클릭, DB 연동, 모달)
+// 🎯 경기둘레길 관련 통합 스크립트
 // =========================================================
-
-// 1. 글로벌 선택 데이터 저장 변수
 window.selectedDulleData = null;
 
-// 2. DOM 로드 완료 후 트래킹 체크박스 이벤트 연결
 document.addEventListener('DOMContentLoaded', function() {
   const trackingCheck = document.getElementById('isTrackingCheck');
   const dulleContainer = document.getElementById('dulleMapContainer');
@@ -4253,7 +4112,6 @@ document.addEventListener('DOMContentLoaded', function() {
         dulleContainer.classList.remove('hidden');
       } else {
         dulleContainer.classList.add('hidden');
-        // 체크 해제 시 마커 및 선택 정보 초기화
         window.selectedDulleData = null;
         const marker = document.getElementById('dulleMapMarker');
         if (marker) marker.classList.add('hidden');
@@ -4264,7 +4122,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 3. 코스 번호(1~60)에 따른 4가지 구간 색상 및 정보 리턴
 function getDulleCourseColor(courseNum) {
   const num = parseInt(courseNum, 10);
   if (num >= 1 && num <= 11) {
@@ -4279,19 +4136,14 @@ function getDulleCourseColor(courseNum) {
   return { bg: 'bg-gray-500', hex: '#6B7280', label: '⚪️ 기타' };
 }
 
-// 4. 둘레길 지도 클릭 시 좌표 찍기 & 코스 번호 입력 받아 색상 마커 생성
-function setDulleCoordinate(event) {
-  // 클릭된 감싸는 영역(dulleMapWrapper) 기준
+window.setDulleCoordinate = function(event) {
   const wrapper = document.getElementById('dulleMapWrapper');
   if (!wrapper) return;
 
   const rect = wrapper.getBoundingClientRect();
-
-  // 클릭한 상대 X, Y 비율 (%) 계산
   const x = ((event.clientX - rect.left) / rect.width) * 100;
   const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-  // 1) 코스 번호 입력 팝업
   const courseInput = prompt("정복한 둘레길 코스 번호를 입력하세요 (1~60):");
   if (!courseInput) return;
 
@@ -4301,10 +4153,8 @@ function setDulleCoordinate(event) {
     return;
   }
 
-  // 2) 구간별 색상 추출
   const colorInfo = getDulleCourseColor(courseNum);
 
-  // 3) 마커 이동 및 표시
   const marker = document.getElementById('dulleMapMarker');
   if (marker) {
     marker.style.left = `${x}%`;
@@ -4313,7 +4163,6 @@ function setDulleCoordinate(event) {
     marker.classList.remove('hidden');
   }
 
-  // 4) 전역 데이터 저장 (DB 저장 시 활용)
   window.selectedDulleData = {
     x: x.toFixed(2),
     y: y.toFixed(2),
@@ -4321,21 +4170,15 @@ function setDulleCoordinate(event) {
     color: colorInfo.hex
   };
 
-  // 5) 하단 텍스트 변경
   const coordDisplay = document.getElementById('dulleCoordDisplay');
   if (coordDisplay) {
     coordDisplay.innerHTML = `선택 코스: <span style="color:${colorInfo.hex}; font-weight:bold;">${courseNum}코스</span> (X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%)`;
   }
-}
+};
 
-
-
-// 5. Firestore DB 저장 연동 함수 (기록 저장 버튼 클릭 시 호출)
-async function saveDulleLog(memberDocId, courseNum, coordX = null, coordY = null) {
+window.saveDulleLog = async function(memberDocId, courseNum, coordX = null, coordY = null) {
   try {
     const userRef = doc(db, "sanwoori", memberDocId);
-    
-    // 좌표값(coordX, coordY)도 객체로 함께 저장하도록 처리
     const dulleObject = (coordX !== null && coordY !== null) 
       ? { course: parseInt(courseNum, 10), x: coordX, y: coordY } 
       : parseInt(courseNum, 10);
@@ -4346,13 +4189,8 @@ async function saveDulleLog(memberDocId, courseNum, coordX = null, coordY = null
   } catch (e) {
     console.error("❌ 둘레길 DB 저장 실패:", e);
   }
-}
+};
 
-// =========================================================
-// 💡 [여기서부터 새로 추가된 모달 제어 및 렌더링 코드입니다]
-// =========================================================
-
-// 6. 경기둘레길 모달 열기/닫기 제어 함수
 window.openGyeonggiTrailModal = function() {
   const modal = document.getElementById('gyeonggiTrailModal');
   if (modal) modal.style.display = 'flex';
@@ -4363,52 +4201,41 @@ window.closeGyeonggiTrailModal = function() {
   if (modal) modal.style.display = 'none';
 };
 
-// 7. 개인 운동 리포트 화면 카운팅, 지도 마커 및 코스별 뱃지 UI 렌더링
 function renderPersonalDulleReport(userData) {
   const dulleArray = userData.dulleCourses || [];
   
-  // 단일 숫자 및 객체 형태({course, x, y}) 예외 처리
   const completedList = dulleArray.map(item => {
     return typeof item === 'object' ? item : { course: parseInt(item, 10) };
   });
 
-  // 중복 코스 제거 및 코스 번호 오름차순 정렬
   const uniqueCourses = Array.from(new Map(completedList.map(item => [item.course, item])).values())
                              .sort((a, b) => a.course - b.course);
 
   const totalCompleted = uniqueCourses.length;
 
-  // 1) 상단 완주 카운트 뱃지 업데이트
   const countBadge = document.getElementById('trailCountBadge');
   if (countBadge) {
     countBadge.innerText = `${totalCompleted}/60`;
   }
 
-  // 2) 지도 위 마커 찍기
   const markerContainer = document.getElementById('modalMarkerContainer');
   if (markerContainer) {
-    markerContainer.innerHTML = ''; // 기존 마커 초기화
+    markerContainer.innerHTML = '';
 
     uniqueCourses.forEach(item => {
-      // 좌표(x, y)가 정상적으로 존재하는 경우에만 마커 생성
       if (item.x !== undefined && item.y !== undefined && item.x !== null && item.y !== null) {
         const color = getDulleCourseColor(item.course);
-        
         const markerEl = document.createElement('div');
         markerEl.className = 'dulle-modal-marker';
-        
-        // 위치 및 색상 설정
         markerEl.style.left = `${item.x}%`;
         markerEl.style.top = `${item.y}%`;
         markerEl.style.backgroundColor = color.hex;
-        markerEl.title = `${item.course}코스`; // 마우스 올렸을 때 코스 번호 툴팁
-        
+        markerEl.title = `${item.course}코스`;
         markerContainer.appendChild(markerEl);
       }
     });
   }
 
-  // 3) 하단 완주 뱃지 목록 UI 렌더링
   const badgeContainer = document.getElementById('dulleBadgeList');
   if (badgeContainer) {
     if (uniqueCourses.length === 0) {
@@ -4427,16 +4254,7 @@ function renderPersonalDulleReport(userData) {
   }
 }
 
-  
-
-  
-      
-// ==========================================
-// 📌 [신규 회원 저장 함수]
-// ==========================================
-
-// 1. 회원 이름을 문서 ID로 직접 지정하여 저장하는 방식 (추천)
-async function saveMemberByName(memberData) {
+window.saveMemberByName = async function(memberData) {
   const { name, gender, level } = memberData;
 
   if (!name || !name.trim()) {
@@ -4444,13 +4262,10 @@ async function saveMemberByName(memberData) {
     return;
   }
 
-  const cleanName = name.trim(); // 공백 제거
+  const cleanName = name.trim();
 
   try {
-    // ⚠️ addDoc 대신 setDoc(doc(db, "컬렉션명", 문서ID))을 사용합니다.
-    // 문서 ID에 바로 한글 이름(cleanName)이 들어갑니다.
     const userRef = doc(db, "sanwoori", cleanName);
-
     await setDoc(userRef, {
       name: cleanName,
       gender: gender || "여",
@@ -4461,20 +4276,18 @@ async function saveMemberByName(memberData) {
       friendshipPoint: 0,
       isHidden: false,
       createdAt: Timestamp.now()
-    }, { merge: true }); // merge: true를 주면 기존 데이터 덮어쓰기 시 필드 보존
+    }, { merge: true });
 
-    console.log(`회원 [${cleanName}] 저장 완료!`);
     alert(`회원 [${cleanName}] 님이 성공적으로 등록되었습니다.`);
   } catch (error) {
     console.error("회원 저장 중 오류 발생:", error);
     alert("회원 저장 실패: " + error.message);
   }
-}
+};
 
-// 2. 만약 숫자/번호를 조합하고 싶을 경우 (예: "01_피치")
-async function saveMemberWithPrefix(userNumber, memberData) {
+window.saveMemberWithPrefix = async function(userNumber, memberData) {
   const cleanName = memberData.name.trim();
-  const customId = `${userNumber}_${cleanName}`; // "01_피치" 형태
+  const customId = `${userNumber}_${cleanName}`;
 
   try {
     const userRef = doc(db, "sanwoori", customId);
@@ -4483,45 +4296,31 @@ async function saveMemberWithPrefix(userNumber, memberData) {
       name: cleanName,
       createdAt: Timestamp.now()
     });
-    console.log(`회원 [${customId}] 저장 완료!`);
   } catch (error) {
     console.error("저장 실패:", error);
   }
-}
+};
 
-
-// ==========================================================================
-// 🏔️ [최종] 러닝/트레킹/산책(km 단위) 데이터 완벽 보존 + 산맥 생성 원천 차단
-// ==========================================================================
-async function saveHikeLog(mId, newLogData) {
+window.saveHikeLog = async function(mId, newLogData) {
     const logsRef = collection(db, `sanwoori/${mId}/logs`);
     
-    // 🎯 [완벽 방어] 러닝, 트레킹, 산책, 단순기록(isSpecial)이거나 고도 데이터가 없다면
-    // 유저의 소중한 거리(km) 기록은 그대로 저장하되, 산맥 100개 순환 계산에서는 완전히 패스!
     if (newLogData.isSpecial || !newLogData.height || newLogData.height <= 0) {
-        await addDoc(logsRef, newLogData); // km 단위 산책/러닝 기록 파괴 없이 그대로 보존
+        await addDoc(logsRef, newLogData);
         return;
     }
 
-    // 1. 여기서부터는 오직 '순수 등산/번외 산행(m 단위)' 진짜 산맥들만 날짜순 조회
     const q = query(logsRef, orderBy("date", "asc"));
     const snap = await getDocs(q);
     
-    // DB에서 일반 활동(isSpecial)이 아니면서 진짜 고도(m)를 가진 산맥 데이터만 필터링
     const existingMountainLogs = snap.docs.filter(d => {
         return (d.data().height || 0) > 0 && !d.data().isSpecial;
     });
 
-    // 2. 진짜 m 단위 산맥 개수가 아직 100개 미만이라면 순서대로 적재
     if (existingMountainLogs.length < 100) {
         await addDoc(logsRef, newLogData);
-        console.log(`🏔️ 순수 등산 산맥 적재 중 (${existingMountainLogs.length + 1}/100)`);
-    } 
-    // 3. 🎯 진짜 산맥 슬롯이 100개가 꽉 찼을 때 (101번째부터 밀어내기)
-    else {
+    } else {
         const maxHeight = Math.max(...existingMountainLogs.map(d => d.data().height || 0));
 
-        // 최고봉(최고 고도 m)은 영구 보존하고, 가장 오래된 구형 산맥 하나를 타겟팅
         let targetDocToDelete = existingMountainLogs.find(docSnap => {
             return docSnap.data().height !== maxHeight;
         });
@@ -4533,65 +4332,62 @@ async function saveHikeLog(mId, newLogData) {
         if (targetDocToDelete) {
             await deleteDoc(doc(db, `sanwoori/${mId}/logs`, targetDocToDelete.id));
             await addDoc(logsRef, newLogData);
-            console.log("🔄 [순환 완료] 최고봉을 보호하고, 가장 오래된 등산 산맥 슬롯을 최신 산으로 교체했습니다.");
         }
     }
-}
+};
 
-        
-    const regionBoundaries = [
-{ name: "서울특별시", x: [25, 35], y: [18, 25] },
-{ name: "경기도", x: [20, 40], y: [12, 32] },
-{ name: "강원도", x: [40, 75], y: [5, 32] },
-{ name: "충청북도", x: [40, 55], y: [30, 48] },
-{ name: "충청남도", x: [15, 35], y: [35, 52] },
-{ name: "대전/세종", x: [35, 42], y: [42, 50] },
-{ name: "전라북도", x: [20, 45], y: [52, 68] },
-{ name: "전라남도", x: [15, 45], y: [68, 88] },
-{ name: "광주광역시", x: [25, 32], y: [72, 80] },
-{ name: "경상북도", x: [55, 88], y: [32, 62] },
-{ name: "경상남도", x: [45, 80], y: [62, 85] },
-{ name: "대구광역시", x: [62, 72], y: [52, 60] },
-{ name: "울산광역시", x: [78, 88], y: [65, 75] },
-{ name: "부산광역시", x: [72, 85], y: [72, 85] },
-{ name: "제주도", x: [20, 40], y: [88, 98] },
-{ name: "인천광역시", x: [18, 26], y: [20, 28] },
-{ name: "울릉도/독도", x: [88, 100], y: [35, 48] }
+const regionBoundaries = [
+  { name: "서울특별시", x: [25, 35], y: [18, 25] },
+  { name: "경기도", x: [20, 40], y: [12, 32] },
+  { name: "강원도", x: [40, 75], y: [5, 32] },
+  { name: "충청북도", x: [40, 55], y: [30, 48] },
+  { name: "충청남도", x: [15, 35], y: [35, 52] },
+  { name: "대전/세종", x: [35, 42], y: [42, 50] },
+  { name: "전라북도", x: [20, 45], y: [52, 68] },
+  { name: "전라남도", x: [15, 45], y: [68, 88] },
+  { name: "광주광역시", x: [25, 32], y: [72, 80] },
+  { name: "경상북도", x: [55, 88], y: [32, 62] },
+  { name: "경상남도", x: [45, 80], y: [62, 85] },
+  { name: "대구광역시", x: [62, 72], y: [52, 60] },
+  { name: "울산광역시", x: [78, 88], y: [65, 75] },
+  { name: "부산광역시", x: [72, 85], y: [72, 85] },
+  { name: "제주도", x: [20, 40], y: [88, 98] },
+  { name: "인천광역시", x: [18, 26], y: [20, 28] },
+  { name: "울릉도/독도", x: [88, 100], y: [35, 48] }
 ];
 
-    function getRegionFromCoord(coords) {
-if(!coords) return "기타";
-const priorityRegions = ["서울특별시", "대구광역시", "부산광역시", "광주광역시", "대전/세종", "인천광역시", "울산광역시", "제주도"];
-for(let rName of priorityRegions) {
-let r = regionBoundaries.find(b => b.name === rName);
-if(coords.x >= r.x[0] && coords.x <= r.x[1] && coords.y >= r.y[0] && coords.y <= r.y[1]) return r.name;
-}
-for(let r of regionBoundaries) {
-if(priorityRegions.includes(r.name)) continue;
-if(coords.x >= r.x[0] && coords.x <= r.x[1] && coords.y >= r.y[0] && coords.y <= r.y[1]) return r.name;
-}
-return "기타";
+function getRegionFromCoord(coords) {
+  if(!coords) return "기타";
+  const priorityRegions = ["서울특별시", "대구광역시", "부산광역시", "광주광역시", "대전/세종", "인천광역시", "울산광역시", "제주도"];
+  for(let rName of priorityRegions) {
+    let r = regionBoundaries.find(b => b.name === rName);
+    if(coords.x >= r.x[0] && coords.x <= r.x[1] && coords.y >= r.y[0] && coords.y <= r.y[1]) return r.name;
+  }
+  for(let r of regionBoundaries) {
+    if(priorityRegions.includes(r.name)) continue;
+    if(coords.x >= r.x[0] && coords.x <= r.x[1] && coords.y >= r.y[0] && coords.y <= r.y[1]) return r.name;
+  }
+  return "기타";
 }
 
 function initAutoSelection() {
-const yearSelect = document.getElementById('yearSelect');
-if (yearSelect) yearSelect.value = selectedYear;
-document.querySelectorAll('.q-btn').forEach((btn, idx) => {
-btn.classList.toggle('active-q', idx + 1 === selectedQuarter);
-});
+  const yearSelect = document.getElementById('yearSelect');
+  if (yearSelect) yearSelect.value = selectedYear;
+  document.querySelectorAll('.q-btn').forEach((btn, idx) => {
+    btn.classList.toggle('active-q', idx + 1 === selectedQuarter);
+  });
 }
 
 const levelThresholds = [
-{ lv: 100, name: "🌌 은하수" }, { lv: 90, name: "🌠 별똥별" }, { lv: 80, name: "💫 타원별" },
-{ lv: 70, name: "🌟 황금별" }, { lv: 60, name: "⭐️ 별" }, { lv: 50, name: "☀️ 해" },
-{ lv: 45, name: "🌕 달" }, { lv: 40, name: "🌙 초승달" }, { lv: 35, name: "☄️ 운석" },
-{ lv: 30, name: "🌈 무지개" }, { lv: 25, name: "🌀 태풍" }, { lv: 20, name: "🌋 화산" },
-{ lv: 15, name: "🏔️ 설산" }, { lv: 10, name: "⛰️ 산" }, { lv: 5, name: "🌳 나무" },
-{ lv: 3, name: "🌿 풀잎" }, { lv: 1, name: "🌱 새싹" }, { lv: 0, name: "🫘 신입" }
+  { lv: 100, name: "🌌 은하수" }, { lv: 90, name: "🌠 별똥별" }, { lv: 80, name: "💫 타원별" },
+  { lv: 70, name: "🌟 황금별" }, { lv: 60, name: "⭐️ 별" }, { lv: 50, name: "☀️ 해" },
+  { lv: 45, name: "🌕 달" }, { lv: 40, name: "🌙 초승달" }, { lv: 35, name: "☄️ 운석" },
+  { lv: 30, name: "🌈 무지개" }, { lv: 25, name: "🌀 태풍" }, { lv: 20, name: "🌋 화산" },
+  { lv: 15, name: "🏔️ 설산" }, { lv: 10, name: "⛰️ 산" }, { lv: 5, name: "🌳 나무" },
+  { lv: 3, name: "🌿 풀잎" }, { lv: 1, name: "🌱 새싹" }, { lv: 0, name: "🫘 신입" }
 ];
 
-
-    const getLevelBadge = (lv) => { for (const t of levelThresholds) { if (lv >= t.lv) return t.name; } return "🫘 신입"; };
+const getLevelBadge = (lv) => { for (const t of levelThresholds) { if (lv >= t.lv) return t.name; } return "🫘 신입"; };
 
 const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     let base = { bg: '#ffffff', border: '#e2e8f0', text: '#94a3b8', blink: '' };
@@ -4608,7 +4404,6 @@ const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     else if (lv >= 10) base = { bg: '#f5f3ff', border: '#ddd6fe', text: '#7c3aed', blink: '' };
     else if (lv >= 3) base = { bg: '#f8fafc', border: '#94a3b8', text: '#475569', blink: '' };
 
-    // 📍 우측 상단 미니 엠블럼 핀 HTML 생성 (1번 글로우 애니메이션 적용)
     let pinHtml = '';
     if (isSuper) {
         pinHtml = `<span class="glow-pin-super">🔥</span>`;
@@ -4619,82 +4414,94 @@ const getLevelStyle = (lv, isSuper = false, isSpecial = false) => {
     return { ...base, pinHtml };
 };
 
-
 async function updateVisitorCount() {
-const d = new Date();
-const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-const statsRef = doc(db, "site_stats", "visitors");
-try { await updateDoc(statsRef, { total: increment(1) }); }
-catch (e) { await setDoc(statsRef, { total: 1 }, { merge: true }); }
-const dailyRef = doc(db, "site_stats", `day_${todayStr}`);
-try { await updateDoc(dailyRef, { count: increment(1) }); }
-catch (e) { await setDoc(dailyRef, { count: 1 }, { merge: true }); }
-await addDoc(collection(db, "visitor_logs"), { timestamp: Timestamp.now() });
+  const d = new Date();
+  const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const statsRef = doc(db, "site_stats", "visitors");
+  try { await updateDoc(statsRef, { total: increment(1) }); }
+  catch (e) { await setDoc(statsRef, { total: 1 }, { merge: true }); }
+  const dailyRef = doc(db, "site_stats", `day_${todayStr}`);
+  try { await updateDoc(dailyRef, { count: increment(1) }); }
+  catch (e) { await setDoc(dailyRef, { count: 1 }, { merge: true }); }
+  await addDoc(collection(db, "visitor_logs"), { timestamp: Timestamp.now() });
 }
 
 function listenVisitors() {
-const d = new Date();
-const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-onSnapshot(doc(db, "site_stats", "visitors"), (s) => {
-if(s.exists()) document.getElementById('totalHits').innerText = s.data().total.toLocaleString();
-});
-onSnapshot(doc(db, "site_stats", `day_${todayStr}`), (s) => {
-if(s.exists()) document.getElementById('todayHits').innerText = s.data().count.toLocaleString();
-else document.getElementById('todayHits').innerText = "0";
-});
+  const d = new Date();
+  const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  onSnapshot(doc(db, "site_stats", "visitors"), (s) => {
+    if(s.exists()) document.getElementById('totalHits').innerText = s.data().total.toLocaleString();
+  });
+  onSnapshot(doc(db, "site_stats", `day_${todayStr}`), (s) => {
+    if(s.exists()) document.getElementById('todayHits').innerText = s.data().count.toLocaleString();
+    else document.getElementById('todayHits').innerText = "0";
+  });
 }
 
 const defaultSubRooms = [
-{ id: "shop", name: "상점", emoji: "🏕", url: "상점 톡방📢 https://open.kakao.com/o/gYPcpN3h" },
-{ id: "blacksmith", name: "대장간", emoji: "⚒️", url: "대장간 톡방📢 https://open.kakao.com/o/gxAupN3h" },
-{ id: "inn", name: "여관", emoji: "🏡", url: "여관 톡방📢 https://open.kakao.com/o/g1EyoN3h" },
-{ id: "storage", name: "창고", emoji: "🛖", url: "창고 톡방📢 https://open.kakao.com/o/gxYloN3h" },
-{ id: "training", name: "훈련소", emoji: "⚔️", url: "훈련소 톡방📢 https://open.kakao.com/o/gDqYnN3h" },
-{ id: "weapon", name: "무기점", emoji: "🗡️", url: "무기점 톡방📢 https://open.kakao.com/o/gbq0qz6h" },
-{ id: "magic", name: "마법상점", emoji: "🔮", url: "마법상점 톡방📢 https://open.kakao.com/o/g0p4sz6h" },
-{ id: "general", name: "잡화점", emoji: "🧺", url: "잡화점 톡방📢 https://open.kakao.com/o/gW3urz6h" },
-{ id: "bank", name: "은행", emoji: "💰", url: "은행 톡방📢 https://open.kakao.com/o/gIiWrz6h" },
-{ id: "stable", name: "승마장", emoji: "🐎", url: "승마장 톡방📢 https://open.kakao.com/o/gYiVoN3h" }
+  { id: "shop", name: "상점", emoji: "🏕", url: "상점 톡방📢 https://open.kakao.com/o/gYPcpN3h" },
+  { id: "blacksmith", name: "대장간", emoji: "⚒️", url: "대장간 톡방📢 https://open.kakao.com/o/gxAupN3h" },
+  { id: "inn", name: "여관", emoji: "🏡", url: "여관 톡방📢 https://open.kakao.com/o/g1EyoN3h" },
+  { id: "storage", name: "창고", emoji: "🛖", url: "창고 톡방📢 https://open.kakao.com/o/gxYloN3h" },
+  { id: "training", name: "훈련소", emoji: "⚔️", url: "훈련소 톡방📢 https://open.kakao.com/o/gDqYnN3h" },
+  { id: "weapon", name: "무기점", emoji: "🗡️", url: "무기점 톡방📢 https://open.kakao.com/o/gbq0qz6h" },
+  { id: "magic", name: "마법상점", emoji: "🔮", url: "마법상점 톡방📢 https://open.kakao.com/o/g0p4sz6h" },
+  { id: "general", name: "잡화점", emoji: "🧺", url: "잡화점 톡방📢 https://open.kakao.com/o/gW3urz6h" },
+  { id: "bank", name: "은행", emoji: "💰", url: "은행 톡방📢 https://open.kakao.com/o/gIiWrz6h" },
+  { id: "stable", name: "승마장", emoji: "🐎", url: "승마장 톡방📢 https://open.kakao.com/o/gYiVoN3h" }
 ];
+
 function listenSubRooms() {
-onSnapshot(collection(db, "sub_rooms"), (snapshot) => {
-const rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-subRoomsData = defaultSubRooms.map(def => {
-const dbData = rooms.find(r => r.id === def.id) || { isActive: false, statusMsg: "" };
-return { ...def, ...dbData };
-});
-renderUserSubRooms(); renderAdminSubRooms();
-});
+  onSnapshot(collection(db, "sub_rooms"), (snapshot) => {
+    const rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    subRoomsData = defaultSubRooms.map(def => {
+      const dbData = rooms.find(r => r.id === def.id) || { isActive: false, statusMsg: "" };
+      return { ...def, ...dbData };
+    });
+    renderUserSubRooms(); 
+    renderAdminSubRooms();
+  });
 }
 
 function renderUserSubRooms() {
-const container = document.getElementById('userSubRoomGrid');
-if(!container) return;
-container.innerHTML = subRoomsData.map(room => `
-<div class="subroom-btn ${room.isActive ? 'room-active' : ''}" onclick="copySubRoomUrl('${room.url}', '${room.name}')">
-<div class="status-dot"></div><span class="subroom-emoji">${room.emoji}</span><span class="subroom-name">${room.name}</span>
-<span class="subroom-status-txt" style="font-size:0.5rem; color:#f87171; height:10px; font-weight:800; margin-top:1px;">${room.isActive ? (room.statusMsg || 'ON') : ''}</span>
-</div>`).join('');
+  const container = document.getElementById('userSubRoomGrid');
+  if(!container) return;
+  container.innerHTML = subRoomsData.map(room => `
+    <div class="subroom-btn ${room.isActive ? 'room-active' : ''}" onclick="copySubRoomUrl('${room.url}', '${room.name}')">
+      <div class="status-dot"></div><span class="subroom-emoji">${room.emoji}</span><span class="subroom-name">${room.name}</span>
+      <span class="subroom-status-txt" style="font-size:0.5rem; color:#f87171; height:10px; font-weight:800; margin-top:1px;">${room.isActive ? (room.statusMsg || 'ON') : ''}</span>
+    </div>`).join('');
 }
 
 function renderAdminSubRooms() {
-const container = document.getElementById('adminSubRoomList');
-if(!container) return;
-container.innerHTML = subRoomsData.map(room => `
-<div class="admin-room-item ${room.isActive ? 'border-blue-400' : 'border-gray-200'}">
-<span class="text-xs">${room.emoji}</span><span class="text-[9px] font-black text-gray-500">${room.name}</span>
-<input type="text" id="msg-${room.id}" value="${room.statusMsg || ''}" placeholder="상태" class="border rounded px-1" onchange="updateSubRoom('${room.id}', ${room.isActive})">
-<button onclick="updateSubRoom('${room.id}', ${!room.isActive})" class="admin-room-toggle ${room.isActive ? 'bg-red-500 text-white' : 'bg-gray-300 text-gray-600'}">${room.isActive ? 'ON' : 'OFF'}</button>
-</div>`).join('');
+  const container = document.getElementById('adminSubRoomList');
+  if(!container) return;
+  container.innerHTML = subRoomsData.map(room => `
+    <div class="admin-room-item ${room.isActive ? 'border-blue-400' : 'border-gray-200'}">
+      <span class="text-xs">${room.emoji}</span><span class="text-[9px] font-black text-gray-500">${room.name}</span>
+      <input type="text" id="msg-${room.id}" value="${room.statusMsg || ''}" placeholder="상태" class="border rounded px-1" onchange="updateSubRoom('${room.id}', ${room.isActive})">
+      <button onclick="updateSubRoom('${room.id}', ${!room.isActive})" class="admin-room-toggle ${room.isActive ? 'bg-red-500 text-white' : 'bg-gray-300 text-gray-600'}">${room.isActive ? 'ON' : 'OFF'}</button>
+    </div>`).join('');
 }
+
 window.updateSubRoom = async (roomId, nextActive) => {
-let msgInput = document.getElementById(`msg-${roomId}`);
-let msg = msgInput.value;
-if (!nextActive) { msg = ""; msgInput.value = ""; }
-await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: msg }, { merge: true });
+  let msgInput = document.getElementById(`msg-${roomId}`);
+  let msg = msgInput ? msgInput.value : "";
+  if (!nextActive) { msg = ""; if (msgInput) msgInput.value = ""; }
+  await setDoc(doc(db, "sub_rooms", roomId), { isActive: nextActive, statusMsg: msg }, { merge: true });
 };
 
-window.copySubRoomUrl = (url, name) => { navigator.clipboard.writeText(url); alert(`[${name}] 링크 복사 완료`); };
+window.copySubRoomUrl = (url, name) => { 
+  navigator.clipboard.writeText(url); 
+  alert(`[${name}] 링크 복사 완료`); 
+};
+
+// 스크립트 초기화 실행
+initAutoSelection();
+listenVisitors();
+listenSubRooms();
+
+      
 
 // ==========================================
 // 📌 회원 선택 수 & 벙주 체크박스 실시간 감지
