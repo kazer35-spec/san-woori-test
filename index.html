@@ -4371,69 +4371,6 @@ window.closeGyeonggiTrailModal = function() {
 function renderPersonalDulleReport(userData) {
   const dulleArray = userData.dulleCourses || [];
   
-  const completedList = dulleArray.map(item => {
-    return typeof item === 'object' ? item : { course: parseInt(item, 10) };
-  });
-
-  const uniqueCourses = Array.from(new Map(completedList.map(item => [item.course, item])).values())
-                             .sort((a, b) => a.course - b.course);
-
-  const totalCompleted = uniqueCourses.length;
-
-  // 1) 상단 완주 카운트 뱃지 업데이트
-  const countBadge = document.getElementById('trailCountBadge');
-  if (countBadge) {
-    countBadge.innerText = `${totalCompleted}/60`;
-  }
-
-  // 2) 지도 위 마커 찍기
-  const markerContainer = document.getElementById('modalMarkerContainer');
-  if (markerContainer) {
-    markerContainer.innerHTML = '';
-
-    uniqueCourses.forEach(item => {
-      if (item.x !== undefined && item.y !== undefined) {
-        const color = getDulleCourseColor(item.course);
-        
-        const markerEl = document.createElement('div');
-        markerEl.className = 'dulle-modal-marker';
-        markerEl.style.cssText = `
-          position: absolute;
-          left: ${item.x}%;
-          top: ${item.y}%;
-          width: 12px;
-          height: 12px;
-          background-color: ${color.hex};
-          border: 2px solid #ffffff;
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-          z-index: 10;
-        `;
-        markerEl.title = `${item.course}코스`;
-        markerContainer.appendChild(markerEl);
-      }
-    });
-  }
-
-  // 3) 하단 완주 뱃지 목록 UI 렌더링
-  const badgeContainer = document.getElementById('dulleBadgeList');
-  if (badgeContainer) {
-    if (uniqueCourses.length === 0) {
-      badgeContainer.innerHTML = `<span style="font-size: 11px; color: #94a3b8;">완주한 코스가 없습니다.</span>`;
-    } else {
-      let badgesHtml = '';
-      uniqueCourses.forEach(item => {
-        const color = getDulleCourseColor(item.course);
-        badgesHtml += `
-          <span style="background-color: ${color.hex}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
-            ${item.course}코스
-          </span>`;
-      });
-// 7. 개인 운동 리포트 화면 카운팅, 지도 마커 및 코스별 뱃지 UI 렌더링
-function renderPersonalDulleReport(userData) {
-  const dulleArray = userData.dulleCourses || [];
-  
   // 단일 숫자 및 객체 형태({course, x, y}) 예외 처리
   const completedList = dulleArray.map(item => {
     return typeof item === 'object' ? item : { course: parseInt(item, 10) };
@@ -4493,6 +4430,8 @@ function renderPersonalDulleReport(userData) {
     }
   }
 }
+
+  
 
   
       
