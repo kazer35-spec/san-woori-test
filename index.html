@@ -4208,7 +4208,7 @@ let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
 // =========================================================
-// 🎯 경기둘레길 관련 통합 스크립트 (토글, 지도 클릭, DB 연동, 모달)
+// 🎯 경기둘레길 관련 통합 스크립트 (오류 수정 완료)
 // =========================================================
 
 // 1. 글로벌 선택 데이터 저장 변수
@@ -4225,7 +4225,6 @@ document.addEventListener('DOMContentLoaded', function() {
         dulleContainer.classList.remove('hidden');
       } else {
         dulleContainer.classList.add('hidden');
-        // 체크 해제 시 마커 및 선택 정보 초기화
         window.selectedDulleData = null;
         const marker = document.getElementById('dulleMapMarker');
         if (marker) marker.classList.add('hidden');
@@ -4251,27 +4250,31 @@ function getDulleCourseColor(courseNum) {
   return { bg: 'bg-gray-500', hex: '#6B7280', label: '⚪️ 기타' };
 }
 
-// 둘레길 지도 클릭 시 좌표 찍기 함수 (모바일 팝업 오류 방지 적용)
+// 4. 둘레길 지도 클릭/터치 좌표 계산 함수 (화면 숨김 오류 수정)
 function setDulleCoordinate(event) {
-  event.preventDefault();
+  // 1. 이벤트 전파가 다른 입력 요소(명산 지도 등)에 영향을 주지 않도록 차단
+  if (event && event.stopPropagation) {
+    event.stopPropagation();
+  }
   
-  // 1. 클릭 대상(이미지) 요소 및 크기 측정
+  // 2. 터치 및 클릭 좌표 추출 (모바일 대응)
+  const clientX = event.touches && event.touches.length > 0 ? event.touches[0].clientX : event.clientX;
+  const clientY = event.touches && event.touches.length > 0 ? event.touches[0].clientY : event.clientY;
+
   const imgElement = document.getElementById('dulleMapImage') || event.currentTarget;
+  if (!imgElement) return;
+
   const rect = imgElement.getBoundingClientRect();
 
-  // 2. 이미지 내부에서의 퍼센트(%) 좌표 계산
-  const x = ((event.clientX - rect.left) / rect.width) * 100;
-  const y = ((event.clientY - rect.top) / rect.height) * 100;
+  // 3. 이미지 내부 퍼센트(%) 좌표 계산
+  const x = ((clientX - rect.left) / rect.width) * 100;
+  const y = ((clientY - rect.top) / rect.height) * 100;
 
   if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
-  // 3. 코스 번호 입력 (prompt 팝업 차단 대비 기본값/입력 처리)
-  let courseInput = prompt("정복한 둘레길 코스 번호를 입력하세요 (1~60):");
-  
-  // 만약 모바일 브라우저에서 prompt가 취소되거나 차단된 경우 디폴트 1코스로 처리 또는 수동 입력 가이드
-  if (!courseInput) {
-    courseInput = "1"; // 입력 취소 시 기본 1코스로 임시 처리
-  }
+  // 4. 코스 번호 입력
+  const courseInput = prompt("정복한 둘레길 코스 번호를 입력하세요 (1~60):");
+  if (!courseInput) return;
 
   const courseNum = parseInt(courseInput, 10);
   if (isNaN(courseNum) || courseNum < 1 || courseNum > 60) {
@@ -4279,16 +4282,16 @@ function setDulleCoordinate(event) {
     return;
   }
 
-  // 4. 구간 색상 추출
+  // 5. 구간 색상 추출
   const colorInfo = getDulleCourseColor(courseNum);
 
-  // 5. 부모 박스 기준 마커 위치 정밀 계산
+  // 6. 부모 박스 기준 마커 위치 계산
   const container = imgElement.parentElement;
   const containerRect = container.getBoundingClientRect();
-  const markerLeft = ((event.clientX - containerRect.left) / containerRect.width) * 100;
-  const markerTop = ((event.clientY - containerRect.top) / containerRect.height) * 100;
+  const markerLeft = ((clientX - containerRect.left) / containerRect.width) * 100;
+  const markerTop = ((clientY - containerRect.top) / containerRect.height) * 100;
 
-  // 6. 마커 이동 및 색상 반영
+  // 7. 마커 표시
   const marker = document.getElementById('dulleMapMarker');
   if (marker) {
     marker.style.left = `${markerLeft}%`;
@@ -4297,31 +4300,37 @@ function setDulleCoordinate(event) {
     marker.classList.remove('hidden');
   }
 
-  // 7. 전역 저장 데이터 객체 업데이트
+  // 8. 전역 저장 데이터 객체 업데이트 (x, y 좌표 포함)
   window.selectedDulleData = {
-    x: x.toFixed(2),
-    y: y.toFixed(2),
+    x: parseFloat(x.toFixed(2)),
+    y: parseFloat(y.toFixed(2)),
     course: courseNum,
     color: colorInfo.hex
   };
 
-  // 8. 하단 안내 텍스트 변경
+  // 9. 하단 안내 텍스트 변경
   const coordDisplay = document.getElementById('dulleCoordDisplay');
   if (coordDisplay) {
     coordDisplay.innerHTML = `✅ 선택됨: <span style="color:${colorInfo.hex}; font-weight:800;">${courseNum}코스</span> (X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%)`;
   }
 }
 
-
-
 // 5. Firestore DB 저장 연동 함수 (기록 저장 버튼 클릭 시 호출)
 async function saveDulleLog(memberDocId, courseNum, coordX = null, coordY = null) {
   try {
     const userRef = doc(db, "sanwoori", memberDocId);
     
-    // 좌표값(coordX, coordY)도 객체로 함께 저장하도록 처리
-    const dulleObject = (coordX !== null && coordY !== null) 
-      ? { course: parseInt(courseNum, 10), x: coordX, y: coordY } 
+    // selectedDulleData에 저장된 x, y 좌표가 있으면 그것을 우선 활용
+    let xVal = coordX;
+    let yVal = coordY;
+    
+    if (window.selectedDulleData && window.selectedDulleData.course === parseInt(courseNum, 10)) {
+      xVal = window.selectedDulleData.x;
+      yVal = window.selectedDulleData.y;
+    }
+
+    const dulleObject = (xVal !== null && yVal !== null) 
+      ? { course: parseInt(courseNum, 10), x: xVal, y: yVal } 
       : parseInt(courseNum, 10);
 
     await updateDoc(userRef, {
@@ -4331,10 +4340,6 @@ async function saveDulleLog(memberDocId, courseNum, coordX = null, coordY = null
     console.error("❌ 둘레길 DB 저장 실패:", e);
   }
 }
-
-// =========================================================
-// 💡 [여기서부터 새로 추가된 모달 제어 및 렌더링 코드입니다]
-// =========================================================
 
 // 6. 경기둘레길 모달 열기/닫기 제어 함수
 window.openGyeonggiTrailModal = function() {
@@ -4360,13 +4365,11 @@ function renderPersonalDulleReport(userData) {
 
   const totalCompleted = uniqueCourses.length;
 
-  // 1) 상단 완주 카운트 뱃지 업데이트
   const countBadge = document.getElementById('trailCountBadge');
   if (countBadge) {
     countBadge.innerText = `${totalCompleted}/60`;
   }
 
-  // 2) 지도 위 마커 찍기
   const markerContainer = document.getElementById('modalMarkerContainer');
   if (markerContainer) {
     markerContainer.innerHTML = '';
@@ -4396,7 +4399,6 @@ function renderPersonalDulleReport(userData) {
     });
   }
 
-  // 3) 하단 완주 뱃지 목록 UI 렌더링
   const badgeContainer = document.getElementById('dulleBadgeList');
   if (badgeContainer) {
     if (uniqueCourses.length === 0) {
@@ -4414,7 +4416,7 @@ function renderPersonalDulleReport(userData) {
     }
   }
 }
-  
+
       
 // ==========================================
 // 📌 [신규 회원 저장 함수]
