@@ -28,33 +28,33 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
-        /* 🎯 경기둘레길 모달 마커 전용 CSS */
-#modalMarkerContainer {
+        /* 🎯 경기둘레길 마커 공통 및 모달 스타일 */
+#modalMarkerContainer, #dulleMapMarkerLayer {
   position: absolute !important;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* 지도 클릭 방해 금지 */
+  pointer-events: none;
 }
 
-/* 동적으로 생성되는 개별 코스 마커 */
 .dulle-modal-marker {
   position: absolute !important;
   width: 12px;
   height: 12px;
   border: 2px solid #ffffff;
   border-radius: 50%;
-  transform: translate(-50%, -50%); /* 마커 중심점을 좌표에 정확히 맞춤 */
+  transform: translate(-50%, -50%);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
   z-index: 10;
-  pointer-events: auto; /* 마커 호버(툴팁)는 작동하도록 설정 */
+  pointer-events: auto;
   transition: transform 0.15s ease-in-out;
 }
 
 .dulle-modal-marker:hover {
-  transform: translate(-50%, -50%) scale(1.3);
+  transform: translate(-50%, -50%) scale(1.4);
 }
+
 
         @keyframes emeraldGlowPulse {
     0%, 100% {
@@ -3733,24 +3733,24 @@ margin: 0 2px !important;
           </div>
         </div>
 
-        <!-- 둘레길 지도 영역 -->
-        <div id="dulleMapContainer" class="hidden mb-2">
-          <div id="dulleMapWrapper" 
-               onclick="setDulleCoordinate(event)"
-               class="relative max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30 cursor-pointer">
-            
-            <img src="https://i.ibb.co/20xSks4z/1.png" 
-                 id="dulleMapImage"
-                 class="max-h-[350px] w-auto max-w-full object-contain rounded-xl pointer-events-none block" 
-                 alt="둘레길 지도">
-            
-            <div id="dulleMapMarker" class="hidden absolute w-3.5 h-3.5 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10 pointer-events-none"></div>
-          </div>
-          
-          <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
-            둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
-          </div>
-        </div>
+        <!-- 🎯 관리자 모드 둘레길 지도 영역 -->
+<div id="dulleMapContainer" class="hidden mb-2">
+  <div id="dulleMapWrapper" 
+       onclick="setDulleCoordinate(event)"
+       class="relative max-h-[380px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30 cursor-pointer">
+    
+    <img src="https://i.ibb.co/20xSks4z/1.png" 
+         id="dulleMapImage"
+         class="max-h-[380px] w-auto max-w-full object-contain rounded-xl pointer-events-none block" 
+         alt="둘레길 지도">
+    
+    <div id="dulleMapMarker" class="hidden absolute w-3.5 h-3.5 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10 pointer-events-none"></div>
+  </div>
+  
+  <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
+    둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
+  </div>
+</div>
 
         <!-- 지도 영역 -->
         <div class="map-container" onclick="setAdminCoordinate(event)">
@@ -4100,32 +4100,12 @@ let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
   
 
+// 전역 변수: 열려있는 회원 데이터 저장용
+window.currentActiveMemberData = null;
+
 // =========================================================
-// 🎯 경기둘레길 지도 즉시 터치/클릭 수동 좌표 스크립트
+// 🎯 경기둘레길 코스 색상 반환 함수
 // =========================================================
-window.selectedDulleData = null;
-
-document.addEventListener('DOMContentLoaded', function() {
-  const trackingCheck = document.getElementById('isTrackingCheck');
-  const dulleContainer = document.getElementById('dulleMapContainer');
-
-  if (trackingCheck && dulleContainer) {
-    trackingCheck.addEventListener('change', function() {
-      if (this.checked) {
-        dulleContainer.classList.remove('hidden');
-      } else {
-        dulleContainer.classList.add('hidden');
-        window.selectedDulleData = null;
-        const marker = document.getElementById('dulleMapMarker');
-        if (marker) marker.classList.add('hidden');
-        const display = document.getElementById('dulleCoordDisplay');
-        if (display) display.innerHTML = '둘레길 코스 선택: 지도상에서 마커 위치를 직접 터치하세요.';
-      }
-    });
-  }
-});
-
-// 코스별 색상 반환 함수
 function getDulleCourseColor(courseNum) {
   const num = parseInt(courseNum, 10);
   if (num >= 1 && num <= 11) {
@@ -4140,112 +4120,39 @@ function getDulleCourseColor(courseNum) {
   return { bg: 'bg-gray-500', hex: '#6B7280', label: '⚪️ 기타' };
 }
 
-// 🎯 지도를 직접 터치/클릭하면 즉시 마커가 해당 위치에 찍히는 함수
-window.setDulleCoordinate = function(event) {
-  const img = document.getElementById('dulleMapImage');
-  if (!img) return;
+// 🎯 경기둘레길 모달 열기 (회원 정보 연동하여 렌더링)
+window.openGyeonggiTrailModal = function(userData = null) {
+  const targetData = userData || window.currentActiveMemberData;
+  const trailModal = document.getElementById('gyeonggiTrailModal');
+  if (!trailModal) return;
 
-  // 1. 지도 이미지 요소의 실제 화면 위치 및 크기 계산
-  const rect = img.getBoundingClientRect();
-
-  // 2. 터치/클릭 이벤트 위치 계산 (모바일 터치 이벤트 호환)
-  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-
-  const clickX = clientX - rect.left;
-  const clickY = clientY - rect.top;
-
-  // 3. 이미지 영역 내부 좌표 백분율(%) 계산
-  let xPercent = (clickX / rect.width) * 100;
-  let yPercent = (clickY / rect.height) * 100;
-
-  if (xPercent < 0 || xPercent > 100 || yPercent < 0 || yPercent > 100) return;
-
-  // 소수점 1자리 정밀도
-  const finalX = parseFloat(xPercent.toFixed(1));
-  const finalY = parseFloat(yPercent.toFixed(1));
-
-  // 4. 입력되어 있는 코스 번호 확인 (기본값 1코스)
-  const courseInputEl = document.getElementById('manualCourseNum');
-  const courseNum = courseInputEl ? parseInt(courseInputEl.value, 10) || 1 : 1;
-  const colorInfo = getDulleCourseColor(courseNum);
-
-  // 5. 관리자 지도 프리뷰 마커 즉시 이동 및 표시
-  const marker = document.getElementById('dulleMapMarker');
-  if (marker) {
-    marker.style.left = `${finalX}%`;
-    marker.style.top = `${finalY}%`;
-    marker.style.backgroundColor = colorInfo.hex;
-    marker.classList.remove('hidden');
+  if (targetData) {
+    renderPersonalDulleReport(targetData);
   }
 
-  // 6. DB 저장용 전역 데이터 업데이트
-  window.selectedDulleData = {
-    course: courseNum,
-    x: finalX,
-    y: finalY,
-    color: colorInfo.hex
-  };
+  trailModal.style.display = 'flex';
 
-  // 7. 안내 텍스트 및 입력창 값 업데이트
-  const coordDisplay = document.getElementById('dulleCoordDisplay');
-  if (coordDisplay) {
-    coordDisplay.innerHTML = `찍은 좌표: <span style="color:${colorInfo.hex}; font-weight:bold;">${courseNum}코스</span> (X: ${finalX}%, Y: ${finalY}%)`;
-  }
-};
-
-// 🎯 DB 저장 함수
-window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = null, coordY = null) {
-  try {
-    const userRef = doc(db, "sanwoori", memberDocId);
-    
-    let targetCourse = courseNum;
-    let targetX = coordX;
-    let targetY = coordY;
-
-    // 전달 인자가 없으면 지도를 직접 클릭해서 찍은 window.selectedDulleData 사용
-    if (!targetCourse && window.selectedDulleData) {
-      targetCourse = window.selectedDulleData.course;
-      targetX = window.selectedDulleData.x;
-      targetY = window.selectedDulleData.y;
+  trailModal.onclick = (e) => {
+    if (e.target === trailModal) {
+      window.closeGyeonggiTrailModal();
     }
-
-    if (!targetCourse) return;
-
-    const isValidX = targetX !== null && targetX !== undefined && !isNaN(Number(targetX));
-    const isValidY = targetY !== null && targetY !== undefined && !isNaN(Number(targetY));
-
-    const dulleObject = (isValidX && isValidY)
-      ? { course: parseInt(targetCourse, 10), x: parseFloat(targetX), y: parseFloat(targetY) }
-      : parseInt(targetCourse, 10);
-
-    await updateDoc(userRef, {
-      dulleCourses: arrayUnion(dulleObject)
-    });
-    
-    console.log("✅ 직접 터치 좌표 DB 저장 성공:", dulleObject);
-  } catch (e) {
-    console.error("❌ 둘레길 DB 저장 실패:", e);
-  }
+  };
 };
 
-window.openGyeonggiTrailModal = function() {
-  const modal = document.getElementById('gyeonggiTrailModal');
-  if (modal) modal.style.display = 'flex';
-};
-
+// 🎯 경기둘레길 모달 닫기
 window.closeGyeonggiTrailModal = function() {
-  const modal = document.getElementById('gyeonggiTrailModal');
-  if (modal) modal.style.display = 'none';
+  const trailModal = document.getElementById('gyeonggiTrailModal');
+  if (trailModal) trailModal.style.display = 'none';
 };
 
-// 🎯 개인 둘레길 모달 레포트 렌더링 (문자열 좌표 자동 변환 보완)
+// 🎯 개인 둘레길 모달 레포트 렌더링 (좌표 찍기 및 갯수 카운팅)
 function renderPersonalDulleReport(userData) {
+  if (!userData) return;
+
   const dulleArray = userData.dulleCourses || [];
   
   const completedList = dulleArray.map(item => {
     if (typeof item === 'object' && item !== null) {
-      // x, y가 문자열("65.45")이든 숫자(65.45)이든 상관없이 parseFloat로 강제 숫자 변환
       const parsedX = parseFloat(item.x);
       const parsedY = parseFloat(item.y);
 
@@ -4268,18 +4175,18 @@ function renderPersonalDulleReport(userData) {
   const uniqueCourses = Array.from(uniqueMap.values()).sort((a, b) => a.course - b.course);
   const totalCompleted = uniqueCourses.length;
 
+  // 1. 카운트 배지 갱신
   const countBadge = document.getElementById('trailCountBadge');
   if (countBadge) {
     countBadge.innerText = `${totalCompleted}/60`;
   }
 
-  // 모달 지도 상단 마커 생성
+  // 2. 모달 지도상 마커 동적 생성
   const markerContainer = document.getElementById('modalMarkerContainer');
   if (markerContainer) {
     markerContainer.innerHTML = '';
 
     uniqueCourses.forEach(item => {
-      // 숫자 검증 성공 시 마커 생성
       if (item.x !== null && item.y !== null) {
         const color = getDulleCourseColor(item.course);
         const markerEl = document.createElement('div');
@@ -4287,13 +4194,13 @@ function renderPersonalDulleReport(userData) {
         markerEl.style.left = `${item.x}%`;
         markerEl.style.top = `${item.y}%`;
         markerEl.style.backgroundColor = color.hex;
-        markerEl.title = `${item.course}코스`;
+        markerEl.title = `${item.course}코스 완주`;
         markerContainer.appendChild(markerEl);
       }
     });
   }
 
-  // 완주 뱃지 리스트 출력
+  // 3. 완주 뱃지 리스트 출력
   const badgeContainer = document.getElementById('dulleBadgeList');
   if (badgeContainer) {
     if (uniqueCourses.length === 0) {
@@ -4303,7 +4210,7 @@ function renderPersonalDulleReport(userData) {
       uniqueCourses.forEach(item => {
         const color = getDulleCourseColor(item.course);
         badgesHtml += `
-          <span style="background-color: ${color.hex}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: inline-block; margin: 2px;">
+          <span style="background-color: ${color.hex}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: inline-block; margin: 2px;">
             ${item.course}코스
           </span>`;
       });
@@ -4311,6 +4218,243 @@ function renderPersonalDulleReport(userData) {
     }
   }
 }
+
+// 🎯 지도 터치/클릭 수동 좌표 찍기 함수
+window.setDulleCoordinate = function(event) {
+  const img = document.getElementById('dulleMapImage');
+  if (!img) return;
+
+  const rect = img.getBoundingClientRect();
+  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+  const clickX = clientX - rect.left;
+  const clickY = clientY - rect.top;
+
+  let xPercent = (clickX / rect.width) * 100;
+  let yPercent = (clickY / rect.height) * 100;
+
+  if (xPercent < 0 || xPercent > 100 || yPercent < 0 || yPercent > 100) return;
+
+  const finalX = parseFloat(xPercent.toFixed(1));
+  const finalY = parseFloat(yPercent.toFixed(1));
+
+  const courseInputEl = document.getElementById('manualCourseNum');
+  const courseNum = courseInputEl ? parseInt(courseInputEl.value, 10) || 1 : 1;
+  const colorInfo = getDulleCourseColor(courseNum);
+
+  const marker = document.getElementById('dulleMapMarker');
+  if (marker) {
+    marker.style.left = `${finalX}%`;
+    marker.style.top = `${finalY}%`;
+    marker.style.backgroundColor = colorInfo.hex;
+    marker.classList.remove('hidden');
+  }
+
+  window.selectedDulleData = {
+    course: courseNum,
+    x: finalX,
+    y: finalY,
+    color: colorInfo.hex
+  };
+
+  const coordDisplay = document.getElementById('dulleCoordDisplay');
+  if (coordDisplay) {
+    coordDisplay.innerHTML = `선택 좌표: <span style="color:${colorInfo.hex}; font-weight:bold;">${courseNum}코스</span> (X: ${finalX}%, Y: ${finalY}%)`;
+  }
+};
+
+// 🎯 운동 리포트 모달 열기 시 전역 회원 데이터 보관
+window.showFadingScroll = async function(mId, dday, level = 0, passedRegDate = null) {
+    const modal = document.getElementById('scrollModal');
+    const content = document.getElementById('scrollContent');
+    const scrollWrap = document.querySelector('.fading-scroll'); 
+    
+    if(!modal || !content) return;
+
+    const safeMemberId = mId ? String(mId).trim() : "";
+    if (!safeMemberId) {
+        alert("회원 정보(ID)를 찾을 수 없습니다.");
+        return;
+    }
+
+    const memberInfo = (typeof currentData !== 'undefined' && currentData) 
+        ? currentData.find(m => String(m.id) === String(safeMemberId) || (m.name && m.name === safeMemberId)) 
+        : null;
+
+    // 🎯 해당 회원의 데이터를 전역에 저장 (둘레길 모달에서 참조)
+    window.currentActiveMemberData = memberInfo;
+
+    const currentLevel = memberInfo ? Number(memberInfo.level) : Number(level || 0);
+
+    if (currentLevel >= 100) {
+        modal.classList.add('is-lv100');
+    } else {
+        modal.classList.remove('is-lv100');
+    }
+
+    if (!window.scrollPagination) window.scrollPagination = {};
+    
+    window.scrollPagination.mId = safeMemberId;
+    window.scrollPagination.isEnd = false;
+    window.scrollPagination.currentCategory = 'all';
+    window.scrollPagination.currentPageSize = 6;
+    window.currentScrollLogs = [];
+
+    modal.style.display = 'flex';
+    content.innerHTML = `
+        <div style="text-align:center; padding:50px 0;">
+            <p style="font-size:12px; color:#a0aec0;">운동 데이터를 분석하는 중...</p>
+        </div>
+    `;
+
+    let formattedRegDateKo = "--년 --월 --일";
+
+    try {
+        let rDate = passedRegDate;
+        
+        if (!rDate && memberInfo) {
+            rDate = memberInfo.regDate;
+        } else if (!rDate) {
+            try {
+                const memberSnap = await getDoc(doc(db, "sanwoori", safeMemberId));
+                if (memberSnap.exists()) {
+                    const freshData = memberSnap.data();
+                    rDate = freshData.regDate;
+                    window.currentActiveMemberData = freshData;
+                }
+            } catch (regError) {
+                console.warn("가입일 정보 로딩 경고:", regError);
+            }
+        }
+
+        if (rDate) {
+            const parsedDate = (typeof rDate.toDate === 'function') ? rDate.toDate() : new Date(rDate);
+            if (parsedDate && !isNaN(parsedDate.getTime())) {
+                const yy = String(parsedDate.getFullYear()).slice(-2); 
+                const mm = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(parsedDate.getDate()).padStart(2, '0');
+                formattedRegDateKo = `${yy}년 ${mm}월 ${dd}일`;
+            }
+        }
+
+        const logsRef = collection(db, `sanwoori/${safeMemberId}/logs`);
+        const q = query(logsRef, orderBy("date", "desc"));
+        const snap = await getDocs(q);
+
+        window.currentScrollLogs = snap.docs.map(doc => {
+            const data = doc.data();
+            return {
+                ...data,
+                docId: doc.id,
+                date: (data.date && typeof data.date.toDate === 'function') ? data.date.toDate() : (data.date ? new Date(data.date) : null)
+            };
+        });
+
+        const counts = window.currentScrollLogs.reduce((acc, log) => {
+            const isKmActivity = log.isRunning || log.isTracking || log.isWalking;
+            const isPureHike = !isKmActivity && !log.isExtraHike;
+
+            if (isPureHike) {
+                acc.schedule++;
+                if (log.isRegular) acc.regular++;
+            } else if (log.isExtraHike) {
+                acc.extra++;
+            } else if (log.isRunning) {
+                acc.running++;
+            } else if (log.isTracking) {
+                acc.trekking++;
+            } else if (log.isWalking) {
+                acc.walking++;
+            }
+            return acc;
+        }, { regular: 0, schedule: 0, extra: 0, trekking: 0, running: 0, walking: 0 });
+
+        content.innerHTML = `
+            <div class="user-report-summary-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px 14px; margin: 6px 0 12px 0;">
+                
+                <div class="user-status-row-bar" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;">
+                    <!-- 🎯 D-Day 클릭 시 전역 회원 데이터를 인자로 전달하여 경기둘레길 모달 오픈 -->
+                    <div class="dday-count-badge" onclick="window.openGyeonggiTrailModal()" style="background: #e0f2fe; color: #0284c7; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px; cursor: pointer; user-select: none; transition: transform 0.1s ease;">
+                        D-Day ${dday !== undefined ? dday : 0}
+                    </div>
+                    <div class="origin-membership-info-mini" style="font-size: 11px; color: #64748b;">
+                        <span class="member-since-label">✨ 우리, 여기서부터 : </span>
+                        <strong class="member-since-date" style="color: #0f172a; font-weight: 700;">${formattedRegDateKo}</strong>
+                    </div>
+                </div>
+
+                <div class="activity-summary-grid" style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px; font-size: 11px; color: #475569; font-weight: 500;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
+                        <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+                            <i style="width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg, #FF69B4, #ADFF2F, #A020F0); display: inline-block; flex-shrink: 0;"></i>
+                            <span>정기산행</span>
+                            <strong style="color: #0f172a; margin-left: auto;">${counts.regular}회</strong>
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+                            <i style="width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; display: inline-block; flex-shrink: 0;"></i>
+                            <span>일정산행</span>
+                            <strong style="color: #0f172a; margin-left: auto;">${counts.schedule}회</strong>
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+                            <i style="width: 7px; height: 7px; border-radius: 50%; background: #5CE1D6; display: inline-block; flex-shrink: 0;"></i>
+                            <span>개인산행</span>
+                            <strong style="color: #0f172a; margin-left: auto;">${counts.extra}회</strong>
+                        </span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; align-items: center;">
+                        <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+                            <i style="width: 7px; height: 7px; border-radius: 50%; background: #FFD1DC; display: inline-block; flex-shrink: 0;"></i>
+                            <span>런닝</span>
+                            <strong style="color: #0f172a; margin-left: auto;">${counts.running}회</strong>
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+                            <i style="width: 7px; height: 7px; border-radius: 50%; background: #E0B0FF; display: inline-block; flex-shrink: 0;"></i>
+                            <span>트레킹</span>
+                            <strong style="color: #0f172a; margin-left: auto;">${counts.trekking}회</strong>
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 3px; white-space: nowrap;">
+                            <i style="width: 7px; height: 7px; border-radius: 50%; background: #FFCC80; display: inline-block; flex-shrink: 0;"></i>
+                            <span>산책</span>
+                            <strong style="color: #0f172a; margin-left: auto;">${counts.walking}회</strong>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-scroll-container">
+                <div class="tab-header-buttons">
+                    <button type="button" onclick="window.switchScrollTab('all')" id="sTab-all" class="tab-btn active">전체</button>
+                    <button type="button" onclick="window.switchScrollTab('hiking')" id="sTab-hiking" class="tab-btn">일정운동</button>
+                    <button type="button" onclick="window.switchScrollTab('running')" id="sTab-running" class="tab-btn">개인/기타</button>
+                </div>
+                
+                <div id="scrollFilteredList" class="scroll-filtered-list-box"></div>
+                <div id="scrollMoreBtnArea" style="text-align:center; margin-top:15px;"></div>
+            </div>
+        `;
+
+        window.loadScrollLogsPage(true);
+
+    } catch (e) {
+        console.error("데이터 로딩 중 치명적 오류:", e);
+        content.innerHTML = `
+            <div style="text-align:center; padding:30px 0; color:#e53e3e; font-size:12px;">
+                일지 로딩 실패<br>
+                <span style="font-size:10px; color:#a0aec0;">(${e.message})</span>
+            </div>
+        `;
+    }
+
+    modal.onclick = (e) => { 
+        if (e.target === modal) window.closeScrollModal();
+    };
+    if(scrollWrap) {
+        scrollWrap.onclick = (e) => e.stopPropagation();
+    }
+};
 
 
 
@@ -11066,36 +11210,33 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
     </div>
 </div>
 
-<!-- 🎯 [경기둘레길 모달 레이어] -->
+<!-- 🎯 [경기둘레길 개인 리포트 모달 레이어] -->
 <div id="gyeonggiTrailModal" class="scroll-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px;">
     <div style="background: #ffffff; width: 100%; max-width: 480px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);">
         
-        <!-- 헤더: 좌측 제목, 우측 0/60 카운팅 배지 & 닫기 버튼 -->
+        <!-- 헤더 -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f1f5f9; background: #ffffff;">
             <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">경기둘레길 정복 현황</h3>
             
             <div style="display: flex; align-items: center; gap: 10px;">
-                <!-- 0/60 카운트 알약형 배지 -->
                 <span id="trailCountBadge" style="background: #0284c7; color: #ffffff; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;">
                     0/60
                 </span>
-                <!-- 닫기 버튼 -->
                 <button type="button" onclick="window.closeGyeonggiTrailModal()" style="background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
             </div>
         </div>
 
-        <!-- 바디: 경기둘레길 코스 이미지 및 마커 영역 (스크롤 지원) -->
+        <!-- 바디: 관리자 모드 지도와 크기/비율 동일하게 지정 -->
         <div style="padding: 12px; overflow-y: auto; background: #f8fafc; flex: 1;">
             
-            <!-- 지도 및 마커 컨테이너 (relative 지정) -->
-            <div id="modalMapWrapper" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; line-height: 0;">
-                <img src="https://i.ibb.co/20xSks4z/1.png" alt="경기둘레길 지도" style="width: 100%; height: auto; display: block;">
+            <div id="modalMapWrapper" class="relative max-h-[380px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <img src="https://i.ibb.co/20xSks4z/1.png" alt="경기둘레길 지도" class="max-h-[380px] w-auto max-w-full object-contain rounded-xl block">
                 
-                <!-- 동적으로 정복한 마커들이 그려질 레이어 -->
-                <div id="modalMarkerContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+                <!-- 마커 동적 생성 레이어 -->
+                <div id="modalMarkerContainer"></div>
             </div>
 
-            <!-- 하단 정복 코스 뱃지 리스트 영역 -->
+            <!-- 완주 뱃지 목록 -->
             <div style="margin-top: 12px; padding: 10px; background: #ffffff; border-radius: 10px; border: 1px solid #e2e8f0; text-align: left;">
                 <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px;">완주한 코스 목록</div>
                 <div id="dulleBadgeList" style="display: flex; flex-wrap: wrap; gap: 4px;">
@@ -11107,7 +11248,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
     </div>
 </div>
-
 
 
 
