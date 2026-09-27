@@ -4290,7 +4290,7 @@ window.toggleDulleMoreRows = function() {
   }
 };
 
-// 🎯 팝업(prompt)으로 코스 번호만 받아서 DB 마스터 좌표로 자동 저장
+// 🎯 팝업(prompt)으로 코스 번호 받아서 DB 저장 + 입력폼 자동 채우기 (산 이름, 트래킹 체크)
 window.saveDulleByPrompt = async function(passedMemberId = null) {
   const inputVal = prompt("완주한 경기둘레길 코스 번호를 입력하세요 (1~60):");
   if (!inputVal) return;
@@ -4301,20 +4301,41 @@ window.saveDulleByPrompt = async function(passedMemberId = null) {
     return;
   }
 
+  // 1️⃣ 폼 필드 자동 채우기 처리
+  const mountainInput = document.getElementById('mountainName');
+  const trackingCheck = document.getElementById('isTrackingCheck');
+  const dulleContainer = document.getElementById('dulleMapContainer');
+
+  const courseTitle = `경기둘레길 ${courseNum}코스`;
+
+  // ① [등산한 산 이름]에 "경기둘레길 OO코스" 자동 입력
+  if (mountainInput) {
+    mountainInput.value = courseTitle;
+  }
+
+  // ② [트래킹👟] 체크박스 자동 체크 및 둘레길 지도 영역 표시
+  if (trackingCheck) {
+    trackingCheck.checked = true;
+    if (dulleContainer) {
+      dulleContainer.classList.remove('hidden');
+    }
+  }
+
+  // 2️⃣ Firebase DB 저장 처리
   const memberDocId = passedMemberId 
     || window.scrollPagination?.mId 
     || window.currentMemberId 
     || document.getElementById('adminMemberSelect')?.value;
 
   if (!memberDocId) {
-    alert("선택된 회원 정보가 없습니다.");
+    alert("입력폼에 코스 이름(" + courseTitle + ")이 설정되었습니다. (선택된 회원이 없어 DB 저장만 건너뜁니다.)");
     return;
   }
 
   try {
     const firestoreDb = window.db || db;
     
-    // ① DB (settings/dulleMaster)에서 코스 번호에 해당하는 마스터 좌표 가져오기
+    // DB에서 마스터 좌표 가져오기
     const masterSnap = await getDoc(doc(firestoreDb, "settings", "dulleMaster"));
     let targetX = 50.0;
     let targetY = 50.0;
@@ -4323,14 +4344,9 @@ window.saveDulleByPrompt = async function(passedMemberId = null) {
       const masterData = masterSnap.data()[`course_${courseNum}`];
       targetX = parseFloat(masterData.x);
       targetY = parseFloat(masterData.y);
-    } else {
-      alert(`⚠️ ${courseNum}코스의 마스터 좌표가 아직 DB에 구축되지 않았습니다. 기본 위치로 등록됩니다.`);
     }
 
-    // ② 회원 데이터 문서에 자동 저장을 위한 객체 구성 ("경기둘레길 OO코스")
-    const courseTitle = `경기둘레길 ${courseNum}코스`;
     const userRef = doc(firestoreDb, "sanwoori", memberDocId);
-
     const dulleObject = {
       course: courseNum,
       title: courseTitle,
@@ -4343,9 +4359,9 @@ window.saveDulleByPrompt = async function(passedMemberId = null) {
     });
 
     const categoryInfo = getDulleCourseCategory(courseNum);
-    alert(`🎉 [${categoryInfo.name}] ${courseTitle} 완주 기록이 성공적으로 등록되었습니다!`);
+    alert(`🎉 [${categoryInfo.name}] ${courseTitle} 완주 기록이 등록되고, 트래킹 폼 정보가 자동 설정되었습니다!`);
 
-    // 모달이 열려있는 경우 새로고침
+    // 개인 둘레길 레포트 모달이 열려있는 경우 새로고침
     if (typeof openGyeonggiTrailModal === 'function') {
       openGyeonggiTrailModal(memberDocId);
     }
@@ -4355,6 +4371,7 @@ window.saveDulleByPrompt = async function(passedMemberId = null) {
     alert("저장 중 오류가 발생했습니다: " + e.message);
   }
 };
+
 
 // 🎯 경기둘레길 모달 열기 함수
 window.openGyeonggiTrailModal = async function(targetMemberId) {
