@@ -3751,6 +3751,13 @@ margin: 0 2px !important;
             둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
           </div>
         </div>
+<!-- 코스 입력창 -->
+<input type="number" id="manualCourseNum" min="1" max="60" placeholder="코스 번호 (1~60)" />
+
+<!-- 저장 버튼 클릭 시 호출 -->
+<button onclick="saveDulleLogByCourseNum(window.scrollPagination?.mId, document.getElementById('manualCourseNum').value)">
+  코스 완주 저장
+</button>
 
         <!-- 지도 영역 -->
         <div class="map-container" onclick="setAdminCoordinate(event)">
@@ -4229,6 +4236,45 @@ window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = nul
   }
 };
 
+   // =========================================================
+// 🎯 경기둘레길 1~60코스 고정 좌표 마스터 테이블 (4230번 줄 근처)
+// =========================================================
+const DULLE_COURSE_COORDS = {
+  1: { x: 28.5, y: 48.2 },
+  2: { x: 26.1, y: 45.0 },
+  3: { x: 24.8, y: 51.3 },
+  // ... 나중에 60개 좌표 채워넣기
+};
+
+// 🎯 코스 번호 선택 시 자동 좌표 DB 저장 함수
+window.saveDulleLogByCourseNum = async function(memberDocId, courseNumInput) {
+  try {
+    const courseNum = parseInt(courseNumInput, 10);
+    if (isNaN(courseNum) || courseNum < 1 || courseNum > 60) {
+      alert("1부터 60까지의 코스 번호를 입력해주세요.");
+      return;
+    }
+
+    const targetCoord = DULLE_COURSE_COORDS[courseNum];
+    const dulleObject = targetCoord 
+      ? { course: courseNum, x: targetCoord.x, y: targetCoord.y }
+      : courseNum;
+
+    const firestoreDb = window.db || db;
+    const userRef = doc(firestoreDb, "sanwoori", memberDocId);
+
+    await updateDoc(userRef, {
+      dulleCourses: arrayUnion(dulleObject)
+    });
+
+    console.log(`✅ ${courseNum}코스 저장 완료:`, dulleObject);
+  } catch (e) {
+    console.error("❌ 저장 실패:", e);
+  }
+};
+
+
+     
 // 🎯 경기둘레길 모달 열기 함수 (4232번 줄 위치)
 window.openGyeonggiTrailModal = async function(targetMemberId) {
     const trailModal = document.getElementById('gyeonggiTrailModal');
