@@ -3724,19 +3724,25 @@ margin: 0 2px !important;
 
       <!-- 🎯 둘레길 지도 영역 (평상시 숨김: hidden) -->
 <div id="dulleMapContainer" class="hidden mb-2">
-  <!-- max-h-[350px]로 최대 높이를 제한하고, flex/justify-center로 중앙 배치 -->
-  <div class="map-container relative cursor-pointer max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30" onclick="setDulleCoordinate(event)">
-    <!-- object-contain과 max-h-full을 추가하여 이미지 비율을 유지하면서 창 안에 쏙 들어가게 조절 -->
-    <img src="https://i.ibb.co/20xSks4z/1.png" class="map-image max-h-[350px] w-auto max-w-full object-contain rounded-xl" alt="둘레길 지도">
+  <!-- 이미지 기준 상대 위치 지정을 위한 relative 상자 -->
+  <div class="map-container relative max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30">
     
-    <!-- 둘레길 좌표 마커가 찍힐 영역 -->
-    <div id="dulleMapMarker" class="map-point hidden absolute w-3 h-3 bg-teal-500 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg"></div>
+    <!-- ⚠️ img 태그에 직접 onclick="setDulleCoordinate(event)"를 넣어줍니다 -->
+    <img src="https://i.ibb.co/20xSks4z/1.png" 
+         id="dulleMapImage"
+         onclick="setDulleCoordinate(event)"
+         class="map-image max-h-[350px] w-auto max-w-full object-contain rounded-xl cursor-pointer block" 
+         alt="둘레길 지도">
+    
+    <!-- pointer-events-none을 추가하여 마커 클릭이 재클릭을 방해하지 않도록 처리 -->
+    <div id="dulleMapMarker" class="map-point hidden absolute w-3 h-3 bg-teal-500 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg pointer-events-none"></div>
   </div>
   
   <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
     둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
   </div>
 </div>
+
 
 
     <!-- 지도 영역 -->
@@ -4246,14 +4252,18 @@ function getDulleCourseColor(courseNum) {
 
 // 4. 둘레길 지도 클릭 시 좌표 찍기 & 코스 번호 입력 받아 색상 마커 생성
 function setDulleCoordinate(event) {
+  // 이벤트가 발생한 대상(이미지 태그)의 경계 크기 정보 취득
   const imgElement = event.currentTarget;
   const rect = imgElement.getBoundingClientRect();
 
+  // 이미지 자체의 렌더링 영역 기준 X, Y 좌표 계산 (%)
   const x = ((event.clientX - rect.left) / rect.width) * 100;
   const y = ((event.clientY - rect.top) / rect.height) * 100;
 
+  // 클릭 위치가 이미지 영역을 벗어났다면 예외 처리
   if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
+  // 코스 번호 입력 팝업
   const courseInput = prompt("정복한 둘레길 코스 번호를 입력하세요 (1~60):");
   if (!courseInput) return;
 
@@ -4263,12 +4273,15 @@ function setDulleCoordinate(event) {
     return;
   }
 
+  // 구간별 색상 추출
   const colorInfo = getDulleCourseColor(courseNum);
 
+  // 부모 컨테이너(map-container) 기준 오프셋을 계산하여 마커 위치 정렬
   const containerRect = imgElement.parentElement.getBoundingClientRect();
   const markerLeft = ((event.clientX - containerRect.left) / containerRect.width) * 100;
   const markerTop = ((event.clientY - containerRect.top) / containerRect.height) * 100;
 
+  // 지도 위 마커 이동 및 색상 반영
   const marker = document.getElementById('dulleMapMarker');
   if (marker) {
     marker.style.left = `${markerLeft}%`;
@@ -4277,6 +4290,7 @@ function setDulleCoordinate(event) {
     marker.classList.remove('hidden');
   }
 
+  // 전역 데이터 객체 갱신
   window.selectedDulleData = {
     x: x.toFixed(2),
     y: y.toFixed(2),
@@ -4284,11 +4298,13 @@ function setDulleCoordinate(event) {
     color: colorInfo.hex
   };
 
+  // 텍스트 안내 업데이트
   const coordDisplay = document.getElementById('dulleCoordDisplay');
   if (coordDisplay) {
     coordDisplay.innerHTML = `선택 코스: <span style="color:${colorInfo.hex}; font-weight:bold;">${courseNum}코스</span> (X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%)`;
   }
 }
+
 
 // 5. Firestore DB 저장 연동 함수 (기록 저장 버튼 클릭 시 호출)
 async function saveDulleLog(memberDocId, courseNum, coordX = null, coordY = null) {
