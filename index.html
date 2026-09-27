@@ -3722,28 +3722,29 @@ margin: 0 2px !important;
   </div>
 </div>
 
-          <!-- 🎯 둘레길 지도 영역 (일반 정복지도와 동일한 레이아웃/크기 적용) -->
+          <!-- 🎯 둘레길 지도 영역 (평상시 숨김: hidden) -->
 <div id="dulleMapContainer" class="hidden mb-2">
   <div class="map-container relative cursor-pointer" onclick="setDulleCoordinate(event)">
-    <img src="https://i.ibb.co/20xSks4z/1.png" class="map-image w-full block rounded-xl border border-teal-200" alt="둘레길 지도">
-    <!-- 둘레길 좌표 마커 -->
-    <div id="dulleMapMarker" class="map-point hidden absolute w-3.5 h-3.5 bg-teal-500 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10"></div>
+    <img src="https://i.ibb.co/jPtcDXF2/image.png" class="map-image w-full rounded-xl border border-teal-200" alt="둘레길 지도">
+    <!-- 둘레길 좌표 마커가 찍힐 영역 -->
+    <div id="dulleMapMarker" class="map-point hidden absolute w-3 h-3 bg-teal-500 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg"></div>
   </div>
-  <div id="dulleCoordDisplay" class="coordinate-display text-[10px] text-teal-600 font-bold mt-1 text-center">
+  <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
     둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
   </div>
 </div>
 
-<!-- 지도 영역 (기존 일반 정복지도) -->
-<div class="map-container relative cursor-pointer" onclick="setAdminCoordinate(event)">
-  <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full block" alt="정복지도">
-  <div id="adminMapMarker" class="map-point hidden"></div>
+    <!-- 지도 영역 -->
+    <div class="map-container" onclick="setAdminCoordinate(event)">
+      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image" alt="정복지도">
+      <div id="adminMapMarker" class="map-point hidden"></div>
+    </div>
+    <div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
+  </div>
+
+  <input type="date" id="activityDate" class="input-gap">
+  <button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
 </div>
-<div id="coordDisplay" class="coordinate-display">좌표: 없음 (지도 클릭)</div>
-
-<input type="date" id="activityDate" class="input-gap mt-3">
-<button onclick="addMultiActivity()" class="btn-submit bg-blue-500 mt-0">기록 저장하기</button>
-
 
 
 
