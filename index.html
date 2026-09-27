@@ -4128,20 +4128,120 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 🎨 권역별 코스 정보 및 색상 정의
+// 🎨 권역별 코스 정보 및 색상 정의 (평화, 숲길, 물길, 갯길)
 function getDulleCourseCategory(courseNum) {
   const num = parseInt(courseNum, 10);
   if (num >= 1 && num <= 11) {
-    return { name: "평화누리길", hex: "#EF4444", bgClass: "bg-red-500" }; // 🔴 빨강 (1~11)
+    return { name: "평화", fullName: "평화누리길", hex: "#EF4444", order: 1 }; // 🔴 빨강 (1~11)
   } else if (num >= 12 && num <= 23) {
-    return { name: "숲길", hex: "#F97316", bgClass: "bg-orange-500" };    // 🟠 주황 (12~23)
+    return { name: "숲길", fullName: "경기 숲길", hex: "#F97316", order: 2 };   // 🟠 주황 (12~23)
   } else if (num >= 24 && num <= 44) {
-    return { name: "물길", hex: "#10B981", bgClass: "bg-emerald-500" };   // 🟢 초록 (24~44)
+    return { name: "물길", fullName: "경기 물길", hex: "#10B981", order: 3 };   // 🟢 초록 (24~44)
   } else if (num >= 45 && num <= 60) {
-    return { name: "갯길", hex: "#3B82F6", bgClass: "bg-blue-500" };      // 🔵 파랑 (45~60)
+    return { name: "갯길", fullName: "경기 갯길", hex: "#3B82F6", order: 4 };   // 🔵 파랑 (45~60)
   }
-  return { name: "경기둘레길", hex: "#6B7280", bgClass: "bg-gray-500" };
+  return { name: "기타", fullName: "기타", hex: "#6B7280", order: 5 };
 }
+
+// 🎯 완주 목록을 [평화 -> 숲길 -> 물길 -> 갯길] 순서대로 알약 형태로 렌더링
+function renderPersonalDulleReport(userData) {
+  const dulleArray = userData.dulleCourses || [];
+  
+  const completedList = dulleArray.map(item => {
+    if (typeof item === 'object' && item !== null) {
+      const parsedX = parseFloat(item.x);
+      const parsedY = parseFloat(item.y);
+
+      return {
+        course: parseInt(item.course, 10),
+        x: (!isNaN(parsedX) && isFinite(parsedX)) ? parsedX : null,
+        y: (!isNaN(parsedY) && isFinite(parsedY)) ? parsedY : null
+      };
+    }
+    return { course: parseInt(item, 10), x: null, y: null };
+  });
+
+  const uniqueMap = new Map();
+  completedList.forEach(item => {
+    if (!isNaN(item.course) && item.course >= 1 && item.course <= 60) {
+      uniqueMap.set(item.course, item);
+    }
+  });
+
+  const uniqueCourses = Array.from(uniqueMap.values()).sort((a, b) => a.course - b.course);
+  const totalCompleted = uniqueCourses.length;
+
+  const countBadge = document.getElementById('trailCountBadge');
+  if (countBadge) {
+    countBadge.innerText = `${totalCompleted}/60`;
+  }
+
+  // 1) 지도상 마커 출력
+  const markerContainer = document.getElementById('modalMarkerContainer');
+  if (markerContainer) {
+    markerContainer.innerHTML = '';
+
+    uniqueCourses.forEach(item => {
+      if (item.x !== null && item.y !== null) {
+        const cat = getDulleCourseCategory(item.course);
+        const markerEl = document.createElement('div');
+        markerEl.className = 'dulle-modal-marker';
+        markerEl.style.left = `${item.x}%`;
+        markerEl.style.top = `${item.y}%`;
+        markerEl.style.backgroundColor = cat.hex;
+        markerEl.title = `${cat.fullName} ${item.course}코스`;
+        markerContainer.appendChild(markerEl);
+      }
+    });
+  }
+
+  // 2) 완주 목록 알약(Pill) UI 렌더링 (평화 -> 숲길 -> 물길 -> 갯길 순)
+  const badgeContainer = document.getElementById('dulleBadgeList');
+  if (badgeContainer) {
+    if (uniqueCourses.length === 0) {
+      badgeContainer.innerHTML = `<span style="font-size: 11px; color: #94a3b8;">완주한 코스가 없습니다.</span>`;
+      return;
+    }
+
+    // 권역별 그룹화
+    const grouped = {
+      1: { name: "평화", courses: [], hex: "#EF4444" },
+      2: { name: "숲길", courses: [], hex: "#F97316" },
+      3: { name: "물길", courses: [], hex: "#10B981" },
+      4: { name: "갯길", courses: [], hex: "#3B82F6" }
+    };
+
+    uniqueCourses.forEach(item => {
+      const cat = getDulleCourseCategory(item.course);
+      if (grouped[cat.order]) {
+        grouped[cat.order].courses.push(item.course);
+      }
+    });
+
+    let html = `<div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; width: 100%; padding: 4px;">`;
+
+    // 1(평화) -> 2(숲길) -> 3(물길) -> 4(갯길) 순서대로 출력
+    [1, 2, 3, 4].forEach(orderKey => {
+      const group = grouped[orderKey];
+      if (group.courses.length > 0) {
+        html += `<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">`;
+        
+        group.courses.forEach(cNum => {
+          html += `
+            <span style="background-color: ${group.hex}; color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; box-shadow: 0 1px 2px rgba(0,0,0,0.12); display: inline-flex; align-items: center; white-space: nowrap;">
+              ${group.name} ${cNum}코스
+            </span>`;
+        });
+
+        html += `</div>`;
+      }
+    });
+
+    html += `</div>`;
+    badgeContainer.innerHTML = html;
+  }
+}
+
 
 // 🎯 팝업(prompt)으로 코스 번호만 받아서 DB 마스터 좌표로 자동 저장
 window.saveDulleByPrompt = async function(passedMemberId = null) {
