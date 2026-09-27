@@ -3733,46 +3733,24 @@ margin: 0 2px !important;
           </div>
         </div>
 
-<!-- 경기둘레길 지도 영역 -->
-<div id="dulleMapContainer" class="mb-2">
-  <div id="dulleMapWrapper" 
-       onclick="setDulleCoordinate(event)"
-       class="relative max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30 cursor-pointer">
-    
-    <img src="https://i.ibb.co/20xSks4z/1.png" 
-         id="dulleMapImage"
-         class="max-h-[350px] w-auto max-w-full object-contain rounded-xl pointer-events-none block" 
-         alt="둘레길 지도">
-    
-    <!-- 미리보기 핀 -->
-    <div id="dulleMapMarker" class="hidden absolute w-3.5 h-3.5 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10 pointer-events-none"></div>
-  </div>
-  
-  <div class="text-[11px] text-teal-600 font-bold mt-1 text-center">
-    💡 지도의 원하는 위치를 클릭하면 코스 번호 입력창이 뜹니다.
-  </div>
-</div>
-
-<!-- 회원 완주 등록용 (코스 번호 입력 후 자동 저장) -->
-<div class="flex gap-2 my-2">
-  <input type="number" 
-         id="manualCourseNum" 
-         min="1" 
-         max="60" 
-         placeholder="완주 코스 번호 (1~60)" 
-         class="border p-2 rounded w-full text-sm" />
-
-  <button type="button" 
-          onclick="saveDulleLogByCourseNum(null, document.getElementById('manualCourseNum').value)"
-          class="bg-teal-600 text-white px-3 py-2 rounded text-xs font-bold whitespace-nowrap">
-    코스 완주 저장
-  </button>
-</div>
-
-<!-- 완주 목록 뱃지 출력 구역 -->
-<div id="dulleBadgeList" class="mt-2 text-center"></div>
-
-
+        <!-- 둘레길 지도 영역 -->
+        <div id="dulleMapContainer" class="hidden mb-2">
+          <div id="dulleMapWrapper" 
+               onclick="setDulleCoordinate(event)"
+               class="relative max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30 cursor-pointer">
+            
+            <img src="https://i.ibb.co/20xSks4z/1.png" 
+                 id="dulleMapImage"
+                 class="max-h-[350px] w-auto max-w-full object-contain rounded-xl pointer-events-none block" 
+                 alt="둘레길 지도">
+            
+            <div id="dulleMapMarker" class="hidden absolute w-3.5 h-3.5 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10 pointer-events-none"></div>
+          </div>
+          
+          <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
+            둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
+          </div>
+        </div>
 
         <!-- 지도 영역 -->
         <div class="map-container" onclick="setAdminCoordinate(event)">
@@ -4251,125 +4229,6 @@ window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = nul
   }
 };
 
-// =========================================================
-// 🎯 경기둘레길 마스터 좌표 구축 & 권역별 자동 매핑 로직
-// =========================================================
-
-// 🎨 1. 경기둘레길 권역별 구간 및 색상 매핑 함수
-function getGyeonggiTrailTheme(courseNum) {
-  const num = parseInt(courseNum, 10);
-  if (num >= 1 && num <= 11) {
-    return { category: "평화누리길", color: "#ef4444", bgClass: "bg-red-500", textClass: "text-red-500" }; // 빨강
-  } else if (num >= 12 && num <= 23) {
-    return { category: "숲길", color: "#f97316", bgClass: "bg-orange-500", textClass: "text-orange-500" }; // 주황
-  } else if (num >= 24 && num <= 44) {
-    return { category: "물길", color: "#10b981", bgClass: "bg-emerald-500", textClass: "text-emerald-500" }; // 초록
-  } else if (num >= 45 && num <= 60) {
-    return { category: "갯길", color: "#3b82f6", bgClass: "bg-blue-500", textClass: "text-blue-500" }; // 파랑
-  }
-  return { category: "경기둘레길", color: "#64748b", bgClass: "bg-slate-500", textClass: "text-slate-500" };
-}
-
-// 🎯 2. 지도 클릭 시 번호 입력 팝업 띄우고 "경기둘레길 OO코스" 로 DB 마스터 저장
-window.setDulleCoordinate = async function(event) {
-  const img = document.getElementById('dulleMapImage');
-  if (!img) return;
-
-  const rect = img.getBoundingClientRect();
-  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-
-  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return;
-
-  // X, Y 상대 좌표 % 계산
-  const xPercent = parseFloat(((clientX - rect.left) / rect.width * 100).toFixed(1));
-  const yPercent = parseFloat(((clientY - rect.top) / rect.height * 100).toFixed(1));
-
-  // 1) 코스 번호 입력 prompt 창 띄우기
-  const inputVal = prompt("등록할 경기둘레길 코스 번호를 입력하세요 (1~60):");
-  if (!inputVal) return;
-
-  const courseNum = parseInt(inputVal.trim(), 10);
-  if (isNaN(courseNum) || courseNum < 1 || courseNum > 60) {
-    alert("1부터 60 사이의 숫자를 입력해 주세요.");
-    return;
-  }
-
-  // 2) 권역 정보 및 자동 명칭 생성 ("경기둘레길 OO코스")
-  const theme = getGyeonggiTrailTheme(courseNum);
-  const courseTitle = `경기둘레길 ${courseNum}코스`;
-
-  try {
-    const firestoreDb = window.db || db;
-    const masterRef = doc(firestoreDb, "settings", "dulleMaster");
-
-    // 3) DB settings/dulleMaster 문서에 마스터 좌표 업로드
-    await setDoc(masterRef, {
-      [`course_${courseNum}`]: {
-        course: courseNum,
-        title: courseTitle,
-        category: theme.category,
-        color: theme.color,
-        x: xPercent,
-        y: yPercent
-      }
-    }, { merge: true });
-
-    // 지도 상 마커 임시 표시
-    const marker = document.getElementById('dulleMapMarker');
-    if (marker) {
-      marker.style.left = `${xPercent}%`;
-      marker.style.top = `${yPercent}%`;
-      marker.style.backgroundColor = theme.color;
-      marker.classList.remove('hidden');
-    }
-
-    alert(`✅ [${theme.category}] ${courseTitle} 좌표가 DB 마스터에 성공적으로 저장되었습니다!\n(X: ${xPercent}%, Y: ${yPercent}%)`);
-
-  } catch (e) {
-    console.error("❌ 마스터 좌표 저장 오류:", e);
-    alert("저장 중 오류가 발생했습니다: " + e.message);
-  }
-};
-
-// 🎯 3. 회원 완주 목록 렌더링 시 권역별 색상 태그 적용 함수
-window.renderDulleBadgeList = function(dulleCoursesArray) {
-  const container = document.getElementById('dulleBadgeList');
-  if (!container) return;
-
-  if (!dulleCoursesArray || dulleCoursesArray.length === 0) {
-    container.innerHTML = `<span style="font-size:11px; color:#94a3b8;">완주한 코스가 없습니다.</span>`;
-    return;
-  }
-
-  // 코스 번호 순 정렬
-  const sorted = [...dulleCoursesArray].sort((a, b) => {
-    const numA = typeof a === 'object' ? a.course : a;
-    const numB = typeof b === 'object' ? b.course : b;
-    return numA - numB;
-  });
-
-  let html = `<div class="flex flex-wrap gap-1.5 justify-center mt-2">`;
-
-  sorted.forEach(item => {
-    const courseNum = typeof item === 'object' ? item.course : parseInt(item, 10);
-    const theme = getGyeonggiTrailTheme(courseNum);
-    const titleText = `경기둘레길 ${courseNum}코스`;
-
-    html += `
-      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold text-white shadow-sm" style="background-color: ${theme.color};">
-        <span class="opacity-80 text-[9px]">[${theme.category}]</span>
-        <span>${titleText}</span>
-      </span>
-    `;
-  });
-
-  html += `</div>`;
-  container.innerHTML = html;
-};
-
-
-     
 // 🎯 경기둘레길 모달 열기 함수 (4232번 줄 위치)
 window.openGyeonggiTrailModal = async function(targetMemberId) {
     const trailModal = document.getElementById('gyeonggiTrailModal');
