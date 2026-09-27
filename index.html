@@ -4097,8 +4097,9 @@ const now = new Date();
 let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
+
 // =========================================================
-// 🎯 경기둘레길 관련 통합 스크립트
+// 🎯 경기둘레길 관련 통합 스크립트 (수정본)
 // =========================================================
 window.selectedDulleData = null;
 
@@ -4122,6 +4123,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// 코스별 색상 반환 함수
 function getDulleCourseColor(courseNum) {
   const num = parseInt(courseNum, 10);
   if (num >= 1 && num <= 11) {
@@ -4136,14 +4138,26 @@ function getDulleCourseColor(courseNum) {
   return { bg: 'bg-gray-500', hex: '#6B7280', label: '⚪️ 기타' };
 }
 
+// 🎯 지도 좌표 클릭 설정 함수 (이미지 요소 직접 기준 계산으로 정밀도 보장)
 window.setDulleCoordinate = function(event) {
-  const wrapper = document.getElementById('dulleMapWrapper');
-  if (!wrapper) return;
+  const img = document.getElementById('dulleMapImage');
+  if (!img) return;
 
-  const rect = wrapper.getBoundingClientRect();
-  const x = ((event.clientX - rect.left) / rect.width) * 100;
-  const y = ((event.clientY - rect.top) / rect.height) * 100;
+  // 1. wrapper가 아닌 이미지(img)의 실제 화면 좌표와 너비/높이를 가져옴
+  const rect = img.getBoundingClientRect();
 
+  // 2. 이미지 내부 클릭 위치 계산
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
+
+  // 3. 이미지 경계 벗어남 방지 (0~100% 한계 설정)
+  let xPercent = (clickX / rect.width) * 100;
+  let yPercent = (clickY / rect.top) * 100; // rect.height 수정
+  yPercent = (clickY / rect.height) * 100;
+
+  if (xPercent < 0 || xPercent > 100 || yPercent < 0 || yPercent > 100) return;
+
+  // 4. 코스 번호 입력
   const courseInput = prompt("정복한 둘레길 코스 번호를 입력하세요 (1~60):");
   if (!courseInput) return;
 
@@ -4155,37 +4169,64 @@ window.setDulleCoordinate = function(event) {
 
   const colorInfo = getDulleCourseColor(courseNum);
 
+  // 5. 숫자로 확실히 타입 변환 (소수점 1자리)
+  const finalX = parseFloat(xPercent.toFixed(1));
+  const finalY = parseFloat(yPercent.toFixed(1));
+
+  // 6. 마커 위치 설정
   const marker = document.getElementById('dulleMapMarker');
   if (marker) {
-    marker.style.left = `${x}%`;
-    marker.style.top = `${y}%`;
+    marker.style.left = `${finalX}%`;
+    marker.style.top = `${finalY}%`;
     marker.style.backgroundColor = colorInfo.hex;
     marker.classList.remove('hidden');
   }
 
+  // 7. 선택된 좌표 객체 기록 (숫자 형식을 유지)
   window.selectedDulleData = {
-    x: x.toFixed(2),
-    y: y.toFixed(2),
+    x: finalX,
+    y: finalY,
     course: courseNum,
     color: colorInfo.hex
   };
 
   const coordDisplay = document.getElementById('dulleCoordDisplay');
   if (coordDisplay) {
-    coordDisplay.innerHTML = `선택 코스: <span style="color:${colorInfo.hex}; font-weight:bold;">${courseNum}코스</span> (X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%)`;
+    coordDisplay.innerHTML = `선택 코스: <span style="color:${colorInfo.hex}; font-weight:bold;">${courseNum}코스</span> (X: ${finalX}%, Y: ${finalY}%)`;
   }
 };
 
-window.saveDulleLog = async function(memberDocId, courseNum, coordX = null, coordY = null) {
+// 🎯 DB 저장 함수 (window.selectedDulleData 연동 지원)
+window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = null, coordY = null) {
   try {
     const userRef = doc(db, "sanwoori", memberDocId);
-    const dulleObject = (coordX !== null && coordY !== null) 
-      ? { course: parseInt(courseNum, 10), x: coordX, y: coordY } 
-      : parseInt(courseNum, 10);
+    
+    let targetCourse = courseNum;
+    let targetX = coordX;
+    let targetY = coordY;
+
+    // 만약 파라미터가 비어있고 window.selectedDulleData에 값이 있다면 자동 매핑
+    if (!targetCourse && window.selectedDulleData) {
+      targetCourse = window.selectedDulleData.course;
+      targetX = window.selectedDulleData.x;
+      targetY = window.selectedDulleData.y;
+    }
+
+    if (!targetCourse) return;
+
+    // x, y 좌표가 유효한 숫자 형태인지 검증
+    const isValidX = targetX !== null && targetX !== undefined && !isNaN(Number(targetX));
+    const isValidY = targetY !== null && targetY !== undefined && !isNaN(Number(targetY));
+
+    const dulleObject = (isValidX && isValidY)
+      ? { course: parseInt(targetCourse, 10), x: parseFloat(targetX), y: parseFloat(targetY) }
+      : parseInt(targetCourse, 10);
 
     await updateDoc(userRef, {
       dulleCourses: arrayUnion(dulleObject)
     });
+    
+    console.log("✅ 둘레길 DB 저장 성공:", dulleObject);
   } catch (e) {
     console.error("❌ 둘레길 DB 저장 실패:", e);
   }
@@ -4201,16 +4242,31 @@ window.closeGyeonggiTrailModal = function() {
   if (modal) modal.style.display = 'none';
 };
 
+// 🎯 개인 둘레길 모달 레포트 렌더링
 function renderPersonalDulleReport(userData) {
   const dulleArray = userData.dulleCourses || [];
   
+  // 객체 형태 및 단순 숫자 형태 호환 처리
   const completedList = dulleArray.map(item => {
-    return typeof item === 'object' ? item : { course: parseInt(item, 10) };
+    if (typeof item === 'object' && item !== null) {
+      return {
+        course: parseInt(item.course, 10),
+        x: item.x !== undefined && item.x !== "*" ? parseFloat(item.x) : null,
+        y: item.y !== undefined && item.y !== "*" ? parseFloat(item.y) : null
+      };
+    }
+    return { course: parseInt(item, 10), x: null, y: null };
   });
 
-  const uniqueCourses = Array.from(new Map(completedList.map(item => [item.course, item])).values())
-                             .sort((a, b) => a.course - b.course);
+  // 코스 중복 제거 (최신 등록 데이터 우선)
+  const uniqueMap = new Map();
+  completedList.forEach(item => {
+    if (!isNaN(item.course)) {
+      uniqueMap.set(item.course, item);
+    }
+  });
 
+  const uniqueCourses = Array.from(uniqueMap.values()).sort((a, b) => a.course - b.course);
   const totalCompleted = uniqueCourses.length;
 
   const countBadge = document.getElementById('trailCountBadge');
@@ -4218,12 +4274,14 @@ function renderPersonalDulleReport(userData) {
     countBadge.innerText = `${totalCompleted}/60`;
   }
 
+  // 모달 지도 위 마커 생성
   const markerContainer = document.getElementById('modalMarkerContainer');
   if (markerContainer) {
     markerContainer.innerHTML = '';
 
     uniqueCourses.forEach(item => {
-      if (item.x !== undefined && item.y !== undefined && item.x !== null && item.y !== null) {
+      // x, y 좌표가 유효한 숫자일 때만 마커 생성
+      if (item.x !== null && item.y !== null && !isNaN(item.x) && !isNaN(item.y)) {
         const color = getDulleCourseColor(item.course);
         const markerEl = document.createElement('div');
         markerEl.className = 'dulle-modal-marker';
@@ -4236,6 +4294,7 @@ function renderPersonalDulleReport(userData) {
     });
   }
 
+  // 모달 하단 완주 뱃지 리스트 생성
   const badgeContainer = document.getElementById('dulleBadgeList');
   if (badgeContainer) {
     if (uniqueCourses.length === 0) {
@@ -4245,7 +4304,7 @@ function renderPersonalDulleReport(userData) {
       uniqueCourses.forEach(item => {
         const color = getDulleCourseColor(item.course);
         badgesHtml += `
-          <span style="background-color: ${color.hex}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: inline-block;">
+          <span style="background-color: ${color.hex}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: inline-block; margin: 2px;">
             ${item.course}코스
           </span>`;
       });
@@ -4253,6 +4312,9 @@ function renderPersonalDulleReport(userData) {
     }
   }
 }
+
+
+        
 
 window.saveMemberByName = async function(memberData) {
   const { name, gender, level } = memberData;
