@@ -4229,14 +4229,15 @@ window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = nul
   }
 };
 
+// 🎯 경기둘레길 모달 열기 함수 (유저 문서의 dulleCourses 배열 읽기)
 window.openGyeonggiTrailModal = async function() {
     const trailModal = document.getElementById('gyeonggiTrailModal');
     if (!trailModal) return;
 
-    // 모달 먼저 표시
+    // 모달 표시
     trailModal.style.display = 'flex';
 
-    // 현재 선택된 멤버 ID 가져오기 (scrollPagination에 저장된 mId 활용)
+    // 현재 선택된 멤버 ID 가져오기
     const currentMemberId = window.scrollPagination?.mId;
     
     const countBadge = document.getElementById('trailCountBadge');
@@ -4253,16 +4254,20 @@ window.openGyeonggiTrailModal = async function() {
     }
 
     try {
-        // 🎯 Firestore에서 해당 회원의 경기둘레길 완주 데이터 가져오기
-        const dulleLogsRef = collection(db, `sanwoori/${currentMemberId}/dulleLogs`);
-        const snap = await getDocs(dulleLogsRef);
+        // 🎯 서브컬렉션이 아닌, 유저 문서 자체를 조회
+        const userDocRef = doc(db, "sanwoori", currentMemberId);
+        const userSnap = await getDoc(userDocRef);
 
-        const dulleLogs = [];
-        snap.forEach(docSnap => {
-            dulleLogs.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        if (!userSnap.exists()) {
+            if (badgeListContainer) badgeListContainer.innerHTML = `<span style="font-size: 11px; color: #94a3b8;">회원 데이터가 없습니다.</span>`;
+            return;
+        }
 
-        const completedCount = dulleLogs.length;
+        const userData = userSnap.data();
+        // dulleCourses 배열 가져오기 (없으면 빈 배열)
+        const dulleArray = userData.dulleCourses || [];
+
+        const completedCount = dulleArray.length;
         const totalCount = 60;
 
         // 1. 카운트 배지 갱신
@@ -4279,16 +4284,25 @@ window.openGyeonggiTrailModal = async function() {
             let markerHtml = '';
             let badgeHtml = '';
 
-            dulleLogs.forEach(log => {
-                const courseName = log.course || log.id || '코스';
-                const x = log.x;
-                const y = log.y;
+            dulleArray.forEach(item => {
+                // 숫자 또는 객체 형태 모두 대응
+                let courseName = '';
+                let x = null;
+                let y = null;
 
-                // 좌표가 있는 경우 마커 추가
-                if (x !== undefined && y !== undefined && x !== null && y !== null) {
+                if (typeof item === 'object' && item !== null) {
+                    courseName = item.course ? `${item.course}코스` : '코스';
+                    x = parseFloat(item.x);
+                    y = parseFloat(item.y);
+                } else {
+                    courseName = `${item}코스`;
+                }
+
+                // 좌표가 존재하는 경우 지도상 마커 추가
+                if (!isNaN(x) && !isNaN(y) && x !== null && y !== null) {
                     markerHtml += `
                         <div class="dulle-modal-marker" 
-                             style="left: ${x}%; top: ${y}%; background-color: #0284c7;" 
+                             style="left: ${x}%; top: ${y}%; background-color: #0284c7; position: absolute; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.4);" 
                              title="${courseName}">
                         </div>
                     `;
@@ -4320,6 +4334,7 @@ window.openGyeonggiTrailModal = async function() {
         }
     };
 };
+
 
 
 window.closeGyeonggiTrailModal = function() {
