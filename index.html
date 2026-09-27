@@ -7691,7 +7691,6 @@ window.toggleDisableCoord = () => {
     }
 };
 
-
 window.addMultiActivity = async () => {
     const dateInput = document.getElementById('activityDate');
     if (!dateInput) return alert("날짜 입력창을 찾을 수 없습니다.");
@@ -7914,6 +7913,16 @@ window.addMultiActivity = async () => {
             if (Object.keys(updateData).length > 0) {
                 await updateDoc(doc(db, "sanwoori", id), updateData);
             }
+
+            // 🎯 [신규 추가] 트래킹 선택 및 둘레길 코스 지정 시 둘레길 DB 연동
+            if (isTracking && window.selectedDulleData && typeof saveDulleLog === 'function') {
+                await saveDulleLog(
+                    id, 
+                    window.selectedDulleData.course, 
+                    window.selectedDulleData.x, 
+                    window.selectedDulleData.y
+                );
+            }
             
             // 3) 개인 로그 생성 및 별/계절마크 획득 처리
             const rawMountainName = document.getElementById('mountainName')?.value.trim();
@@ -7928,12 +7937,11 @@ window.addMultiActivity = async () => {
             for (let i = 0; i < finalLogLoopCount; i++) {
                 let starType = null;
                 
-                // 🎯 [수정된 핵심 로직] 정기산행일 경우 전분기 점수 반영 추첨 실행
+                // 🎯 정기산행일 경우 전분기 점수 반영 추첨 실행
                 if (isRegular) {
                     if (typeof window.drawRegularHikeStar === 'function') {
                         starType = window.drawRegularHikeStar(member, currentYear, currentQuarter);
                     } else {
-                        // Fallback: 함수를 찾을 수 없을 때의 기본 가중치 적용
                         const rand = Math.random() * 100;
                         if (rand <= 3) starType = "super";
                         else if (rand <= 10) starType = "special";
@@ -7984,33 +7992,29 @@ window.addMultiActivity = async () => {
         } 
 
         if (isRealHike && isMultiHike && selectedNames.length >= 2) {
-    const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
-    const cleanDate = dateVal.trim();
-    let bondingDocId = `${cleanMountain}_${cleanDate}`;
+            const cleanMountain = (mName || "트레킹산행").trim().replace(/\s+/g, "");
+            const cleanDate = dateVal.trim();
+            let bondingDocId = `${cleanMountain}_${cleanDate}`;
 
-    let bondingRef = doc(db, "bondingForest", bondingDocId);
-    let checkSnap = await getDoc(bondingRef);
-    let dupSeq = 2;
-    while (checkSnap.exists()) {
-        bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
-        
-        // 🎯 doc(doc, ...) -> doc(db, ...) 로 수정!
-        bondingRef = doc(db, "bondingForest", bondingDocId); 
-        
-        checkSnap = await getDoc(bondingRef);
-        dupSeq++;
-    }
+            let bondingRef = doc(db, "bondingForest", bondingDocId);
+            let checkSnap = await getDoc(bondingRef);
+            let dupSeq = 2;
+            while (checkSnap.exists()) {
+                bondingDocId = `${cleanMountain}_${cleanDate}_${dupSeq}`;
+                bondingRef = doc(db, "bondingForest", bondingDocId); 
+                checkSnap = await getDoc(bondingRef);
+                dupSeq++;
+            }
 
-    await setDoc(bondingRef, {
-        mountain: cleanMountain, 
-        members: selectedNames, 
-        memberCount: selectedNames.length, 
-        date: cleanDate, 
-        type: "정식", 
-        createdAt: new Date()
-    });
-}
-
+            await setDoc(bondingRef, {
+                mountain: cleanMountain, 
+                members: selectedNames, 
+                memberCount: selectedNames.length, 
+                date: cleanDate, 
+                type: "정식", 
+                createdAt: new Date()
+            });
+        }
 
         if (typeof pendingLevelUpCards !== 'undefined' && pendingLevelUpCards.length > 0 && typeof showCombinedLevelUpAlert === 'function') {
             showCombinedLevelUpAlert();
@@ -8050,12 +8054,22 @@ window.addMultiActivity = async () => {
         const defaultRadio = document.querySelector('input[name="upAmount"][value="1"]');
         if (defaultRadio) defaultRadio.checked = true;
 
+        // 일반 산 좌표 초기화
         tempCoord = null; 
         const marker = document.getElementById('adminMapMarker');
         if (marker) marker.classList.add('hidden');
         
         const display = document.getElementById('coordDisplay');
         if (display) display.innerText = '좌표: 없음 (지도 클릭)';
+
+        // 🎯 [신규 추가] 둘레길 지도 선택 상태 & 마커 초기화
+        window.selectedDulleData = null;
+        const dulleMarker = document.getElementById('dulleMapMarker');
+        if (dulleMarker) dulleMarker.classList.add('hidden');
+        const dulleDisplay = document.getElementById('dulleCoordDisplay');
+        if (dulleDisplay) dulleDisplay.innerHTML = '둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.';
+        const dulleContainer = document.getElementById('dulleMapContainer');
+        if (dulleContainer) dulleContainer.classList.add('hidden');
 
         const kstDate = new Date(new Date().getTime() + (9 * 60 * 60 * 1000));
         if (dateInput) {
@@ -8068,62 +8082,9 @@ window.addMultiActivity = async () => {
         alert("저장 실패: " + error.message);
     }
 };
- 
-                 
-            
-            
-                    
 
-// 📌 [신규 회원 등록 함수]
-window.addMember = async () => {
-    const nameInput = document.getElementById('newName');
-    const genderInput = document.querySelector('input[name="newGender"]:checked');
-    const dateInput = document.getElementById('regDate');
-
-    if (!nameInput || !nameInput.value.trim()) {
-        return alert("회원 이름을 입력해주세요.");
-    }
-
-    const cleanName = nameInput.value.trim();
-    const gender = genderInput ? genderInput.value : "여";
-    
-    const regDateVal = dateInput && dateInput.value ? new Date(dateInput.value) : new Date();
-    const ts = (typeof Timestamp !== 'undefined') ? Timestamp.fromDate(regDateVal) : regDateVal;
-
-    try {
-        const userRef = doc(db, "sanwoori", cleanName);
-
-        await setDoc(userRef, {
-            name: cleanName,
-            gender: gender,
-            level: 0,
-            count: 0,
-            bonusDays: 0,
-            buddyCount: 0,
-            friendshipPoint: 0,
-            qCount: 0,
-            isHidden: false,
-            regDate: ts,
-            createdAt: ts,
-            lastDate: ts
-        }, { merge: true });
-
-        alert(`신규 회원 [${cleanName}] 님이 정상 등록되었습니다! 🎉`);
-
-        nameInput.value = "";
         
-        if (typeof startRealtimeSync === 'function') {
-            startRealtimeSync();
-        }
-    } catch (error) {
-        console.error("회원 등록 실패 원인:", error);
-        alert("회원 등록 중 오류가 발생했습니다: " + error.message);
-    }
-};
 
-            
-
-            
 // 📌 회원 이름 변경 및 데이터 완벽 이전 함수
 window.updateMemberName = async () => {
     const selectEl = document.getElementById('memberSelectEdit');
