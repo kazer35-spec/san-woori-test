@@ -4178,7 +4178,7 @@ function getDulleCourseCategory(courseNum) {
   return { name: "기타", fullName: "기타", hex: "#6B7280", bgHex: "#F3F4F6", order: 5 };
 }
 
-// 🎯 완주 목록 UI 렌더링 (길별 최대 4개 + 길 색상에 맞춘 더보기 버튼)
+// 🎯 완주 목록 UI 렌더링 (최대 4개 + 동일한 줄에 깔끔하게 맞춘 더보기 버튼)
 function renderPersonalDulleReport(userData) {
   window.currentDulleMemberCourses = userData?.dulleCourses || [];
   const dulleArray = window.currentDulleMemberCourses;
@@ -4254,22 +4254,23 @@ function renderPersonalDulleReport(userData) {
       }
     });
 
-    let html = `<div id="dulleListContainer" style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start; width: 100%; padding: 2px;">`;
+    let html = `<div id="dulleListContainer" style="display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 2px;">`;
 
     [1, 2, 3, 4].forEach(orderKey => {
       const group = grouped[orderKey];
       if (group.courses.length === 0) return;
 
       const isExpanded = !!window.dulleExpandedState[orderKey];
-      const LIMIT = 4; // 🌟 최대 4개 노출
+      const LIMIT = 4; // 최대 4개 표시
       const visibleCourses = isExpanded ? group.courses : group.courses.slice(0, LIMIT);
       const hasMore = group.courses.length > LIMIT;
 
+      // 줄 바꿈 시 자연스럽게 연결되도록 flex-wrap 및 gap 조정
       html += `<div class="dulle-row-item" style="display: flex; flex-wrap: wrap; align-items: center; gap: 5px; width: 100%;">`;
       
       // ① 권역명 타이틀 알약
       html += `
-        <span style="background-color: ${group.hex}; color: #ffffff; font-size: 8pt; font-weight: 700; padding: 2px 8px; border-radius: 9999px; display: inline-flex; align-items: center;">
+        <span style="background-color: ${group.hex}; color: #ffffff; font-size: 8pt; font-weight: 700; padding: 3px 8px; border-radius: 9999px; display: inline-flex; align-items: center; shrink: 0;">
           ${group.name}
         </span>`;
 
@@ -4281,12 +4282,11 @@ function renderPersonalDulleReport(userData) {
           </span>`;
       });
 
-      // ③ 4개 초과 시 길 색상과 일치하는 더보기 / 접기 버튼
+      // ③ 더보기 / 접기 버튼 (숫자 제거 및 줄맞춤 스타일 수정)
       if (hasMore) {
-        const extraCount = group.courses.length - LIMIT;
         html += `
-          <button type="button" onclick="toggleDulleCategoryMore(${orderKey})" style="background-color: ${group.bgHex}; color: ${group.hex}; border: 1px solid ${group.hex}; font-size: 8pt; font-weight: 700; padding: 2px 8px; border-radius: 9999px; cursor: pointer; display: inline-flex; align-items: center; margin-left: 2px; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-            ${isExpanded ? '접기 ▲' : `+${extraCount}개 더보기 ▼`}
+          <button type="button" onclick="toggleDulleCategoryMore(${orderKey})" style="background-color: ${group.bgHex}; color: ${group.hex}; border: 1px solid ${group.hex}; font-size: 8pt; font-weight: 700; padding: 2px 8px; border-radius: 9999px; cursor: pointer; display: inline-flex; align-items: center; transition: opacity 0.2s; shrink: 0;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+            ${isExpanded ? '접기 ▲' : '더보기 ▼'}
           </button>`;
       }
 
@@ -4467,6 +4467,9 @@ window.closeGyeonggiTrailModal = function() {
   const modal = document.getElementById('gyeonggiTrailModal');
   if (modal) modal.style.display = 'none';
 };
+
+      
+
 
 
 
