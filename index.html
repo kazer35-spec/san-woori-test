@@ -4280,18 +4280,17 @@ function getDulleCourseColor(courseNum) {
 
 // 4. 둘레길 지도 클릭 시 좌표 찍기 & 코스 번호 입력 받아 색상 마커 생성
 function setDulleCoordinate(event) {
-  // 이벤트가 발생한 대상(이미지 태그)의 경계 크기 정보 취득
   const imgElement = event.currentTarget;
   const rect = imgElement.getBoundingClientRect();
 
-  // 이미지 자체의 렌더링 영역 기준 X, Y 좌표 계산 (%)
+  // 1) 클릭 위치 (이미지 내부 기준 %)
   const x = ((event.clientX - rect.left) / rect.width) * 100;
   const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-  // 클릭 위치가 이미지 영역을 벗어났다면 예외 처리
+  // 클릭 위치가 이미지 영역 밖이면 종료
   if (x < 0 || x > 100 || y < 0 || y > 100) return;
 
-  // 코스 번호 입력 팝업
+  // 2) 코스 번호 입력 팝업
   const courseInput = prompt("정복한 둘레길 코스 번호를 입력하세요 (1~60):");
   if (!courseInput) return;
 
@@ -4301,24 +4300,26 @@ function setDulleCoordinate(event) {
     return;
   }
 
-  // 구간별 색상 추출
+  // 3) 구간별 색상 추출
   const colorInfo = getDulleCourseColor(courseNum);
 
-  // 부모 컨테이너(map-container) 기준 오프셋을 계산하여 마커 위치 정렬
-  const containerRect = imgElement.parentElement.getBoundingClientRect();
+  // 4) 지도 위 마커 이동 및 색상 반영
+  // 이미지 자체가 아닌, 이미지를 감사고 있는 relative 상자(.map-container) 기준으로 오프셋 계산
+  const container = imgElement.closest('.map-container') || imgElement.parentElement;
+  const containerRect = container.getBoundingClientRect();
+
   const markerLeft = ((event.clientX - containerRect.left) / containerRect.width) * 100;
   const markerTop = ((event.clientY - containerRect.top) / containerRect.height) * 100;
 
-  // 지도 위 마커 이동 및 색상 반영
   const marker = document.getElementById('dulleMapMarker');
   if (marker) {
     marker.style.left = `${markerLeft}%`;
     marker.style.top = `${markerTop}%`;
     marker.style.backgroundColor = colorInfo.hex;
-    marker.classList.remove('hidden');
+    marker.classList.remove('hidden'); // 마커 숨김 해제
   }
 
-  // 전역 데이터 객체 갱신
+  // 5) 전역 데이터 객체 갱신
   window.selectedDulleData = {
     x: x.toFixed(2),
     y: y.toFixed(2),
@@ -4326,12 +4327,13 @@ function setDulleCoordinate(event) {
     color: colorInfo.hex
   };
 
-  // 텍스트 안내 업데이트
+  // 6) 텍스트 안내 업데이트
   const coordDisplay = document.getElementById('dulleCoordDisplay');
   if (coordDisplay) {
     coordDisplay.innerHTML = `선택 코스: <span style="color:${colorInfo.hex}; font-weight:bold;">${courseNum}코스</span> (X: ${x.toFixed(1)}%, Y: ${y.toFixed(1)}%)`;
   }
 }
+
 
 
 // 5. Firestore DB 저장 연동 함수 (기록 저장 버튼 클릭 시 호출)
