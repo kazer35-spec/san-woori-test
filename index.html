@@ -4143,12 +4143,35 @@ margin: 0 2px !important;
 </div>
 
 <!-- 하단 닫기 버튼 -->
+          
 <div class="flex-shrink-0 pt-3">
   <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
     닫기
   </button>
 </div>       
-      
+      <!-- [모던 산우리 운동 리포트 모달 레이어] -->
+<div id="scrollModal" class="scroll-overlay" style="display: none; position: fixed; inset: 0; z-index: 9999; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 16px;">
+    <div class="fading-scroll" onclick="event.stopPropagation()">
+
+        <!-- 헤더 영역 -->
+        <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center; relative;">
+            <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
+            <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
+            <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
+            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
+        </div>
+
+        <!-- 스크롤 컨텐츠 영역 -->
+        <div id="scrollContent" class="scroll-body"></div>
+
+        <!-- 하단 푸터 영역 -->
+        <div class="scroll-footer">
+            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()">닫기</button>
+        </div>
+        
+    </div>
+</div>
+
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
 <div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
