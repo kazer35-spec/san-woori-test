@@ -3733,7 +3733,7 @@ margin: 0 2px !important;
           </div>
         </div>
 
-        <!-- 둘레길 지도 영역 -->
+<!-- 둘레길 지도 영역 -->
 <div id="dulleMapContainer" class="mb-2">
   <div id="dulleMapWrapper" 
        onclick="setDulleCoordinate(event)"
@@ -3744,16 +3744,15 @@ margin: 0 2px !important;
          class="max-h-[350px] w-auto max-w-full object-contain rounded-xl pointer-events-none block" 
          alt="둘레길 지도">
     
-    <!-- 클릭한 위치에 표시될 미리보기 핀 -->
     <div id="dulleMapMarker" class="hidden absolute w-3.5 h-3.5 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg z-10 pointer-events-none bg-sky-500"></div>
   </div>
   
   <div id="dulleCoordDisplay" class="text-[11px] text-teal-600 font-bold mt-1 text-center">
-    지도상에서 원하는 코스 위치를 클릭하세요.
+    마스터 좌표 구축 시: 지도상에서 클릭 후 [DB 마스터 좌표 등록] 클릭
   </div>
 </div>
 
-<!-- 코스 번호 입력 및 저장 -->
+<!-- 코스 번호 입력 및 버튼 구역 -->
 <div class="flex gap-2 my-2">
   <input type="number" 
          id="manualCourseNum" 
@@ -3762,12 +3761,21 @@ margin: 0 2px !important;
          placeholder="코스 번호 (1~60)" 
          class="border p-2 rounded w-full text-sm" />
 
+  <!-- 1. 관리자용: 마스터 좌표 DB 등록 버튼 -->
   <button type="button" 
-          onclick="saveManualDulleLog(window.scrollPagination?.mId)"
-          class="bg-teal-600 text-white px-4 py-2 rounded text-sm font-bold whitespace-nowrap">
-    클릭한 위치 저장
+          onclick="saveDulleMasterCoord()"
+          class="bg-amber-600 text-white px-3 py-2 rounded text-xs font-bold whitespace-nowrap">
+    DB 마스터 좌표 등록
+  </button>
+
+  <!-- 2. 사용자/완주용: 코스 번호만으로 자동 좌표 완주 저장 -->
+  <button type="button" 
+          onclick="saveDulleLogByCourseNum(null, document.getElementById('manualCourseNum').value)"
+          class="bg-teal-600 text-white px-3 py-2 rounded text-xs font-bold whitespace-nowrap">
+    코스 번호로 자동 저장
   </button>
 </div>
+
 
 
         <!-- 지도 영역 -->
@@ -4247,10 +4255,13 @@ window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = nul
   }
 };
 
-  // 전역 변수로 선택된 좌표 임시 저장
+// =========================================================
+// 🎯 경기둘레길 1~60코스 마스터 좌표 DB 구축 & 자동 완주 처리
+// =========================================================
+
 window.selectedDulleCoord = null;
 
-// 🎯 1. 지도 클릭 시 좌표 추출 및 마커 표시
+// 1. [관리자용] 지도 클릭 시 좌표 미리보기
 window.setDulleCoordinate = function(event) {
   const img = document.getElementById('dulleMapImage');
   const marker = document.getElementById('dulleMapMarker');
@@ -4258,24 +4269,17 @@ window.setDulleCoordinate = function(event) {
 
   if (!img) return;
 
-  // 지도 이미지 위치 및 크기 계산
   const rect = img.getBoundingClientRect();
   const clientX = event.touches ? event.touches[0].clientX : event.clientX;
   const clientY = event.touches ? event.touches[0].clientY : event.clientY;
 
-  // 이미지 영역 밖 클릭 방지
-  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-    return;
-  }
+  if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return;
 
-  // 상대 좌표 백분율(%) 계산
   const xPercent = parseFloat(((clientX - rect.left) / rect.width * 100).toFixed(1));
   const yPercent = parseFloat(((clientY - rect.top) / rect.height * 100).toFixed(1));
 
-  // 임시 변수에 저장
   window.selectedDulleCoord = { x: xPercent, y: yPercent };
 
-  // 지도 위 마커 표시
   if (marker) {
     marker.style.left = `${xPercent}%`;
     marker.style.top = `${yPercent}%`;
@@ -4286,60 +4290,97 @@ window.setDulleCoordinate = function(event) {
   const currentCourse = courseInput ? courseInput.value : '';
 
   if (display) {
-    display.innerHTML = `선택된 좌표: <span class="text-sky-600">X: ${xPercent}%, Y: ${yPercent}%</span> ${currentCourse ? `(${currentCourse}코스)` : ''}`;
+    display.innerHTML = `선택 좌표: <span class="text-sky-600 font-bold">X: ${xPercent}%, Y: ${yPercent}%</span> ${currentCourse ? `(${currentCourse}코스)` : ''}`;
   }
 };
 
-// 🎯 2. 수동 좌표 + 코스 번호 DB 저장
-window.saveManualDulleLog = async function(memberDocId) {
+// 2. [관리자용] 지도에서 찍은 좌표를 DB 'dulleMaster' 상수 문서에 저장
+window.saveDulleMasterCoord = async function() {
   try {
     const courseInput = document.getElementById('manualCourseNum');
     const courseNum = courseInput ? parseInt(courseInput.value, 10) : null;
 
-    if (!courseNum || isNaN(courseNum) || courseNum < 1 || courseNum > 60) {
-      alert("1부터 60 사이의 코스 번호를 입력해주세요.");
+    if (!courseNum || courseNum < 1 || courseNum > 60) {
+      alert("1~60 사이의 코스 번호를 입력해주세요.");
       return;
     }
 
     if (!window.selectedDulleCoord) {
-      alert("지도 상에서 코스 위치를 먼저 클릭해 주세요!");
+      alert("지도에서 먼저 좌표 위치를 클릭해 주세요!");
       return;
     }
+
+    const firestoreDb = window.db || db;
+    // 'settings' 컬렉션의 'dulleMaster' 문서에 저장 (필요시 경로 변경 가능)
+    const masterRef = doc(firestoreDb, "settings", "dulleMaster");
+
+    // Map 구조 형태(예: "course_2": { course: 2, x: 25.4, y: 40.1 })로 저장
+    await setDoc(masterRef, {
+      [`course_${courseNum}`]: {
+        course: courseNum,
+        x: window.selectedDulleCoord.x,
+        y: window.selectedDulleCoord.y
+      }
+    }, { merge: true });
+
+    alert(`✅ ${courseNum}코스의 기준 좌표(X:${window.selectedDulleCoord.x}%, Y:${window.selectedDulleCoord.y}%)가 DB 마스터에 등록되었습니다!`);
+    window.selectedDulleCoord = null;
+
+  } catch (e) {
+    console.error("❌ 마스터 좌표 저장 실패:", e);
+    alert("마스터 좌표 저장 실패: " + e.message);
+  }
+};
+
+// 3. [완주 등록용] 코스 번호만 입력하면 DB에서 마스터 좌표를 읽어와 회원 데이터에 자동 저장
+window.saveDulleLogByCourseNum = async function(passedMemberId, courseNumInput) {
+  try {
+    const courseNum = parseInt(courseNumInput, 10);
+    if (!courseNum || courseNum < 1 || courseNum > 60) {
+      alert("1~60 사이의 코스 번호를 입력해주세요.");
+      return;
+    }
+
+    const memberDocId = passedMemberId 
+      || window.scrollPagination?.mId 
+      || window.currentMemberId 
+      || document.getElementById('adminMemberSelect')?.value;
 
     if (!memberDocId) {
       alert("선택된 회원 ID가 없습니다.");
       return;
     }
 
-    // 데이터 객체 생성
-    const dulleObject = {
-      course: courseNum,
-      x: window.selectedDulleCoord.x,
-      y: window.selectedDulleCoord.y
-    };
-
     const firestoreDb = window.db || db;
-    const userRef = doc(firestoreDb, "sanwoori", memberDocId);
 
-    // Firestore DB 저장
+    // ① DB에서 마스터 좌표 불러오기
+    const masterSnap = await getDoc(doc(firestoreDb, "settings", "dulleMaster"));
+    let targetCoord = { course: courseNum, x: 50.0, y: 50.0 }; // 기본값
+
+    if (masterSnap.exists() && masterSnap.data()[`course_${courseNum}`]) {
+      targetCoord = masterSnap.data()[`course_${courseNum}`];
+    } else {
+      alert(`⚠️ ${courseNum}코스의 마스터 좌표가 아직 DB에 등록되어 있지 않습니다. 기본 위치로 저장됩니다.`);
+    }
+
+    // ② 회원 데이터 문서에 자동 매핑된 좌표 등록
+    const userRef = doc(firestoreDb, "sanwoori", memberDocId);
     await updateDoc(userRef, {
-      dulleCourses: arrayUnion(dulleObject)
+      dulleCourses: arrayUnion(targetCoord)
     });
 
-    alert(`${courseNum}코스 (X:${dulleObject.x}%, Y:${dulleObject.y}%) 위치 저장이 완료되었습니다!`);
+    alert(`🎉 ${courseNum}코스 완주 기록이 자동 설정된 좌표로 저장되었습니다!`);
 
-    // 선택 좌표 초기화 및 모달 현황 갱신
-    window.selectedDulleCoord = null;
     if (typeof openGyeonggiTrailModal === 'function') {
       openGyeonggiTrailModal(memberDocId);
     }
 
   } catch (e) {
-    console.error("❌ 둘레길 저장 실패:", e);
+    console.error("❌ 완주 저장 실패:", e);
     alert("저장 중 오류가 발생했습니다.");
   }
 };
- 
+
     
 
      
