@@ -4109,8 +4109,7 @@ let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
 
   
-
-  // =========================================================
+// =========================================================
 // 🎯 경기둘레길 DB 마스터 좌표 자동 매핑 & 완주 처리 스크립트
 // =========================================================
 
@@ -4133,15 +4132,15 @@ document.addEventListener('DOMContentLoaded', function() {
 function getDulleCourseCategory(courseNum) {
   const num = parseInt(courseNum, 10);
   if (num >= 1 && num <= 11) {
-    return { name: "평화", fullName: "평화누리길", hex: "#EF4444", order: 1 }; // 🔴 빨강 (1~11)
+    return { name: "평화", fullName: "평화누리길", hex: "#EF4444", bgHex: "#FEE2E2", order: 1 }; // 🔴 빨강
   } else if (num >= 12 && num <= 23) {
-    return { name: "숲길", fullName: "경기 숲길", hex: "#F97316", order: 2 };   // 🟠 주황 (12~23)
+    return { name: "숲길", fullName: "경기 숲길", hex: "#F97316", bgHex: "#FFEDD5", order: 2 };   // 🟠 주황
   } else if (num >= 24 && num <= 44) {
-    return { name: "물길", fullName: "경기 물길", hex: "#10B981", order: 3 };   // 🟢 초록 (24~44)
+    return { name: "물길", fullName: "경기 물길", hex: "#10B981", bgHex: "#D1FAE5", order: 3 };   // 🟢 초록
   } else if (num >= 45 && num <= 60) {
-    return { name: "갯길", fullName: "경기 갯길", hex: "#3B82F6", order: 4 };   // 🔵 파랑 (45~60)
+    return { name: "갯길", fullName: "경기 갯길", hex: "#3B82F6", bgHex: "#DBEAFE", order: 4 };   // 🔵 파랑
   }
-  return { name: "기타", fullName: "기타", hex: "#6B7280", order: 5 };
+  return { name: "기타", fullName: "기타", hex: "#6B7280", bgHex: "#F3F4F6", order: 5 };
 }
 
 // 🎯 완주 목록을 [평화 -> 숲길 -> 물길 -> 갯길] 순서대로 알약 형태로 렌더링
@@ -4196,7 +4195,7 @@ function renderPersonalDulleReport(userData) {
     });
   }
 
-  // 2) 완주 목록 알약(Pill) UI 렌더링 (권역명 1회 표기 + 코스 번호만 나열)
+  // 2) 완주 목록 알약(Pill) UI 렌더링
   const badgeContainer = document.getElementById('dulleBadgeList');
   if (badgeContainer) {
     if (uniqueCourses.length === 0) {
@@ -4206,10 +4205,10 @@ function renderPersonalDulleReport(userData) {
 
     // 권역별 그룹화
     const grouped = {
-      1: { name: "평화", courses: [], hex: "#EF4444" },
-      2: { name: "숲길", courses: [], hex: "#F97316" },
-      3: { name: "물길", courses: [], hex: "#10B981" },
-      4: { name: "갯길", courses: [], hex: "#3B82F6" }
+      1: { name: "평화", courses: [], hex: "#EF4444", bgHex: "#FEE2E2" },
+      2: { name: "숲길", courses: [], hex: "#F97316", bgHex: "#FFEDD5" },
+      3: { name: "물길", courses: [], hex: "#10B981", bgHex: "#D1FAE5" },
+      4: { name: "갯길", courses: [], hex: "#3B82F6", bgHex: "#DBEAFE" }
     };
 
     uniqueCourses.forEach(item => {
@@ -4219,36 +4218,77 @@ function renderPersonalDulleReport(userData) {
       }
     });
 
-    let html = `<div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; width: 100%; padding: 4px;">`;
-
-    // 1(평화) -> 2(숲길) -> 3(물길) -> 4(갯길) 순서대로 줄바꿈 출력
+    let activeGroups = [];
     [1, 2, 3, 4].forEach(orderKey => {
-      const group = grouped[orderKey];
-      if (group.courses.length > 0) {
-        html += `<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">`;
-        
-        // ① 권역명 타이틀 알약 (맨 앞에 1회만 표기)
-        html += `
-          <span style="background-color: ${group.hex}; color: #ffffff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 9999px; display: inline-flex; align-items: center;">
-            ${group.name}
-          </span>`;
-
-        // ② 코스 번호 알약 나열
-        group.courses.forEach(cNum => {
-          html += `
-            <span style="background-color: #f1f5f9; color: #334155; border: 1px solid ${group.hex}; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 9999px; display: inline-flex; align-items: center;">
-              ${cNum}코스
-            </span>`;
-        });
-
-        html += `</div>`;
+      if (grouped[orderKey].courses.length > 0) {
+        activeGroups.push(grouped[orderKey]);
       }
     });
 
+    let html = `<div id="dulleListContainer" style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start; width: 100%; padding: 2px;">`;
+
+    activeGroups.forEach((group, idx) => {
+      // 4줄 초과 항목은 기본적으로 숨김 처리
+      const isHidden = idx >= 4 ? 'display: none;' : 'display: flex;';
+      
+      html += `<div class="dulle-row-item" style="${isHidden} flex-wrap: wrap; align-items: center; gap: 5px;">`;
+      
+      // ① 권역명 타이틀 알약 (글자 크기 8pt)
+      html += `
+        <span style="background-color: ${group.hex}; color: #ffffff; font-size: 8pt; font-weight: 700; padding: 2px 8px; border-radius: 9999px; display: inline-flex; align-items: center;">
+          ${group.name}
+        </span>`;
+
+      // ② 코스 번호 알약 (색상 적용 & 글자 크기 8pt)
+      group.courses.forEach(cNum => {
+        html += `
+          <span style="background-color: ${group.bgHex}; color: ${group.hex}; border: 1px solid ${group.hex}; font-size: 8pt; font-weight: 700; padding: 2px 7px; border-radius: 9999px; display: inline-flex; align-items: center;">
+            ${cNum}코스
+          </span>`;
+      });
+
+      html += `</div>`;
+    });
+
     html += `</div>`;
+
+    // 세로 4줄이 넘어가는 경우 "더보기" 버튼 추가
+    if (activeGroups.length > 4) {
+      html += `
+        <div style="width: 100%; text-align: center; margin-top: 6px;">
+          <button id="dulleMoreBtn" onclick="toggleDulleMoreRows()" style="background: none; border: none; color: #64748b; font-size: 8pt; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 4px;">
+            더보기 ▼
+          </button>
+        </div>`;
+    }
+
     badgeContainer.innerHTML = html;
   }
 }
+
+// 🎯 더보기 / 접기 토글 함수
+window.toggleDulleMoreRows = function() {
+  const hiddenRows = document.querySelectorAll('.dulle-row-item');
+  const moreBtn = document.getElementById('dulleMoreBtn');
+
+  if (!moreBtn) return;
+
+  let isExpanded = moreBtn.getAttribute('data-expanded') === 'true';
+
+  hiddenRows.forEach((row, idx) => {
+    if (idx >= 4) {
+      row.style.display = isExpanded ? 'none' : 'flex';
+    }
+  });
+
+  if (isExpanded) {
+    moreBtn.innerText = '더보기 ▼';
+    moreBtn.setAttribute('data-expanded', 'false');
+  } else {
+    moreBtn.innerText = '접기 ▲';
+    moreBtn.setAttribute('data-expanded', 'true');
+  }
+};
 
 // 🎯 팝업(prompt)으로 코스 번호만 받아서 DB 마스터 좌표로 자동 저장
 window.saveDulleByPrompt = async function(passedMemberId = null) {
@@ -4373,6 +4413,7 @@ window.closeGyeonggiTrailModal = function() {
   const modal = document.getElementById('gyeonggiTrailModal');
   if (modal) modal.style.display = 'none';
 };
+
 
 
 
