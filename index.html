@@ -28,6 +28,34 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f4f7f9; color: 
 .main-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 .brand-logo { height: 1.6rem; width: auto; margin-right: 6px; object-fit: contain; }
 
+        /* 🎯 경기둘레길 모달 마커 전용 CSS */
+#modalMarkerContainer {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* 지도 클릭 방해 금지 */
+}
+
+/* 동적으로 생성되는 개별 코스 마커 */
+.dulle-modal-marker {
+  position: absolute !important;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%); /* 마커 중심점을 좌표에 정확히 맞춤 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  pointer-events: auto; /* 마커 호버(툴팁)는 작동하도록 설정 */
+  transition: transform 0.15s ease-in-out;
+}
+
+.dulle-modal-marker:hover {
+  transform: translate(-50%, -50%) scale(1.3);
+}
+
         @keyframes emeraldGlowPulse {
     0%, 100% {
         box-shadow: 0 0 3px rgba(16, 185, 129, 0.5), 0 0 6px rgba(16, 185, 129, 0.2);
@@ -4402,10 +4430,70 @@ function renderPersonalDulleReport(userData) {
             ${item.course}코스
           </span>`;
       });
+// 7. 개인 운동 리포트 화면 카운팅, 지도 마커 및 코스별 뱃지 UI 렌더링
+function renderPersonalDulleReport(userData) {
+  const dulleArray = userData.dulleCourses || [];
+  
+  // 단일 숫자 및 객체 형태({course, x, y}) 예외 처리
+  const completedList = dulleArray.map(item => {
+    return typeof item === 'object' ? item : { course: parseInt(item, 10) };
+  });
+
+  // 중복 코스 제거 및 코스 번호 오름차순 정렬
+  const uniqueCourses = Array.from(new Map(completedList.map(item => [item.course, item])).values())
+                             .sort((a, b) => a.course - b.course);
+
+  const totalCompleted = uniqueCourses.length;
+
+  // 1) 상단 완주 카운트 뱃지 업데이트
+  const countBadge = document.getElementById('trailCountBadge');
+  if (countBadge) {
+    countBadge.innerText = `${totalCompleted}/60`;
+  }
+
+  // 2) 지도 위 마커 찍기
+  const markerContainer = document.getElementById('modalMarkerContainer');
+  if (markerContainer) {
+    markerContainer.innerHTML = ''; // 기존 마커 초기화
+
+    uniqueCourses.forEach(item => {
+      // 좌표(x, y)가 정상적으로 존재하는 경우에만 마커 생성
+      if (item.x !== undefined && item.y !== undefined && item.x !== null && item.y !== null) {
+        const color = getDulleCourseColor(item.course);
+        
+        const markerEl = document.createElement('div');
+        markerEl.className = 'dulle-modal-marker';
+        
+        // 위치 및 색상 설정
+        markerEl.style.left = `${item.x}%`;
+        markerEl.style.top = `${item.y}%`;
+        markerEl.style.backgroundColor = color.hex;
+        markerEl.title = `${item.course}코스`; // 마우스 올렸을 때 코스 번호 툴팁
+        
+        markerContainer.appendChild(markerEl);
+      }
+    });
+  }
+
+  // 3) 하단 완주 뱃지 목록 UI 렌더링
+  const badgeContainer = document.getElementById('dulleBadgeList');
+  if (badgeContainer) {
+    if (uniqueCourses.length === 0) {
+      badgeContainer.innerHTML = `<span style="font-size: 11px; color: #94a3b8;">완주한 코스가 없습니다.</span>`;
+    } else {
+      let badgesHtml = '';
+      uniqueCourses.forEach(item => {
+        const color = getDulleCourseColor(item.course);
+        badgesHtml += `
+          <span style="background-color: ${color.hex}; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: inline-block;">
+            ${item.course}코스
+          </span>`;
+      });
       badgeContainer.innerHTML = badgesHtml;
     }
   }
 }
+
   
       
 // ==========================================
