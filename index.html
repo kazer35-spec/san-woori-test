@@ -3865,7 +3865,32 @@ margin: 0 2px !important;
     </button>
   </div>
 </div>
-       
+
+
+        <!-- 📜 History 상세보기 팝업 모달 (z-[9999]로 메인 모달 최상단에 배치) -->
+<div id="historyDetailModal" class="modal-overlay hidden fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-[9999] flex items-center justify-center p-4" onclick="closeHistoryDetailModal()">
+  <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-100 relative" onclick="event.stopPropagation()">
+    
+    <!-- 모달 헤더 -->
+    <div class="flex justify-between items-center mb-3 pb-2.5 border-b border-slate-100">
+      <h3 id="historyDetailTitle" class="text-xs font-black text-slate-800 tracking-tight flex items-center gap-1">
+        <!-- JS로 타이틀 주입 -->
+      </h3>
+      <button onclick="closeHistoryDetailModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 leading-none">&times;</button>
+    </div>
+
+    <!-- 모달 본문 -->
+    <div id="historyDetailBody" class="py-1">
+      <!-- JS로 상세 목록 주입 -->
+    </div>
+
+    <!-- 하단 닫기 버튼 -->
+    <button onclick="closeHistoryDetailModal()" class="w-full mt-3.5 py-2.5 bg-slate-800 text-white rounded-xl font-black text-xs active:scale-98 transition-all">
+      닫기
+    </button>
+  </div>
+</div>
+
 
 <div id="hallModal" class="modal-overlay" onclick="toggleHallModal(false)">
 <div class="modal-content !p-5 !max-w-[440px]" onclick="event.stopPropagation()">
@@ -4004,174 +4029,110 @@ margin: 0 2px !important;
       </div>
     </div>
 
-<!-- Main Map View -->
-<div id="mapViewMain">
-  <!-- 지도 컨테이너 -->
-  <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3 overflow-hidden">
-    
-    <!-- 🌲 [기존] 산림청 100대 명산 지도 영역 -->
-    <div id="sanrimMapArea" class="relative">
-      <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl">
-      
-      <!-- 🌲 지도 우측 상단 미니 배지 (클릭 시 경기도 둘레길 지도로 전환) -->
-      <button 
-        type="button"
-        onclick="showDullegilMap()" 
-        class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20 hover:bg-emerald-50 transition-colors cursor-pointer"
-      >
-        <span class="text-[10px]">🌲</span>
-        <span id="miniTop100Badge" class="tracking-tight">0/100</span>
+    <!-- Main Map View -->
+    <div id="mapViewMain">
+      <!-- 지도 컨테이너 -->
+      <div class="map-container relative rounded-2xl border border-slate-200 shadow-sm mb-3">
+        <img src="https://i.ibb.co/bMLmRYRJ/2-1.jpg" class="map-image w-full h-auto block rounded-2xl">
+        
+        <!-- 🌲 지도 우측 상단 미니 배지 -->
+        <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-emerald-500/30 text-emerald-700 px-2.5 py-1 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1.5 z-20">
+          <span class="text-[10px]">🌲</span>
+          <span id="miniTop100Badge" class="tracking-tight">0/100</span>
+        </div>
+
+        <div id="conquerMapPoints"></div>
+        <!-- 💡 출처 텍스트: 범례 아래 우측 위치 -->
+        <div class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
+      </div>
+
+      <!-- 상세 통계 전환 버튼 -->
+      <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
+        <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
+          <span>🎖️</span> 정복 통계 및 산림청 100대 목록
+        </span>
+        <span class="text-xs font-bold text-sky-600 flex items-center gap-0.5">
+          상세보기
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </span>
       </button>
 
-      <div id="conquerMapPoints"></div>
-      <!-- 💡 출처 텍스트: 범례 아래 우측 위치 -->
-      <div class="map-source-txt absolute bottom-0 right-5 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 산림청</div>
+      <div class="hidden">
+        <span id="mapTotalHeight">0</span>
+        <span id="mapGlobalTotalHeight">0</span>
+      </div>
     </div>
 
-    <!-- 🏃 [전환] 경기도 둘레길 지도 영역 (초기 hidden) -->
-    <div id="dullegilMapArea" class="hidden flex-col bg-white">
-      
-      <!-- 🔴 이미지 빨간 테두리 영역: 지도 바로 위에 배치되는 상단 헤더 바 -->
-      <div class="p-2.5 bg-white border-b border-slate-100 flex justify-between items-center z-20">
-        <!-- 좌측: 경기도 둘레길 타이틀 배지 -->
-        <div class="flex items-center gap-1.5 bg-[#2B3040] text-white px-3.5 py-1.5 rounded-full text-xs font-extrabold shadow-sm">
-          <span class="text-[11px]">🏃</span>
-          <span>경기도 둘레길</span>
-        </div>
+    <!-- Detailed Stats View (통계 3종 탭) -->
+    <div id="mapViewStats" class="hidden-view">
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col justify-between">
         
-        <!-- 우측: 카운터 배지 및 닫기 버튼 -->
-        <div class="flex items-center gap-1.5">
-          <div class="bg-emerald-50 border border-emerald-200/80 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-black shadow-sm flex items-center gap-1">
-            <span class="text-[11px]">🏃</span>
-            <span id="dullegilCounter">0/60</span>
+        <!-- Header & Tab Navigation -->
+        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
+          <div class="flex gap-1 overflow-x-auto no-scrollbar">
+            <!-- 🔵 100대 명산 탭 (초기 파란 배경 + 흰 점) -->
+            <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
+              <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
+            </button>
+            <!-- 🔴 기타 명산 탭 -->
+            <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
+              <span id="dotNormal" class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 기타 명산
+            </button>
+            <!-- 지역 점유율 탭 -->
+            <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
+              지역 점유율
+            </button>
           </div>
-          
-          <!-- 산림청 지도로 복귀하는 X 버튼 -->
-          <button 
-            type="button" 
-            onclick="showSanrimMap()" 
-            class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold text-xs flex items-center justify-center transition-colors ml-0.5"
-            title="원래 지도로 돌아가기"
-          >
-            ✕
+          <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2 py-1 rounded-lg font-bold shadow-sm hover:bg-slate-50 flex-shrink-0">
+            ← 지도
           </button>
         </div>
-      </div>
 
-      <!-- 지도 이미지 영역 -->
-      <div class="relative">
-        <img src="https://i.ibb.co/jPtcDXF2/image.png" class="w-full h-auto block">
-        <div id="dullegilMapPoints"></div>
-        <div class="map-source-txt absolute bottom-2 right-4 text-[8px] text-slate-400/80 font-medium z-20 pointer-events-none">출처: 경기도 둘레길</div>
-      </div>
+        <!-- Tab Contents -->
+        <div class="flex-1 flex flex-col min-h-0">
+          <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
+          <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
+            <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
+              <div id="top100MountainGrid" class="space-y-1.5"></div>
+              <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
+                더보기
+              </button>
+            </div>
+          </div>
 
+          <!-- Tab 2: 일반 정복한 산 목록 -->
+          <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
+            <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
+              <div id="normalMountainGrid" class="space-y-1.5"></div>
+              <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
+                더보기
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab 3: 지역별 점유율 -->
+          <div id="regionStatsBox" class="flex-1 min-h-0 hidden">
+            <div id="conquerRegionGrid" class="h-[280px] overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-  </div>
-
-  <!-- 상세 통계 전환 버튼 -->
-  <button onclick="toggleMapView('stats')" class="w-full py-3 px-4 bg-emerald-50/60 hover:bg-emerald-100/60 rounded-2xl border border-emerald-200/60 transition-all flex justify-between items-center shadow-sm">
-    <span class="text-xs font-extrabold text-emerald-800 flex items-center gap-1.5">
-      <span>🎖️</span> 정복 통계 및 산림청 100대 목록
-    </span>
-    <span class="text-xs font-bold text-sky-600 flex items-center gap-0.5">
-      상세보기
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-    </span>
-  </button>
-
-  <div class="hidden">
-    <span id="mapTotalHeight">0</span>
-    <span id="mapGlobalTotalHeight">0</span>
-  </div>
-</div>
-
-<!-- Detailed Stats View (통계 3종 탭) -->
-<div id="mapViewStats" class="hidden-view">
-  <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/70 flex flex-col justify-between">
-    
-    <!-- Header & Tab Navigation -->
-    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200 gap-1 flex-shrink-0">
-      <div class="flex gap-1 overflow-x-auto no-scrollbar">
-        <!-- 🔵 100대 명산 탭 (초기 파란 배경 + 흰 점) -->
-        <button id="tabBtnTop100" onclick="switchStatsTab('top100')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-sky-500 text-white shadow-sm whitespace-nowrap flex items-center gap-1">
-          <span id="dotTop100" class="w-1.5 h-1.5 rounded-full bg-white inline-block"></span> 100대 명산
-        </button>
-        <!-- 🔴 기타 명산 탭 -->
-        <button id="tabBtnNormal" onclick="switchStatsTab('normal')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap flex items-center gap-1">
-          <span id="dotNormal" class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block"></span> 기타 명산
-        </button>
-        <!-- 지역 점유율 탭 -->
-        <button id="tabBtnRegion" onclick="switchStatsTab('region')" class="py-1 px-2 rounded-lg text-[11px] font-bold bg-white text-slate-500 border border-slate-200 whitespace-nowrap">
-          지역 점유율
-        </button>
-      </div>
-      <button onclick="toggleMapView('main')" class="text-[10px] bg-white text-slate-600 border border-slate-200 px-2 py-1 rounded-lg font-bold shadow-sm hover:bg-slate-50 flex-shrink-0">
-        ← 지도
+    <!-- 하단 닫기 버튼 (항상 노출 및 고정 위치 감싸기) -->
+    <div class="flex-shrink-0 pt-3">
+      <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
+        닫기
       </button>
     </div>
 
-    <!-- Tab Contents -->
-    <div class="flex-1 flex flex-col min-h-0">
-      <!-- Tab 1: 산림청 100대 명산 정복 목록 -->
-      <div id="top100ListBox" class="flex-1 flex flex-col min-h-0">
-        <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
-          <div id="top100MountainGrid" class="space-y-1.5"></div>
-          <button id="top100MoreBtn" onclick="loadNext20Top100()" class="w-full mt-2 py-2.5 bg-sky-50 hover:bg-sky-100 text-sky-600 text-xs font-bold rounded-xl border border-sky-200 flex-shrink-0 hidden">
-            더보기
-          </button>
-        </div>
-      </div>
-
-      <!-- Tab 2: 일반 정복한 산 목록 -->
-      <div id="normalListBox" class="flex-1 flex flex-col min-h-0 hidden">
-        <div class="h-[280px] overflow-y-auto pr-1 flex flex-col justify-between">
-          <div id="normalMountainGrid" class="space-y-1.5"></div>
-          <button id="normalMoreBtn" onclick="loadNext20Normal()" class="w-full mt-2 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 flex-shrink-0 hidden">
-            더보기
-          </button>
-        </div>
-      </div>
-
-      <!-- Tab 3: 지역별 점유율 -->
-      <div id="regionStatsBox" class="flex-1 min-h-0 hidden">
-        <div id="conquerRegionGrid" class="h-[280px] overflow-y-auto pr-1"></div>
-      </div>
-    </div>
-
   </div>
 </div>
 
-<!-- 하단 닫기 버튼 -->
+      
+
           
-<div class="flex-shrink-0 pt-3">
-  <button onclick="toggleMapModal(false)" class="w-full py-3.5 bg-slate-100 hover:bg-slate-200/80 text-slate-700 rounded-2xl font-bold text-xs transition-colors">
-    닫기
-  </button>
-</div>       
-      <!-- [모던 산우리 운동 리포트 모달 레이어] -->
-<div id="scrollModal" class="scroll-overlay" style="display: none; position: fixed; inset: 0; z-index: 9999; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 16px;">
-    <div class="fading-scroll" onclick="event.stopPropagation()">
-
-        <!-- 헤더 영역 -->
-        <div class="scroll-header" style="padding-top: 12px; padding-bottom: 6px; text-align: center; relative;">
-            <!-- 🎯 사진 속 디자인과 동일한 글씨 크기 & 색상 적용 -->
-            <div class="scroll-title-sub" style="font-size: 10px; font-weight: 800; color: #cbd5e1; letter-spacing: 1.2px;">SAN WOORI RECORD</div>
-            <h3 class="scroll-title-main" style="margin-top: 2px; font-size: 17px; font-weight: 900; color: #1e293b;">개인 운동 상태 리포트</h3>
-            <span class="modal-close-btn" onclick="window.closeScrollModal()">&times;</span>
-        </div>
-
-        <!-- 스크롤 컨텐츠 영역 -->
-        <div id="scrollContent" class="scroll-body"></div>
-
-        <!-- 하단 푸터 영역 -->
-        <div class="scroll-footer">
-            <button class="modal-bottom-close-btn" onclick="window.closeScrollModal()">닫기</button>
-        </div>
-        
-    </div>
-</div>
-
+      
 
     <div id="milkyWayModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-sm">
 <div class="relative w-[90%] max-w-md bg-[#050b18] rounded-3xl overflow-hidden border border-blue-900/50 shadow-[0_0_50px_rgba(30,58,138,0.5)]">
@@ -4222,47 +4183,6 @@ const now = new Date();
 let selectedYear = now.getFullYear();
 let selectedQuarter = Math.ceil((now.getMonth() + 1) / 3);
 
-  // 경기둘레길 지도 띄우기
-function showDullegilMap() {
-  const sanrimArea = document.getElementById('sanrimMapArea');
-  const dullegilArea = document.getElementById('dullegilMapArea');
-
-  if (sanrimArea && dullegilArea) {
-    sanrimArea.style.display = 'none'; // hidden 클래스 대신 inline style 사용하여 충돌 방지
-    dullegilArea.style.display = 'flex';
-  }
-}
-
-// 산림청 지도로 복귀
-function showSanrimMap() {
-  const sanrimArea = document.getElementById('sanrimMapArea');
-  const dullegilArea = document.getElementById('dullegilMapArea');
-
-  if (sanrimArea && dullegilArea) {
-    dullegilArea.style.display = 'none';
-    sanrimArea.style.display = 'block';
-  }
-}
-
-// 뷰 전환 (지도 <-> 통계 상세)
-function toggleMapView(view) {
-  const mainView = document.getElementById('mapViewMain');
-  const statsView = document.getElementById('mapViewStats');
-
-  if (view === 'stats') {
-    // 상세보기(통계) 창 열기
-    mainView.style.display = 'none';
-    statsView.style.display = 'block';
-    statsView.classList.remove('hidden-view');
-  } else {
-    // 지도 창으로 돌아오기
-    statsView.style.display = 'none';
-    statsView.classList.add('hidden-view');
-    mainView.style.display = 'block';
-  }
-}
-
-        
 // ==========================================
 // 📌 [신규 회원 저장 함수]
 // ==========================================
