@@ -4229,10 +4229,98 @@ window.saveDulleLog = async function(memberDocId, courseNum = null, coordX = nul
   }
 };
 
-window.openGyeonggiTrailModal = function() {
-  const modal = document.getElementById('gyeonggiTrailModal');
-  if (modal) modal.style.display = 'flex';
+window.openGyeonggiTrailModal = async function() {
+    const trailModal = document.getElementById('gyeonggiTrailModal');
+    if (!trailModal) return;
+
+    // 모달 먼저 표시
+    trailModal.style.display = 'flex';
+
+    // 현재 선택된 멤버 ID 가져오기 (scrollPagination에 저장된 mId 활용)
+    const currentMemberId = window.scrollPagination?.mId;
+    
+    const countBadge = document.getElementById('trailCountBadge');
+    const markerContainer = document.getElementById('modalMarkerContainer');
+    const badgeListContainer = document.getElementById('dulleBadgeList');
+
+    if (markerContainer) markerContainer.innerHTML = '';
+    if (badgeListContainer) badgeListContainer.innerHTML = '<span style="font-size:11px; color:#94a3b8;">로딩 중...</span>';
+
+    if (!currentMemberId) {
+        if (countBadge) countBadge.textContent = '0/60';
+        if (badgeListContainer) badgeListContainer.innerHTML = '<span style="font-size:11px; color:#94a3b8;">회원 정보를 찾을 수 없습니다.</span>';
+        return;
+    }
+
+    try {
+        // 🎯 Firestore에서 해당 회원의 경기둘레길 완주 데이터 가져오기
+        const dulleLogsRef = collection(db, `sanwoori/${currentMemberId}/dulleLogs`);
+        const snap = await getDocs(dulleLogsRef);
+
+        const dulleLogs = [];
+        snap.forEach(docSnap => {
+            dulleLogs.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        const completedCount = dulleLogs.length;
+        const totalCount = 60;
+
+        // 1. 카운트 배지 갱신
+        if (countBadge) {
+            countBadge.textContent = `${completedCount}/${totalCount}`;
+        }
+
+        // 2. 지도 위 마커 생성 및 하단 뱃지 생성
+        if (completedCount === 0) {
+            if (badgeListContainer) {
+                badgeListContainer.innerHTML = `<span style="font-size: 11px; color: #94a3b8;">완주한 코스가 없습니다.</span>`;
+            }
+        } else {
+            let markerHtml = '';
+            let badgeHtml = '';
+
+            dulleLogs.forEach(log => {
+                const courseName = log.course || log.id || '코스';
+                const x = log.x;
+                const y = log.y;
+
+                // 좌표가 있는 경우 마커 추가
+                if (x !== undefined && y !== undefined && x !== null && y !== null) {
+                    markerHtml += `
+                        <div class="dulle-modal-marker" 
+                             style="left: ${x}%; top: ${y}%; background-color: #0284c7;" 
+                             title="${courseName}">
+                        </div>
+                    `;
+                }
+
+                // 하단 완주 뱃지 추가
+                badgeHtml += `
+                    <span style="background: #e0f2fe; color: #0284c7; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 12px; border: 1px solid #bae6fd;">
+                        ${courseName}
+                    </span>
+                `;
+            });
+
+            if (markerContainer) markerContainer.innerHTML = markerHtml;
+            if (badgeListContainer) badgeListContainer.innerHTML = badgeHtml;
+        }
+
+    } catch (error) {
+        console.error("둘레길 데이터 로딩 오류:", error);
+        if (badgeListContainer) {
+            badgeListContainer.innerHTML = `<span style="font-size:11px; color:#ef4444;">데이터 로드 실패</span>`;
+        }
+    }
+
+    // 외부 클릭 시 닫기
+    trailModal.onclick = (e) => {
+        if (e.target === trailModal) {
+            window.closeGyeonggiTrailModal();
+        }
+    };
 };
+
 
 window.closeGyeonggiTrailModal = function() {
   const modal = document.getElementById('gyeonggiTrailModal');
@@ -11070,36 +11158,34 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 <div id="gyeonggiTrailModal" class="scroll-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px;">
     <div style="background: #ffffff; width: 100%; max-width: 480px; max-height: 85vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);">
         
-        <!-- 헤더: 좌측 제목, 우측 0/60 카운팅 배지 & 닫기 버튼 -->
+        <!-- 헤더 -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid #f1f5f9; background: #ffffff;">
             <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">경기둘레길 정복 현황</h3>
             
             <div style="display: flex; align-items: center; gap: 10px;">
-                <!-- 0/60 카운트 알약형 배지 -->
                 <span id="trailCountBadge" style="background: #0284c7; color: #ffffff; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;">
                     0/60
                 </span>
-                <!-- 닫기 버튼 -->
                 <button type="button" onclick="window.closeGyeonggiTrailModal()" style="background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer; line-height: 1; padding: 0;">&times;</button>
             </div>
         </div>
 
-        <!-- 바디: 경기둘레길 코스 이미지 및 마커 영역 (스크롤 지원) -->
+        <!-- 바디 -->
         <div style="padding: 12px; overflow-y: auto; background: #f8fafc; flex: 1;">
             
-            <!-- 지도 및 마커 컨테이너 (relative 지정) -->
-            <div id="modalMapWrapper" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; line-height: 0;">
-                <img src="https://i.ibb.co/20xSks4z/1.png" alt="경기둘레길 지도" style="width: 100%; height: auto; display: block;">
+            <!-- 🎯 관리자 모드와 동일하게 max-h-[350px] 및 중앙 정렬 지정 -->
+            <div id="modalMapWrapper" class="relative max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30">
+                <img src="https://i.ibb.co/20xSks4z/1.png" alt="경기둘레길 지도" class="max-h-[350px] w-auto max-w-full object-contain rounded-xl pointer-events-none block">
                 
-                <!-- 동적으로 정복한 마커들이 그려질 레이어 -->
-                <div id="modalMarkerContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+                <!-- 완주 마커 레이어 -->
+                <div id="modalMarkerContainer" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
             </div>
 
-            <!-- 하단 정복 코스 뱃지 리스트 영역 -->
+            <!-- 완주 코스 뱃지 리스트 -->
             <div style="margin-top: 12px; padding: 10px; background: #ffffff; border-radius: 10px; border: 1px solid #e2e8f0; text-align: left;">
                 <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px;">완주한 코스 목록</div>
                 <div id="dulleBadgeList" style="display: flex; flex-wrap: wrap; gap: 4px;">
-                    <span style="font-size: 11px; color: #94a3b8;">완주한 코스가 없습니다.</span>
+                    <span style="font-size: 11px; color: #94a3b8;">완주한 코스를 불러오는 중...</span>
                 </div>
             </div>
 
@@ -11107,7 +11193,6 @@ window.loadScrollLogsPage = (isFirstPage = false) => {
 
     </div>
 </div>
-
 
 
 
