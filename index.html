@@ -3722,17 +3722,22 @@ margin: 0 2px !important;
   </div>
 </div>
 
-          <!-- 🎯 둘레길 지도 영역 (평상시 숨김: hidden) -->
+      <!-- 🎯 둘레길 지도 영역 (평상시 숨김: hidden) -->
 <div id="dulleMapContainer" class="hidden mb-2">
-  <div class="map-container relative cursor-pointer" onclick="setDulleCoordinate(event)">
-    <img src="https://i.ibb.co/jPtcDXF2/image.png" class="map-image w-full rounded-xl border border-teal-200" alt="둘레길 지도">
+  <!-- max-h-[350px]로 최대 높이를 제한하고, flex/justify-center로 중앙 배치 -->
+  <div class="map-container relative cursor-pointer max-h-[350px] w-full flex items-center justify-center overflow-hidden rounded-xl border border-teal-200 bg-teal-50/30" onclick="setDulleCoordinate(event)">
+    <!-- object-contain과 max-h-full을 추가하여 이미지 비율을 유지하면서 창 안에 쏙 들어가게 조절 -->
+    <img src="https://i.ibb.co/20xSks4z/1.png" class="map-image max-h-[350px] w-auto max-w-full object-contain rounded-xl" alt="둘레길 지도">
+    
     <!-- 둘레길 좌표 마커가 찍힐 영역 -->
     <div id="dulleMapMarker" class="map-point hidden absolute w-3 h-3 bg-teal-500 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 shadow-lg"></div>
   </div>
+  
   <div id="dulleCoordDisplay" class="text-[10px] text-teal-600 font-bold mt-1 text-center">
     둘레길 코스 선택: 지도상에서 코스 위치를 클릭하세요.
   </div>
 </div>
+
 
     <!-- 지도 영역 -->
     <div class="map-container" onclick="setAdminCoordinate(event)">
