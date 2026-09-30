@@ -5710,8 +5710,8 @@ window.switchHallTab = (tabType) => {
 };
 
 
-    /* ==========================================
-   명단 리스트 렌더링 (분기 자동 전환 및 3분기 아카이브 포함)
+ /* ==========================================
+   명단 리스트 렌더링 (분기별 필드 정합성 및 아카이브 완벽 반영)
    ========================================== */
 function renderHallList() {
     const listArea = document.getElementById('hallListArea');
@@ -5756,7 +5756,7 @@ function renderHallList() {
     const glowClasses = ["glow-gold", "glow-silver", "glow-bronze"];
 
     // -------------------------------------------------------------
-    // [CASE 1] 실황정보 탭
+    // [CASE 1] 실황정보 탭 (4분기 시작 시그니처 및 정확한 필드 매칭)
     // -------------------------------------------------------------
     if (window.currentHallTab === 'live') {
         let liveWithFull = [];
@@ -5778,15 +5778,17 @@ function renderHallList() {
                 ozMember = currentData.find(m => m.name === "오즈") || null;
                 youthMember = currentData.find(m => m.name === "유스") || null;
 
-                // 4분기 실황 데이터 계산 (현재 분기 qKey 기준)
+                // 1. 우정대장: 분기 총활동 점수 (qCount 또는 분기별 total) 기준
                 liveWithFull = [...currentData]
-                    .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[qKey]?.qCount) || 0) > 0)
-                    .sort((a, b) => ((b.quarterlyStats?.[qKey]?.qCount) || 0) - ((a.quarterlyStats?.[qKey]?.qCount) || 0) || b.level - a.level);
+                    .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[qKey]?.total || m.quarterlyStats?.[qKey]?.qCount) || 0) > 0)
+                    .sort((a, b) => ((b.quarterlyStats?.[qKey]?.total || b.quarterlyStats?.[qKey]?.qCount) || 0) - ((a.quarterlyStats?.[qKey]?.total || a.quarterlyStats?.[qKey]?.qCount) || 0) || b.level - a.level);
 
+                // 2. 등산의신: 분기 hike 필드 기준
                 liveMountainFull = [...currentData]
                     .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
                     .sort((a, b) => (b.quarterlyStats?.[qKey]?.hike || 0) - (a.quarterlyStats?.[qKey]?.hike || 0) || b.level - a.level);
 
+                // 3. 벙의달인: 분기 hosted 필드 기준
                 liveHostFull = [...currentData]
                     .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스" && ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
                     .sort((a, b) => (b.quarterlyStats?.[qKey]?.hosted || 0) - (a.quarterlyStats?.[qKey]?.hosted || 0) || b.level - a.level);
@@ -5894,11 +5896,11 @@ function renderHallList() {
             </div>
         </div>`;
 
-        // 1. 우정대장 카드
+        // 1. 우정대장 카드 (총활동점수 기준)
         if (true) {
             const isExpanded = window.expandedLiveSections.with;
-            const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.qCount || 0) : 0;
-            const youthValue = youthMember ? (youthMember.quarterlyStats?.[qKey]?.qCount || 0) : 0;
+            const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.total || ozMember.quarterlyStats?.[qKey]?.qCount || 0) : 0;
+            const youthValue = youthMember ? (youthMember.quarterlyStats?.[qKey]?.total || youthMember.quarterlyStats?.[qKey]?.qCount || 0) : 0;
 
             combinedHtml += `
             <div class="hall-card" style="margin-top: 0px !important; padding: 10px 10px !important; border-radius: 18px; border: 1px solid #ffedd5; background: linear-gradient(180deg, #fffbee 0%, #fff 100%);">
@@ -5915,15 +5917,15 @@ function renderHallList() {
                     </div>
                 </div>
                 <div class="hall-rank-flex" style="gap: 5px !important; display: flex; flex-direction: row; justify-content: space-between;">
-                    ${makeLiveCompactRow("🥇산대장", liveWith[0]?.name, liveWith[0]?.quarterlyStats?.[qKey]?.qCount || 0, "점", glowClasses[0])}
-                    ${makeLiveCompactRow("🥈길잡이", liveWith[1]?.name, liveWith[1]?.quarterlyStats?.[qKey]?.qCount || 0, "점", glowClasses[1])}
-                    ${makeLiveCompactRow("🥉마당발", liveWith[2]?.name, liveWith[2]?.quarterlyStats?.[qKey]?.qCount || 0, "점", glowClasses[2])}
+                    ${makeLiveCompactRow("🥇산대장", liveWith[0]?.name, liveWith[0]?.quarterlyStats?.[qKey]?.total || liveWith[0]?.quarterlyStats?.[qKey]?.qCount || 0, "점", glowClasses[0])}
+                    ${makeLiveCompactRow("🥈길잡이", liveWith[1]?.name, liveWith[1]?.quarterlyStats?.[qKey]?.total || liveWith[1]?.quarterlyStats?.[qKey]?.qCount || 0, "점", glowClasses[1])}
+                    ${makeLiveCompactRow("🥉마당발", liveWith[2]?.name, liveWith[2]?.quarterlyStats?.[qKey]?.total || liveWith[2]?.quarterlyStats?.[qKey]?.qCount || 0, "점", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml('with', liveWithFull, ozValue, youthValue, m => m.quarterlyStats?.[qKey]?.qCount || 0, "점") : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml('with', liveWithFull, ozValue, youthValue, m => m.quarterlyStats?.[qKey]?.total || m.quarterlyStats?.[qKey]?.qCount || 0, "점") : ''}
             </div>`;
         }
 
-        // 2. 등산의신 카드
+        // 2. 등산의신 카드 (hike 필드 기준)
         if (true) {
             const isExpanded = window.expandedLiveSections.mountain;
             const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.hike || 0) : 0;
@@ -5952,7 +5954,7 @@ function renderHallList() {
             </div>`;
         }
 
-        // 3. 벙의달인 카드
+        // 3. 벙의달인 카드 (hosted 필드 기준)
         if (true) {
             const isExpanded = window.expandedLiveSections.host;
             const ozValue = ozMember ? (ozMember.quarterlyStats?.[qKey]?.hosted || 0) : 0;
@@ -6000,7 +6002,7 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 역대 시즌 아카이브 탭 (2026년 3분기 포함 자동 매핑)
+    // [CASE 2] 역대 시즌 아카이브 탭
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
@@ -6011,7 +6013,7 @@ function renderHallList() {
             let top3 = [];
             let isCurrent = (s.year === currentYear && s.quarter === currentQuarter);
             
-            // 🌟 2026년 3분기(Season 4) 아카이브 데이터 확정 매핑
+            // 2026년 3분기(Season 4) 아카이브 데이터 확정 매핑
             if (s.year === 2026 && s.quarter === 3) {
                 if (window.currentHallTab === 'mountain') {
                     top3 = [{ name: "유스" }, { name: "지니" }, { name: "하트" }];
@@ -6034,9 +6036,8 @@ function renderHallList() {
             else if (s.year === 2025 && s.quarter === 4) {
                 top3 = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }];
             }
-            // 2027년 이후 다가올 분기들도 데이터가 없을 경우 안전하게 빈 배열 처리
             else if (isCurrent) {
-                top3 = []; // 현재 진행 중인 분기는 실황 탭과 연동되므로 아카이브에서는 비워둠
+                top3 = []; 
             }
 
             if (top3.length > 0 || !isCurrent) {
@@ -6069,11 +6070,7 @@ function renderHallList() {
     
     listArea.innerHTML = combinedHtml;
 }
-    
-        
-        
-        
-
+      
                  
 
     
