@@ -5710,7 +5710,7 @@ window.switchHallTab = (tabType) => {
 };
 
 
- /* ==========================================
+/* ==========================================
    명단 리스트 렌더링 (분기별 필드 정합성 및 아카이브 완벽 반영)
    ========================================== */
 function renderHallList() {
@@ -6002,7 +6002,7 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 역대 시즌 아카이브 탭
+    // [CASE 2] 역대 시즌 아카이브 탭 (3분기 qCount 점수 및 오타 수정 반영)
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
@@ -6013,14 +6013,14 @@ function renderHallList() {
             let top3 = [];
             let isCurrent = (s.year === currentYear && s.quarter === currentQuarter);
             
-            // 2026년 3분기(Season 4) 아카이브 데이터 확정 매핑
+            // 아카이브 데이터 매핑
             if (s.year === 2026 && s.quarter === 3) {
                 if (window.currentHallTab === 'mountain') {
-                    top3 = [{ name: "유스" }, { name: "지니" }, { name: "하트" }];
+                    top3 = [{ name: "유스", score: 14, tail: "회" }, { name: "지니", score: 12, tail: "회" }, { name: "하트", score: 10, tail: "회" }];
                 } else if (window.currentHallTab === 'host') {
-                    top3 = [{ name: "유스" }, { name: "아랑" }, { name: "해수" }];
+                    top3 = [{ name: "유스", score: 8, tail: "회" }, { name: "아랑", score: 6, tail: "회" }, { name: "해수", score: 5, tail: "회" }];
                 } else {
-                    top3 = [{ name: "푸싱" }, { name: "아랑" }, { name: "애플" }];
+                    top3 = [{ name: "푸싱", score: 45, tail: "점" }, { name: "아랑", score: 40, tail: "점" }, { name: "애플", score: 35, tail: "점" }];
                 }
             }
             else if (s.year === 2026 && s.quarter === 2) {
@@ -6043,6 +6043,19 @@ function renderHallList() {
             if (top3.length > 0 || !isCurrent) {
                 const cardMarginStyle = isCurrent ? 'margin-top: 0px !important;' : 'margin-top: 10px !important;';
                 
+                const renderArchiveItem = (rankLabel, item, glowClass) => {
+                    const name = item?.name || '-';
+                    const scoreText = (item?.score !== undefined) ? `<span style="font-size: 9.5px; color: #64748b; font-weight: bold; white-space: nowrap;">(${item.score}${item.tail})</span>` : '';
+                    return `
+                    <div class="hall-rank-item" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 14px; padding: 6px 4px; border: 1px solid #f1f5f9;">
+                        <span class="hall-rank-label ${glowClass}" style="margin-bottom: 4px !important; font-size: 10px; padding: 1px 5px; display: inline-block;">${rankLabel}</span>
+                        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 2px; width: 100%;">
+                            <span class="hall-rank-name" style="font-size: 11.5px; max-width: 55px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${name}</span>
+                            ${scoreText}
+                        </div>
+                    </div>`;
+                };
+
                 combinedHtml += `
                 <div class="hall-card ${isCurrent ? 'border-blue-100 bg-blue-50/30' : ''}" style="${cardMarginStyle} padding: 10px 10px !important; border-radius: 18px;">
                     <div class="hall-season-title" style="margin-bottom: 8px !important; display: flex; justify-content: space-between; align-items: center;">
@@ -6050,18 +6063,9 @@ function renderHallList() {
                         ${isCurrent ? '<span class="status-badge-live">LIVE</span>' : '<span class="status-badge-end">종료</span>'}
                     </div>
                     <div class="hall-rank-flex" style="gap: 5px !important; display: flex; flex-direction: row; justify-content: space-between;">
-                        <div class="hall-rank-item" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 14px; padding: 6px 4px; border: 1px solid #f1f5f9;">
-                            <span class="hall-rank-label ${glowClasses[0]}" style="margin-bottom: 4px !important; font-size: 10px; padding: 1px 5px; display: inline-block;">${rankLabels[0]}</span>
-                            <span class="hall-rank-name" style="font-size: 11.5px;">${top3[0]?.name || '-'}</span>
-                        </div>
-                        <div class="hall-rank-item" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 14px; padding: 6px 4px; border: 1px solid #f1f5f9;">
-                            <span class="hall-rank-label ${glowClasses[1]}" style="margin-bottom: 4px !important; font-size: 10px; padding: 1px 5px; display: inline-block;">${rankLabels[1]}</span>
-                            <span class="hall-rank-name" style="font-size: 11.5px;">${top3[1]?.name || '-'}</span>
-                        </div>
-                        <div class="hall-rank-item" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 14px; padding: 6px 4px; border: 1px solid #f1f5f9;">
-                            <span class="hall-rank-label ${glowClasses[2]}" style="margin-bottom: 4px !important; font-size: 10px; padding: 1px 5px; display: inline-block;">${rankLabels[2]}</span>
-                            <span class="hall-rank-name" style="font-size: 11.5px;">${top3[2]?.name || '-'}</span>
-                        </div>
+                        ${renderArchiveItem(rankLabels[0], top3[0], glowClasses[0])}
+                        ${renderArchiveItem(rankLabels[1], top3[1], glowClasses[1])}
+                        ${renderArchiveItem(rankLabels[2], top3[2], glowClasses[2])}
                     </div>
                 </div>`;
             }
@@ -6070,8 +6074,8 @@ function renderHallList() {
     
     listArea.innerHTML = combinedHtml;
 }
-      
-                 
+
+            
 
     
 window.toggleVibeModal = (show) => {
