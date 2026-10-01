@@ -4803,7 +4803,7 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 
-window.renderStatusTable = function() {
+   window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
         const searchInput = document.getElementById('searchInput');
@@ -4827,27 +4827,13 @@ window.renderStatusTable = function() {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
+        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 목록(같은 날 획득한 공동 보유자 전체) 가져오기
         const latestSuperHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('super') : [];
         const latestSpecialHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('special') : [];
 
-        // 🎯 [핵심 수정] 상단 분기 탭 버튼(.q-btn.active)의 텍스트나 클래스를 최우선으로 정확하게 읽어옴
-        let targetYear = (typeof selectedYear !== 'undefined') ? selectedYear : 2026;
-        let targetQuarter = 4; // 기본값
-
-        const activeQuarterBtn = document.querySelector('#quarterTabs .q-btn.active, .q-btn.active, button.active[id*="q"], [class*="active"][id*="q"]');
-        if (activeQuarterBtn) {
-            const btnText = activeQuarterBtn.innerText || "";
-            const btnId = activeQuarterBtn.id || "";
-            
-            if (btnText.includes('1분기') || btnId.includes('1')) targetQuarter = 1;
-            else if (btnText.includes('2분기') || btnId.includes('2')) targetQuarter = 2;
-            else if (btnText.includes('3분기') || btnId.includes('3')) targetQuarter = 3;
-            else if (btnText.includes('4분기') || btnId.includes('4')) targetQuarter = 4;
-        } else {
-            if (typeof selectedQuarter !== 'undefined') targetQuarter = selectedQuarter;
-            else if (typeof currentQuarter !== 'undefined') targetQuarter = currentQuarter;
-        }
-
+        // 🎯 현재 선택된 연도와 분기 탭 확인 (기본값 2026년 4분기)
+        const targetYear = (typeof selectedYear !== 'undefined') ? selectedYear : 2026;
+        const targetQuarter = (typeof selectedQuarter !== 'undefined') ? selectedQuarter : 4;
         const activeQKey = `${targetYear}_q${targetQuarter}`;
 
         let processedData = currentData.map(m => {
@@ -4867,32 +4853,23 @@ window.renderStatusTable = function() {
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🎯 활성화된 분기 키(activeQKey)에 해당하는 quarterlyStats 값을 완벽하게 가져옴[span_2](start_span)[span_2](end_span)
+            // 🎯 선택된 분기 탭에 맞는 qCount를 안전하게 가져오기 (없으면 0점)
             let quarterQCount = 0;
-            let quarterHike = 0;
-            let quarterTotal = 0;
-
-            if (m.quarterlyStats && m.quarterlyStats[activeQKey]) {
-                const qData = m.quarterlyStats[activeQKey];
-                quarterQCount = qData.qCount !== undefined ? qData.qCount : 0;
-                quarterHike = qData.hike !== undefined ? qData.hike : 0;
-                quarterTotal = qData.total !== undefined ? qData.total : 0;
+            if (m.quarterlyStats && m.quarterlyStats[activeQKey] && m.quarterlyStats[activeQKey].qCount !== undefined) {
+                quarterQCount = m.quarterlyStats[activeQKey].qCount;
             } else if (activeQKey === '2026_q4') {
                 quarterQCount = m.qCount || 0;
-                quarterHike = m.hike || 0;
-                quarterTotal = m.total || 0;
             }
 
             return { 
                 ...m, 
-                qCount: quarterQCount, 
-                hike: quarterHike,
-                total: quarterTotal,
+                qCount: quarterQCount, // 👈 화면에 보여질 qCount를 선택된 분기 점수로 교체
                 ddayVal: ddayVal,
                 dPlusVal: dPlusVal
             };
         });
 
+        // 정렬
         processedData.sort((a, b) => {
             if (sort === 'qCount') return (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0);
             if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
@@ -4902,6 +4879,7 @@ window.renderStatusTable = function() {
             return 0;
         });
 
+        // 🌟 칭호 부여 대상(TOP 3) 선정 시 '오즈', '유스' 제외
         const topNames = [...processedData]
             .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스")
             .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
@@ -4924,18 +4902,33 @@ window.renderStatusTable = function() {
             let rankT = ""; 
             let rankC = "";
 
+            // 🌟 오즈/유스가 아니면서 점수가 있고, topNames 목록에 있을 때만 랭킹 칭호 부여
             if (m.name !== "오즈" && m.name !== "유스" && (m.qCount || 0) > 0 && !m.isHidden) {
                 const idx = topNames.indexOf(m.name);
-                const is2026_H1 = (targetYear === 2026) && (targetQuarter === 1 || targetQuarter === 2);
+                
+                let activeQuarter = 1; 
+                const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+                if (activeBtn) {
+                    const btnId = activeBtn.id; 
+                    activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+                } else {
+                    activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
+                                    ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
+                }
+                
+                const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+                const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
                 if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
                 else if (idx === 1) { rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
+            // 👑 슈퍼/스페셜 왕좌 상태 체크 (같은 날 획득자 모두 적용)
             const isSuper = latestSuperHolderIds.includes(m.id) || latestSuperHolderIds.includes(m.name);
             const isSpecial = latestSpecialHolderIds.includes(m.id) || latestSpecialHolderIds.includes(m.name);
 
+            // 레벨 스타일 및 핀 HTML 가져오기
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
                 : { bg: '#fff', border: '#ccc', text: '#000', blink: '', pinHtml: '' };
@@ -4998,6 +4991,7 @@ window.renderStatusTable = function() {
 
         list.innerHTML = htmlBuilder;
 
+        // 3초 간격 텍스트 교체 타이머
         let showDPlus = false;
         window.recordBtnToggleInterval = setInterval(() => {
             showDPlus = !showDPlus;
@@ -5024,11 +5018,9 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
-
+                 
 
         
-
-
 
 
    // 🎯 계절 영역 토글 펼침/접기
