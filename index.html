@@ -4803,8 +4803,7 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 
-         
-  window.renderStatusTable = function() {
+window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
         const searchInput = document.getElementById('searchInput');
@@ -4860,14 +4859,14 @@ function isMatchName(name, searchKeyword) {
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🌟 2026년 1, 2분기인 경우 quarterlyStatsMap에서 해당 분기 점수 가져오기 (없으면 기본 qCount 혹은 0)
+            // 🌟 3분기(2026_q3 등)부터는 quarterlyStatsMap의 qCount 점수 사용, 1~2분기는 기존 방식 유지
             let effectiveQCount = m.qCount || 0;
-            if (activeYear === 2026 && (activeQuarter === 1 || activeQuarter === 2)) {
+            if (activeYear === 2026 && activeQuarter >= 3) {
                 const qKey = `2026_q${activeQuarter}`;
-                if (m.quarterlyStatsMap && m.quarterlyStatsMap[qKey]) {
-                    effectiveQCount = m.quarterlyStatsMap[qKey].qCount !== undefined ? m.quarterlyStatsMap[qKey].qCount : (m.quarterlyStatsMap[qKey].total || 0);
+                if (m.quarterlyStatsMap && m.quarterlyStatsMap[qKey] && m.quarterlyStatsMap[qKey].qCount !== undefined) {
+                    effectiveQCount = m.quarterlyStatsMap[qKey].qCount;[span_1](start_span)[span_1](end_span)
                 } else {
-                    effectiveQCount = 0; // 해당 분기 데이터가 없으면 0점 처리
+                    effectiveQCount = 0;
                 }
             }
 
@@ -4879,7 +4878,7 @@ function isMatchName(name, searchKeyword) {
             };
         });
 
-        // 정렬 (effectiveQCount 기준 정렬 지원)
+        // 정렬
         processedData.sort((a, b) => {
             if (sort === 'qCount') return (b.effectiveQCount || 0) - (a.effectiveQCount || 0) || (b.level || 0) - (a.level || 0);
             if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
@@ -4889,7 +4888,7 @@ function isMatchName(name, searchKeyword) {
             return 0;
         });
 
-        // 🌟 TOP 3 선정 시에도 effectiveQCount 기준 적용 ('오즈', '유스' 제외)
+        // 🌟 TOP 3 선정 시 effectiveQCount 기준 적용 ('오즈', '유스' 제외)
         const topNames = [...processedData]
             .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스")
             .sort((a, b) => (b.effectiveQCount || 0) - (a.effectiveQCount || 0) || (b.level || 0) - (a.level || 0))
@@ -5013,7 +5012,11 @@ function isMatchName(name, searchKeyword) {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
-              
+         
+  
+            
+
+            
         
 
 
