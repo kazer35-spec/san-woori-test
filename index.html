@@ -4803,7 +4803,7 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 
-window.renderStatusTable = function() {
+  window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
         const searchInput = document.getElementById('searchInput');
@@ -4827,6 +4827,7 @@ window.renderStatusTable = function() {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
+        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 목록(같은 날 획득한 공동 보유자 전체) 가져오기
         const latestSuperHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('super') : [];
         const latestSpecialHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('special') : [];
 
@@ -4866,18 +4867,18 @@ window.renderStatusTable = function() {
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🎯 [정확한 분기별 데이터 매핑 분기]
+            // 🎯 [핵심 수정] 3분기 이후(3분기, 4분기)부터는 기본 qCount 점수를 사용하고, 1~2분기는 기존 원본 방식 유지
             let quarterQCount = 0;
             let quarterHike = 0;
             let quarterTotal = 0;
 
-            if (activeQuarter === 3) {
-                // 🌟 3분기만 기본 qCount 필드 사용 (데이터가 없으면 0)
+            if (activeQuarter >= 3) {
+                // 🌟 3분기 이후로는 문서의 기본 qCount 필드 점수 사용 (없으면 0)
                 quarterQCount = m.qCount !== undefined ? m.qCount : 0;
                 quarterHike = m.hike !== undefined ? m.hike : 0;
                 quarterTotal = m.total !== undefined ? m.total : 0;
             } else {
-                // 1분기, 2분기(그리고 4분기)는 기존처럼 quarterlyStats 객체에서 정확히 가져옴
+                // 1분기, 2분기는 기존 quarterlyStats 객체 조회 방식을 100% 원본 그대로 유지
                 if (m.quarterlyStats && m.quarterlyStats[activeQKey]) {
                     const qData = m.quarterlyStats[activeQKey];
                     quarterQCount = qData.qCount !== undefined ? qData.qCount : 0;
@@ -4906,6 +4907,7 @@ window.renderStatusTable = function() {
             return 0;
         });
 
+        // 🌟 칭호 부여 대상(TOP 3) 선정 시 '오즈', '유스' 제외
         const topNames = [...processedData]
             .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스")
             .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
@@ -4928,8 +4930,10 @@ window.renderStatusTable = function() {
             let rankT = ""; 
             let rankC = "";
 
+            // 🌟 오즈/유스가 아니면서 점수가 있고, topNames 목록에 있을 때만 랭킹 칭호 부여
             if (m.name !== "오즈" && m.name !== "유스" && (m.qCount || 0) > 0 && !m.isHidden) {
                 const idx = topNames.indexOf(m.name);
+                
                 const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
 
                 if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
@@ -4937,9 +4941,11 @@ window.renderStatusTable = function() {
                 else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
+            // 👑 슈퍼/스페셜 왕좌 상태 체크 (같은 날 획득자 모두 적용)
             const isSuper = latestSuperHolderIds.includes(m.id) || latestSuperHolderIds.includes(m.name);
             const isSpecial = latestSpecialHolderIds.includes(m.id) || latestSpecialHolderIds.includes(m.name);
 
+            // 레벨 스타일 및 핀 HTML 가져오기
             const style = (typeof getLevelStyle === 'function') 
                 ? getLevelStyle(m.level, isSuper, isSpecial) 
                 : { bg: '#fff', border: '#ccc', text: '#000', blink: '', pinHtml: '' };
@@ -5002,6 +5008,7 @@ window.renderStatusTable = function() {
 
         list.innerHTML = htmlBuilder;
 
+        // 3초 간격 텍스트 교체 타이머
         let showDPlus = false;
         window.recordBtnToggleInterval = setInterval(() => {
             showDPlus = !showDPlus;
@@ -5028,6 +5035,7 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
+              
 
             
         
