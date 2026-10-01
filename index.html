@@ -4831,14 +4831,6 @@ window.renderStatusTable = function() {
         const latestSuperHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('super') : [];
         const latestSpecialHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('special') : [];
 
-        // 🎯 현재 선택된 연도와 분기 탭 확인 (기본값 2026년 4분기)
-        const targetYear = (typeof selectedYear !== 'undefined') ? selectedYear : 2026;
-        const targetQuarter = (typeof selectedQuarter !== 'undefined') ? selectedQuarter : 4;
-        const activeQKey = `${targetYear}_q${targetQuarter}`;
-        
-        // 🎯 1분기 또는 2분기 여부 확인 (1, 2분기는 hike 횟수를 기준으로 표시)
-        const isHikeQuarter = (targetYear === 2026 && (targetQuarter === 1 || targetQuarter === 2));
-
         let processedData = currentData.map(m => {
             let last = new Date();
             if (m.lastDate) {
@@ -4856,23 +4848,8 @@ window.renderStatusTable = function() {
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🎯 선택된 분기에 따라 점수(qCount) 또는 등산횟수(hike)를 다이내믹하게 매핑
-            let displayScore = 0;
-            if (isHikeQuarter) {
-                if (m.quarterlyStats && m.quarterlyStats[activeQKey] && m.quarterlyStats[activeQKey].hike !== undefined) {
-                    displayScore = m.quarterlyStats[activeQKey].hike;
-                }
-            } else {
-                if (m.quarterlyStats && m.quarterlyStats[activeQKey] && m.quarterlyStats[activeQKey].qCount !== undefined) {
-                    displayScore = m.quarterlyStats[activeQKey].qCount;
-                } else if (activeQKey === '2026_q4') {
-                    displayScore = m.qCount || 0;
-                }
-            }
-
             return { 
                 ...m, 
-                qCount: displayScore, // 👈 화면에 보여질 값 (1,2분기는 hike 횟수, 그 외는 qCount 점수)
                 ddayVal: ddayVal,
                 dPlusVal: dPlusVal
             };
@@ -4911,13 +4888,26 @@ window.renderStatusTable = function() {
             let rankT = ""; 
             let rankC = "";
 
-            // 🌟 오즈/유스가 아니면서 점수/횟수가 있고, topNames 목록에 있을 때만 랭킹 칭호 부여
+            // 🌟 오즈/유스가 아니면서 점수가 있고, topNames 목록에 있을 때만 랭킹 칭호 부여
             if (m.name !== "오즈" && m.name !== "유스" && (m.qCount || 0) > 0 && !m.isHidden) {
                 const idx = topNames.indexOf(m.name);
                 
-                if (idx === 0) { rankT = isHikeQuarter ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
-                else if (idx === 1) { rankT = isHikeQuarter ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
-                else if (idx === 2) { rankT = isHikeQuarter ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
+                let activeQuarter = 1; 
+                const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+                if (activeBtn) {
+                    const btnId = activeBtn.id; 
+                    activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+                } else {
+                    activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
+                                    ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
+                }
+                
+                const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
+                const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
+
+                if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
+                else if (idx === 1) { rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
+                else if (idx === 2) { rankT = is2026_H1 ? "🥉나무꾼" : "🥉마당발"; rankC = "rank-3"; }
             }
 
             // 👑 슈퍼/스페셜 왕좌 상태 체크 (같은 날 획득자 모두 적용)
@@ -4936,9 +4926,6 @@ window.renderStatusTable = function() {
             const displayHeight = rawHeight >= 10000 
                 ? (rawHeight / 1000).toFixed(1) + 'k' 
                 : rawHeight + 'm';
-
-            // 🎯 단위 설정 (1, 2분기는 '회', 그 외는 '점')
-            const scoreUnit = isHikeQuarter ? '회' : '점';
 
             htmlBuilder += `<tr class="${m.isHidden ? 'opacity-40' : ''}">
             <td style="position: relative;" class="text-xs text-center">
@@ -4967,7 +4954,7 @@ window.renderStatusTable = function() {
             </td>
             <td style="position: relative;">
                 ${clickTag}
-                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount || 0}${scoreUnit} 📈</button>
+                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount || 0}점 📈</button>
             </td>
             <td style="position: relative;">
                 ${clickTag}
@@ -5016,10 +5003,10 @@ window.renderStatusTable = function() {
     } catch (err) {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
-};
+};       
+
 
         
-
 
    // 🎯 계절 영역 토글 펼침/접기
 window.toggleSeasonMarkBox = () => {
