@@ -4853,7 +4853,7 @@ window.renderStatusTable = function() {
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🎯 선택된 분기 탭에 맞는 qCount를 안전하게 가져오기 (없으면 0점)
+            // 🎯 선택된 분기 탭에 맞는 qCount를 안전하게 가져오기 (1~4분기 모두 동일하게 qCount 점수 사용)
             let quarterQCount = 0;
             if (m.quarterlyStats && m.quarterlyStats[activeQKey] && m.quarterlyStats[activeQKey].qCount !== undefined) {
                 quarterQCount = m.quarterlyStats[activeQKey].qCount;
@@ -5018,8 +5018,7 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
-  
-        
+
 
 
    // 🎯 계절 영역 토글 펼침/접기
