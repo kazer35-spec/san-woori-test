@@ -5725,8 +5725,9 @@ window.switchHallTab = (tabType) => {
 };
 
 
- /* ==========================================
-   명단 리스트 렌더링 (과거 아카이브 복원, 횟수 제거, 오즈·유스 제외, 4분기 0점 초기화, qCount 우정점수 반영)
+ 
+            /* ==========================================
+   명단 리스트 렌더링 (26년 3분기부터만 오즈·유스 제외, 2분기 및 과거는 정상 표시 반영)
    ========================================== */
 function renderHallList() {
     const listArea = document.getElementById('hallListArea');
@@ -5771,7 +5772,7 @@ function renderHallList() {
     const glowClasses = ["glow-gold", "glow-silver", "glow-bronze"];
 
     // -------------------------------------------------------------
-    // [CASE 1] 실황정보 탭 (현재 분기 실시간 집계 - qCount 우정점수 우선 정렬 반영)
+    // [CASE 1] 실황정보 탭 (현재 분기 - 오즈, 유스 제외 적용)
     // -------------------------------------------------------------
     if (window.currentHallTab === 'live') {
         let liveWithFull = [];
@@ -5786,10 +5787,10 @@ function renderHallList() {
                 liveMountainFull = window.hallDataCache.mountainFull;
                 liveHostFull = window.hallDataCache.hostFull;
             } else {
-                // 오즈, 유스 완전 제외 필터 적용
+                // 현재 분기가 2026년 3분기 이후이므로 오즈, 유스 제외
                 const validMembers = currentData.filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스");
 
-                // 1. 우정대장: qCount 우정점수 기준 정렬 (없으면 기존 total/qCount fallback)
+                // 1. 우정대장: qCount 우정점수 우선 정렬
                 liveWithFull = [...validMembers]
                     .filter(m => ((m.quarterlyStats?.[qKey]?.qCount ?? m.quarterlyStats?.[qKey]?.total) || 0) > 0)
                     .sort((a, b) => {
@@ -5798,12 +5799,12 @@ function renderHallList() {
                         return scoreB - scoreA || b.level - a.level;
                     });
 
-                // 2. 등산의신: 4분기 hike 필드 기준
+                // 2. 등산의신: hike 필드 기준
                 liveMountainFull = [...validMembers]
                     .filter(m => ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
                     .sort((a, b) => (b.quarterlyStats?.[qKey]?.hike || 0) - (a.quarterlyStats?.[qKey]?.hike || 0) || b.level - a.level);
 
-                // 3. 벙의달인: 4분기 hosted 필드 기준
+                // 3. 벙의달인: hosted 필드 기준
                 liveHostFull = [...validMembers]
                     .filter(m => ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
                     .sort((a, b) => (b.quarterlyStats?.[qKey]?.hosted || 0) - (a.quarterlyStats?.[qKey]?.hosted || 0) || b.level - a.level);
@@ -5846,7 +5847,7 @@ function renderHallList() {
             if (listFrom4th.length === 0) {
                 return `
                 <div id="hallMoreArea_${sectionKey}" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-                    <div style="text-align: center; color: #94a3b8; font-size: 10.5px; padding: 8px 0;">4위 이하 순위 데이터가 없습니다. (현재 4분기 초기화 상태)</div>
+                    <div style="text-align: center; color: #94a3b8; font-size: 10.5px; padding: 8px 0;">4위 이하 순위 데이터가 없습니다.</div>
                 </div>`;
             }
 
@@ -5978,7 +5979,7 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 역대 시즌 아카이브 탭 (3분기 포함 qCount 우정점수 정렬 반영)
+    // [CASE 2] 역대 시즌 아카이브 탭 (26년 3분기부터는 오즈·유스 제외, 2분기는 정상 표시)
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
@@ -5989,7 +5990,7 @@ function renderHallList() {
             let top3 = [];
             let isCurrent = (s.year === currentYear && s.quarter === currentQuarter);
             
-            // 3분기(2026년 3분기): qCount 우정점수 기반 정렬 (오즈, 유스 제외)
+            // 3분기(2026년 3분기): 오즈, 유스 제외 후 qCount 점수 기반 정렬
             if (s.year === 2026 && s.quarter === 3 && typeof currentData !== 'undefined' && Array.isArray(currentData)) {
                 const q3Key = "2026_q3";
                 const validMembers = currentData.filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스");
@@ -6009,10 +6010,10 @@ function renderHallList() {
                     top3 = sorted.slice(0, 3).map(m => ({ name: m.name }));
                 }
             }
-            // 2분기 아카이브 복원
+            // 2분기 아카이브 복원 (유스 정상 포함)
             else if (s.year === 2026 && s.quarter === 2) {
-                if (window.currentHallTab === 'mountain') top3 = [{ name: "하트" }, { name: "아랑" }, { name: "지니" }];
-                else if (window.currentHallTab === 'host') top3 = [{ name: "아랑" }, { name: "해수" }, { name: "지니" }];
+                if (window.currentHallTab === 'mountain') top3 = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
+                else if (window.currentHallTab === 'host') top3 = [{ name: "유스" }, { name: "아랑" }, { name: "해수" }];
                 else top3 = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }];
             }
             // 1분기 아카이브 복원
@@ -6061,7 +6062,7 @@ function renderHallList() {
     
     listArea.innerHTML = combinedHtml;
 }
-           
+
 
 
 
