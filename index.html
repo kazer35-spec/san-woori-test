@@ -8214,6 +8214,55 @@ window.addMultiActivity = async () => {
 };
 
           
+  // 📌 [신규 회원 등록 함수] - 수정본
+window.addMember = async () => {
+    const nameInput = document.getElementById('newName');
+    const genderInput = document.querySelector('input[name="newGender"]:checked');
+    const dateInput = document.getElementById('regDate');
+
+    if (!nameInput || !nameInput.value.trim()) {
+        return alert("회원 이름을 입력해주세요.");
+    }
+
+    const cleanName = nameInput.value.trim(); // 한글 이름 공백 제거
+    const gender = genderInput ? genderInput.value : "여";
+    
+    // 날짜 선택이 안 되어있으면 오늘 날짜 적용
+    const regDateVal = dateInput && dateInput.value ? new Date(dateInput.value) : new Date();
+    const ts = (typeof Timestamp !== 'undefined') ? Timestamp.fromDate(regDateVal) : regDateVal;
+
+    try {
+        const userRef = doc(db, "sanwoori", cleanName);
+
+        await setDoc(userRef, {
+            name: cleanName,
+            gender: gender,
+            level: 0,
+            count: 0,
+            bonusDays: 0,
+            buddyCount: 0,
+            friendshipPoint: 0,
+            qCount: 0,
+            isHidden: false,
+            regDate: ts, // 👈 🎯 핵심! 이 필드가 추가되어야 가입일 조회가 정상 작동합니다.
+            createdAt: ts, // 기존 createdAt도 유지
+            lastDate: ts
+        }, { merge: true });
+
+        alert(`신규 회원 [${cleanName}] 님이 정상 등록되었습니다! 🎉`);
+
+        // 입력 폼 초기화
+        nameInput.value = "";
+        
+        // 데이터 실시간 동기화 함수가 있다면 재실행
+        if (typeof startRealtimeSync === 'function') {
+            startRealtimeSync();
+        }
+    } catch (error) {
+        console.error("회원 등록 실패 원인:", error);
+        alert("회원 등록 중 오류가 발생했습니다: " + error.message);
+    }
+};
 
         
 
