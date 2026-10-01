@@ -4830,17 +4830,17 @@ window.renderStatusTable = function() {
         const latestSuperHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('super') : [];
         const latestSpecialHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('special') : [];
 
-        // 🌟 현재 선택된 연도 및 분기 구하기
-        const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
-        let activeQuarter = 1; 
+        // 🌟 현재 선택된 연도 및 분기 탭 확인
+        const targetYear = (typeof selectedYear !== 'undefined') ? selectedYear : ((typeof currentYear !== 'undefined') ? currentYear : 2026);
+        let targetQuarter = 1;
         const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
         if (activeBtn) {
             const btnId = activeBtn.id; 
-            activeQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+            targetQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
         } else {
-            activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
-                            ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
+            targetQuarter = (typeof selectedQuarter !== 'undefined') ? selectedQuarter : ((typeof currentQuarter !== 'undefined') ? currentQuarter : 1);
         }
+        const activeQKey = `${targetYear}_q${targetQuarter}`;
 
         let processedData = currentData.map(m => {
             let last = new Date();
@@ -4859,28 +4859,26 @@ window.renderStatusTable = function() {
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🌟 1, 2분기는 기존 방식 유지, 3분기부터는 quarterlyStatsMap에서 해당 분기 qCount를 명시적으로 가져옴
-            let effectiveQCount = m.qCount || 0;
-            if (activeYear === 2026) {
-                const qKey = `2026_q${activeQuarter}`;
-                if (activeQuarter >= 3) {
-                    if (m.quarterlyStatsMap && m.quarterlyStatsMap[qKey] !== undefined) {
-                        // qCount 필드가 있으면 우선 사용, 없으면 0
-                        effectiveQCount = Number(m.quarterlyStatsMap[qKey].qCount) || 0;[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
-                    } else {
-                        effectiveQCount = 0;
-                    }
+            // 🌟 1, 2분기는 기존 quarterlyStatsMap 방식 유지, 3, 4분기는 quarterlyStats 방식 적용
+            let quarterQCount = 0;
+            if (targetYear === 2026 && targetQuarter <= 2) {
+                const qKey = `2026_q${targetQuarter}`;
+                if (m.quarterlyStatsMap && m.quarterlyStatsMap[qKey]) {
+                    quarterQCount = m.quarterlyStatsMap[qKey].qCount !== undefined ? m.quarterlyStatsMap[qKey].qCount : (m.quarterlyStatsMap[qKey].total || 0);
                 } else {
-                    // 1, 2분기 기존 유지 로직 (필요시 기존 맵핑 사용)
-                    if (m.quarterlyStatsMap && m.quarterlyStatsMap[qKey]) {
-                        effectiveQCount = m.quarterlyStatsMap[qKey].qCount !== undefined ? m.quarterlyStatsMap[qKey].qCount : (m.quarterlyStatsMap[qKey].total || 0);
-                    }
+                    quarterQCount = m.qCount || 0;
+                }
+            } else {
+                if (m.quarterlyStats && m.quarterlyStats[activeQKey] && m.quarterlyStats[activeQKey].qCount !== undefined) {
+                    quarterQCount = m.quarterlyStats[activeQKey].qCount;
+                } else if (activeQKey === '2026_q4') {
+                    quarterQCount = m.qCount || 0;
                 }
             }
 
             return { 
                 ...m, 
-                effectiveQCount: effectiveQCount,
+                qCount: quarterQCount,
                 ddayVal: ddayVal,
                 dPlusVal: dPlusVal
             };
@@ -4888,18 +4886,18 @@ window.renderStatusTable = function() {
 
         // 정렬
         processedData.sort((a, b) => {
-            if (sort === 'qCount') return (b.effectiveQCount || 0) - (a.effectiveQCount || 0) || (b.level || 0) - (a.level || 0);
+            if (sort === 'qCount') return (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0);
             if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
-            if (sort === 'level') return (b.level || 0) - (a.level || 0) || (b.effectiveQCount || 0) - (a.effectiveQCount || 0);
+            if (sort === 'level') return (b.level || 0) - (a.level || 0) || (b.qCount || 0) - (a.qCount || 0);
             if (sort === 'name') return String(a.name || '').localeCompare(String(b.name || ''), 'ko');
             if (sort === 'dday') return a.ddayVal - b.ddayVal;
             return 0;
         });
 
-        // 🌟 TOP 3 선정 시 effectiveQCount 기준 적용 ('오즈', '유스' 제외)
+        // 🌟 TOP 3 선정 시 '오즈', '유스' 제외
         const topNames = [...processedData]
             .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스")
-            .sort((a, b) => (b.effectiveQCount || 0) - (a.effectiveQCount || 0) || (b.level || 0) - (a.level || 0))
+            .sort((a, b) => (b.qCount || 0) - (a.qCount || 0) || (b.level || 0) - (a.level || 0))
             .slice(0, 3)
             .map(m => m.name);
 
@@ -4919,10 +4917,9 @@ window.renderStatusTable = function() {
             let rankT = ""; 
             let rankC = "";
 
-            if (m.name !== "오즈" && m.name !== "유스" && (m.effectiveQCount || 0) > 0 && !m.isHidden) {
+            if (m.name !== "오즈" && m.name !== "유스" && (m.qCount || 0) > 0 && !m.isHidden) {
                 const idx = topNames.indexOf(m.name);
-                
-                const is2026_H1 = (activeYear === 2026) && (activeQuarter === 1 || activeQuarter === 2);
+                const is2026_H1 = (targetYear === 2026) && (targetQuarter === 1 || targetQuarter === 2);
 
                 if (idx === 0) { rankT = is2026_H1 ? "🥇산신령" : "🥇산대장"; rankC = "rank-1"; }
                 else if (idx === 1) { rankT = is2026_H1 ? "🥈심마니" : "🥈길잡이"; rankC = "rank-2"; }
@@ -4971,7 +4968,7 @@ window.renderStatusTable = function() {
             </td>
             <td style="position: relative;">
                 ${clickTag}
-                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.effectiveQCount}점 📈</button>
+                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.qCount || 0}점 📈</button>
             </td>
             <td style="position: relative;">
                 ${clickTag}
@@ -5021,6 +5018,7 @@ window.renderStatusTable = function() {
     }
 };
 
+            
             
          
   
