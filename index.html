@@ -4830,7 +4830,7 @@ window.renderStatusTable = function() {
         const latestSuperHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('super') : [];
         const latestSpecialHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('special') : [];
 
-        // 🎯 현재 활성화된 연도 및 분기 감지
+        // 현재 활성화된 연도 및 분기 감지
         let activeQuarter = 1; 
         const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
         if (activeBtn) {
@@ -4866,25 +4866,18 @@ window.renderStatusTable = function() {
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🎯 [핵심 수정] 3분기부터는 qCount 점수를 기본 필드(또는 해당 분기 스탯)로 처리
+            // 🎯 [정확한 분기별 데이터 매핑 분기]
             let quarterQCount = 0;
             let quarterHike = 0;
             let quarterTotal = 0;
 
-            if (activeQuarter >= 3) {
-                // 3분기, 4분기는 기본 qCount 및 문서 필드 사용
-                if (m.quarterlyStats && m.quarterlyStats[activeQKey]) {
-                    const qData = m.quarterlyStats[activeQKey];
-                    quarterQCount = qData.qCount !== undefined ? qData.qCount : (m.qCount || 0);
-                    quarterHike = qData.hike !== undefined ? qData.hike : (m.hike || 0);
-                    quarterTotal = qData.total !== undefined ? qData.total : (m.total || 0);
-                } else {
-                    quarterQCount = m.qCount || 0;
-                    quarterHike = m.hike || 0;
-                    quarterTotal = m.total || 0;
-                }
+            if (activeQuarter === 3) {
+                // 🌟 3분기만 기본 qCount 필드 사용 (데이터가 없으면 0)
+                quarterQCount = m.qCount !== undefined ? m.qCount : 0;
+                quarterHike = m.hike !== undefined ? m.hike : 0;
+                quarterTotal = m.total !== undefined ? m.total : 0;
             } else {
-                // 1분기, 2분기는 기존 quarterlyStats 맵핑 방식 유지
+                // 1분기, 2분기(그리고 4분기)는 기존처럼 quarterlyStats 객체에서 정확히 가져옴
                 if (m.quarterlyStats && m.quarterlyStats[activeQKey]) {
                     const qData = m.quarterlyStats[activeQKey];
                     quarterQCount = qData.qCount !== undefined ? qData.qCount : 0;
@@ -5035,6 +5028,9 @@ window.renderStatusTable = function() {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
+
+            
+        
 
 
 
