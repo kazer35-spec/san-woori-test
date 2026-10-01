@@ -4803,7 +4803,8 @@ function isMatchName(name, searchKeyword) {
 }
 
 // ─── 3. 실시간 현황 
- window.renderStatusTable = function() {
+         
+  window.renderStatusTable = function() {
     try {
         const list = document.getElementById('statusList');
         const searchInput = document.getElementById('searchInput');
@@ -4827,7 +4828,10 @@ function isMatchName(name, searchKeyword) {
         const today = new Date();
         const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
-        // 현재 활성화된 연도 및 분기 구하기
+        const latestSuperHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('super') : [];
+        const latestSpecialHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('special') : [];
+
+        // 🌟 현재 선택된 연도 및 분기 구하기
         const activeYear = (typeof currentYear !== 'undefined') ? currentYear : 2026;
         let activeQuarter = 1; 
         const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
@@ -4838,10 +4842,6 @@ function isMatchName(name, searchKeyword) {
             activeQuarter = (typeof currentQuarter !== 'undefined') ? currentQuarter : 
                             ((typeof selectedQuarter !== 'undefined') ? selectedQuarter : 1);
         }
-
-        // 🌟 최신 슈퍼별/스페셜별 보유자 ID 목록 가져오기
-        const latestSuperHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('super') : [];
-        const latestSpecialHolderIds = (typeof getLatestLegendHolders === 'function') ? getLatestLegendHolders('special') : [];
 
         let processedData = currentData.map(m => {
             let last = new Date();
@@ -4855,36 +4855,31 @@ function isMatchName(name, searchKeyword) {
 
             let dPlusVal = 0;
             if (m.regDate) {
-                const reg = (typeof m.regDate.toDate === 'function') ? reg.regDate.toDate() : new Date(m.regDate);
+                const reg = (typeof m.regDate.toDate === 'function') ? m.regDate.toDate() : new Date(m.regDate);
                 const regZero = new Date(reg.getFullYear(), reg.getMonth(), reg.getDate()).getTime();
                 dPlusVal = Math.floor((todayZero - regZero) / (1000 * 60 * 60 * 24)) + 1;
             }
 
-            // 🌟 26년 1~2분기는 quarterlyStatsMap 점수 적용, 3분기부터는 기본 qCount 사용
+            // 🌟 2026년 1, 2분기인 경우 quarterlyStatsMap에서 해당 분기 점수 가져오기 (없으면 기본 qCount 혹은 0)
             let effectiveQCount = m.qCount || 0;
-            if (m.quarterlyStatsMap) {
-                const qKey = `${activeYear}_q${activeQuarter}`;
-                // 2026년 1분기 또는 2분기이고 해당 분기 데이터가 존재할 경우 분기 점수(qCount 또는 total)를 할당
-                if (activeYear === 2026 && (activeQuarter === 1 || activeQuarter === 2)) {
-                    if (m.quarterlyStatsMap[qKey]) {
-                        effectiveQCount = m.quarterlyStatsMap[qKey].qCount ?? m.quarterlyStatsMap[qKey].total ?? 0;
-                    } else {
-                        effectiveQCount = 0; // 해당 분기 기록이 없으면 0점 처리
-                    }
+            if (activeYear === 2026 && (activeQuarter === 1 || activeQuarter === 2)) {
+                const qKey = `2026_q${activeQuarter}`;
+                if (m.quarterlyStatsMap && m.quarterlyStatsMap[qKey]) {
+                    effectiveQCount = m.quarterlyStatsMap[qKey].qCount !== undefined ? m.quarterlyStatsMap[qKey].qCount : (m.quarterlyStatsMap[qKey].total || 0);
+                } else {
+                    effectiveQCount = 0; // 해당 분기 데이터가 없으면 0점 처리
                 }
-            } else if (activeYear === 2026 && (activeQuarter === 1 || activeQuarter === 2)) {
-                effectiveQCount = 0;
             }
 
             return { 
                 ...m, 
+                effectiveQCount: effectiveQCount,
                 ddayVal: ddayVal,
-                dPlusVal: dPlusVal,
-                effectiveQCount: effectiveQCount // 랭킹 및 표시에 사용할 점수
+                dPlusVal: dPlusVal
             };
         });
 
-        // 정렬 (effectiveQCount 기준 정렬)
+        // 정렬 (effectiveQCount 기준 정렬 지원)
         processedData.sort((a, b) => {
             if (sort === 'qCount') return (b.effectiveQCount || 0) - (a.effectiveQCount || 0) || (b.level || 0) - (a.level || 0);
             if (sort === 'totalHeight') return (b.totalHeight || 0) - (a.totalHeight || 0);
@@ -4894,7 +4889,7 @@ function isMatchName(name, searchKeyword) {
             return 0;
         });
 
-        // 🌟 칭호 부여 대상(TOP 3) 선정 시 '오즈', '유스' 제외 및 effectiveQCount 기준
+        // 🌟 TOP 3 선정 시에도 effectiveQCount 기준 적용 ('오즈', '유스' 제외)
         const topNames = [...processedData]
             .filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스")
             .sort((a, b) => (b.effectiveQCount || 0) - (a.effectiveQCount || 0) || (b.level || 0) - (a.level || 0))
@@ -4917,7 +4912,6 @@ function isMatchName(name, searchKeyword) {
             let rankT = ""; 
             let rankC = "";
 
-            // 🌟 오즈/유스가 아니면서 점수가 있고, topNames 목록에 있을 때만 랭킹 칭호 부여
             if (m.name !== "오즈" && m.name !== "유스" && (m.effectiveQCount || 0) > 0 && !m.isHidden) {
                 const idx = topNames.indexOf(m.name);
                 
@@ -4970,7 +4964,7 @@ function isMatchName(name, searchKeyword) {
             </td>
             <td style="position: relative;">
                 ${clickTag}
-                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.effectiveQCount || 0}점 📈</button>
+                <button onclick="showMemberTimeline('${m.name}', '${m.name}')" class="qcount-box bg-gray-soft border-none hover:bg-slate-200 text-slate-600">${m.effectiveQCount}점 📈</button>
             </td>
             <td style="position: relative;">
                 ${clickTag}
@@ -5019,7 +5013,7 @@ function isMatchName(name, searchKeyword) {
         console.error("renderStatusTable 실행 중 오류 발생:", err);
     }
 };
- 
+              
         
 
 
