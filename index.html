@@ -8805,44 +8805,64 @@ window.updateManualLevel = async () => {
     }
 };
 
+
+        // 🔥 [수정] 분기별 분기 횟수(qCount) 및 공통 qCount 동시 수정 기능
 window.updateManualQCount = async () => {
     const id = document.getElementById('memberSelectEdit').value; 
     const newQCount = parseInt(document.getElementById('manualQCountInput').value);
 
-    if(!id) return alert("대상 회원을 먼저 선택해주세요.");
-    if(isNaN(newQCount) || newQCount < 0) return alert("변경할 올바른 분기 횟수 숫자를 입력해주세요.");
+    if (!id) return alert("대상 회원을 먼저 선택해주세요.");
+    if (isNaN(newQCount) || newQCount < 0) return alert("변경할 올바른 분기 횟수 숫자를 입력해주세요.");
 
-    // 변경하고자 하는 분기 키 (필요시 Select box나 변수로 동적 할당)
-    const currentQuarter = "2026_q4"; 
+    // 🌟 현재 선택된 연도 및 분기 확인 (renderStatusTable과 동일한 로직)
+    const targetYear = (typeof selectedYear !== 'undefined') ? selectedYear : ((typeof currentYear !== 'undefined') ? currentYear : 2026);
+    let targetQuarter = 1;
+    const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
+    if (activeBtn) {
+        const btnId = activeBtn.id; 
+        targetQuarter = parseInt(btnId.replace('qBtn', ''), 10) || 1;
+    } else {
+        targetQuarter = (typeof selectedQuarter !== 'undefined') ? selectedQuarter : ((typeof currentQuarter !== 'undefined') ? currentQuarter : 1);
+    }
+    
+    const qKey = `${targetYear}_q${targetQuarter}`;
 
-    if(confirm(`선택한 회원의 전체 횟수 및 [${currentQuarter}] 분기 횟수를 ${newQCount}회로 변경하시겠습니까?`)) {
+    if (confirm(`[${targetYear}년 제${targetQuarter분기}] 선택한 회원의 분기 횟수를 ${newQCount}회로 변경하시겠습니까?`)) {
         try {
-            const docRef = doc(db, "sanwoori", id);
-            const docSnap = await getDoc(docRef);
+            const memberDocRef = doc(db, "sanwoori", id);
+            
+            // 기존 문서 데이터를 가져와서 분기 데이터 구조가 깨지지 않도록 병합 준비
+            const memberSnap = await getDoc(memberDocRef);
+            if (!memberSnap.exists()) {
+                alert("해당 회원을 찾을 수 없습니다.");
+                return;
+            }
+            const memberData = memberSnap.data();
 
-            if (!docSnap.exists()) {
-                return alert("존재하지 않는 회원 데이터입니다.");
+            let updatePayload = { qCount: newQCount }; // 호환성을 위한 기본 필드 업데이트
+
+            // 🌟 1, 2분기는 quarterlyStatsMap, 3, 4분기는 quarterlyStats 구조 반영
+            if (targetYear === 2026 && targetQuarter <= 2) {
+                let currentStatsMap = memberData.quarterlyStatsMap || {};
+                currentStatsMap[qKey] = {
+                    ...(currentStatsMap[qKey] || {}),
+                    qCount: newQCount,
+                    total: newQCount
+                };
+                updatePayload.quarterlyStatsMap = currentStatsMap;
+            } else {
+                let currentStats = memberData.quarterlyStats || {};
+                currentStats[qKey] = {
+                    ...(currentStats[qKey] || {}),
+                    qCount: newQCount
+                };
+                updatePayload.quarterlyStats = currentStats;
             }
 
-            const currentData = docSnap.data();
-            const quarterlyStat = currentData.quarterlyStat || {};
+            // 데이터베이스 업데이트 실행
+            await updateDoc(memberDocRef, updatePayload);
 
-            // 해당 분기 객체가 없으면 새로 생성, 있으면 기존 값 유지하면서 qCount 업데이트
-            const targetQuarterData = quarterlyStat[currentQuarter] || {};
-            
-            quarterlyStat[currentQuarter] = {
-                ...targetQuarterData,
-                qCount: newQCount
-                // 필요 시 total 등 다른 연관 횟수도 함께 수정 가능
-            };
-
-            // 전체 qCount와 quarterlyStat 객체를 통째로 업데이트
-            await updateDoc(docRef, {
-                qCount: newQCount,
-                quarterlyStat: quarterlyStat
-            });
-
-            alert("분기 횟수 변경 완료! ✅");
+            alert(`[${targetYear}년 ${targetQuarter}분기] 횟수 변경 완료! ✅`);
             document.getElementById('manualQCountInput').value = ""; 
             if (typeof startRealtimeSync === 'function') startRealtimeSync(); 
         } catch (e) {
@@ -8851,6 +8871,7 @@ window.updateManualQCount = async () => {
         }
     }
 };
+
 
 
 
