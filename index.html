@@ -8806,15 +8806,17 @@ window.updateManualLevel = async () => {
 };
 
 
-        // 🔥 [수정] 분기별 분기 횟수(qCount) 및 공통 qCount 동시 수정 기능
+        // ==========================================================================
+// 🛠️️ [수정 완료] 선택된 연도/분기별(quarterlyStats 및 quarterlyStatsMap) 분기 횟수 수정 기능
+// ==========================================================================
 window.updateManualQCount = async () => {
     const id = document.getElementById('memberSelectEdit').value; 
-    const newQCount = parseInt(document.getElementById('manualQCountInput').value);
+    const newQCount = parseInt(document.getElementById('manualQCountInput').value, 10);
 
-    if (!id) return alert("대상 회원을 먼저 선택해주세요.");
-    if (isNaN(newQCount) || newQCount < 0) return alert("변경할 올바른 분기 횟수 숫자를 입력해주세요.");
+    if(!id) return alert("대상 회원을 먼저 선택해주세요.");
+    if(isNaN(newQCount) || newQCount < 0) return alert("변경할 올바른 분기 횟수 숫자를 입력해주세요.");
 
-    // 🌟 현재 선택된 연도 및 분기 확인 (renderStatusTable과 동일한 로직)
+    // 🌟 1. 현재 화면에서 선택된 연도 및 분기 구하기 (renderStatusTable과 동일한 로직)
     const targetYear = (typeof selectedYear !== 'undefined') ? selectedYear : ((typeof currentYear !== 'undefined') ? currentYear : 2026);
     let targetQuarter = 1;
     const activeBtn = document.querySelector('#quarterTabs .q-btn.active');
@@ -8825,46 +8827,48 @@ window.updateManualQCount = async () => {
         targetQuarter = (typeof selectedQuarter !== 'undefined') ? selectedQuarter : ((typeof currentQuarter !== 'undefined') ? currentQuarter : 1);
     }
     
-    const qKey = `${targetYear}_q${targetQuarter}`;
+    const activeQKey = `${targetYear}_q${targetQuarter}`;
 
-    if (confirm(`[${targetYear}년 제${targetQuarter분기}] 선택한 회원의 분기 횟수를 ${newQCount}회로 변경하시겠습니까?`)) {
+    if(confirm(`[${targetYear년 ${targetQuarter분기}] 선택된 회원의 분기 횟수를 ${newQCount}회로 변경하시겠습니까?`)) {
         try {
             const memberDocRef = doc(db, "sanwoori", id);
             
-            // 기존 문서 데이터를 가져와서 분기 데이터 구조가 깨지지 않도록 병합 준비
-            const memberSnap = await getDoc(memberDocRef);
-            if (!memberSnap.exists()) {
-                alert("해당 회원을 찾을 수 없습니다.");
-                return;
+            // 🌟 2. 기존 문서 데이터를 가져와서 분기별 구조 업데이트 준비
+            const memberDocSnap = await getDoc(memberDocRef);
+            let updatePayload = { qCount: newQCount }; // 최상위 qCount도 기존 호환성을 위해 같이 업데이트
+
+            if (memberDocSnap.exists()) {
+                const data = memberDocSnap.data();
+
+                // 2026년 1, 2분기는 quarterlyStatsMap 구조 사용
+                if (targetYear === 2026 && targetQuarter <= 2) {
+                    let quarterlyStatsMap = data.quarterlyStatsMap || {};
+                    if (!quarterlyStatsMap[activeQKey]) {
+                        quarterlyStatsMap[activeQKey] = {};
+                    }
+                    quarterlyStatsMap[activeQKey].qCount = newQCount;
+                    quarterlyStatsMap[activeQKey].total = newQCount; // 필드 구조에 따라 total 병행 반영
+                    updatePayload.quarterlyStatsMap = quarterlyStatsMap;
+                } 
+                // 3, 4분기 또는 기타 연도는 quarterlyStats 구조 사용
+                else {
+                    let quarterlyStats = data.quarterlyStats || {};
+                    if (!quarterlyStats[activeQKey]) {
+                        quarterlyStats[activeQKey] = {};
+                    }
+                    quarterlyStats[activeQKey].qCount = newQCount;
+                    updatePayload.quarterlyStats = quarterlyStats;
+                }
             }
-            const memberData = memberSnap.data();
 
-            let updatePayload = { qCount: newQCount }; // 호환성을 위한 기본 필드 업데이트
-
-            // 🌟 1, 2분기는 quarterlyStatsMap, 3, 4분기는 quarterlyStats 구조 반영
-            if (targetYear === 2026 && targetQuarter <= 2) {
-                let currentStatsMap = memberData.quarterlyStatsMap || {};
-                currentStatsMap[qKey] = {
-                    ...(currentStatsMap[qKey] || {}),
-                    qCount: newQCount,
-                    total: newQCount
-                };
-                updatePayload.quarterlyStatsMap = currentStatsMap;
-            } else {
-                let currentStats = memberData.quarterlyStats || {};
-                currentStats[qKey] = {
-                    ...(currentStats[qKey] || {}),
-                    qCount: newQCount
-                };
-                updatePayload.quarterlyStats = currentStats;
-            }
-
-            // 데이터베이스 업데이트 실행
+            // 🌟 3. 데이터베이스에 반영
             await updateDoc(memberDocRef, updatePayload);
 
-            alert(`[${targetYear}년 ${targetQuarter}분기] 횟수 변경 완료! ✅`);
+            alert(`[${targetYear}년 Q${targetQuarter}] 분기 횟수 변경 완료! ✅`);
             document.getElementById('manualQCountInput').value = ""; 
+            
             if (typeof startRealtimeSync === 'function') startRealtimeSync(); 
+            if (typeof window.renderStatusTable === 'function') window.renderStatusTable(); // 테이블 즉시 갱신
         } catch (e) {
             console.error(e);
             alert("변경 실패: " + e.message);
