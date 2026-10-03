@@ -8806,9 +8806,7 @@ window.updateManualLevel = async () => {
 };
 
 // 🔥 [신규 추가] 분기별 분기 횟수(qCount) 임의 수정 기능
-// ==========================================================================
-// 🛠️ [기존 유지] 수동 분기 횟수 수정 함수
-// ==========================================================================
+// 🔥 [수정] 전체 qCount 및 해당 분기별 qCount 동시 수정 기능
 window.updateManualQCount = async () => {
     const id = document.getElementById('memberSelectEdit').value; 
     const newQCount = parseInt(document.getElementById('manualQCountInput').value);
@@ -8816,9 +8814,20 @@ window.updateManualQCount = async () => {
     if(!id) return alert("대상 회원을 먼저 선택해주세요.");
     if(isNaN(newQCount) || newQCount < 0) return alert("변경할 올바른 분기 횟수 숫자를 입력해주세요.");
 
-    if(confirm(`선택한 회원의 이번 분기 횟수를 ${newQCount}회로 변경하시겠습니까?`)) {
+    // 현재 적용할 분기 키 (예: '2026_q4' 등 서비스에서 사용하는 현재 분기 변수명이나 문자열로 지정)
+    // 만약 select 박스나 전역 변수로 분기를 선택하는 부분이 있다면 해당 값을 가져오시면 됩니다.
+    const currentQuarter = "2026_q4"; // 예시: 현재 분기값 (필요에 따라 동적 변수로 교체)
+
+    if(confirm(`선택한 회원의 전체 횟수 및 [${currentQuarter}] 분기 횟수를 ${newQCount}회로 변경하시겠습니까?`)) {
         try {
-            await updateDoc(doc(db, "sanwoori", id), { qCount: newQCount });
+            // Firestore Dot Notation을 사용하여 상위 qCount와 quarterlyStat 내부의 해당 분기 qCount를 동시에 업데이트
+            const updateData = {
+                qCount: newQCount,
+                [`quarterlyStat.${currentQuarter}.qCount`]: newQCount
+            };
+
+            await updateDoc(doc(db, "sanwoori", id), updateData);
+            
             alert("분기 횟수 변경 완료! ✅");
             document.getElementById('manualQCountInput').value = ""; 
             if (typeof startRealtimeSync === 'function') startRealtimeSync(); 
@@ -8828,6 +8837,7 @@ window.updateManualQCount = async () => {
         }
     }
 };
+
 
 // ==========================================================================
 // 🚀 [기존 유지] 초기 실행 로직 및 실시간 리스너 작동 세션
