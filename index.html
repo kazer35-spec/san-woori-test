@@ -5542,8 +5542,6 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 
 
 
-
-
 // ==========================================
 // 타이머, 더보기 상태 및 데이터 캐시 변수
 // ==========================================
@@ -5781,8 +5779,8 @@ function renderHallList() {
                 scoreA = a.quarterlyStats?.[targetQKey]?.hosted || 0;
                 scoreB = b.quarterlyStats?.[targetQKey]?.hosted || 0;
             } else {
-                scoreA = a.quarterlyStats?.[targetQKey]?.qCount ?? a.quarterlyStats?.[targetQKey]?.total ?? 0;
-                scoreB = b.quarterlyStats?.[targetQKey]?.qCount ?? b.quarterlyStats?.[targetQKey]?.total ?? 0;
+                scoreA = a.quarterlyStats?.[targetQKey]?.qCount ?? a.quarterlyStats?.[targetQKey]?.total || 0;
+                scoreB = b.quarterlyStats?.[targetQKey]?.qCount ?? b.quarterlyStats?.[targetQKey]?.total || 0;
             }
             const levelA = a.level || 0;
             const levelB = b.level || 0;
@@ -5801,7 +5799,7 @@ function renderHallList() {
             if (!m) return 0;
             if (type === 'mountain') return m.quarterlyStats?.[targetQKey]?.hike || 0;
             if (type === 'host') return m.quarterlyStats?.[targetQKey]?.hosted || 0;
-            return m.quarterlyStats?.[targetQKey]?.qCount ?? m.quarterlyStats?.[targetQKey]?.total ?? 0;
+            return m.quarterlyStats?.[targetQKey]?.qCount ?? m.quarterlyStats?.[targetQKey]?.total || 0;
         };
 
         if (ozMem) {
@@ -6038,14 +6036,20 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 역대 시즌 아카이브 탭 (26년 3분기부터 실황정보와 동일한 로직 적용)
+    // [CASE 2] 역대 시즌 아카이브 탭
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
         if (window.currentHallTab === 'mountain') rankLabels = ["🥇산신령", "🥈심마니", "🥉나무꾼"];
         else if (window.currentHallTab === 'host') rankLabels = ["🥇산지기", "🥈선봉장", "🥉파수꾼"];
 
-        const unit = (window.currentHallTab === 'mountain' || window.currentHallTab === 'host') ? '회' : '점';
+        // 26년 3분기 이후만 단위를 붙이고, 26년 2분기 이전(26년 2분기, 1분기, 25년 4분기 등)은 빈 문자열("") 처리
+        const getUnitForSeason = (y, q) => {
+            if (y > 2026 || (y === 2026 && q >= 3)) {
+                return (window.currentHallTab === 'mountain' || window.currentHallTab === 'host') ? '회' : '점';
+            }
+            return '';
+        };
 
         for (const s of seasons) {
             let fullList = [];
@@ -6053,8 +6057,8 @@ function renderHallList() {
             let youthMem = null;
             let isCurrent = (s.year === currentYear && s.quarter === currentQuarter);
             const targetQKey = `${s.year}_q${s.quarter}`;
+            const unit = getUnitForSeason(s.year, s.quarter);
 
-            // 2026년 3분기 이후이거나 현재 데이터가 있는 경우 실황과 동일하게 동적 계산
             if (typeof currentData !== 'undefined' && Array.isArray(currentData) && (s.year > 2026 || (s.year === 2026 && s.quarter >= 3))) {
                 ozMem = currentData.find(m => m.name === "오즈") || null;
                 youthMem = currentData.find(m => m.name === "유스") || null;
@@ -6068,7 +6072,6 @@ function renderHallList() {
                     fullList = sortMembersList(validMembers, targetQKey, 'with');
                 }
             } else {
-                // 기존 하드코딩된 과거 시즌 데이터 Fallback
                 if (s.year === 2026 && s.quarter === 2) {
                     if (window.currentHallTab === 'mountain') fullList = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
                     else if (window.currentHallTab === 'host') fullList = [{ name: "유스" }, { name: "아랑" }, { name: "하트" }];
@@ -6095,15 +6098,17 @@ function renderHallList() {
                     if (name !== '-') {
                         if (window.currentHallTab === 'mountain') score = member.quarterlyStats?.[targetQKey]?.hike || 0;
                         else if (window.currentHallTab === 'host') score = member.quarterlyStats?.[targetQKey]?.hosted || 0;
-                        else score = member.quarterlyStats?.[targetQKey]?.qCount ?? member.quarterlyStats?.[targetQKey]?.total ?? 0;
+                        else score = member.quarterlyStats?.[targetQKey]?.qCount ?? member.quarterlyStats?.[targetQKey]?.total || 0;
                     }
+
+                    const scoreDisplay = (s.year < 2026 || (s.year === 2026 && s.quarter < 3)) && score === 0 ? '' : `(${score}${unit})`;
 
                     return `
                     <div class="hall-rank-item" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 14px; padding: 6px 4px; border: 1px solid #f1f5f9;">
                         <span class="hall-rank-label ${glowClass}" style="margin-bottom: 4px !important; font-size: 10px; padding: 1px 5px; display: inline-block;">${rankLabel}</span>
                         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 2px; width: 100%;">
                             <span class="hall-rank-name" style="font-size: 11.5px; max-width: 55px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-align: center;">${name}</span>
-                            <span style="font-size: 10px; color: #64748b; font-weight: 700; white-space: nowrap;">(${score}${unit})</span>
+                            ${scoreDisplay ? `<span style="font-size: 10px; color: #64748b; font-weight: 700; white-space: nowrap;">${scoreDisplay}</span>` : ''}
                         </div>
                     </div>`;
                 };
@@ -6139,9 +6144,10 @@ function renderHallList() {
 }
 
 
-                
-                             
+        
+         
             
+           
 
 
 
