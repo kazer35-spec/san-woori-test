@@ -5541,6 +5541,190 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
 
+
+
+
+// ==========================================
+// 타이머, 더보기 상태 및 데이터 캐시 변수
+// ==========================================
+window.hallTimerInterval = null;
+
+if (!window.expandedLiveSections) {
+    window.expandedLiveSections = {};
+}
+
+// [데이터 절약 모드] 연산 결과 메모리 캐시
+window.hallDataCache = {
+    key: null,
+    withFull: null,
+    mountainFull: null,
+    hostFull: null,
+    ozMember: null,
+    youthMember: null
+};
+
+/* ==========================================
+   모달 열기/닫기 (닫을 때 더보기 상태 초기화 추가)
+   ========================================== */
+window.toggleHallModal = async (show) => {
+    const modal = document.getElementById('hallModal');
+    if (!modal) return;
+    
+    modal.style.display = show ? 'flex' : 'none';
+    
+    if (show) {
+        if (!window.currentHallTab) {
+            window.currentHallTab = 'live'; 
+        }
+        renderHallModalStructure();
+        renderHallList();
+    } else {
+        if (window.expandedLiveSections) {
+            Object.keys(window.expandedLiveSections).forEach(key => {
+                window.expandedLiveSections[key] = false;
+            });
+        }
+
+        if (window.hallTimerInterval) {
+            clearInterval(window.hallTimerInterval);
+            window.hallTimerInterval = null;
+        }
+    }
+};
+
+
+/* ==========================================
+   더보기 토글 (아코디언 방식: 하나만 열리도록) 및 자동 스크롤
+   ========================================== */
+window.toggleHallMore = (sectionKey) => {
+    const nextState = !window.expandedLiveSections[sectionKey];
+
+    Object.keys(window.expandedLiveSections).forEach(key => {
+        window.expandedLiveSections[key] = false;
+    });
+
+    window.expandedLiveSections[sectionKey] = nextState;
+
+    renderHallList();
+
+    if (nextState) {
+        setTimeout(() => {
+            const targetEl = document.getElementById(`hallMoreArea_${sectionKey}`);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 50);
+    }
+};
+
+
+/* ==========================================
+   탭 UI 구조 생성 및 기존 버튼 정리
+   ========================================== */
+function renderHallModalStructure() {
+    const modal = document.getElementById('hallModal');
+    
+    const existingCloseBtns = modal.querySelectorAll('button:not(.hall-tab-btn):not(.hall-modal-close-x), .modal-close, [onclick*="toggleHallModal(false)"]');
+    existingCloseBtns.forEach(btn => {
+        if (!btn.classList.contains('hall-modal-close-x')) {
+            btn.style.display = 'none';
+        }
+    });
+
+    const ruleNotices = modal.querySelectorAll('.hall-rule-notice');
+    ruleNotices.forEach(notice => notice.remove());
+
+    let closeBtn = modal.querySelector('.hall-modal-close-x');
+    if (!closeBtn) {
+        closeBtn = document.createElement('button');
+        closeBtn.className = 'hall-modal-close-x';
+        closeBtn.innerHTML = '&#10005;';
+        closeBtn.setAttribute('style', `
+            position: absolute !important;
+            top: 14px !important;
+            right: 16px !important;
+            background: transparent !important;
+            border: none !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            color: #94a3b8 !important;
+            cursor: pointer !important;
+            padding: 4px !important;
+            line-height: 1 !important;
+            z-index: 100 !important;
+            transition: color 0.2s;
+        `);
+        closeBtn.onmouseover = () => closeBtn.style.color = '#334155';
+        closeBtn.onmouseout = () => closeBtn.style.color = '#94a3b8';
+        closeBtn.onclick = () => window.toggleHallModal(false);
+        
+        const modalContent = modal.querySelector('.modal-content') || modal.firstElementChild || modal;
+        modalContent.style.position = 'relative';
+        modalContent.appendChild(closeBtn);
+    }
+
+    let tabWrapper = document.getElementById('hallTabWrapper');
+    const originalSubtitle = modal.querySelector('p.uppercase') || modal.querySelector('.text-gray-400');
+    
+    if (!tabWrapper) {
+        tabWrapper = document.createElement('div');
+        tabWrapper.id = 'hallTabWrapper';
+        tabWrapper.className = 'hall-tab-container-95';
+        
+        if (originalSubtitle && originalSubtitle.parentNode) {
+            originalSubtitle.parentNode.insertBefore(tabWrapper, originalSubtitle.nextSibling);
+        }
+    }
+
+    tabWrapper.setAttribute('style', 'margin: 12px auto 16px auto !important; width: 100% !important; padding: 4px !important; box-sizing: border-box; display: flex; gap: 2px; background-color: #f1f5f9; border-radius: 30px;');
+
+    const btnStyle = `
+        flex: 1; 
+        min-width: 0;
+        display: flex; 
+        flex-direction: row; 
+        align-items: center; 
+        justify-content: center; 
+        gap: 3px;
+        padding: 12px 0; 
+        font-size: 11.5px; 
+        font-weight: 700; 
+        line-height: 1; 
+        margin: 0; 
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        border-radius: 24px;
+        box-sizing: border-box;
+    `;
+
+    tabWrapper.innerHTML = `
+        <button class="hall-tab-btn ${window.currentHallTab === 'live' ? 'active' : ''}" 
+                style="${btnStyle}" 
+                onclick="switchHallTab('live')">⚡️ 실황정보</button>
+        <button class="hall-tab-btn ${window.currentHallTab === 'with' ? 'active' : ''}" 
+                style="${btnStyle}" 
+                onclick="switchHallTab('with')">👑 우정대장</button>
+        <button class="hall-tab-btn ${window.currentHallTab === 'mountain' ? 'active' : ''}" 
+                style="${btnStyle}" 
+                onclick="switchHallTab('mountain')">🎖 등산의신</button>
+        <button class="hall-tab-btn ${window.currentHallTab === 'host' ? 'active' : ''}" 
+                style="${btnStyle}" 
+                onclick="switchHallTab('host')">🏅 벙의달인</button>
+    `;
+}
+
+
+window.switchHallTab = (tabType) => {
+    window.currentHallTab = tabType;
+    if (window.hallTimerInterval) {
+        clearInterval(window.hallTimerInterval);
+        window.hallTimerInterval = null;
+    }
+    renderHallModalStructure(); 
+    renderHallList();           
+};
+
+
 /* ==========================================
    명단 리스트 렌더링
    ========================================== */
@@ -5854,7 +6038,7 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 역대 시즌 아카이브 탭
+    // [CASE 2] 역대 시즌 아카이브 탭 (26년 3분기부터 실황정보와 동일한 로직 적용)
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
@@ -5907,26 +6091,19 @@ function renderHallList() {
 
                 const makeArchiveCompactRowWithScore = (rankLabel, member, glowClass) => {
                     const name = member?.name || '-';
-                    
-                    // 과거 하드코딩 시즌이거나 점수/횟수가 없는 경우 점수 영역을 아예 출력하지 않음
-                    const isLegacyOrZero = (s.year < 2026 || (s.year === 2026 && s.quarter < 3));
-
-                    let scoreHtml = '';
-                    if (!isLegacyOrZero && name !== '-') {
-                        let score = 0;
+                    let score = 0;
+                    if (name !== '-') {
                         if (window.currentHallTab === 'mountain') score = member.quarterlyStats?.[targetQKey]?.hike || 0;
                         else if (window.currentHallTab === 'host') score = member.quarterlyStats?.[targetQKey]?.hosted || 0;
                         else score = member.quarterlyStats?.[targetQKey]?.qCount ?? member.quarterlyStats?.[targetQKey]?.total ?? 0;
-
-                        scoreHtml = `<span style="font-size: 10px; color: #64748b; font-weight: 700; white-space: nowrap;">(${score}${unit})</span>`;
                     }
 
                     return `
                     <div class="hall-rank-item" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 14px; padding: 6px 4px; border: 1px solid #f1f5f9;">
                         <span class="hall-rank-label ${glowClass}" style="margin-bottom: 4px !important; font-size: 10px; padding: 1px 5px; display: inline-block;">${rankLabel}</span>
                         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 2px; width: 100%;">
-                            <span class="hall-rank-name" style="font-size: 11.5px; max-width: ${isLegacyOrZero ? '75px' : '55px'}; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-align: center;">${name}</span>
-                            ${scoreHtml}
+                            <span class="hall-rank-name" style="font-size: 11.5px; max-width: 55px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-align: center;">${name}</span>
+                            <span style="font-size: 10px; color: #64748b; font-weight: 700; white-space: nowrap;">(${score}${unit})</span>
                         </div>
                     </div>`;
                 };
@@ -5962,10 +6139,13 @@ function renderHallList() {
 }
 
 
-
-         
-
+                
+                             
             
+
+
+
+    
 window.toggleVibeModal = (show) => {
   const modal = document.getElementById('vibeModal');
   if (!modal) return;
