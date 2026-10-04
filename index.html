@@ -5541,9 +5541,8 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
 
-
 /* ==========================================
-   명단 리스트 렌더링 (과거 시즌 0점/0회 표기 제거 및 전체 코드 완성본)
+   명단 리스트 렌더링
    ========================================== */
 function renderHallList() {
     const listArea = document.getElementById('hallListArea');
@@ -5598,8 +5597,8 @@ function renderHallList() {
                 scoreA = a.quarterlyStats?.[targetQKey]?.hosted || 0;
                 scoreB = b.quarterlyStats?.[targetQKey]?.hosted || 0;
             } else {
-                scoreA = a.quarterlyStats?.[targetQKey]?.qCount ?? a.quarterlyStats?.[targetQKey]?.total || 0;
-                scoreB = b.quarterlyStats?.[targetQKey]?.qCount ?? b.quarterlyStats?.[targetQKey]?.total || 0;
+                scoreA = a.quarterlyStats?.[targetQKey]?.qCount ?? a.quarterlyStats?.[targetQKey]?.total ?? 0;
+                scoreB = b.quarterlyStats?.[targetQKey]?.qCount ?? b.quarterlyStats?.[targetQKey]?.total ?? 0;
             }
             const levelA = a.level || 0;
             const levelB = b.level || 0;
@@ -5618,7 +5617,7 @@ function renderHallList() {
             if (!m) return 0;
             if (type === 'mountain') return m.quarterlyStats?.[targetQKey]?.hike || 0;
             if (type === 'host') return m.quarterlyStats?.[targetQKey]?.hosted || 0;
-            return m.quarterlyStats?.[targetQKey]?.qCount ?? m.quarterlyStats?.[targetQKey]?.total || 0;
+            return m.quarterlyStats?.[targetQKey]?.qCount ?? m.quarterlyStats?.[targetQKey]?.total ?? 0;
         };
 
         if (ozMem) {
@@ -5629,7 +5628,7 @@ function renderHallList() {
                     <span style="font-size: 9.5px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 2px 6px; border-radius: 5px;">ADMIN</span>
                     <span style="font-weight: 700; color: #334155;">오즈</span>
                 </div>
-                <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">${ozScore > 0 ? ozScore + unit : ''}</span>
+                <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">${ozScore}${unit}</span>
             </div>`;
         }
 
@@ -5641,7 +5640,7 @@ function renderHallList() {
                     <span style="font-size: 9.5px; font-weight: 800; color: #9333ea; background: #f3e8ff; padding: 2px 6px; border-radius: 5px;">초월자</span>
                     <span style="font-weight: 700; color: #334155;">유스</span>
                 </div>
-                <span style="font-weight: 800; color: #7e22ce; font-size: 11px;">${youthScore > 0 ? youthScore + unit : ''}</span>
+                <span style="font-weight: 800; color: #7e22ce; font-size: 11px;">${youthScore}${unit}</span>
             </div>`;
         }
 
@@ -5654,7 +5653,7 @@ function renderHallList() {
                     <span style="font-weight: 800; color: #64748b; min-width: 26px;">${rank}위</span>
                     <span style="font-weight: 700; color: #334155;">${m.name}</span>
                 </div>
-                <span style="color: #64748b; font-weight: 600; font-size: 10.5px;">${score > 0 ? score + unit : ''}</span>
+                <span style="color: #64748b; font-weight: 600; font-size: 10.5px;">${score}${unit}</span>
             </div>`;
         }).join('');
 
@@ -5871,6 +5870,7 @@ function renderHallList() {
             let isCurrent = (s.year === currentYear && s.quarter === currentQuarter);
             const targetQKey = `${s.year}_q${s.quarter}`;
 
+            // 2026년 3분기 이후이거나 현재 데이터가 있는 경우 실황과 동일하게 동적 계산
             if (typeof currentData !== 'undefined' && Array.isArray(currentData) && (s.year > 2026 || (s.year === 2026 && s.quarter >= 3))) {
                 ozMem = currentData.find(m => m.name === "오즈") || null;
                 youthMem = currentData.find(m => m.name === "유스") || null;
@@ -5884,6 +5884,7 @@ function renderHallList() {
                     fullList = sortMembersList(validMembers, targetQKey, 'with');
                 }
             } else {
+                // 기존 하드코딩된 과거 시즌 데이터 Fallback
                 if (s.year === 2026 && s.quarter === 2) {
                     if (window.currentHallTab === 'mountain') fullList = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
                     else if (window.currentHallTab === 'host') fullList = [{ name: "유스" }, { name: "아랑" }, { name: "하트" }];
@@ -5906,23 +5907,26 @@ function renderHallList() {
 
                 const makeArchiveCompactRowWithScore = (rankLabel, member, glowClass) => {
                     const name = member?.name || '-';
-                    let score = 0;
-                    if (name !== '-') {
+                    
+                    // 과거 하드코딩 시즌이거나 점수/횟수가 없는 경우 점수 영역을 아예 출력하지 않음
+                    const isLegacyOrZero = (s.year < 2026 || (s.year === 2026 && s.quarter < 3));
+
+                    let scoreHtml = '';
+                    if (!isLegacyOrZero && name !== '-') {
+                        let score = 0;
                         if (window.currentHallTab === 'mountain') score = member.quarterlyStats?.[targetQKey]?.hike || 0;
                         else if (window.currentHallTab === 'host') score = member.quarterlyStats?.[targetQKey]?.hosted || 0;
-                        else score = member.quarterlyStats?.[targetQKey]?.qCount ?? member.quarterlyStats?.[targetQKey]?.total || 0;
-                    }
+                        else score = member.quarterlyStats?.[targetQKey]?.qCount ?? member.quarterlyStats?.[targetQKey]?.total ?? 0;
 
-                    // 과거 시즌(26년 2분기 이전 등) 데이터에 점수/횟수가 없으면 괄호와 단위를 아예 생략
-                    const isOldSeasonWithoutData = (s.year < 2026 || (s.year === 2026 && s.quarter < 3));
-                    const scoreDisplayHtml = (isOldSeasonWithoutData || score <= 0) ? '' : `<span style="font-size: 10px; color: #64748b; font-weight: 700; white-space: nowrap;">(${score}${unit})</span>`;
+                        scoreHtml = `<span style="font-size: 10px; color: #64748b; font-weight: 700; white-space: nowrap;">(${score}${unit})</span>`;
+                    }
 
                     return `
                     <div class="hall-rank-item" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border-radius: 14px; padding: 6px 4px; border: 1px solid #f1f5f9;">
                         <span class="hall-rank-label ${glowClass}" style="margin-bottom: 4px !important; font-size: 10px; padding: 1px 5px; display: inline-block;">${rankLabel}</span>
                         <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 2px; width: 100%;">
-                            <span class="hall-rank-name" style="font-size: 11.5px; max-width: 55px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-align: center;">${name}</span>
-                            ${scoreDisplayHtml}
+                            <span class="hall-rank-name" style="font-size: 11.5px; max-width: ${isLegacyOrZero ? '75px' : '55px'}; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; text-align: center;">${name}</span>
+                            ${scoreHtml}
                         </div>
                     </div>`;
                 };
@@ -5957,12 +5961,9 @@ function renderHallList() {
     listArea.innerHTML = combinedHtml;
 }
 
-    
-            
-             
 
-        
 
+         
 
             
 window.toggleVibeModal = (show) => {
