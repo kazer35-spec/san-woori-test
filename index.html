@@ -5541,8 +5541,9 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 };
 
 
+
 /* ==========================================
-   명단 리스트 렌더링 (과거 시즌 0점/0회 표기 제거 적용)
+   명단 리스트 렌더링 (과거 시즌 0점/0회 표기 제거 및 전체 코드 완성본)
    ========================================== */
 function renderHallList() {
     const listArea = document.getElementById('hallListArea');
@@ -5585,6 +5586,7 @@ function renderHallList() {
 
     const glowClasses = ["glow-gold", "glow-silver", "glow-bronze"];
 
+    // 데이터 정렬 공통 함수 (점수/횟수 내림차순, 동점 시 레벨 높은 순)
     const sortMembersList = (members, targetQKey, type) => {
         return [...members].sort((a, b) => {
             let scoreA = 0;
@@ -5606,6 +5608,7 @@ function renderHallList() {
         });
     };
 
+    // 4위 이하 목록 및 오즈/유스 영역 생성 헬퍼
     const makeMoreListFrom4thHtml = (sectionKey, fullList, unit, targetQKey, ozMem, youthMem, type) => {
         const listFrom4th = fullList.slice(3);
         let ozRowHtml = '';
@@ -5954,7 +5957,9 @@ function renderHallList() {
     listArea.innerHTML = combinedHtml;
 }
 
-        
+    
+            
+             
 
         
 
