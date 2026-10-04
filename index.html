@@ -5542,17 +5542,15 @@ window.saveBondingForestData = async (mountainName, dateStr, membersList) => {
 
 
 
+
+
 // ==========================================
 // 타이머, 더보기 상태 및 데이터 캐시 변수
 // ==========================================
 window.hallTimerInterval = null;
 
 if (!window.expandedLiveSections) {
-    window.expandedLiveSections = {
-        with: false,
-        mountain: false,
-        host: false
-    };
+    window.expandedLiveSections = {};
 }
 
 // [데이터 절약 모드] 연산 결과 메모리 캐시
@@ -5581,14 +5579,12 @@ window.toggleHallModal = async (show) => {
         renderHallModalStructure();
         renderHallList();
     } else {
-        // 모달을 닫을 때 더보기 펼침 상태 모두 닫힘으로 초기화
         if (window.expandedLiveSections) {
             Object.keys(window.expandedLiveSections).forEach(key => {
                 window.expandedLiveSections[key] = false;
             });
         }
 
-        // 카운트다운 타이머 정지
         if (window.hallTimerInterval) {
             clearInterval(window.hallTimerInterval);
             window.hallTimerInterval = null;
@@ -5601,21 +5597,16 @@ window.toggleHallModal = async (show) => {
    더보기 토글 (아코디언 방식: 하나만 열리도록) 및 자동 스크롤
    ========================================== */
 window.toggleHallMore = (sectionKey) => {
-    // 1. 현재 클릭한 섹션의 다음 열림/닫림 상태 결정
     const nextState = !window.expandedLiveSections[sectionKey];
 
-    // 2. 모든 섹션 상태를 닫힘(false)으로 초기화 (단일 오픈 아코디언 방식)
     Object.keys(window.expandedLiveSections).forEach(key => {
         window.expandedLiveSections[key] = false;
     });
 
-    // 3. 클릭한 섹션에만 토글된 상태 반영
     window.expandedLiveSections[sectionKey] = nextState;
 
-    // 4. UI 리렌더링
     renderHallList();
 
-    // 5. 열린 상태일 때 해당 섹션 하단으로 부드럽게 스크롤
     if (nextState) {
         setTimeout(() => {
             const targetEl = document.getElementById(`hallMoreArea_${sectionKey}`);
@@ -5778,59 +5769,68 @@ function renderHallList() {
 
     const glowClasses = ["glow-gold", "glow-silver", "glow-bronze"];
 
-    // -------------------------------------------------------------
-    // [공통 헬퍼 함수] 4위 이하 목록 및 오즈/유스 영역 생성
-    // -------------------------------------------------------------
-    const makeMoreListFrom4thHtml = (sectionKey, fullList, unit, targetQKey, ozMem, youthMem) => {
+    // 데이터 정렬 공통 함수 (점수/횟수 내림차순, 동점 시 레벨 높은 순)
+    const sortMembersList = (members, targetQKey, type) => {
+        return [...members].sort((a, b) => {
+            let scoreA = 0;
+            let scoreB = 0;
+            if (type === 'mountain') {
+                scoreA = a.quarterlyStats?.[targetQKey]?.hike || 0;
+                scoreB = b.quarterlyStats?.[targetQKey]?.hike || 0;
+            } else if (type === 'host') {
+                scoreA = a.quarterlyStats?.[targetQKey]?.hosted || 0;
+                scoreB = b.quarterlyStats?.[targetQKey]?.hosted || 0;
+            } else {
+                scoreA = a.quarterlyStats?.[targetQKey]?.qCount ?? a.quarterlyStats?.[targetQKey]?.total ?? 0;
+                scoreB = b.quarterlyStats?.[targetQKey]?.qCount ?? b.quarterlyStats?.[targetQKey]?.total ?? 0;
+            }
+            const levelA = a.level || 0;
+            const levelB = b.level || 0;
+
+            return scoreB - scoreA || levelB - levelA;
+        });
+    };
+
+    // 4위 이하 목록 및 오즈/유스 영역 생성 헬퍼
+    const makeMoreListFrom4thHtml = (sectionKey, fullList, unit, targetQKey, ozMem, youthMem, type) => {
         const listFrom4th = fullList.slice(3);
         let ozRowHtml = '';
         let youthRowHtml = '';
 
-        // 1. ADMIN 오즈 영역
-        if (ozMem) {
-            let ozScore = 0;
-            if (sectionKey === 'mountain') ozScore = ozMem.quarterlyStats?.[targetQKey]?.hike || 0;
-            else if (sectionKey === 'host') ozScore = ozMem.quarterlyStats?.[targetQKey]?.hosted || 0;
-            else ozScore = ozMem.quarterlyStats?.[targetQKey]?.qCount ?? ozMem.quarterlyStats?.[targetQKey]?.total ?? 0;
+        const getScore = (m) => {
+            if (!m) return 0;
+            if (type === 'mountain') return m.quarterlyStats?.[targetQKey]?.hike || 0;
+            if (type === 'host') return m.quarterlyStats?.[targetQKey]?.hosted || 0;
+            return m.quarterlyStats?.[targetQKey]?.qCount ?? m.quarterlyStats?.[targetQKey]?.total ?? 0;
+        };
 
+        if (ozMem) {
+            const ozScore = getScore(ozMem);
             ozRowHtml = `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 11px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 6px;">
                 <div style="display: flex; align-items: center; gap: 6px;">
-                    <span style="font-size: 9.5px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 2px 6px; border-radius: 5px; letter-spacing: -0.02em;">ADMIN</span>
+                    <span style="font-size: 9.5px; font-weight: 800; color: #6366f1; background: #e0e7ff; padding: 2px 6px; border-radius: 5px;">ADMIN</span>
                     <span style="font-weight: 700; color: #334155;">오즈</span>
                 </div>
-                <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">
-                    ${ozScore}${unit}
-                </span>
+                <span style="font-weight: 800; color: #4f46e5; font-size: 11px;">${ozScore}${unit}</span>
             </div>`;
         }
 
-        // 2. 초월자 유스 영역
         if (youthMem) {
-            let youthScore = 0;
-            if (sectionKey === 'mountain') youthScore = youthMem.quarterlyStats?.[targetQKey]?.hike || 0;
-            else if (sectionKey === 'host') youthScore = youthMem.quarterlyStats?.[targetQKey]?.hosted || 0;
-            else youthScore = youthMem.quarterlyStats?.[targetQKey]?.qCount ?? youthMem.quarterlyStats?.[targetQKey]?.total ?? 0;
-
+            const youthScore = getScore(youthMem);
             youthRowHtml = `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; font-size: 11px; background: #faf5ff; border: 1px solid #f3e8ff; border-radius: 10px; margin-bottom: 10px;">
                 <div style="display: flex; align-items: center; gap: 6px;">
-                    <span style="font-size: 9.5px; font-weight: 800; color: #9333ea; background: #f3e8ff; padding: 2px 6px; border-radius: 5px; letter-spacing: -0.02em;">초월자</span>
+                    <span style="font-size: 9.5px; font-weight: 800; color: #9333ea; background: #f3e8ff; padding: 2px 6px; border-radius: 5px;">초월자</span>
                     <span style="font-weight: 700; color: #334155;">유스</span>
                 </div>
-                <span style="font-weight: 800; color: #7e22ce; font-size: 11px;">
-                    ${youthScore}${unit}
-                </span>
+                <span style="font-weight: 800; color: #7e22ce; font-size: 11px;">${youthScore}${unit}</span>
             </div>`;
         }
 
         let rows = listFrom4th.map((m, idx) => {
             const rank = idx + 4;
-            let score = 0;
-            if (sectionKey === 'mountain') score = m.quarterlyStats?.[targetQKey]?.hike || 0;
-            else if (sectionKey === 'host') score = m.quarterlyStats?.[targetQKey]?.hosted || 0;
-            else score = m.quarterlyStats?.[targetQKey]?.qCount ?? m.quarterlyStats?.[targetQKey]?.total ?? 0;
-
+            const score = getScore(m);
             return `
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; font-size: 11px; border-bottom: 1px dashed #f1f5f9;">
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -5874,24 +5874,9 @@ function renderHallList() {
 
                 const validMembers = currentData.filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스");
 
-                // 1. 우정대장: qCount 우정점수 기준
-                liveWithFull = [...validMembers]
-                    .filter(m => ((m.quarterlyStats?.[qKey]?.qCount ?? m.quarterlyStats?.[qKey]?.total) || 0) > 0)
-                    .sort((a, b) => {
-                        const scoreA = a.quarterlyStats?.[qKey]?.qCount ?? a.quarterlyStats?.[qKey]?.total ?? 0;
-                        const scoreB = b.quarterlyStats?.[qKey]?.qCount ?? b.quarterlyStats?.[qKey]?.total ?? 0;
-                        return scoreB - scoreA || b.level - a.level;
-                    });
-
-                // 2. 등산의신: hike 필드 기준
-                liveMountainFull = [...validMembers]
-                    .filter(m => ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0)
-                    .sort((a, b) => (b.quarterlyStats?.[qKey]?.hike || 0) - (a.quarterlyStats?.[qKey]?.hike || 0) || b.level - a.level);
-
-                // 3. 벙의달인: hosted 필드 기준
-                liveHostFull = [...validMembers]
-                    .filter(m => ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0)
-                    .sort((a, b) => (b.quarterlyStats?.[qKey]?.hosted || 0) - (a.quarterlyStats?.[qKey]?.hosted || 0) || b.level - a.level);
+                liveWithFull = sortMembersList(validMembers.filter(m => ((m.quarterlyStats?.[qKey]?.qCount ?? m.quarterlyStats?.[qKey]?.total) || 0) > 0), qKey, 'with');
+                liveMountainFull = sortMembersList(validMembers.filter(m => ((m.quarterlyStats?.[qKey]?.hike) || 0) > 0), qKey, 'mountain');
+                liveHostFull = sortMembersList(validMembers.filter(m => ((m.quarterlyStats?.[qKey]?.hosted) || 0) > 0), qKey, 'host');
 
                 window.hallDataCache = {
                     key: cacheKey,
@@ -5910,12 +5895,10 @@ function renderHallList() {
 
         let nextQuarterStartMonth = currentQuarter * 3; 
         let targetYear = currentYear;
-        
         if (nextQuarterStartMonth === 12) {
             targetYear = currentYear + 1;
             nextQuarterStartMonth = 0; 
         }
-        
         const targetDate = new Date(targetYear, nextQuarterStartMonth, 1, 0, 0, 0);
 
         const makeLiveCompactRowWithScore = (label, member, scoreVal, unit, glowClass) => {
@@ -5946,7 +5929,7 @@ function renderHallList() {
             </div>
         </div>`;
 
-        // 1. 우정대장 카드 (단위: 점)
+        // 1. 우정대장
         {
             const isExpanded = window.expandedLiveSections.with;
             const score0 = liveWith[0]?.quarterlyStats?.[qKey]?.qCount ?? liveWith[0]?.quarterlyStats?.[qKey]?.total;
@@ -5972,11 +5955,11 @@ function renderHallList() {
                     ${makeLiveCompactRowWithScore("🥈길잡이", liveWith[1], score1, "점", glowClasses[1])}
                     ${makeLiveCompactRowWithScore("🥉마당발", liveWith[2], score2, "점", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml('with', liveWithFull, '점', qKey, ozMember, youthMember) : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml('with', liveWithFull, '점', qKey, ozMember, youthMember, 'with') : ''}
             </div>`;
         }
 
-        // 2. 등산의신 카드 (단위: 회)
+        // 2. 등산의신
         {
             const isExpanded = window.expandedLiveSections.mountain;
             const score0 = liveMountain[0]?.quarterlyStats?.[qKey]?.hike;
@@ -6002,11 +5985,11 @@ function renderHallList() {
                     ${makeLiveCompactRowWithScore("🥈심마니", liveMountain[1], score1, "회", glowClasses[1])}
                     ${makeLiveCompactRowWithScore("🥉나무꾼", liveMountain[2], score2, "회", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml('mountain', liveMountainFull, '회', qKey, ozMember, youthMember) : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml('mountain', liveMountainFull, '회', qKey, ozMember, youthMember, 'mountain') : ''}
             </div>`;
         }
 
-        // 3. 벙의달인 카드 (단위: 회)
+        // 3. 벙의달인
         {
             const isExpanded = window.expandedLiveSections.host;
             const score0 = liveHost[0]?.quarterlyStats?.[qKey]?.hosted;
@@ -6032,7 +6015,7 @@ function renderHallList() {
                     ${makeLiveCompactRowWithScore("🥈선봉장", liveHost[1], score1, "회", glowClasses[1])}
                     ${makeLiveCompactRowWithScore("🥉파수꾼", liveHost[2], score2, "회", glowClasses[2])}
                 </div>
-                ${isExpanded ? makeMoreListFrom4thHtml('host', liveHostFull, '회', qKey, ozMember, youthMember) : ''}
+                ${isExpanded ? makeMoreListFrom4thHtml('host', liveHostFull, '회', qKey, ozMember, youthMember, 'host') : ''}
             </div>`;
         }
 
@@ -6055,14 +6038,14 @@ function renderHallList() {
         window.hallTimerInterval = setInterval(updateCountdown, 1000);
     } 
     // -------------------------------------------------------------
-    // [CASE 2] 역대 시즌 아카이브 탭 (우정대장/등산의신/벙의달인 분기별)
+    // [CASE 2] 역대 시즌 아카이브 탭 (26년 3분기부터 실황정보와 동일한 로직 적용)
     // -------------------------------------------------------------
     else {
         let rankLabels = ["🥇산대장", "🥈길잡이", "🥉마당발"];
         if (window.currentHallTab === 'mountain') rankLabels = ["🥇산신령", "🥈심마니", "🥉나무꾼"];
         else if (window.currentHallTab === 'host') rankLabels = ["🥇산지기", "🥈선봉장", "🥉파수꾼"];
 
-        const unit = (window.currentHallTab === 'with') ? '점' : '회';
+        const unit = (window.currentHallTab === 'mountain' || window.currentHallTab === 'host') ? '회' : '점';
 
         for (const s of seasons) {
             let fullList = [];
@@ -6071,35 +6054,32 @@ function renderHallList() {
             let isCurrent = (s.year === currentYear && s.quarter === currentQuarter);
             const targetQKey = `${s.year}_q${s.quarter}`;
 
-            if (typeof currentData !== 'undefined' && Array.isArray(currentData)) {
+            // 2026년 3분기 이후이거나 현재 데이터가 있는 경우 실황과 동일하게 동적 계산
+            if (typeof currentData !== 'undefined' && Array.isArray(currentData) && (s.year > 2026 || (s.year === 2026 && s.quarter >= 3))) {
                 ozMem = currentData.find(m => m.name === "오즈") || null;
                 youthMem = currentData.find(m => m.name === "유스") || null;
                 const validMembers = currentData.filter(m => !m.isHidden && m.name !== "오즈" && m.name !== "유스");
 
                 if (window.currentHallTab === 'mountain') {
-                    fullList = [...validMembers].sort((a, b) => (b.quarterlyStats?.[targetQKey]?.hike || 0) - (a.quarterlyStats?.[targetQKey]?.hike || 0));
+                    fullList = sortMembersList(validMembers, targetQKey, 'mountain');
                 } else if (window.currentHallTab === 'host') {
-                    fullList = [...validMembers].sort((a, b) => (b.quarterlyStats?.[targetQKey]?.hosted || 0) - (a.quarterlyStats?.[targetQKey]?.hosted || 0));
+                    fullList = sortMembersList(validMembers, targetQKey, 'host');
                 } else {
-                    fullList = [...validMembers].sort((a, b) => {
-                        const scoreA = a.quarterlyStats?.[targetQKey]?.qCount ?? a.quarterlyStats?.[targetQKey]?.total ?? 0;
-                        const scoreB = b.quarterlyStats?.[targetQKey]?.qCount ?? b.quarterlyStats?.[targetQKey]?.total ?? 0;
-                        return scoreB - scoreA;
-                    });
+                    fullList = sortMembersList(validMembers, targetQKey, 'with');
                 }
-            }
-            
-            // 하드코딩된 과거 데이터 Fallback 처리 (데이터 구조에 없을 경우)
-            if ((!fullList || fullList.length === 0) && s.year === 2026 && s.quarter === 2) {
-                if (window.currentHallTab === 'mountain') fullList = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
-                else if (window.currentHallTab === 'host') fullList = [{ name: "유스" }, { name: "아랑" }, { name: "하트" }];
-                else fullList = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }];
-            } else if ((!fullList || fullList.length === 0) && s.year === 2026 && s.quarter === 1) {
-                if (window.currentHallTab === 'mountain') fullList = [{ name: "지니" }, { name: "나스" }, { name: "해수" }];
-                else if (window.currentHallTab === 'host') fullList = [{ name: "지니" }, { name: "해수" }, { name: "용삼" }];
-                else fullList = [{ name: "지니" }, { name: "해수" }, { name: "하트" }];
-            } else if ((!fullList || fullList.length === 0) && s.year === 2025 && s.quarter === 4) {
-                fullList = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }];
+            } else {
+                // 기존 하드코딩된 과거 시즌 데이터 Fallback
+                if (s.year === 2026 && s.quarter === 2) {
+                    if (window.currentHallTab === 'mountain') fullList = [{ name: "유스" }, { name: "하트" }, { name: "아랑" }];
+                    else if (window.currentHallTab === 'host') fullList = [{ name: "유스" }, { name: "아랑" }, { name: "하트" }];
+                    else fullList = [{ name: "하트" }, { name: "지니" }, { name: "아랑" }];
+                } else if (s.year === 2026 && s.quarter === 1) {
+                    if (window.currentHallTab === 'mountain') fullList = [{ name: "지니" }, { name: "나스" }, { name: "해수" }];
+                    else if (window.currentHallTab === 'host') fullList = [{ name: "지니" }, { name: "해수" }, { name: "용삼" }];
+                    else fullList = [{ name: "지니" }, { name: "해수" }, { name: "하트" }];
+                } else if (s.year === 2025 && s.quarter === 4) {
+                    fullList = [{ name: "아랑" }, { name: "용삼" }, { name: "우진" }];
+                }
             }
 
             const top3 = fullList.slice(0, 3);
@@ -6128,7 +6108,6 @@ function renderHallList() {
                     </div>`;
                 };
 
-                // window.expandedLiveSections 객체에 동적 키 바인딩 확장
                 if (window.expandedLiveSections[sectionKey] === undefined) {
                     window.expandedLiveSections[sectionKey] = false;
                 }
@@ -6150,7 +6129,7 @@ function renderHallList() {
                         ${makeArchiveCompactRowWithScore(rankLabels[1], top3[1], glowClasses[1])}
                         ${makeArchiveCompactRowWithScore(rankLabels[2], top3[2], glowClasses[2])}
                     </div>
-                    ${isExpanded && fullList.length > 3 ? makeMoreListFrom4thHtml(sectionKey, fullList, unit, targetQKey, ozMem, youthMem) : ''}
+                    ${isExpanded && fullList.length > 3 ? makeMoreListFrom4thHtml(sectionKey, fullList, unit, targetQKey, ozMem, youthMem, window.currentHallTab) : ''}
                 </div>`;
             }
         }
@@ -6159,9 +6138,6 @@ function renderHallList() {
     listArea.innerHTML = combinedHtml;
 }
 
-        
-
-    
 
                 
                              
